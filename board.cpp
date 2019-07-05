@@ -6,16 +6,10 @@
     using namespace std;
 
     cBoard::cBoard(){ 
-        fields[8][8]; /* = { 
-            {0x4, 0x2, 0x3, 0x5, 0x6, 0x3, 0x2, 0x4},
-            {0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
-            {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-            {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-            {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-            {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-            {0x9, 0x9, 0x9, 0x9, 0x9, 0x9, 0x9, 0x9}, 
-            {0xC, 0xA, 0xB, 0xD, 0xE, 0xB, 0xA, 0xC}
-        }; */
+        fields[0] = BASE0;
+        fields[1] = BASE1;
+        fields[2] = BASE2;
+        fields[3] = BASE3;
         wKg = COLS["E"] + RANKS["1"] * 8;
         bKgx = COLS["E"] + RANKS["8"] * 8;
         wKg_first_move_on = -1;
@@ -27,7 +21,7 @@
     }
 
     int cBoard::getField(int idx){ 
-        return (first >> (63 - idx) & 0x1) | (second >> (62 - idx) & 0x2) | (third >> (61 - idx) & 0x4) | (fourth >> (60 - idx)) & 0x8);
+        return (fields[0] >> (63 - idx) & 0x1) | (fields[1] >> (62 - idx) & 0x2) | (fields[2] >> (61 - idx) & 0x4) | (fields[3] >> (60 - idx)) & 0x8);
     }
 
     void cBoard::setfield(int idx, int value){
@@ -35,11 +29,7 @@
         for(int i = 0; i < 4; ++i){
             eraseval = (0x0000000000000001 << (63 - (i + idx)) ^ 0xFFFFFFFFFFFFFFFF;
             setval = value << (63 - (i + idx));
-            switch(i){
-                case 0 : first = (first & eraseval) | setval; break;
-                case 1 : second = (second & eraseval) | setval; break;
-                case 2 : third = (third & eraseval) | setval; break;
-                case 3 : fourth = (fourth & eraseval) | setval; break;
+            fields[i] = (fields[i] & eraseval) | setval;
             }
         }
     }
