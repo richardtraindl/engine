@@ -6,14 +6,16 @@
     
     using namespace std;
 
-    cMove::cMove(int **_prevfields, int _srcx, int _srcy, int _dstx, int _dsty, int _prompiece){ 
+    cMove::cMove(unsigned long long *_prevfields, int _src, int _dst, int _prompiece){ 
         if(_prevfields != NULL){
-            for(int y = 0; y < 8; ++y){
-                for(int x = 0; x < 8; ++x){
-                    prevfields[y][x] = *(*_prevfields + y) + x;
+            for(int i = 0; i < 4; ++i){
+                prevfields[i] = *(_prevfields + i);
                 }
             }
         }
+        src = _src;
+        dst = _dst;
+        prompiece = _prompiece;
     } 
     cMove::cMove(){
     }
@@ -25,10 +27,10 @@
     string cMove::format(){
         int piece = prevfields[srcy][srcx];
         if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
-            if(srcx - dstx == -2){
+            if(src % 8 - dst % 8 == -2){
                 return "0-0";
             }
-            if(srcx - dstx == 2){
+            if(src % 8 - dst % 8 == 2){
                 return "0-0-0";
             }
         }
@@ -49,12 +51,12 @@
                 trailing = ", " + out.str(); // STR_PIECES(prompiece);
             }
             else{
-                if(dstpiece == PIECES["blk"] && srcx != dstx){
+                if(dstpiece == PIECES["blk"] && src % 8 != dst % 8){
                     trailing = " e.p.";
                 }
             }
         }
-        return index_to_coord(srcx, srcy) + hyphen + index_to_coord(dstx, dsty) + trailing;
+        return index_to_coord(src) + hyphen + index_to_coord(dst) + trailing;
     }
 
 
@@ -66,11 +68,14 @@
 
 
     cPrioMove::cPrioMove(cMove *_move){
-        // prevfields = _move->prevfields;
-        srcx = _move->srcx;
-        srcy = _move->srcy;
-        dstx = _move->dstx;
-        dsty = _move->dsty;
+        if(_move->prevfields != NULL){
+            for(int i = 0; i < 4; ++i){
+                prevfields[i] = *(_move->prevfields + i);
+                }
+            }
+        }
+        src = _move->src;
+        dst = _move->dst;
         prompiece = _move->prompiece;
     }
 
