@@ -20,8 +20,8 @@
     cMove::cMove(){
     }
 
-    int cMove::getPrevfield(int x, int y){
-        return prevfields[y][x];
+    int cMove::getPrevfield(int idx){
+        return (prevfields[0] >> (63 - idx) & 0x1) | (prevfields[1] >> (62 - idx) & 0x2) | (prevfields[2] >> (61 - idx) & 0x4) | (prevfields[3] >> (60 - idx)) & 0x8);
     }
 
     string cMove::format(){
