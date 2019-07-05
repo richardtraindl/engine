@@ -16,16 +16,25 @@
             {0x9, 0x9, 0x9, 0x9, 0x9, 0x9, 0x9, 0x9}, 
             {0xC, 0xA, 0xB, 0xD, 0xE, 0xB, 0xA, 0xC}
         }; */
-        wKg_x = COLS["E"];
-        wKg_y = RANKS["1"];
-        bKg_x = COLS["E"];
-        bKg_y = RANKS["8"];
+        wKg = COLS["E"] + RANKS["1"] * 8;
+        bKgx = COLS["E"] + RANKS["8"] * 8;
         wKg_first_move_on = -1;
         bKg_first_move_on = -1;
         wRkA_first_move_on = -1;
         wRkH_first_move_on = -1;
         bRkA_first_move_on = -1;
         bRkH_first_move_on = -1;
+    }
+
+    int cBoard::getField(int idx){ 
+        return (first >> (63 - idx) & 0x1) | (second >> (62 - idx) & 0x2) | (third >> (61 - idx) & 0x4) | (fourth >> (60 - idx)) & 0x8);
+    }
+
+    void cBoard::setfield(int idx, int value){
+        tmpfields = self.SINGLE >> (idx * 4)
+        tmpfields = tmpfields ^ self.FULL
+        tmpfields = tmpfields & self.fields
+        self.fields = tmpfields | (value << ((63 - idx) * 4))
     }
 
 /*
