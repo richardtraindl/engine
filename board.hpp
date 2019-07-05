@@ -11,10 +11,7 @@
 
     class cBoard{
         private:
-            unsigned long long int first;
-            unsigned long long int second;
-            unsigned long long int third;
-            unsigned long long int fourth
+            unsigned long long int fields[4];
         public:
             int wKg;
             int bKg;
