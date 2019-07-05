@@ -2,4 +2,5 @@
 *.geany
 *.o
 *.py
+engine
 ui/
