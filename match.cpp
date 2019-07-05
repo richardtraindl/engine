@@ -14,6 +14,7 @@ using namespace std;
         level = LEVELS["blitz"];
         // board = new cBoard(); 
     } 
+    cMatch::cMatch(const cMatch &obj) // copy constructor
 
     void cMatch::update_attributes(){
         for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
@@ -96,27 +97,43 @@ using namespace std;
         return minutes.size() >= 60;
     }
 
-
+    // 100 Züge davor kein Bauernzug und keine Figur geschlagen
+    bool is_fifty_moves_rule(){
+        int cnt = 0;
+        int maxlen = minutes.size();
+        for(list<cMove>::reverse_iterator it = minutes.rbegin(); ++it){
+            int srcpiece = it->getPrevfield(it->srcx, it->srcy);
+            int dstpiece = it->getPrevfield(it->dstx, it->dsty);
+            if(srcpiece == PIECES["wPw"] or srcpiece == PIECES["bPw"] or dstpiece != PIECES["blk"]){
+                cnt = 0;
+            }
+            else{
+                int += 1;
+                if(cnt > 100){
+                    return true;
+                }
+                if(maxlen - cnt < 100){
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
 
 /*
-
-    # 100 Züge davor kein Bauernzug und keine Figur geschlagen
-    def is_fifty_moves_rule(self):
-        cnt = 0
-        maxlen = len(self.minutes)
-        for move in reversed(self.minutes):
-            srcpiece = move.getprevfield(move.src)
-            dstpiece = move.getprevfield(move.dst)
-            if(srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw'] or
-               dstpiece != PIECES['blk']):
-                cnt = 0
-            else:
-                cnt += 1
-                if(cnt > 100):
-                    return True
-                if(maxlen - cnt < 100):
-                    return False
-        return False
+    int is_move_repetition(){
+        newmatch = this;
+        fields = newmatch.board.fields;
+        int count = 0;
+		int maxcnt = min(newmatch.minutes.size(), 8);
+		for(int i = 0; i < maxcnt; ++i){}
+            newmatch.undo_move();
+            if(fields == newmatch.board.fields){
+                count += 1;
+			}
+		}
+        return count >= 2;
+	}
 
     def is_move_repetition(self):
         newmatch = copy.deepcopy(self)
