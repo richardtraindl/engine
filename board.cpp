@@ -11,7 +11,7 @@
         fields[2] = BASE2;
         fields[3] = BASE3;
         wKg = COLS["E"] + RANKS["1"] * 8;
-        bKgx = COLS["E"] + RANKS["8"] * 8;
+        bKg = COLS["E"] + RANKS["8"] * 8;
         wKg_first_move_on = -1;
         bKg_first_move_on = -1;
         wRkA_first_move_on = -1;
@@ -20,18 +20,57 @@
         bRkH_first_move_on = -1;
     }
 
-    int cBoard::getField(int idx){ 
-        return (fields[0] >> (63 - idx) & 0x1) | (fields[1] >> (62 - idx) & 0x2) | (fields[2] >> (61 - idx) & 0x4) | (fields[3] >> (60 - idx)) & 0x8);
+        map<string, int> cBoard::RANKS = {
+            {"1", 0},
+            {"2", 1},
+            {"3", 2},
+            {"4", 3},
+            {"5", 4},
+            {"6", 5},
+            {"7", 6},
+            {"8", 7}
+        };
+
+        map<string, int> cBoard::COLS = {
+            {"A", 0},
+            {"B", 1},
+            {"C", 2},
+            {"D", 3},
+            {"E", 4},
+            {"F", 5},
+            {"G", 6},
+            {"H", 7}
+        };
+
+    int cBoard::getfield(int idx){ 
+        return ((fields[0] >> (63 - idx)) & 0x1) | 
+               ((fields[1] >> (62 - idx)) & 0x2) | 
+               ((fields[2] >> (61 - idx)) & 0x4) | 
+               ((fields[3] >> (60 - idx)) & 0x8);
     }
 
     void cBoard::setfield(int idx, int value){
         int eraseval, setval;
         for(int i = 0; i < 4; ++i){
-            eraseval = (0x0000000000000001 << (63 - (i + idx)) ^ 0xFFFFFFFFFFFFFFFF;
+            eraseval = (0x0000000000000001 << (63 - (i + idx))) ^ 0xFFFFFFFFFFFFFFFF;
             setval = value << (63 - (i + idx));
             fields[i] = (fields[i] & eraseval) | setval;
+        }
+    }
+
+    void cBoard::copyfields(unsigned long long int _fields[]){
+        for(int i = 0; i < 4; ++i){
+            _fields[i] = fields[i];
+        }
+    }
+
+    bool cBoard::comparefields(unsigned long long int _fields[]){
+        for(int i = 0; i < 4; ++i){
+            if(_fields[i] != fields[i]){
+                return false;
             }
         }
+        return true;    
     }
 
 /*
@@ -98,15 +137,6 @@
         if(abs(self.wKg // 8 - self.bKg // 8) < 2 and abs(self.wKg % 8 - self.bKg % 8) < 2):
             return False
         return True
-
-    def setfield(self, idx, value):
-        tmpfields = self.SINGLE >> (idx * 4)
-        tmpfields = tmpfields ^ self.FULL
-        tmpfields = tmpfields & self.fields
-        self.fields = tmpfields | (value << ((63 - idx) * 4))
-
-    def getfield(self, idx):
-        return (self.fields >> ((63 - idx) * 4)) & 0xF
 
     def search(self, src, step, maxcnt=7):
         cnt = 0

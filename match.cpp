@@ -12,9 +12,51 @@ using namespace std;
         status = STATUS["active"];
         score = 0;
         level = LEVELS["blitz"];
-        // board = new cBoard(); 
+        // board = cBoard(); 
     } 
-    cMatch::cMatch(const cMatch &obj) // copy constructor
+    cMatch::cMatch(const cMatch &obj){
+    } // copy constructor
+
+    map<string, int> cMatch::STATUS = {
+        {"active", 10},
+        {"draw", 11}, 
+        {"winner-white", 12}, 
+        {"winner-black", 13}
+    };
+
+    map<string, int> cMatch::LEVELS = {
+        {"blitz", 15}, 
+        {"low", 30}, 
+        {"medium", 60}, 
+        {"high", 90}
+    };
+
+    map<int, int> cMatch::SECS_PER_MOVE = {
+        {LEVELS["blitz"], 15}, 
+        {LEVELS["low"], 30}, 
+        {LEVELS["medium"], 60}, 
+        {LEVELS["high"], 90}
+    };
+
+    map<string, int> cMatch::EVAL_MODES = {
+        {"ignore-pins", 0}, 
+        {"only-pins-to-king", 1}, 
+        {"all-pins", 2}
+    };
+
+    map<string, int> RETURN_CODES = {
+        {"ok", 10}, 
+        {"draw", 11}, 
+        {"winner-white", 12}, 
+        {"winner-black", 13}, 
+        {"match-cancelled", 14}, 
+        {"wrong-color", 15}, 
+        {"piece-error", 16},
+        {"king-attacked-error", 17}, 
+        {"format-error", 18}, 
+        {"out-of-bounds", 19},
+        {"general-error", 20}
+    };
 
     void cMatch::update_attributes(){
         for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
@@ -51,7 +93,7 @@ using namespace std;
         }
         score = 0;
         for(int idx = 0; idx < 64; ++idx){
-            int piece = board.getField(idx);
+            int piece = board.getfield(idx);
             score -= SCORES[piece];
             if(piece == PIECES["wKg"]){
                 board.wKg = idx;
@@ -94,17 +136,17 @@ using namespace std;
     }
 
     // 100 Züge davor kein Bauernzug und keine Figur geschlagen
-    bool is_fifty_moves_rule(){
+    bool cMatch::is_fifty_moves_rule(){
         int cnt = 0;
         int maxlen = minutes.size();
-        for(list<cMove>::reverse_iterator it = minutes.rbegin(); ++it){
-            int srcpiece = it->getPrevfield(it->srcx, it->srcy);
-            int dstpiece = it->getPrevfield(it->dstx, it->dsty);
+        for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
+            int srcpiece = it->getPrevfield(it->src);
+            int dstpiece = it->getPrevfield(it->dst);
             if(srcpiece == PIECES["wPw"] or srcpiece == PIECES["bPw"] or dstpiece != PIECES["blk"]){
                 cnt = 0;
             }
             else{
-                int += 1;
+                cnt += 1;
                 if(cnt > 100){
                     return true;
                 }
@@ -116,25 +158,18 @@ using namespace std;
         return false;
     }
 
-    int is_move_repetition(){
-        cMatch newmatch = this;
-	unsigned long long int fields[4];
-	for(int k = 0; k < 4; ++k){
-            fields[k] = newmatch.board.fields[k];
+    int cMatch::is_move_repetition(){
+        cMatch newmatch = *this;
+        unsigned long long int fields[4];
+        newmatch.board.copyfields(fields);
         int count = 0;
-        int maxcnt = min(newmatch.minutes.size(), 8);
+        int maxcnt = min((int)newmatch.minutes.size(), 8);
         for(int i = 0; i < maxcnt; ++i){
-            newmatch.undo_move();
-	    int incnt = 0;
-	    for(int j = 0; j < 4; ++j){
-                if(fields[j] == newmatch.board.fields[j]){
-                    incnt += 1;
-		}
-	    }
-	    if(incount == 4){
-		count += 2;
-	    {
-	}
+            // newmatch.undo_move();
+            if(newmatch.board.comparefields(fields)){
+                count += 2;
+            }
+        }
         return count >= 2;
     }
 
