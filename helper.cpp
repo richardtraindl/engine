@@ -3,24 +3,23 @@
 
 using namespace std;
 
-    int *coord_to_index(string coord){
-        int index[2];
+    int coord_to_index(string coord){
         int x = stoi(coord.substr(0, 1), nullptr, 10);
         int y = stoi(coord.substr(1, 1), nullptr, 10);
         if(x > (int)'H'){
-            index[0] = x - (int)'a';
+            x -= (int)'a';
         }
         else{
-            index[0] = x - (int)'A';
+            x -= (int)'A';
         }
-        index[1] = y - (int)'1';
-        return index;
+        y -= (int)'1';
+        return x + y * 8;
     };
 
-    string index_to_coord(int x, int y){
+    string index_to_coord(int idx){
         string coord;
         stringstream out;
-        out << (x + (int)'a') << (y + (int)'1');
+        out << (idx % 8 + (int)'a') << (idx / 8 + (int)'1');
         coord = out.str();
         return coord;
     };
