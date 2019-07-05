@@ -31,13 +31,17 @@
     }
 
     void cBoard::setfield(int idx, int value){
-        unsigned long long int first;
+        int eraseval, setval;
         for(int i = 0; i < 4; ++i){
-            
-        tmpfields = self.SINGLE >> (idx * 4)
-        tmpfields = tmpfields ^ self.FULL
-        tmpfields = tmpfields & self.fields
-        self.fields = tmpfields | (value << ((63 - idx) * 4))
+            eraseval = (0x0000000000000001 << (63 - (i + idx)) ^ 0xFFFFFFFFFFFFFFFF;
+            setval = value << (63 - (i + idx));
+            switch(i){
+                case 0 : first = (first & eraseval) | setval; break;
+                case 1 : second = (second & eraseval) | setval; break;
+                case 2 : third = (third & eraseval) | setval; break;
+                case 3 : fourth = (fourth & eraseval) | setval; break;
+            }
+        }
     }
 
 /*
