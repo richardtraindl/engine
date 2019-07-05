@@ -60,6 +60,10 @@
             };
 
             cBoard();
+        
+            int getField(int idx);
+
+            void setfield(int idx, int value);
 
     };
 
