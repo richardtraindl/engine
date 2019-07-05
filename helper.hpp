@@ -5,9 +5,8 @@
     #include <string>
 
     using namespace std;
-    
-    int *coord_to_index(string coord);
 
-    string index_to_coord(int x, int y);
+    int coord_to_index(string coord);
+
+    string index_to_coord(int idx);
 #endif
-
