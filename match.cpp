@@ -117,10 +117,10 @@ using namespace std;
     }
 
     int is_move_repetition(){
-        newmatch = this;
+        cMatch newmatch = this;
 	unsigned long long int fields[4];
-	for(int i = 0; i < 4; ++i){
-            fields[i] = newmatch.board.fields[i];
+	for(int k = 0; k < 4; ++k){
+            fields[k] = newmatch.board.fields[k];
         int count = 0;
         int maxcnt = min(newmatch.minutes.size(), 8);
         for(int i = 0; i < maxcnt; ++i){
@@ -139,16 +139,6 @@ using namespace std;
     }
 
 /*
-    def is_move_repetition(self):
-        newmatch = copy.deepcopy(self)
-        board = newmatch.board.fields
-        count = 0
-        for i in range(8):
-            if(newmatch.undo_move() is None):
-                return count >= 2
-            if(board == newmatch.board.fields):
-                count += 1
-        return count >= 2
 
     def is_move_valid(self, src, dst, prompiece):
         piece = self.board.getfield(src)
