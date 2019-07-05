@@ -10,12 +10,14 @@
     typedef map<string, int> MapStrInt;
 
     class cBoard{
+        private:
+            unsigned long long int bits0;
+            unsigned long long int bits1;
+            unsigned long long int bits2;
+            unsigned long long int bits3;
         public:
-            int fields[8][8];
-            int wKg_x;
-            int wKg_y;
-            int bKg_x;
-            int bKg_y;
+            int wKg;
+            int bKg;
             int wKg_first_move_on;
             int bKg_first_move_on;
             int wRkA_first_move_on;
