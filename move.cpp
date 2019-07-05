@@ -67,16 +67,9 @@
     }
 
 
-    cPrioMove::cPrioMove(cMove *_move){
-        if(_move->prevfields != NULL){
-            for(int i = 0; i < 4; ++i){
-                prevfields[i] = *(_move->prevfields + i);
-                }
-            }
-        }
-        src = _move->src;
-        dst = _move->dst;
-        prompiece = _move->prompiece;
+    cPrioMove::cPrioMove(cMove *_move, int _prio){
+        Move(_move->prevfields, _move->src, _move->dst, _move->prompiece);
+        prio = _prio;
     }
 
     void cPrioMove::evaluate_priority(){
