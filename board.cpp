@@ -31,6 +31,9 @@
     }
 
     void cBoard::setfield(int idx, int value){
+        unsigned long long int first;
+        for(int i = 0; i < 4; ++i){
+            
         tmpfields = self.SINGLE >> (idx * 4)
         tmpfields = tmpfields ^ self.FULL
         tmpfields = tmpfields & self.fields
