@@ -11,10 +11,10 @@
 
     class cBoard{
         private:
-            unsigned long long int bits0;
-            unsigned long long int bits1;
-            unsigned long long int bits2;
-            unsigned long long int bits3;
+            unsigned long long int first;
+            unsigned long long int second;
+            unsigned long long int third;
+            unsigned long long int fourth
         public:
             int wKg;
             int bKg;
@@ -25,9 +25,12 @@
             int bRkA_first_move_on;
             int bRkH_first_move_on;
 
-            const int BASE     = 0xF; // 0x42356324111111110000000000000000000000000000000099999999CABDEBAC;
-            const int FULL     = 0xF; // 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-            const int SINGLE   = 0xF; // 0xF000000000000000000000000000000000000000000000000000000000000000;
+            const unsigned long long int BASE0  = 0b0000000000000000000000000000000000000000000000001111111111111111;
+            const unsigned long long int BASE1  = 0b1001100100000000000000000000000000000000000000000000000010011001;
+            const unsigned long long int BASE2  = 0x0110111000000000000000000000000000000000000000000000000001101110;
+            const unsigned long long int BASE3  = 0x0011010011111111000000000000000000000000000000001111111100110100;
+            const unsigned long long int FULL   = 0xFFFFFFFFFFFFFFFF;
+            const unsigned long long int SINGLE = 0b1000000000000000000000000000000000000000000000000000000000000000;
             const int BITS1000 = 0xF; // 0x8888888888888888888888888888888888888888888888888888888888888888;
             const int BITS1110 = 0xF; // 0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE;
             const int BITS1100 = 0xF; // 0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;
