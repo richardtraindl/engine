@@ -19,50 +19,46 @@ using namespace std;
     void cMatch::update_attributes(){
         for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
             if(board.wKg_first_move_on == -1 && 
-               it->srcx == board.COLS["E"] && it->srcy == board.RANKS["1"]){
+               it->src % 8 == board.COLS["E"] && it->src / 8 == board.RANKS["1"]){
                 board.wKg_first_move_on = movecnt();
                 continue;
             }
             if(board.bKg_first_move_on == -1 && 
-               it->srcx == board.COLS["E"] && it->srcy == board.RANKS["8"]){
+               it->src % 8 == board.COLS["E"] && it->src / 8 == board.RANKS["8"]){
                 board.bKg_first_move_on = movecnt();
                 continue;
             }
             if(board.wRkA_first_move_on == -1 && 
-               it->srcx == board.COLS["A"] && it->srcy == board.RANKS["1"]){
+               it->src % 8 == board.COLS["A"] && it->src / 8 == board.RANKS["1"]){
                 board.wRkA_first_move_on = movecnt();
                 continue;
             }
             if(board.wRkH_first_move_on == -1 && 
-               it->srcx == board.COLS["H"] && it->srcy == board.RANKS["1"]){
+               it->src % 8 == board.COLS["H"] && it->src / 8 == board.RANKS["1"]){
                 board.wRkH_first_move_on = movecnt();
                 continue;
             }
             if(board.bRkA_first_move_on == -1 && 
-               it->srcx == board.COLS["A"] && it->srcy == board.RANKS["8"]){
+               it->src % 8 == board.COLS["A"] && it->src / 8 == board.RANKS["8"]){
                 board.bRkA_first_move_on = movecnt();
                 continue;
             }
             if(board.bRkH_first_move_on == -1 && 
-               it->srcx == board.COLS["H"] && it->srcy == board.RANKS["8"]){
+               it->src % 8 == board.COLS["H"] && it->src / 8 == board.RANKS["8"]){
                 board.bRkH_first_move_on = movecnt();
                 continue;
             }
         }
         score = 0;
-        for(int y = 0; y < 8; ++y){
-            for(int x = 0; x < 8; ++x){
-                int piece = board.fields[y][x];
-                score -= SCORES[piece];
-                if(piece == PIECES["wKg"]){
-                    board.wKg_x = x;
-                    board.wKg_y = y;
-                    continue;
-                }
-                if(piece == PIECES["bKg"]){
-                    board.bKg_x = x;
-                    board.bKg_y = y;
-                }
+        for(int idx = 0; idx < 64; ++idx){
+            int piece = board.getField(idx);
+            score -= SCORES[piece];
+            if(piece == PIECES["wKg"]){
+                board.wKg = idx;
+                continue;
+            }
+            if(piece == PIECES["bKg"]){
+                board.bKg = idx;
             }
         }
     }
@@ -120,21 +116,29 @@ using namespace std;
         return false;
     }
 
-/*
     int is_move_repetition(){
         newmatch = this;
-        fields = newmatch.board.fields;
+	unsigned long long int fields[4];
+	for(int i = 0; i < 4; ++i){
+            fields[i] = newmatch.board.fields[i];
         int count = 0;
-		int maxcnt = min(newmatch.minutes.size(), 8);
-		for(int i = 0; i < maxcnt; ++i){}
+        int maxcnt = min(newmatch.minutes.size(), 8);
+        for(int i = 0; i < maxcnt; ++i){
             newmatch.undo_move();
-            if(fields == newmatch.board.fields){
-                count += 1;
-			}
+	    int incnt = 0;
+	    for(int j = 0; j < 4; ++j){
+                if(fields[j] == newmatch.board.fields[j]){
+                    incnt += 1;
 		}
-        return count >= 2;
+	    }
+	    if(incount == 4){
+		count += 2;
+	    {
 	}
+        return count >= 2;
+    }
 
+/*
     def is_move_repetition(self):
         newmatch = copy.deepcopy(self)
         board = newmatch.board.fields
