@@ -11,17 +11,15 @@
     class cMove{
         // private:
         public:
-            int prevfields[8][8];
-            int srcx;
-            int srcy;
-            int dstx;
-            int dsty;
+            unsigned long long int prevfields[4];
+            int src;
+            int dst;
             int prompiece;
 
-            cMove(int **prevfields, int srcx, int srcy, int dstx, int dsty, int prompiece);
+            cMove(int *prevfields, int src, int dst, int prompiece);
             cMove();
 
-            int getPrevfield(int x, int y);
+            int getPrevfield(int idx);
 
             string format();
     };
