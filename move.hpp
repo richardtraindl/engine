@@ -9,7 +9,6 @@
     using namespace std;
 
     class cMove{
-        // private:
         public:
             unsigned long long int prevfields[4];
             int src;
