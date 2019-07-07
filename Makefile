@@ -1,7 +1,7 @@
 CC = g++
 
-all: values.o helper.o move.o board.o match.o engine.o
-	$(CC) -Wall -ggdb match.o board.o move.o helper.o values.o engine.o -o engine
+all: ./pieces/searchforpiece.o ./pieces/piece.o ./pieces/rook.o values.o helper.o move.o board.o match.o engine.o
+	$(CC) -Wall -ggdb ./pieces/searchforpiece.o ./pieces/piece.o ./pieces/rook.o match.o board.o move.o helper.o values.o engine.o -o engine
 
 engine.o: engine.cpp
 	$(CC) -Wall -ggdb -c engine.cpp
@@ -22,7 +22,7 @@ match.o: match.cpp match.hpp board.hpp helper.hpp values.hpp
 	$(CC) -Wall -ggdb -c match.cpp
 
 make: 
-	make ./forth/Makefile
+	make ./pieces/Makefile
 
 clean:
 	rm -f *.o

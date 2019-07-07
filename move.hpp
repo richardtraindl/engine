@@ -19,6 +19,8 @@
             cMove();
 
             int getPrevfield(int idx);
+    
+            void copyprevfields(unsigned long long int _fields[]);
 
             string format();
     };

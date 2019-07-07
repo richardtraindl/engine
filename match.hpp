@@ -12,7 +12,6 @@
     using namespace std;
 
     class cMatch{
-    // private:
         public:
             time_t created_at;
             int status;

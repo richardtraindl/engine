@@ -7,12 +7,9 @@
 
     using namespace std;
 
-    typedef map<string, int> MapStrInt;
-
     class cBoard{
-        private:
-            unsigned long long int fields[4];
         public:
+            unsigned long long int fields[4];
             int wKg;
             int bKg;
             int wKg_first_move_on;
@@ -46,6 +43,12 @@
             void copyfields(unsigned long long int _fields[]);
             
             bool comparefields(unsigned long long int _fields[]);
+            
+            bool is_inbounds(int src, int dst, int step);
+            
+            int search(int src, int step, int maxcnt);
+            
+            bool search_bi_dirs(int *first, int *second, int src, int step, int maxcnt);
 
     };
 

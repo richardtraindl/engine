@@ -73,12 +73,85 @@
         return true;    
     }
 
+    bool cBoard::is_inbounds(int src, int dst, int step){
+        if(src < 0 or src > 63 or dst < 0 or dst > 63){
+            return false;
+        }
+        if(step == 0){
+            return true;
+        }
+        int dir = DIR_FOR_STEP[step];
+        if(dir == 0){
+            return false;
+        }
+        if(dir == DIRS["nth"] || dir == DIRS["sth"]){
+            return true;
+        }
+        if(dir == DIRS["est"] || dir == DIRS["nth-est"] || dir == DIRS["sth-est"]){
+            return (src % 8) < (dst % 8);
+        }
+        if(dir == DIRS["wst"] || dir == DIRS["sth-wst"] || dir == DIRS["nth-wst"]){
+            return (src % 8) > (dst % 8);
+        }
+        if(dir == DIRS["2nth-est"] || dir == DIRS["nth-2est"] || 
+           dir == DIRS["sth-2est"] || dir == DIRS["2sth-est"]){
+            return (src % 8) < (dst % 8);
+        }
+        if(dir == DIRS["2sth-wst"] || dir == DIRS["sth-2wst"] || 
+           dir == DIRS["nth-2wst"] || dir == DIRS["2nth-wst"]){
+            return (src % 8) > (dst % 8);
+        }
+        return false;
+    }
+
+    int cBoard::search(int src, int step, int maxcnt){
+        int cnt = 0;
+        int dst = src + step;
+        while(is_inbounds(src, dst, step) && cnt < maxcnt){
+            int piece = getfield(dst);
+            if(piece != PIECES["blk"]){
+                return dst;
+            }
+            cnt += 1;
+            dst += step;
+        }
+        return -1;
+    }
+
+    bool cBoard::search_bi_dirs(int *first, int *second, int src, int step, int maxcnt){
+        int cnt = 0;
+        *first = -1;
+        int bisteps[2] = {step, (step * -1)};
+        for(const int bistep : bisteps){
+            int dst = src + bistep;
+            while(is_inbounds(src, dst, bistep) || cnt < maxcnt){
+                int piece = getfield(dst);
+                if(piece != PIECES["blk"]){
+                    if(*first == -1){
+                        *first = dst;
+                        break;
+                    }
+                    else{
+                        *second = dst;
+                        return true;
+                    }
+                }
+                cnt += 1;
+                dst += bistep;
+            }
+            if(*first == -1){
+                break;
+            }
+        }
+        return false;
+    }
+
 /*
 
     def set_to_base(self):
         self.fields = self.BASE
-        self.wKg = self.COLS['E'] + self.RANKS['1'] * 8
-        self.bKg = self.COLS['E'] + self.RANKS['8'] * 8
+        self.wKg = self.COLS["E"] + self.RANKS["1"] * 8
+        self.bKg = self.COLS["E"] + self.RANKS["8"] * 8
         self.wKg_first_move_on = None
         self.bKg_first_move_on = None
         self.wRkA_first_move_on = None
@@ -106,21 +179,21 @@
         bOfficer_cnt = 0
         for idx in range(64):
             piece = self.getfield(idx)
-            if(piece == PIECES['wKg']):
+            if(piece == PIECES["wKg"]):
                 wKg_cnt += 1
-            elif(piece == PIECES['bKg']):
+            elif(piece == PIECES["bKg"]):
                 bKg_cnt += 1
-            elif(piece == PIECES['wPw']):
+            elif(piece == PIECES["wPw"]):
                 wPw_cnt += 1
-            elif(piece == PIECES['bPw']):
+            elif(piece == PIECES["bPw"]):
                 bPw_cnt += 1
-            elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or 
-                 piece == PIECES['wKn'] or piece == PIECES['wQu']):
+            elif(piece == PIECES["wRk"] or piece == PIECES["wBp"] or 
+                 piece == PIECES["wKn"] or piece == PIECES["wQu"]):
                 wOfficer_cnt += 1
-            elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or 
-                 piece == PIECES['bKn'] or piece == PIECES['bQu']):
+            elif(piece == PIECES["bRk"] or piece == PIECES["bBp"] or 
+                 piece == PIECES["bKn"] or piece == PIECES["bQu"]):
                 bOfficer_cnt += 1
-            elif(piece == PIECES['blk']):
+            elif(piece == PIECES["blk"]):
                 continue
             else:
                 return False
@@ -137,37 +210,6 @@
         if(abs(self.wKg // 8 - self.bKg // 8) < 2 and abs(self.wKg % 8 - self.bKg % 8) < 2):
             return False
         return True
-
-    def search(self, src, step, maxcnt=7):
-        cnt = 0
-        dst = src + step
-        while(self.is_inbounds(src, dst, step) and cnt < maxcnt):
-            piece = self.getfield(dst)
-            if(piece != PIECES['blk']):
-                return dst
-            cnt += 1
-            dst += step
-        return None
-
-    def search_bi_dirs(self, src, step, maxcnt=7):
-        cnt = 0
-        first = None
-        steps = [step, (step * -1)]
-        for step in steps:
-            dst = src + step
-            while(self.is_inbounds(src, dst, step) and cnt < maxcnt):
-                piece = self.getfield(dst)
-                if(piece != PIECES['blk']):
-                    if(first is None):
-                        first = dst
-                        break
-                    else:
-                        return first, dst
-                cnt += 1
-                dst += step
-            if(first is None):
-                break
-        return None, None
 
     @classmethod
     def is_inbounds_core(cls, src, dst):
@@ -231,29 +273,6 @@
             return True
         else:
             return False
-
-    @classmethod
-    def is_inbounds(cls, src, dst, step):
-        if(src < 0 or src > 63 or dst < 0 or dst > 63):
-            return False
-        if(step is None):
-            return True
-        direction = DIR_FOR_STEP[step]
-        if(direction is None):
-            return False
-        if(direction == DIRS['nth'] or direction == DIRS['sth']):
-            return True
-        if(direction == DIRS['est'] or direction == DIRS['nth-est'] or direction == DIRS['sth-est']):
-            return (src % 8) < (dst % 8)
-        if(direction == DIRS['wst'] or direction == DIRS['sth-wst'] or direction == DIRS['nth-wst']):
-            return (src % 8) > (dst % 8)
-        if(direction == DIRS['2nth-est'] or direction == DIRS['nth-2est'] or 
-           direction == DIRS['sth-2est'] or direction == DIRS['2sth-est']):
-            return (src % 8) < (dst % 8)
-        if(direction == DIRS['2sth-wst'] or direction == DIRS['sth-2wst'] or 
-           direction == DIRS['nth-2wst'] or direction == DIRS['2nth-wst']):
-            return (src % 8) > (dst % 8)
-        return False
 
     @classmethod
     def erase_whites(cls, fields):

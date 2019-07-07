@@ -23,6 +23,12 @@
         return ((prevfields[0] >> (63 - idx)) & 0x1) | ((prevfields[1] >> (62 - idx)) & 0x2) | ((prevfields[2] >> (61 - idx)) & 0x4) | ((prevfields[3] >> (60 - idx)) & 0x8);
     }
 
+    void cMove::copyprevfields(unsigned long long int _fields[]){
+        for(int i = 0; i < 4; ++i){
+            _fields[i] = prevfields[i];
+        }
+    }
+
     string cMove::format(){
         int piece = getPrevfield(src);
         if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){

@@ -3,10 +3,10 @@
 #include "./match.hpp"
 #include "./values.hpp"
 
+    using namespace std;
 
     int main(void){
         cMatch match;
-        // cout << "\nmatch.status " << match.calcStatus();
         cout << "\nF " << match.STATUS["active"];
         cout << "\nD " << match.board.wKg;
         cout << "\nC " << PIECES["wKg"];
