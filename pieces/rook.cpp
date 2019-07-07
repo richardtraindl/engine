@@ -6,27 +6,29 @@
 
 using namespace std;
 
-    int cRook::DIRS_ARY[4] = {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
-    int cRook::STEPS[4] = {8, -8, 1, -1};
-    int cRook::MV_STEPS[4][2] = {{8, PIECES["blk"]}, {-8, PIECES["blk"]},  {1, PIECES["blk"]}, {-1, PIECES["blk"]}};
+    int cRook::DIRS_ARY[4] = 
+        {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
+    int cRook::STEPS[4] = 
+        {8, -8, 1, -1};
+    int cRook::MV_STEPS[4][2] = 
+        {{8, PIECES["blk"]}, {-8, PIECES["blk"]},  {1, PIECES["blk"]}, {-1, PIECES["blk"]}};
 
     int cRook::dir_for_move(int src, int dst){
-        /*
-        if(match->board.is_inbounds_core(src, dst) == false){
+        if(cBoard::is_inbounds_core(src, dst) == false){
             return DIRS["undef"];
         }
-        if(is_nth(src, dst)){
+        if(cBoard::is_nth(src, dst)){
             return DIRS["nth"];
         }
-        if(is_sth(src, dst)){
+        if(cBoard::is_sth(src, dst)){
             return DIRS["sth"];
         }
-        if(is_est(src, dst)){
+        if(cBoard::is_est(src, dst)){
             return DIRS["est"];
         }
-        if(is_wst(src, dst)){
+        if(cBoard::is_wst(src, dst)){
             return DIRS["wst"];
-        }*/
+        }
         return DIRS["undef"];
     }
 
@@ -47,26 +49,25 @@ using namespace std;
     }
 
     cMove cRook::do_move(int dst, int prompiece, int movecnt){
-        int dstpiece = match->board.getfield(dst);
         cMove move = cPiece::do_move(dst, prompiece, movecnt);
         int srcx = pos % 8;
         int srcy = pos / 8;
         if(color == COLORS["white"]){
-            if(srcx == match->board.COLS["A"] && srcy == match->board.RANKS["1"] && 
+            if(srcx == cBoard::COLS["A"] && srcy == cBoard::RANKS["1"] && 
                match->board.wRkA_first_move_on == -1){
                 match->board.wRkA_first_move_on = movecnt;
             }
-            if(srcx == match->board.COLS["H"] && srcy == match->board.RANKS["1"] && 
+            if(srcx == cBoard::COLS["H"] && srcy == cBoard::RANKS["1"] && 
                  match->board.wRkH_first_move_on == -1){
                 match->board.wRkH_first_move_on = movecnt;
             }
         }
         else{
-            if(srcx == match->board.COLS["A"] && srcy == match->board.RANKS["8"] && 
+            if(srcx == cBoard::COLS["A"] && srcy == cBoard::RANKS["8"] && 
                match->board.bRkA_first_move_on == -1){
                 match->board.bRkA_first_move_on = movecnt;
             }
-            if(srcx == match->board.COLS["H"] && srcy == match->board.RANKS["8"] && 
+            if(srcx == cBoard::COLS["H"] && srcy == cBoard::RANKS["8"] && 
                  match->board.bRkH_first_move_on == -1){
                 match->board.bRkH_first_move_on = movecnt;
             }

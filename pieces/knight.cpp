@@ -1,36 +1,44 @@
 
-from .. values import *
-from .piece import cPiece
+#include "./knight.hpp"
+#include "./searchforpiece.hpp"
+#include "../values.hpp"
+#include "../helper.hpp"
+
+    using namespace std;
 
 
-class cKnight(cPiece):
-    STEPS    = [17, 10, -6, -15, -17, -10, 6, 15]
-    MV_STEPS = [[17, PIECES['blk']],  [10, PIECES['blk']],  [-6, PIECES['blk']], [-15, PIECES['blk']], 
-                [-17, PIECES['blk']], [-10, PIECES['blk']], [6, PIECES['blk']],  [15, PIECES['blk']]]
-    MAXCNT = 1
+    int cKnight::DIRS_ARY[1] = {0};
+    int cKnight::STEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
+    int cKnight::MV_STEPS[8][2] = {{17, PIECES["blk"]},  {10, PIECES["blk"]},  {-6, PIECES["blk"]}, 
+                                   {-15, PIECES["blk"]}, {-17, PIECES["blk"]}, {-10, PIECES["blk"]}, 
+                                   {6, PIECES["blk"]},   {15, PIECES["blk"]}};
+    int cKnight::MAXCNT = 1;
 
-    def __init__(self, match, pos):
-        super().__init__(match, pos)
+    bool cKnight::is_trapped(){
+        return false; //knight cannot be trapped
+    }
 
-    def is_trapped(self):
-        return False # knight cannot be trapped
+    bool cKnight::is_move_valid(int dst, int prompiece){
+        bool flag = false;
+        for(const int step : STEPS){
+            if(pos + step == dst && match->board.is_inbounds(pos, dst, step)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag == false){
+            return false;
+        }
+        int pin_dir = DIRS["undef"]; // match->eval_pin_dir(pos);
+        if(pin_dir != DIRS["undef"]){
+            return false;
+        }
+        int dstpiece = match->board.getfield(dst);
+        if(match->color_of_piece(dstpiece) == color){
+            return false;
+        }
+        return true;
+    }
 
-    def is_move_valid(self, dst, prompiece=PIECES['blk']):
-        flag = False
-        for step in self.STEPS:
-            if((self.pos + step) == dst and 
-                self.match.board.is_inbounds(self.pos, dst, step)):
-                flag = True
-                break
-        if(flag == False):
-            return False
-        pin_dir = self.match.eval_pin_dir(self.pos)
-        if(pin_dir != DIRS['undef']):
-            return False
-        dstpiece = self.match.board.getfield(dst)
-        if(self.match.color_of_piece(dstpiece) == self.color):
-            return False
-        return True
 
-# class end
 

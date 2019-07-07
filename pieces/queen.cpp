@@ -1,48 +1,34 @@
 
-from .. values import *
-from .piece import cPiece
-from .rook import cRook
-from .bishop import cBishop
+#include "./queen.hpp"
+#include "./searchforpiece.hpp"
+#include "../values.hpp"
+#include "../helper.hpp"
+
+using namespace std;
 
 
-class cQueen(cPiece):
-    DIRS_ARY = cRook.DIRS_ARY
-    DIRS_ARY.extend(cBishop.DIRS_ARY)
-    STEPS    = cRook.STEPS
-    STEPS.extend(cBishop.STEPS)
-    MV_STEPS = cRook.MV_STEPS
-    MV_STEPS.extend(cBishop.MV_STEPS)
+    int cQueen::DIRS_ARY[8] = 
+        {DIRS["nth"],     DIRS["sth"],     DIRS["est"],     DIRS["wst"],
+         DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
+    int cQueen::STEPS[8] = 
+        {8, -8, 1, -1, 9, -9, 7, -7};
+    int cQueen::MV_STEPS[8][2] = 
+        {{8, PIECES["blk"]}, {-8, PIECES["blk"]},  {1, PIECES["blk"]}, {-1, PIECES["blk"]}, 
+         {9, PIECES["blk"]}, {-9, PIECES["blk"]},  {7, PIECES["blk"]}, {-7, PIECES["blk"]}};
 
-    def __init__(self, match, pos):
-        super().__init__(match, pos)
-
-    @classmethod
-    def dir_for_move(cls, src, dst):
-        direction = cRook.dir_for_move(src, dst)
-        if(direction != DIRS['undef']):
-            return direction
-        return cBishop.dir_for_move(src, dst)
-
-    @classmethod
-    def step_for_dir(cls, direction):
-        if(direction == DIRS['nth']):
-            return 8
-        elif(direction == DIRS['sth']):
-            return -8
-        elif(direction == DIRS['est']):
-            return 1
-        elif(direction == DIRS['wst']):
-            return -1
-        elif(direction == DIRS['nth-est']):
-            return 9
-        elif(direction == DIRS['sth-wst']):
-            return -9
-        elif(direction == DIRS['nth-wst']):
-            return 7
-        elif(direction == DIRS['sth-est']):
-            return -7
-        else:
-            return None
-
-# class end
-
+    int cQueen::dir_for_move(int src, int dst){
+        int dir = cRook::dir_for_move(src, dst);
+        if(dir != DIRS["undef"]){
+            return dir;
+        }
+        return cBishop::dir_for_move(src, dst);
+    }
+        
+    int cQueen::step_for_dir(int dir){
+        int step = cRook::step_for_dir(dir);
+        if(step != 0){
+            return step;
+        }
+        return cBishop::step_for_dir(dir);
+    }
+   

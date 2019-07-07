@@ -1,7 +1,7 @@
 CC = g++
 
-all: ./pieces/searchforpiece.o ./pieces/piece.o ./pieces/rook.o values.o helper.o move.o board.o match.o engine.o
-	$(CC) -Wall -ggdb ./pieces/searchforpiece.o ./pieces/piece.o ./pieces/rook.o match.o board.o move.o helper.o values.o engine.o -o engine
+all: ./pieces/searchforpiece.o ./pieces/piece.o ./pieces/rook.o ./pieces/bishop.o ./pieces/knight.o ./pieces/queen.o ./pieces/pawn.o ./pieces/whitepawn.o ./pieces/blackpawn.o values.o helper.o move.o board.o match.o engine.o
+	$(CC) -Wall -ggdb ./pieces/searchforpiece.o ./pieces/piece.o ./pieces/rook.o ./pieces/bishop.o ./pieces/knight.o ./pieces/queen.o ./pieces/pawn.o ./pieces/whitepawn.o ./pieces/blackpawn.o match.o board.o move.o helper.o values.o engine.o -o engine
 
 engine.o: engine.cpp
 	$(CC) -Wall -ggdb -c engine.cpp

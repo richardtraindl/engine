@@ -41,7 +41,7 @@
                         return false;
                     }
                     list<cTouch> frdlytouches, enmytouches;
-                    list_all_field_touches(match, pos1, color, &frdlytouches, &enmytouches);
+                    field_touches_for_both(match, pos1, color, &frdlytouches, &enmytouches);
                     bool enmy_is_lower = false;
                     for(const cTouch enmy : enmytouches){
                         if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
@@ -76,8 +76,6 @@
         }
         int step = step_for_dir(dir);
         if(step == 0){
-            int x = pos % 8;
-            int y = pos / 8;
             int pin_dir = 0; // match->eval_pin_dir(pos);
             for(const int piecedir : DIRS_ARY){
                 if(dir == piecedir){

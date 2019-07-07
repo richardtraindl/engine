@@ -25,11 +25,11 @@
         public:
             cSearchForPiece();
 
-            bool is_field_touched(cMatch *match, int src, int color, int mode);
+            static bool is_field_touched(cMatch *match, int src, int color, int mode);
 
-            void list_all_field_touches(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
+            static void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
 
-            void list_field_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
+            static void field_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
     };
 
 
@@ -38,8 +38,6 @@
             static int STEPS[4];
             static int MAXCNT;
             static int TARGETS[4];
-        public:
-            SearchforRook();
     };
 
 
@@ -48,8 +46,6 @@
             static int STEPS[4];
             static int MAXCNT;
             static int TARGETS[4];
-        public:
-            SearchforBishop();
     };
 
 
@@ -59,8 +55,7 @@
             static int MAXCNT;
             static int TARGETS[2];
         public:
-            SearchforKing();
-            bool is_field_touched(cMatch *match, int src, int color);
+            static bool is_field_touched(cMatch *match, int src, int color);
     };
 
 
@@ -69,8 +64,6 @@
             static int STEPS[8];
             static int MAXCNT;
             static int TARGETS[2];
-        public:
-            SearchforKnight();
     };
 
     class SearchforWhitePawn : public cSearchForPiece{
@@ -78,8 +71,6 @@
             static int STEPS[2];
             static int MAXCNT;
             static int TARGETS[1];
-        public:
-            SearchforWhitePawn();
     };
 
 
@@ -88,17 +79,15 @@
             static int STEPS[2];
             static int MAXCNT;
             static int TARGETS[1];
-        public:
-            SearchforBlackPawn();
     };
 
 
     bool is_field_touched(cMatch *match, int src, int color, int mode);
 
-    void list_all_field_touches(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
+    void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
 
-    void list_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
+    void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
 
-    list<cTouch> *list_field_touches(cMatch *match, int src, int color);
+    list<cTouch> field_touches_for_color(cMatch *match, int src, int color);
 
 #endif

@@ -2,7 +2,6 @@
 #include "./match.hpp"
 #include "./helper.hpp"
 #include "./values.hpp"
-// #include <Python.h>
 
 using namespace std;
 
@@ -12,7 +11,6 @@ using namespace std;
         status = STATUS["active"];
         score = 0;
         level = LEVELS["blitz"];
-        // board = cBoard(); 
     } 
     cMatch::cMatch(const cMatch &obj){
     } // copy constructor
@@ -61,32 +59,32 @@ using namespace std;
     void cMatch::update_attributes(){
         for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
             if(board.wKg_first_move_on == -1 && 
-               it->src % 8 == board.COLS["E"] && it->src / 8 == board.RANKS["1"]){
+               it->src % 8 == cBoard::COLS["E"] && it->src / 8 == cBoard::RANKS["1"]){
                 board.wKg_first_move_on = movecnt();
                 continue;
             }
             if(board.bKg_first_move_on == -1 && 
-               it->src % 8 == board.COLS["E"] && it->src / 8 == board.RANKS["8"]){
+               it->src % 8 == cBoard::COLS["E"] && it->src / 8 == cBoard::RANKS["8"]){
                 board.bKg_first_move_on = movecnt();
                 continue;
             }
             if(board.wRkA_first_move_on == -1 && 
-               it->src % 8 == board.COLS["A"] && it->src / 8 == board.RANKS["1"]){
+               it->src % 8 == cBoard::COLS["A"] && it->src / 8 == cBoard::RANKS["1"]){
                 board.wRkA_first_move_on = movecnt();
                 continue;
             }
             if(board.wRkH_first_move_on == -1 && 
-               it->src % 8 == board.COLS["H"] && it->src / 8 == board.RANKS["1"]){
+               it->src % 8 == cBoard::COLS["H"] && it->src / 8 == cBoard::RANKS["1"]){
                 board.wRkH_first_move_on = movecnt();
                 continue;
             }
             if(board.bRkA_first_move_on == -1 && 
-               it->src % 8 == board.COLS["A"] && it->src / 8 == board.RANKS["8"]){
+               it->src % 8 == cBoard::COLS["A"] && it->src / 8 == cBoard::RANKS["8"]){
                 board.bRkA_first_move_on = movecnt();
                 continue;
             }
             if(board.bRkH_first_move_on == -1 && 
-               it->src % 8 == board.COLS["H"] && it->src / 8 == board.RANKS["8"]){
+               it->src % 8 == cBoard::COLS["H"] && it->src / 8 == cBoard::RANKS["8"]){
                 board.bRkH_first_move_on = movecnt();
                 continue;
             }

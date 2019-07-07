@@ -20,27 +20,27 @@
         bRkH_first_move_on = -1;
     }
 
-        map<string, int> cBoard::RANKS = {
-            {"1", 0},
-            {"2", 1},
-            {"3", 2},
-            {"4", 3},
-            {"5", 4},
-            {"6", 5},
-            {"7", 6},
-            {"8", 7}
-        };
+    map<string, int> cBoard::RANKS = {
+        {"1", 0},
+        {"2", 1},
+        {"3", 2},
+        {"4", 3},
+        {"5", 4},
+        {"6", 5},
+        {"7", 6},
+        {"8", 7}
+    };
 
-        map<string, int> cBoard::COLS = {
-            {"A", 0},
-            {"B", 1},
-            {"C", 2},
-            {"D", 3},
-            {"E", 4},
-            {"F", 5},
-            {"G", 6},
-            {"H", 7}
-        };
+    map<string, int> cBoard::COLS = {
+        {"A", 0},
+        {"B", 1},
+        {"C", 2},
+        {"D", 3},
+        {"E", 4},
+        {"F", 5},
+        {"G", 6},
+        {"H", 7}
+    };
 
     int cBoard::getfield(int idx){ 
         return ((fields[0] >> (63 - idx)) & 0x1) | 
@@ -73,8 +73,74 @@
         return true;    
     }
 
+    bool cBoard::verify(){
+        int wKg_cnt = 0;
+        int bKg_cnt = 0;
+        int wPw_cnt = 0;
+        int bPw_cnt = 0;
+        int wOfficer_cnt = 0;
+        int bOfficer_cnt = 0;
+        for(int idx = 0; idx < 64; ++idx){
+            int piece = getfield(idx);
+            if(piece == PIECES["wKg"]){
+                wKg_cnt += 1; 
+                continue;
+            }
+            if(piece == PIECES["bKg"]){
+                bKg_cnt += 1;
+                continue;
+            }
+            if(piece == PIECES["wPw"]){
+                wPw_cnt += 1;
+                continue;
+            }
+            if(piece == PIECES["bPw"]){
+                bPw_cnt += 1;
+                continue; 
+            }
+            if(piece == PIECES["wRk"] || piece == PIECES["wBp"] || 
+               piece == PIECES["wKn"] || piece == PIECES["wQu"]){
+                wOfficer_cnt += 1;
+                continue;
+            }
+            if(piece == PIECES["bRk"] || piece == PIECES["bBp"] || 
+               piece == PIECES["bKn"] || piece == PIECES["bQu"]){
+                bOfficer_cnt += 1;
+                continue;
+            }
+        }
+        if(wKg_cnt != 1 || bKg_cnt != 1){
+            return false;
+        }
+        if(wPw_cnt > 8 || bPw_cnt > 8){
+            return false;
+        }
+        if(wPw_cnt + wOfficer_cnt > 15){
+            return false;
+        }
+        if(bPw_cnt + bOfficer_cnt > 15){
+            return false;
+        }
+        if(wKg == -1 || bKg == -1){
+            return false;
+        }
+        if(abs(wKg / 8 - bKg / 8) < 2 && abs(wKg % 8 - bKg % 8) < 2){
+            return false;
+        }
+        return true;
+    }
+
+    bool cBoard::is_inbounds_core(int src, int dst){
+        if(src < 0 || src > 63 || dst < 0 || dst > 63){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
     bool cBoard::is_inbounds(int src, int dst, int step){
-        if(src < 0 or src > 63 or dst < 0 or dst > 63){
+        if(src < 0 || src > 63 || dst < 0 || dst > 63){
             return false;
         }
         if(step == 0){
@@ -115,7 +181,7 @@
             cnt += 1;
             dst += step;
         }
-        return -1;
+        return PIECES["blk"];
     }
 
     bool cBoard::search_bi_dirs(int *first, int *second, int src, int step, int maxcnt){
@@ -146,9 +212,82 @@
         return false;
     }
 
+    bool cBoard::is_nth(int src, int dst){
+        if(src < dst && abs(src - dst) % 8 == 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool cBoard::is_sth(int src, int dst){
+        if(src > dst && abs(src - dst) % 8 == 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool cBoard::is_est(int src, int dst){
+        if(src % 8 < dst % 8 && src / 8 == dst / 8){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool cBoard::is_wst(int src, int dst){
+        if(src % 8 > dst % 8 && src / 8 == dst / 8){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool cBoard::is_nth_est(int src, int dst){
+        if(abs(src - dst) % 9 == 0 && src < dst && src % 8 < dst % 8){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool cBoard::is_sth_wst(int src, int dst){
+        if(abs(src - dst) % 9 == 0 && src > dst && src % 8 > dst % 8){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool cBoard::is_nth_wst(int src, int dst){
+        if(abs(src - dst) % 7 == 0 && src < dst && src % 8 > dst % 8){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool cBoard::is_sth_est(int src, int dst){
+        if(abs(src - dst) % 7 == 0 && src > dst && src % 8 < dst % 8){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
 /*
 
-    def set_to_base(self):
+    def set_to_base(self){
         self.fields = self.BASE
         self.wKg = self.COLS["E"] + self.RANKS["1"] * 8
         self.bKg = self.COLS["E"] + self.RANKS["8"] * 8
@@ -159,7 +298,7 @@
         self.bRkA_first_move_on = None
         self.bRkH_first_move_on = None
 
-    def clear(self):
+    def clear(self){
         self.fields = 0x0
         self.wKg = None
         self.bKg = None
@@ -170,124 +309,22 @@
         self.bRkA_first_move_on = None
         self.bRkH_first_move_on = None
 
-    def verify(self):
-        wKg_cnt = 0
-        bKg_cnt = 0
-        wPw_cnt = 0
-        bPw_cnt = 0
-        wOfficer_cnt = 0
-        bOfficer_cnt = 0
-        for idx in range(64):
-            piece = self.getfield(idx)
-            if(piece == PIECES["wKg"]):
-                wKg_cnt += 1
-            elif(piece == PIECES["bKg"]):
-                bKg_cnt += 1
-            elif(piece == PIECES["wPw"]):
-                wPw_cnt += 1
-            elif(piece == PIECES["bPw"]):
-                bPw_cnt += 1
-            elif(piece == PIECES["wRk"] or piece == PIECES["wBp"] or 
-                 piece == PIECES["wKn"] or piece == PIECES["wQu"]):
-                wOfficer_cnt += 1
-            elif(piece == PIECES["bRk"] or piece == PIECES["bBp"] or 
-                 piece == PIECES["bKn"] or piece == PIECES["bQu"]):
-                bOfficer_cnt += 1
-            elif(piece == PIECES["blk"]):
-                continue
-            else:
-                return False
-        if(wKg_cnt != 1 or bKg_cnt != 1):
-            return False
-        if(wPw_cnt > 8 or bPw_cnt > 8):
-            return False
-        if(wPw_cnt + wOfficer_cnt > 15):
-            return False
-        if(bPw_cnt + bOfficer_cnt > 15):
-            return False
-        if(self.wKg is None or self.bKg is None):
-            return False
-        if(abs(self.wKg // 8 - self.bKg // 8) < 2 and abs(self.wKg % 8 - self.bKg % 8) < 2):
-            return False
-        return True
+    
 
     @classmethod
-    def is_inbounds_core(cls, src, dst):
-        if(src < 0 or src > 63 or dst < 0 or dst > 63):
-            return False
-        else:
-            return True
-
-    @classmethod
-    def is_nth(cls, src, dst):
-        if(src < dst and abs(src - dst) % 8 == 0):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def is_sth(cls, src, dst):
-        if(src > dst and abs(src - dst) % 8 == 0):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def is_est(cls, src, dst):
-        if(src % 8 < dst % 8 and src // 8 == dst // 8):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def is_wst(cls, src, dst):
-        if(src % 8 > dst % 8 and src // 8 == dst // 8):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def is_nth_est(cls, src, dst):
-        if(abs(src - dst) % 9 == 0 and src < dst and src % 8 < dst % 8):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def is_sth_wst(cls, src, dst):
-        if(abs(src - dst) % 9 == 0 and src > dst and src % 8 > dst % 8):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def is_nth_wst(cls, src, dst):
-        if(abs(src - dst) % 7 == 0 and src < dst and src % 8 > dst % 8):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def is_sth_est(cls, src, dst):
-        if(abs(src - dst) % 7 == 0 and src > dst and src % 8 < dst % 8):
-            return True
-        else:
-            return False
-
-    @classmethod
-    def erase_whites(cls, fields):
+    def erase_whites(cls, fields){
         mask = fields & cls.BITS1000
         mask = mask | mask >> 1 | mask >> 2 | mask >> 3
         return fields & mask
 
     @classmethod
-    def erase_blacks(cls, fields):
+    def erase_blacks(cls, fields){
         mask = fields & cls.BITS1000
         mask = (mask | mask >> 1 | mask >> 2 | mask >> 3)
         return fields & (mask ^ cls.FULL)
 
     @classmethod
-    def mask_pieces(cls, fields, piece):
+    def mask_pieces(cls, fields, piece){
         negative = fields ^ PIECES_MASK[piece]
         negative = negative | ((negative & cls.BITS1110) >> 1)
         negative = negative | ((negative & cls.BITS1100) >> 2)

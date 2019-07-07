@@ -1,44 +1,54 @@
 
-from .. values import *
-from .. board import cBoard
-from .piece import cPiece
+#include "./bishop.hpp"
+#include "./searchforpiece.hpp"
+#include "../values.hpp"
+#include "../helper.hpp"
 
+    using namespace std;
 
-class cBishop(cPiece):
-    DIRS_ARY = [DIRS['nth-est'], DIRS['sth-wst'], DIRS['nth-wst'], DIRS['sth-est']]
-    STEPS    = [9, -9, 7, -7]
-    MV_STEPS = [[9, PIECES['blk']], [-9, PIECES['blk']],  [7, PIECES['blk']], [-7, PIECES['blk']]]
+    int cBishop::DIRS_ARY[4] = 
+        {DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
+    int cBishop::STEPS[4] = 
+        {9, -9, 7, -7};
+    int cBishop::MV_STEPS[4][2] = 
+        {{9, PIECES["blk"]}, {-9, PIECES["blk"]},  {7, PIECES["blk"]}, {-7, PIECES["blk"]}};
 
-    def __init__(self, match, pos):
-        super().__init__(match, pos)
-
-    @classmethod
-    def dir_for_move(cls, src, dst):
-        if(cBoard.is_inbounds_core(src, dst) == False):
-            return DIRS['undef']
-        if(cBoard.is_nth_est(src, dst)):
-            return DIRS['nth-est']
-        elif(cBoard.is_sth_wst(src, dst)):
-            return DIRS['sth-wst']
-        elif(cBoard.is_sth_est(src, dst) == True):
-            return DIRS['sth-est']
-        elif(cBoard.is_nth_wst(src, dst) == True):
-            return DIRS['nth-wst']
-        else:
-            return DIRS['undef']
-
-    @classmethod
-    def step_for_dir(cls, direction):
-        if(direction == DIRS['nth-est']):
-            return 9
-        elif(direction == DIRS['sth-wst']):
-            return -9
-        elif(direction == DIRS['nth-wst']):
-            return 7
-        elif(direction == DIRS['sth-est']):
-            return -7
-        else:
-            return None
-
-# class end
+    int cBishop::dir_for_move(int src, int dst){
+        if(cBoard::is_inbounds_core(src, dst) == false){
+            return DIRS["undef"];
+        }
+        if(match->board.is_nth_est(src, dst)){
+            return DIRS["nth-est"];
+        }
+        if(match->board.is_sth_wst(src, dst)){
+            return DIRS["sth-wst"];
+        }
+        if(match->board.is_sth_est(src, dst) == true){
+            return DIRS["sth-est"];
+        }
+        if(match->board.is_nth_wst(src, dst) == true){
+            return DIRS["nth-wst"];
+        }
+        else{
+            return DIRS["undef"];
+        }
+    }
+    
+    int cBishop::step_for_dir(int dir){
+        if(dir == DIRS["nth-est"]){
+            return 9;
+        }
+        if(dir == DIRS["sth-wst"]){
+            return -9;
+        }
+        if(dir == DIRS["nth-wst"]){
+            return 7;
+        }
+        if(dir == DIRS["sth-est"]){
+            return -7;
+        }
+        else{
+            return 0;
+        }
+    }
 

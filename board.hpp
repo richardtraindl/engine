@@ -19,6 +19,9 @@
             int bRkA_first_move_on;
             int bRkH_first_move_on;
 
+            static map<string, int> RANKS;
+            static map<string, int> COLS;
+
             const unsigned long long int BASE0  = 0b0000000000000000000000000000000000000000000000001111111111111111;
             const unsigned long long int BASE1  = 0b1001100100000000000000000000000000000000000000000000000010011001;
             const unsigned long long int BASE2  = 0b0110111000000000000000000000000000000000000000000000000001101110;
@@ -31,9 +34,6 @@
             const int BITS0111 = 0xF; // 0x7777777777777777777777777777777777777777777777777777777777777777;
             const int BITS0011 = 0xF; // 0x3333333333333333333333333333333333333333333333333333333333333333; */
 
-            static map<string, int> RANKS;
-            static map<string, int> COLS;
-
             cBoard();
         
             int getfield(int idx);
@@ -44,12 +44,31 @@
             
             bool comparefields(unsigned long long int _fields[]);
             
-            bool is_inbounds(int src, int dst, int step);
+            bool verify();
+            
+            static bool is_inbounds_core(int src, int dst);
+
+            static bool is_inbounds(int src, int dst, int step);
             
             int search(int src, int step, int maxcnt);
             
             bool search_bi_dirs(int *first, int *second, int src, int step, int maxcnt);
 
+            static bool is_nth(int src, int dst);
+
+            static bool is_sth(int src, int dst);
+
+            static bool is_est(int src, int dst);
+
+            static bool is_wst(int src, int dst);
+
+            static bool is_nth_est(int src, int dst);
+
+            static bool is_sth_wst(int src, int dst);
+
+            static bool is_nth_wst(int src, int dst);
+
+            static bool is_sth_est(int src, int dst);
     };
 
 #endif
