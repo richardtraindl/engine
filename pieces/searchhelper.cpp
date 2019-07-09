@@ -11,7 +11,28 @@
     cTouch::cTouch(){
     }
 
-    bool _is_field_touched(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]){
+
+    cSearchHelper::int RKSTEPS[4];
+        int cSearchHelper::RKSTEPS[4] = {8, -8, 1, -1}; 
+        int cSearchHelper::RKMAXCNT = 7;
+        int cSearchHelper::RKTARGETS[4] = {PIECES["wRk"], PIECES["wQu"], PIECES["bRk"], PIECES["wQu"]};
+        int cSearchHelper::BPSTEPS[4] = {9, -9, 7, -7};
+        int cSearchHelper::BPMAXCNT = 7;
+        int cSearchHelper::BPTARGETS[4] = {PIECES["wBp"], PIECES["wQu"], PIECES["bBp"], PIECES["wQu"]};
+        int cSearchHelper::KGSTEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
+        int cSearchHelper::KGMAXCNT = 1;
+        int cSearchHelper::KGTARGETS[2] = {PIECES["wKg"], PIECES["bKg"]};
+        int stacSearchHelper::KNSTEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
+        int cSearchHelper::KNMAXCNT = 1;
+        int cSearchHelper::KNTARGETS[2] = {PIECES["wKn"], PIECES["bKn"]};
+        int cSearchHelper::WPWSTEPS[2] = {-7, -9};
+        int cSearchHelper::WPWMAXCNT = 1;
+        int cSearchHelper::WPWTARGETS[1] = {PIECES["wPw"]};
+        int cSearchHelper::BPWSTEPS[2] = {9, 7};
+        int cSearchHelper::BPWMAXCNT = 1;
+        int cSearchHelper::BPWTARGETS[1] = {PIECES["bPw"]};
+
+    bool cSearchHelper::_is_field_touched(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]){
         for(const int step : steps){
             int dst = match->board.search(src, step, maxcnt);
             if(dst != -1){
@@ -110,38 +131,23 @@
     }
 
     cSearchHelper::bool is_field_touched(cMatch *match, int src, int color, int mode){
-        int rksteps[4] = {8, -8, 1, -1};
-        int bpsteps[4] = {9, -9, 7, -7};
-        int kgsteps[8] = {8, 9, 1, -7, -8, -9, -1, 7};
-        int knsteps[8] = {17, 10, -6, -15, -17, -10, 6, 15};
-        
-        int rkmaxcnt = 7;
-        int bpmaxcnt = 7;
-        int kgmaxcnt = 1;
-        int knmaxcnt = 1;
-        int pwmaxcnt = 1;
-
         if(color == COLORS["white"]){
-            int pwsteps[2] = {-7, -9};
             int rktargets[2] = {PIECES["wRk"], PIECES["wQu"]};
             int bptargets[2] = {PIECES["wBp"], PIECES["wQu"]};
             int kgtargets[1] = {PIECES["wKg"]};
             int kntargets[1] = {PIECES["wKn"]};
-            int pwtargets[1] = {PIECES["wPw"]};
             // wpw
-            if(_is_field_touched(match, src, color, mode, pwsteps, pwmaxcnt, pwtargets)){
+            if(_is_field_touched(match, src, color, mode, wpwsteps, wpwmaxcnt, wpwtargets)){
                 return true;
             }
         }
         else{
-            int pwsteps[2] = {9, 7};
             int rktargets[2] = {PIECES["bRk"], PIECES["wQu"]};
             int bptargets[2] = {PIECES["bBp"], PIECES["wQu"]};
             int kgtargets[1] = {PIECES["bKg"]};
             int kntargets[1] = {PIECES["bKn"]};
-            int pwtargets[1] =  {PIECES["bPw"]};
             // bpw
-            if(_is_field_touched(match, src, color, mode, pwsteps, pwmaxcnt, pwtargets)){
+            if(_is_field_touched(match, src, color, mode, bpwsteps, bpwmaxcnt, bpwtargets)){
                 return true;
             }
         }
@@ -159,7 +165,7 @@
         }
         return false;
     }
-    
+
 
     void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> *enmies){
         // frdlytouches = []
