@@ -16,21 +16,19 @@
             cTouch();
     };
 
-    class cSearchForPiece{
-        private:
-            static int STEPS[1];
-            static int MAXCNT;
-            static int TARGETS[1];
-        public:
-            cSearchForPiece();
+    bool is_field_touched(cMatch *match, int src, int color, int mode, int steps[], int maxcnt, int targets[]);
 
-            static bool is_field_touched(cMatch *match, int src, int color, int mode);
+    void search_for_color_pieces(cMatch *match, int src, int color, list<cTouch> *touches, int steps[], int maxcnt, int targets[]);
 
-            static void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
+    void search_for_pieces(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches, int steps[], int maxcnt, int targets[]);
 
-            static void field_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
-    };
+    bool is_field_touched(cMatch *match, int src, int color, int mode);
 
+    void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
+
+    void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
+
+    list<cTouch> field_touches_for_color(cMatch *match, int src, int color);
 
     class SearchforRook : public cSearchForPiece{
          private:
@@ -81,12 +79,6 @@
     };
 
 
-    bool is_field_touched(cMatch *match, int src, int color, int mode);
 
-    void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
-
-    void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
-
-    list<cTouch> field_touches_for_color(cMatch *match, int src, int color);
 
 #endif
