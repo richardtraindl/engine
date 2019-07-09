@@ -110,15 +110,15 @@
     }
 
     void _collect_touches(cMatch *match, int src, int steps[], int maxcnt, int targets[], list<cTouch> *touches){
-        for(const int step : STEPS){
-            int dst = match->board.search(src, step, MAXCNT);
+        for(const int step : steps){
+            int dst = match->board.search(src, step, maxcnt);
             if(dst != -1){
                 int piece = match->board.getfield(dst);
                 /*cpiece = match.obj_for_piece(piece, dst);
                 if(cpiece.is_move_stuck(src)){
                     continue;
                 }*/
-                for(const int target : TARGETS){
+                for(const int target : targets){
                     if(piece == target){
                         touches->push_back(cTouch(piece, dst));
                     }
@@ -154,7 +154,7 @@
         if(_is_field_touched(match, src, color, mode, bpsteps, bpmaxcnt, bptargets)){
             return true;
         }
-        if(_is_field_touched_by_king(match, src, color, kgsteps, kgmaxcnt, kgtargets)){
+        if(_is_field_touched_by_king(match, src, kgsteps, kgmaxcnt, kgtargets)){
             return true;
         }
         if(_is_field_touched(match, src, mode, knsteps, knmaxcnt, kntargets)){
@@ -164,30 +164,36 @@
     }
 
     void collect_frdly_and_enemy_touches(cMatch *match, int src, int frdlycolor, list<cTouch> *friends, list<cTouch> *enemies){
-        // frdlytouches = []
-        // enmytouches = []
-                    int rktargets[2] = {PIECES["wRk"], PIECES["bRk"], PIECES["wQu"], PIECES["bQu"]};
-            int bptargets[2] = {PIECES["wBp"], PIECES["bBp"], PIECES["wQu"], PIECES["bQu"]};
-            int kgtargets[1] = {PIECES["wKg"], PIECES["bKg"]};
-            int kntargets[1] = {PIECES["wKn"], PIECES["bKn"]};
-            int wpwtargets[1] = {PIECES["wPw"]};
-            int bpwtargets[1] =  {PIECES["bPw"]};
-        SearchforRook::field_touches_for_both(match, src, color, friends, enemies);
-        SearchforBishop::field_touches_for_both(match, src, color, friends, enemies);
-        SearchforKnight::field_touches_for_both(match, src, color, friends, enemies);
-        SearchforKing::field_touches_for_both(match, src, color, friends, enemies);
-        SearchforWhitePawn::field_touches_for_both(match, src, color, friends, enemies);
-        SearchforBlackPawn::field_touches_for_both(match, src, color, friends, enemies);
+        _collect_frdly_and_enemy_touches(match, src, frdlycolor, rksteps[], rkmaxcnt, rktargets[], friends, enemies);
+        _collect_frdly_and_enemy_touches(match, src, frdlycolor, bpsteps[], bpmaxcnt, bptargets[], friends, enemies);
+        _collect_frdly_and_enemy_touches(match, src, frdlycolor, kgsteps[], kgmaxcnt, kgtargets[], friends, enemies);
+        _collect_frdly_and_enemy_touches(match, src, frdlycolor, knsteps[], knmaxcnt, kntargets[], friends, enemies);
+        _collect_frdly_and_enemy_touches(match, src, frdlycolor, wpwsteps[], wpwmaxcnt, wpwtargets[], friends, enemies);
+        _collect_frdly_and_enemy_touches(match, src, frdlycolor, bpwsteps[], bpwmaxcnt, bpwtargets[], friends, enemies);
     }
 
     list<cTouch> collect_touches_for_color(cMatch *match, int src, int color){
         list<cTouch> touches;
-        SearchforRook::field_touches_for_color(match, src, color, &touches);
-        SearchforBishop::field_touches_for_color(match, src, color, &touches);
-        SearchforKnight::field_touches_for_color(match, src, color, &touches);
-        SearchforKing::field_touches_for_color(match, src, color, &touches);
-        SearchforWhitePawn::field_touches_for_color(match, src, color, &touches);
-        SearchforBlackPawn::field_touches_for_color(match, src, color, &touches);
+        if(color == COLORS["white"]){
+            int rktargets[2] = {PIECES["wRk"], PIECES["wQu"]};
+            int bptargets[2] = {PIECES["wBp"], PIECES["wQu"]};
+            int kgtargets[1] = {PIECES["wKg"]};
+            int kntargets[1] = {PIECES["wKn"]};
+            // wpw
+            _collect_touches(match, src, wpwsteps[], wpwmaxcnt, wpwtargets[], touches);
+        }
+        else{
+            int rktargets[2] = {PIECES["bRk"], PIECES["wQu"]};
+            int bptargets[2] = {PIECES["bBp"], PIECES["wQu"]};
+            int kgtargets[1] = {PIECES["bKg"]};
+            int kntargets[1] = {PIECES["bKn"]};
+            // bpw
+            _collect_touches(match, src, bpwsteps[], bpwmaxcnt, bpwtargets[], touches);
+        }
+        _collect_touches(match, src, rksteps[], rkmaxcnt, rktargets[], touches);
+        _collect_touches(match, src, bpsteps[], bpmaxcnt, bptargets[], touches);
+        _collect_touches(match, src, kgsteps[], kgmaxcnt, kgtargets[], touches);
+        _collect_touches(match, src, knsteps[], knmaxcnt, kntargets[], touches);
         return touches;
     }
 
