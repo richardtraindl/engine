@@ -11,22 +11,12 @@
     cTouch::cTouch(){
     }
 
-    cSearchForPiece::cSearchForPiece(){
-    }
-
-    int cSearchForPiece::STEPS[1] = {0};
-    int cSearchForPiece::MAXCNT = 1;
-    int cSearchForPiece::TARGETS[1] = {-1};
-
-    bool cSearchForPiece::is_field_touched(cMatch *match, int src, int color, int mode){
-        for(const int step : STEPS){
-            int dst = match->board.search(src, step, MAXCNT);
+    bool _is_field_touched(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]){
+        for(const int step : steps){
+            int dst = match->board.search(src, step, maxcnt);
             if(dst != -1){
                 int piece = match->board.getfield(dst);
-                if(match->color_of_piece(piece) != color){
-                    continue;
-                }
-                for(const int target : TARGETS){
+                for(const int target : targets){
                     if(piece == target){
                         if(mode == cMatch::EVAL_MODES["ignore-pins"]){
                             return true;
@@ -58,18 +48,36 @@
         return false;
     }
 
-    void cSearchForPiece::field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches){
-        for(const int step : STEPS){
-            int dst = match->board.search(src, step, MAXCNT);
+    bool is_field_touched_by_king(cMatch *match, int src, int color, int steps[], int maxcnt, int targets[]){
+        for(const int step : steps){
+            int dst = match->board.search(src, step, maxcnt);
             if(dst != -1){
                 int piece = match->board.getfield(dst);
-                for(const int target : TARGETS){
+                if(match->color_of_piece(piece) != color){
+                    continue;
+                }
+                for(const int target : targets){
+                    if(piece == target){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    void search_for_frdly_and_enemy_pieces(cMatch *match, int src, int frdlycolor, int steps[], int maxcnt, int targets[], list<cTouch> *frdlytouches, list<cTouch> *enmytouches){
+        for(const int step : steps){
+            int dst = match->board.search(src, step, maxcnt);
+            if(dst != -1){
+                int piece = match->board.getfield(dst);
+                for(const int target : targets){
                     if(piece == target){
                         /*cpiece = match.obj_for_piece(piece, dst);
                         if(cpiece.is_move_stuck(src)){
                             break;
                         }*/
-                        if(match->color_of_piece(piece) == color){
+                        if(match->color_of_piece(piece) == frdlycolor){
                             cTouch touch; //  = cTouch(piece, dst);
                             frdlytouches->push_back(touch);
                         }
@@ -83,14 +91,11 @@
         }
     }
 
-    void cSearchForPiece::field_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches){
+    void search_for_pieces(cMatch *match, int src, int steps[], int maxcnt, int targets[], list<cTouch> *touches){
         for(const int step : STEPS){
             int dst = match->board.search(src, step, MAXCNT);
             if(dst != -1){
                 int piece = match->board.getfield(dst);
-                if(match->color_of_piece(piece) != color){
-                    continue;
-                }
                 /*cpiece = match.obj_for_piece(piece, dst);
                 if(cpiece.is_move_stuck(src)){
                     continue;
@@ -104,80 +109,67 @@
         }
     }
 
+    bool is_field_touched(cMatch *match, int src, int color, int mode){
+        int rksteps[4] = {8, -8, 1, -1};
+        int bpsteps[4] = {9, -9, 7, -7};
+        int kgsteps[8] = {8, 9, 1, -7, -8, -9, -1, 7};
+        int knsteps[8] = {17, 10, -6, -15, -17, -10, 6, 15};
+        
+        int rkmaxcnt = 7;
+        int bpmaxcnt = 7;
+        int kgmaxcnt = 1;
+        int knmaxcnt = 1;
+        int pwmaxcnt = 1;
 
-    int SearchforRook::STEPS[4] = {8, -8, 1, -1};
-    int SearchforRook::MAXCNT = 7;
-    int SearchforRook::TARGETS[4] = {PIECES["wRk"], PIECES["bRk"], PIECES["wQu"], PIECES["bQu"]};
-
-
-    int SearchforBishop::STEPS[4] = {9, -9, 7, -7};
-    int SearchforBishop::MAXCNT = 7;
-    int SearchforBishop::TARGETS[4] = {PIECES["wBp"], PIECES["bBp"], PIECES["wQu"], PIECES["bQu"]};
-
-
-    int SearchforKing::STEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
-    int SearchforKing::MAXCNT = 1;
-    int SearchforKing::TARGETS[2] = {PIECES["wKg"], PIECES["bKg"]};
-
-    bool SearchforKing::is_field_touched(cMatch *match, int src, int color){
-        for(const int step : STEPS){
-            int dst = match->board.search(src, step, MAXCNT);
-            if(dst != -1){
-                int piece = match->board.getfield(dst);
-                if(match->color_of_piece(piece) != color){
-                    continue;
-                }
-                for(const int target : TARGETS){
-                    if(piece == target){
-                        return true;
-                    }
-                }
+        if(color == COLORS["white"]){
+            int pwsteps[2] = {-7, -9};
+            int rktargets[2] = {PIECES["wRk"], PIECES["wQu"]};
+            int bptargets[2] = {PIECES["wBp"], PIECES["wQu"]};
+            int kgtargets[1] = {PIECES["wKg"]};
+            int kntargets[1] = {PIECES["wKn"]};
+            int pwtargets[1] = {PIECES["wPw"]};
+            // wpw
+            if(_is_field_touched(match, src, color, mode, pwsteps, pwmaxcnt, pwtargets)){
+                return true;
             }
         }
-        return false;
-    }
-
-
-    int SearchforKnight::STEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
-    int SearchforKnight::MAXCNT = 1;
-    int SearchforKnight::TARGETS[2] = {PIECES["wKn"], PIECES["bKn"]};
-
-
-    int SearchforWhitePawn::STEPS[2] = {-7, -9};
-    int SearchforWhitePawn::MAXCNT = 1;
-    int SearchforWhitePawn::TARGETS[1] = {PIECES["wPw"]};
-
-
-    int SearchforBlackPawn::STEPS[2] = {9, 7};
-    int SearchforBlackPawn::MAXCNT = 1;
-    int SearchforBlackPawn::TARGETS[1] = {PIECES["bPw"]};
-
-
-    bool is_field_touched(cMatch *match, int src, int color, int mode){
-        if(SearchforRook::is_field_touched(match, src, color, mode)){
+        else{
+            int pwsteps[2] = {9, 7};
+            int rktargets[2] = {PIECES["bRk"], PIECES["wQu"]};
+            int bptargets[2] = {PIECES["bBp"], PIECES["wQu"]};
+            int kgtargets[1] = {PIECES["bKg"]};
+            int kntargets[1] = {PIECES["bKn"]};
+            int pwtargets[1] =  {PIECES["bPw"]};
+            // bpw
+            if(_is_field_touched(match, src, color, mode, pwsteps, pwmaxcnt, pwtargets)){
+                return true;
+            }
+        }
+        if(_is_field_touched(cMatch *match, int src, int mode, rksteps, rkmaxcnt, rktargets){)){
             return true;
         }
-        if(SearchforBishop::is_field_touched(match, src, color, mode)){
+        if(_is_field_touched(match, src, color, mode, bpsteps, bpmaxcnt, bptargets)){
             return true;
         }
-        if(SearchforKing::is_field_touched(match, src, color)){
+        if(_is_field_touched_by_king(match, src, color, kgsteps, kgmaxcnt, kgtargets)){
             return true;
         }
-        if(SearchforKnight::is_field_touched(match, src, color, mode)){
-            return true;
-        }
-        if(SearchforWhitePawn::is_field_touched(match, src, color, mode)){
-            return true;
-        }
-        if(SearchforBlackPawn::is_field_touched(match, src, color, mode)){
+        if(_is_field_touched(match, src, mode, knsteps, knmaxcnt, kntargets)){
             return true;
         }
         return false;
     }
+    
 
     void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> *enmies){
         // frdlytouches = []
         // enmytouches = []
+                    int rktargets[2] = {PIECES["wRk"], PIECES["bRk"], PIECES["wQu"], PIECES["bQu"]};
+            int bptargets[2] = {PIECES["wBp"], PIECES["bBp"], PIECES["wQu"], PIECES["bQu"]};
+            int kgtargets[1] = {PIECES["wKg"], PIECES["bKg"]};
+            int kntargets[1] = {PIECES["wKn"], PIECES["bKn"]};
+            int wpwtargets[1] = {PIECES["wPw"]};
+            int bpwtargets[1] =  {PIECES["bPw"]};
         SearchforRook::field_touches_for_both(match, src, color, friends, enmies);
         SearchforBishop::field_touches_for_both(match, src, color, friends, enmies);
         SearchforKnight::field_touches_for_both(match, src, color, friends, enmies);
