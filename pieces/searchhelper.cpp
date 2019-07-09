@@ -172,8 +172,7 @@
         _collect_frdly_and_enemy_touches(match, src, frdlycolor, bpwsteps[], bpwmaxcnt, bpwtargets[], friends, enemies);
     }
 
-    list<cTouch> collect_touches_for_color(cMatch *match, int src, int color){
-        list<cTouch> touches;
+    list<cTouch> collect_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches){
         if(color == COLORS["white"]){
             int rktargets[2] = {PIECES["wRk"], PIECES["wQu"]};
             int bptargets[2] = {PIECES["wBp"], PIECES["wQu"]};
@@ -194,16 +193,10 @@
         _collect_touches(match, src, bpsteps[], bpmaxcnt, bptargets[], touches);
         _collect_touches(match, src, kgsteps[], kgmaxcnt, kgtargets[], touches);
         _collect_touches(match, src, knsteps[], knmaxcnt, kntargets[], touches);
-        return touches;
     }
 
-    void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch){
+    void add_field_touches_beyond(cMatch *match, int frdlycolor, cTouch *ctouch){
         list<cTouch> supporter_beyond = ctouch->supporter_beyond;
         list<cTouch> attacker_beyond = ctouch->attacker_beyond;
-        SearchforRook::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforBishop::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforKnight::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforKing::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforWhitePawn::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforBlackPawn::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
+        collect_frdly_and_enemy_touches(match, src, frdlycolor, supporter_beyond, attacker_beyond);
     }
