@@ -37,15 +37,15 @@
             static int BPMAXCNT;
             static int BPTARGETS[1];
 
-            bool _is_field_touched(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]);
-            bool _is_field_touched_by_king(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]);
-            void _collect_frdly_and_enemy_touches(cMatch *match, int src, int frdlycolor, int steps[], int maxcnt, int targets[], list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
-            void _collect_touches(cMatch *match, int src, int steps[], int maxcnt, int targets[], list<cTouch> *touches);
+            static bool _is_field_touched(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]);
+            static bool _is_field_touched_by_king(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]);
+            static void _collect_frdly_and_enemy_touches(cMatch *match, int src, int frdlycolor, int steps[], int maxcnt, int targets[], list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
+            static void _collect_touches(cMatch *match, int src, int steps[], int maxcnt, int targets[], list<cTouch> *touches);
         public:
-            bool is_field_touched(cMatch *match, int src, int color, int mode);
-            void collect_frdly_and_enemy_touches(cMatch *match, int src, int frdlycolor, list<cTouch> *friends, list<cTouch> * enmies);
-            list<cTouch> collect_touches_for_color(cMatch *match, int src, int color);
-            void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
+            static bool is_field_touched(cMatch *match, int src, int color, int mode);
+            static void collect_frdly_and_enemy_touches(cMatch *match, int src, int frdlycolor, list<cTouch> *friends, list<cTouch> * enmies);
+            static list<cTouch> collect_touches_for_color(cMatch *match, int src, int color);
+            static void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
     };
 
 #endif
