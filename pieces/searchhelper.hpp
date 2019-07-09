@@ -37,10 +37,10 @@
             static int BPMAXCNT;
             static int BPTARGETS[1];
 
-            bool _is_field_touched(cMatch *match, int src, int color, int mode);
-            bool _is_field_touched_by_king(cMatch *match, int src, int color, int mode);
-            void _search_for_color_pieces(cMatch *match, int src, int color, list<cTouch> *touches);
-            void _search_for_pieces(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
+            bool _is_field_touched(cMatch *match, int src, int color, int mode, int steps[], int maxcnt, int targets[]);
+            bool _is_field_touched_by_king(cMatch *match, int src, int color, int mode, int steps[], int maxcnt, int targets[]);
+            void _search_for_color_pieces(cMatch *match, int src, int color, int steps[], int maxcnt, int targets[], list<cTouch> *touches);
+            void _search_for_both_colors_pieces(cMatch *match, int src, int color, int steps[], int maxcnt, int targets[], list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
         public:
             bool is_field_touched(cMatch *match, int src, int color, int mode);
             void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
@@ -49,3 +49,4 @@
     };
 
 #endif
+
