@@ -109,7 +109,7 @@
         }
     }
 
-    bool is_field_touched(cMatch *match, int src, int color, int mode){
+    cSearchHelper::bool is_field_touched(cMatch *match, int src, int color, int mode){
         int rksteps[4] = {8, -8, 1, -1};
         int bpsteps[4] = {9, -9, 7, -7};
         int kgsteps[8] = {8, 9, 1, -7, -8, -9, -1, 7};
