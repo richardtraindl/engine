@@ -12,25 +12,25 @@
     }
 
 
-    cSearchHelper::int RKSTEPS[4];
-        int cSearchHelper::RKSTEPS[4] = {8, -8, 1, -1}; 
-        int cSearchHelper::RKMAXCNT = 7;
-        int cSearchHelper::RKTARGETS[4] = {PIECES["wRk"], PIECES["wQu"], PIECES["bRk"], PIECES["wQu"]};
-        int cSearchHelper::BPSTEPS[4] = {9, -9, 7, -7};
-        int cSearchHelper::BPMAXCNT = 7;
-        int cSearchHelper::BPTARGETS[4] = {PIECES["wBp"], PIECES["wQu"], PIECES["bBp"], PIECES["wQu"]};
-        int cSearchHelper::KGSTEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
-        int cSearchHelper::KGMAXCNT = 1;
-        int cSearchHelper::KGTARGETS[2] = {PIECES["wKg"], PIECES["bKg"]};
-        int stacSearchHelper::KNSTEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
-        int cSearchHelper::KNMAXCNT = 1;
-        int cSearchHelper::KNTARGETS[2] = {PIECES["wKn"], PIECES["bKn"]};
-        int cSearchHelper::WPWSTEPS[2] = {-7, -9};
-        int cSearchHelper::WPWMAXCNT = 1;
-        int cSearchHelper::WPWTARGETS[1] = {PIECES["wPw"]};
-        int cSearchHelper::BPWSTEPS[2] = {9, 7};
-        int cSearchHelper::BPWMAXCNT = 1;
-        int cSearchHelper::BPWTARGETS[1] = {PIECES["bPw"]};
+    int cSearchHelper::int RKSTEPS[4];
+    int cSearchHelper::RKSTEPS[4] = {8, -8, 1, -1}; 
+    int cSearchHelper::RKMAXCNT = 7;
+    int cSearchHelper::RKTARGETS[4] = {PIECES["wRk"], PIECES["wQu"], PIECES["bRk"], PIECES["wQu"]};
+    int cSearchHelper::BPSTEPS[4] = {9, -9, 7, -7};
+    int cSearchHelper::BPMAXCNT = 7;
+    int cSearchHelper::BPTARGETS[4] = {PIECES["wBp"], PIECES["wQu"], PIECES["bBp"], PIECES["wQu"]};
+    int cSearchHelper::KGSTEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
+    int cSearchHelper::KGMAXCNT = 1;
+    int cSearchHelper::KGTARGETS[2] = {PIECES["wKg"], PIECES["bKg"]};
+    int stacSearchHelper::KNSTEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
+    int cSearchHelper::KNMAXCNT = 1;
+    int cSearchHelper::KNTARGETS[2] = {PIECES["wKn"], PIECES["bKn"]};
+    int cSearchHelper::WPWSTEPS[2] = {-7, -9};
+    int cSearchHelper::WPWMAXCNT = 1;
+    int cSearchHelper::WPWTARGETS[1] = {PIECES["wPw"]};
+    int cSearchHelper::BPWSTEPS[2] = {9, 7};
+    int cSearchHelper::BPWMAXCNT = 1;
+    int cSearchHelper::BPWTARGETS[1] = {PIECES["bPw"]};
 
     bool cSearchHelper::_is_field_touched(cMatch *match, int src, int mode, int steps[], int maxcnt, int targets[]){
         for(const int step : steps){
