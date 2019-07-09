@@ -45,7 +45,7 @@
             static bool is_field_touched(cMatch *match, int src, int color, int mode);
             static void collect_frdly_and_enemy_touches(cMatch *match, int src, int frdlycolor, list<cTouch> *friends, list<cTouch> * enemies);
             static void collect_touches_for_color(cMatch *match, int src, int color, static list<cTouch> *touches);
-            static void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
+            static void add_field_touches_beyond(cMatch *match, int frdlycolor, cTouch *ctouch);
     };
 
 #endif
