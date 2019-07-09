@@ -16,69 +16,36 @@
             cTouch();
     };
 
-    bool is_field_touched(cMatch *match, int src, int color, int mode, int steps[], int maxcnt, int targets[]);
-
-    void search_for_color_pieces(cMatch *match, int src, int color, list<cTouch> *touches, int steps[], int maxcnt, int targets[]);
-
-    void search_for_pieces(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches, int steps[], int maxcnt, int targets[]);
-
-    bool is_field_touched(cMatch *match, int src, int color, int mode);
-
-    void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
-
-    void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
-
-    list<cTouch> field_touches_for_color(cMatch *match, int src, int color);
-
-    class SearchforRook : public cSearchForPiece{
-         private:
-            static int STEPS[4];
-            static int MAXCNT;
-            static int TARGETS[4];
-    };
-
-
-    class SearchforBishop : public cSearchForPiece{
+    class cSearchHelper{
         private:
-            static int STEPS[4];
-            static int MAXCNT;
-            static int TARGETS[4];
-    };
+            static int RKSTEPS[4];
+            static int RKMAXCNT;
+            static int RKTARGETS[4];
+            static int BPSTEPS[4];
+            static int BPMAXCNT;
+            static int BPTARGETS[4];
+            static int KGSTEPS[8];
+            static int KGMAXCNT;
+            static int KGTARGETS[2];
+            static int KNSTEPS[8];
+            static int KNMAXCNT;
+            static int KNTARGETS[2];
+            static int WPSTEPS[2];
+            static int WPMAXCNT;
+            static int WPTARGETS[1];
+            static int BPSTEPS[2];
+            static int BPMAXCNT;
+            static int BPTARGETS[1];
 
-
-    class SearchforKing : public cSearchForPiece{
-        private:
-            static int STEPS[8];
-            static int MAXCNT;
-            static int TARGETS[2];
+            bool _is_field_touched(cMatch *match, int src, int color, int mode);
+            bool _is_field_touched_by_king(cMatch *match, int src, int color, int mode);
+            void _search_for_color_pieces(cMatch *match, int src, int color, list<cTouch> *touches);
+            void _search_for_pieces(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
         public:
-            static bool is_field_touched(cMatch *match, int src, int color);
+            bool is_field_touched(cMatch *match, int src, int color, int mode);
+            void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
+            list<cTouch> field_touches_for_color(cMatch *match, int src, int color);
+            void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
     };
-
-
-    class SearchforKnight : public cSearchForPiece{
-        private:
-            static int STEPS[8];
-            static int MAXCNT;
-            static int TARGETS[2];
-    };
-
-    class SearchforWhitePawn : public cSearchForPiece{
-        private:
-            static int STEPS[2];
-            static int MAXCNT;
-            static int TARGETS[1];
-    };
-
-
-    class SearchforBlackPawn : public cSearchForPiece{
-        private:
-            static int STEPS[2];
-            static int MAXCNT;
-            static int TARGETS[1];
-    };
-
-
-
 
 #endif
