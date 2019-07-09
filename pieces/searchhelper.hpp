@@ -1,5 +1,5 @@
-#ifndef SEARCHFORPIECE_HPP
-    #define SEARCHFORPIECE_HPP
+#ifndef SEARCHHELPER_HPP
+    #define SEARCHHELPER_HPP
 
     #include <list> 
     #include "../match.hpp"
