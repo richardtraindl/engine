@@ -48,7 +48,7 @@
         return false;
     }
 
-    bool is_field_touched_by_king(cMatch *match, int src, int color, int steps[], int maxcnt, int targets[]){
+    bool _is_field_touched_by_king(cMatch *match, int src, int color, int steps[], int maxcnt, int targets[]){
         for(const int step : steps){
             int dst = match->board.search(src, step, maxcnt);
             if(dst != -1){
@@ -66,7 +66,7 @@
         return false;
     }
 
-    void search_for_frdly_and_enemy_pieces(cMatch *match, int src, int frdlycolor, int steps[], int maxcnt, int targets[], list<cTouch> *frdlytouches, list<cTouch> *enmytouches){
+    void _search_for_frdly_and_enemy_pieces(cMatch *match, int src, int frdlycolor, int steps[], int maxcnt, int targets[], list<cTouch> *frdlytouches, list<cTouch> *enmytouches){
         for(const int step : steps){
             int dst = match->board.search(src, step, maxcnt);
             if(dst != -1){
@@ -91,7 +91,7 @@
         }
     }
 
-    void search_for_pieces(cMatch *match, int src, int steps[], int maxcnt, int targets[], list<cTouch> *touches){
+    void _search_for_pieces(cMatch *match, int src, int steps[], int maxcnt, int targets[], list<cTouch> *touches){
         for(const int step : STEPS){
             int dst = match->board.search(src, step, MAXCNT);
             if(dst != -1){
