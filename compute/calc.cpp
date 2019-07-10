@@ -54,68 +54,78 @@
         for(list<cMove>::iterator it = newcandidates.begin(); it != newcandidates.end(); ++it){
             candidates.push_back(newcandidate);
 
-def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
-    color = match.next_color()
-    candidates = []
-    newcandidates = []
-    count = 0
-    starttime = time.time()
-
-    if(maximizing):
-        maxscore = alpha
-    else:
-        minscore = beta
-
-    dbggmove = cMove(None, 3, 51, PIECES['blk'])
-    search_for_mate = match.is_endgame()
-    priomoves = generate_moves(match, candidate, dbggmove, search_for_mate, True)
-    priomoves.sort(key = attrgetter('prio'))
-    maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove)
-
-    if(len(priomoves) == 0 or maxcnt == 0):
-        return score_position(match, len(priomoves)), candidates
-
-    for priomove in priomoves:
-        move = priomove.move
-        count += 1
-
-        match.do_move(move.src, move.dst, move.prompiece)
-        if(maximizing):
-            newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, None)
-        else:
-            newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, None)
-        match.undo_move()
-
-        if(depth == 1):
-            prnt_search(match, "CURRENT SEARCH: ", newscore, move, newcandidates)
-            if(candidates):
-                if(maximizing):
-                    prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
-                else:
-                    prnt_search(match, "CANDIDATE:      ", minscore, None, candidates)
+    void alphabeta(cMatch *match, int depth, cSlimits *slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, int *result_score, list<cPrioMove> *result_candidates){
+        int color = match->next_color();
+        list<cPrioMove> newcandidates;
+        int newscore;
+        int score;
+        int count = 0;
+        time_t starttime = time.time();
 
         if(maximizing):
-            if(newscore > maxscore):
-               maxscore = newscore
-               if(maxscore >= beta):
-                   break # beta cut-off
-               else:
-                   append_newmove(move, candidates, newcandidates)
+            score = alpha;
         else:
-            if(newscore < minscore):
-                minscore = newscore
-                if(minscore <= alpha):
-                    break # alpha cut-off
-                else:
-                    append_newmove(move, candidates, newcandidates)
+            score = beta;
 
-        if(count >= maxcnt):
-            break
+        cMove dbggmove = cMove(0x0, 3, 51, PIECES["blk"]);
+        bool search_for_mate = match->is_endgame();
+        list<cPrioMove> priomoves = generate_moves(match, candidate, dbggmove, search_for_mate, true);
+        // priomoves.sort(key = attrgetter('prio'))
+        int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
 
-    if(maximizing):
-        return maxscore, candidates
-    else:
-        return minscore, candidates
+        if(priomoves.size() == 0 || maxcnt == 0){
+            *result_score = score_position(match, priomoves.size();
+            for(list<cMove>::iterator it = candidates.begin(); it != candidates.end(); ++it){                          
+                result_candidates->push_back(*it);
+            }
+        }
+
+        for(list<cMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+            count += 1
+
+            match->do_move(it->src, it->dst, it->prompiece);
+            if(maximizing){
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, None);
+            }
+            else{
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, None);
+            }
+            match->undo_move();
+
+            if(depth == 1){
+                prnt_search(match, "CURRENT SEARCH: ", newscore, move, newcandidates);
+                if(candidates != NULL){
+                    prnt_search(match, "CANDIDATE:      ", score, None, candidates);
+
+            if(maximizing){
+                if(newscore > core){
+                   score = newscore;
+                   if(score >= beta){
+                       break; // beta cut-off
+                   }
+                   else{
+                       append_newmove(move, candidates, newcandidates);
+                   }
+                }
+            else{
+                if(newscore < score){
+                    score = newscore;
+                    if(score <= alpha){
+                        break; // alpha cut-off
+                    }
+                    else{
+                        append_newmove(move, candidates, newcandidates);
+                    }
+                }
+            }
+            if(count >= maxcnt){
+                break;
+
+        *result_score = score;
+        for(list<cMove>::iterator it = candidates.begin(); it != candidates.end(); ++it){                          
+            result_candidates->push_back(*it);
+        }
+    }
 
 
 class SearchLimits:
