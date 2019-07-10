@@ -232,43 +232,58 @@
 
 
     int select_movecnt(cMatch *match, list<cPrioMove> *priomoves, int depth, cSlimits *slimits, cPrioMove *last_pmove){
-        if(len(priomoves) == 0 or depth > slimits.dpth_max):
-            return 0
-        if(depth <= slimits.dpth_stage1 and priomoves[0].has_domain(cTactic.DOMAINS['defends-check'])):
-            return len(priomoves)
-
-        stormycnt = count_up_within_stormy(priomoves)
-        if(depth <= slimits.dpth_stage1):
-            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
-            count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
-            if(count == 0):
-                count = slimits.mvcnt_stage1
-            else:
-                count = min(count, slimits.mvcnt_stage1)
-            return max(stormycnt, count)
-        elif(depth <= slimits.dpth_stage2):
-            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
-            count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
-            if(count == 0):
-                count = slimits.mvcnt_stage2
-            else:
-                count = min(count, slimits.mvcnt_stage2)
-            return max(stormycnt, count)
-            """elif(depth <= slimits.dpth_stage3):
-            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, False)
-            count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
-            if(count == 0):
-                count = slimits.mvcnt_stage3
-            else:
-                count = min(count, slimits.mvcnt_stage3)
-            return max(stormycnt, count)"""
+        if(priomoves.size() == 0 || depth > slimits->dpth_max){
+            return 0;
+        }
+        int count;
+        if(depth <= slimits->dpth_stage1 && (*priomoves).has_domain(cTactic.DOMAINS["defends-check"])){
+            return priomoves.size();
+        }
+        int stormycnt = count_up_within_stormy(priomoves);
+        if(depth <= slimits->dpth_stage1){
+            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio1"], last_pmove, false);
+            count = count_up_to_prio(priomoves, cPrioMove.PRIOS["prio2"]);
+            if(count == 0){
+                count = slimits->mvcnt_stage1;
+            }
+            else{
+                count = min(count, slimits->mvcnt_stage1);
+            }
+            return max(stormycnt, count);
+        if(depth <= slimits->dpth_stage2){
+            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio1"], last_pmove, false);
+            count = count_up_to_prio(priomoves, cPrioMove.PRIOS["prio2"]);
+            if(count == 0){
+                count = slimits.mvcnt_stage2;
+            }
+            else{
+                count = min(count, slimits.mvcnt_stage2);
+            }
+            return max(stormycnt, count);
+            /*
+            if(depth <= slimits.dpth_stage3):
+                resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio0"], last_pmove, false);
+                count = count_up_to_prio(priomoves, cPrioMove.PRIOS["prio0"]);
+                if(count == 0){
+                    count = slimits->mvcnt_stage3;
+                }
+                else{
+                    count = min(count, slimits.mvcnt_stage3);
+                }
+                return max(stormycnt, count) ;
+            }
+            */
         else:
-            if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, True)):
-                return count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
-                #return min(slimits.mvcnt_stage3, count)
-                #return min(2, count)
-            else:
-                return 0
+            if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio0"], last_pmove, True)){
+                return count_up_to_prio(priomoves, cPrioMove.PRIOS["prio0"]);
+                // return min(slimits.mvcnt_stage3, count)
+                // return min(2, count)
+            }
+            else{
+                return 0;
+            }
+        }
+    }
 
 
     string concat_fmtmoves(cMatch *match, list<cPrioMove> *moves){
@@ -301,6 +316,10 @@
         bool maximizing = match->next_color() == COLORS["white"];
         int alpha = SCORES[PIECES["wKg"]] * 10;
         int beta = SCORES[PIECES["bKg"]] * 10;
+        int result_score;
+        list<cPrioMove> result_candidates;
+
+        alphabeta(match, depth, slimits, alpha, beta, maximizing, NULL, NULL, &result_score, &result_candidates);
 
         cout << "result: " << score << " match: " << match->created_at << " ";
         cout << concat_fmtmoves(match, candidates));
