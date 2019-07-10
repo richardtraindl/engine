@@ -128,60 +128,58 @@
         }
     }
 
-    SearchLimitsLevelBlitz::add_mvcnt = 2;
-    SearchLimitsLevelBlitz::dpth_max = 8;
-    SearchLimitsLevelBlitz::dpth_stage1 = 2;
-    SearchLimitsLevelBlitz::dpth_stage2 = 4;
-    SearchLimitsLevelBlitz::mvcnt_stage1 = 6;
-    SearchLimitsLevelBlitz::mvcnt_stage2 = 6;
+    int SearchLimitsLevelBlitz::add_mvcnt = 2;
+    int SearchLimitsLevelBlitz::dpth_max = 8;
+    int SearchLimitsLevelBlitz::dpth_stage1 = 2;
+    int SearchLimitsLevelBlitz::dpth_stage2 = 4;
+    int SearchLimitsLevelBlitz::mvcnt_stage1 = 6;
+    int SearchLimitsLevelBlitz::mvcnt_stage2 = 6;
 
-    SearchLimitsLevelLow::add_mvcnt = 2;
-    SearchLimitsLevelLow::dpth_max = 12;
-    SearchLimitsLevelLow::dpth_stage1 = 2;
-    SearchLimitsLevelLow::dpth_stage2 = 5;
-    SearchLimitsLevelLow::mvcnt_stage1 = 8;
-    SearchLimitsLevelLow::mvcnt_stage2 = 6;
+    int SearchLimitsLevelLow::add_mvcnt = 2;
+    int SearchLimitsLevelLow::dpth_max = 12;
+    int SearchLimitsLevelLow::dpth_stage1 = 2;
+    int SearchLimitsLevelLow::dpth_stage2 = 5;
+    int SearchLimitsLevelLow::mvcnt_stage1 = 8;
+    int SearchLimitsLevelLow::mvcnt_stage2 = 6;
 
-    SearchLimitsLevelMedium::add_mvcnt = 2;
-    SearchLimitsLevelMedium::dpth_max = 16;
-    SearchLimitsLevelMedium::dpth_stage1 = 2;
-    SearchLimitsLevelMedium::dpth_stage2 = 6;
-    SearchLimitsLevelMedium::mvcnt_stage1 = 10;
-    SearchLimitsLevelMedium::mvcnt_stage2 = 6;
+    int SearchLimitsLevelMedium::add_mvcnt = 2;
+    int SearchLimitsLevelMedium::dpth_max = 16;
+    int SearchLimitsLevelMedium::dpth_stage1 = 2;
+    int SearchLimitsLevelMedium::dpth_stage2 = 6;
+    int SearchLimitsLevelMedium::mvcnt_stage1 = 10;
+    int SearchLimitsLevelMedium::mvcnt_stage2 = 6;
 
-        elif(match.level == match.LEVELS['high']):
-            self.dpth_max = 20
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
-            #self.dpth_stage3 = 8
-            self.mvcnt_stage1 = 12
-            self.mvcnt_stage2 = 6
-            #self.mvcnt_stage3 = 3
-
-        if(match.is_endgame()):
-            self.dpth_stage1 += 2
-            self.dpth_stage2 += 1
-# class end
+    int SearchLimitsLevelHigh::add_mvcnt = 2;
+    int SearchLimitsLevelHigh::dpth_max = 20;
+    int SearchLimitsLevelHigh::dpth_stage1 = 3;
+    int SearchLimitsLevelHigh::dpth_stage2 = 6;
+    int SearchLimitsLevelHigh::mvcnt_stage1 = 12;
+    int SearchLimitsLevelHigh::mvcnt_stage2 = 6;
 
 
-def count_up_to_prio(priomoves, priolimit):
-    count = 0
-    for priomove in priomoves:
-        if(priomove.prio <= priolimit or priomove.is_tactic_stormy()):
-            count += 1
-        else:
-            break
-    return count
+    int count_up_to_prio(list<cPrioMove> *priomoves, int priolimit){
+        int count = 0;
+        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+            if(it->prio <= priolimit || it->is_tactic_stormy()){
+                count += 1;
+            }
+            else{
+                break;
+            }
+        }
+        return count;
+    }
 
 
-def count_up_within_stormy(priomoves):
-    count = 0
-    for priomove in priomoves:
-        if(priomove.is_tactic_stormy()):
-            count += 1
-        else:
-            break
-    return count
+    int count_up_within_stormy(list<cPrioMove> *priomoves){
+        int count = 0;
+        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+            if(it->is_tactic_stormy()){
+                count += 1;
+            }
+        }
+        return count;
+    }
 
 
 def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchange):
