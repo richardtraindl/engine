@@ -13,7 +13,7 @@
     }
 
 
-    void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]):
+    void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]){
         string str_gmove;
         if(move != NULL){
             str_gmove = " [" + move->format() + "] ";
@@ -23,12 +23,13 @@
     }
 
 
-def concat_fmtmoves(match, moves):
-    str_gmoves = ""
-    for move in moves:
-        if(move):
-            str_moves += " [" + move.format() + "] "
-    return str_moves
+    sting concat_fmtmoves(cMatch match, list<cMove> *moves){
+        string str_gmoves = "";
+        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+            if(*it != NULL){
+                str_moves += " [" + it->format() + "] ";
+        return str_moves;
+    }
 
 
 def generate_moves(match, candidate, dbggmove, search_for_mate, mode):
