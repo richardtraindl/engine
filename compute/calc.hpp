@@ -13,35 +13,11 @@
     using namespace std;
 
 
-    void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves){
-        cout << "------------------------------------------------\n ";
-        int idx = 1;
-        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
-            cout << idx << ". ";
-            cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << "\n";
-            cout << it->concat_fmttactics() << "\n";
-            idx += 1;
-        cout << "------------------------------------------------\n ";
-    }
+    void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves);
 
+    void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]);
 
-    void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]):
-        string str_gmove;
-        if(move != NULL){
-            str_gmove = " [" + move->format() + "] ";
-        else:
-            str_gmove = "";
-        cout << label << score << str_gmove << concat_fmtmoves(match, candidates));
-    }
-
-
-    def concat_fmtmoves(match, moves):
-        str_gmoves = ""
-        for move in moves:
-            if(move):
-                str_moves += " [" + move.format() + "] "
-        return str_moves
-
+    void concat_fmtmoves(cMatch *match, list<cMove> *moves);
 
 def generate_moves(match, candidate, dbggmove, search_for_mate, mode):
     color = match.next_color()
