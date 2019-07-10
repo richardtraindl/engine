@@ -1,5 +1,5 @@
 
-#<include> "calc.hpp"
+#<include> "./calc.hpp"
 
     void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves){
         cout << "------------------------------------------------\n ";
