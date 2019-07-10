@@ -11,85 +11,17 @@
 
     using namespace std;
 
-
     void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves);
 
     void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]);
 
     string concat_fmtmoves(cMatch *match, list<cMove> *moves);
 
-def generate_moves(match, candidate, dbggmove, search_for_mate, mode):
-    color = match.next_color()
-    moves = []
-    #for idx in range(64):
-    fields = match.board.fields
-    for idx in range(63, -1, -1):
-        piece = fields & 0xF
-        fields = fields >> 4
-        #piece = match.board.getfield(idx)
-        if(piece == PIECES['blk'] or color != match.color_of_piece(piece)):
-            continue
-        else:
-            cpiece = match.obj_for_piece(piece, idx)
-            piecemoves = cpiece.generate_moves(candidate, dbggmove, search_for_mate, mode)
-            if(len(piecemoves) > 0):
-                moves.extend(piecemoves)
-    return moves
+    list<cPrioMove> generate_moves(cMatch *match, int candidate, cMove *dbggmove, bool search_for_mate, int mode);
 
+    void append_newmove(cMove *move, list<cMove> candidates, list<cMove> newcandidates);
 
-def append_newmove(move, candidates, newcandidates):
-    candidates.clear()
-    candidates.append(move)
-    for newcandidate in newcandidates:
-        if(newcandidate):
-            candidates.append(newcandidate)
-        else:
-            break
-
-
-def mpcalc(match, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
-    candidates = []
-    newcandidates = []
-
-    dbggmove = None
-    search_for_mate = match.is_endgame()
-    priomoves = generate_moves(match, candidate, dbggmove, search_for_mate, True)
-    priomoves.sort(key = attrgetter('prio'))
-    maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove)
-    print("************ maxcnt: " + str(maxcnt) + " ******************")
-    prnt_priomoves(match, priomoves)
-
-    if(len(priomoves) == 0 or maxcnt == 0):
-        return score_position(match, len(priomoves)), candidates
-    elif(len(priomoves) == 1):
-        priomove = priomoves[0]
-        candidates.append(priomove.move)
-        if(priomove.has_domain(cTactic.DOMAINS['is-tactical-draw'])):
-            return 0, candidates
-        else:
-            return score_position(match, len(priomoves)), candidates
-    else:
-        pool = mp.Pool(processes=maxcnt)
-        newmatch = copy.deepcopy(match)
-        results = [pool.apply_async(alphabeta_stage1, args=(newmatch, priomove, depth, slimits, alpha, beta, maximizing, priomove, None,)) for priomove in priomoves[:maxcnt]]
-        pool.close()
-        pool.join()
-        results = [p.get() for p in results]
-        if(maximizing):
-            candidate = [SCORES[PIECES['wKg']], None]
-        else:
-            candidate = [SCORES[PIECES['bKg']], None]
-        for result in results:
-            if(maximizing):
-                if(result[0] > candidate[0]):
-                    candidate = result
-            else:
-                if(result[0] < candidate[0]):
-                    candidate = result
-        return candidate
-
-
-def alphabeta_stage1(match, priomove, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
+    def alphabeta_stage1(match, priomove, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
     candidates = []
     newcandidates = []
 
