@@ -3,7 +3,6 @@
 
     #include <iostream>
     #include <list> 
-    #include <map>
     #include <string>
     #include <ctime>
     #include "./board.hpp"
@@ -17,7 +16,7 @@
 
     void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]);
 
-    void concat_fmtmoves(cMatch *match, list<cMove> *moves);
+    string concat_fmtmoves(cMatch *match, list<cMove> *moves);
 
 def generate_moves(match, candidate, dbggmove, search_for_mate, mode):
     color = match.next_color()
