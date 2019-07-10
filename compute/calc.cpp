@@ -182,96 +182,118 @@
     }
 
 
-def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchange):
-    if(only_exchange and last_pmove is not None and 
-       last_pmove.has_domain(cTactic.DOMAINS['captures']) == False):
-        return False
-    if(last_pmove is not None and 
-       last_pmove.has_tactic_ext(cTactic(cTactic.DOMAINS['captures'], cTactic.WEIGHTS['bad-deal']))):
-        last_pmove_capture_bad_deal = True
-    else:
-        last_pmove_capture_bad_deal = False
-    count_of_stormy = 0
-    count_of_good_captures = 0
-    first_silent = None
-    bad_captures = []
-    for priomove in priomoves:
-        if(only_exchange == False and priomove.is_tactic_stormy()):
-            count_of_stormy += 1
-            priomove.prio = min(priomove.prio, (new_prio + priomove.prio % 10) - 13)
-        elif(priomove.has_domain(cTactic.DOMAINS['captures'])):
-            weight = priomove.fetch_weight(cTactic.DOMAINS['captures'])
-            if(weight > cTactic.WEIGHTS['bad-deal']):
-                count_of_good_captures += 1
-                priomove.prio = min(priomove.prio, (new_prio  + priomove.prio % 10) - 12)
-            elif(last_pmove_capture_bad_deal):
-                bad_captures.append(priomove)
-                #count_of_bad_captures += 1
-                #priomove.prio = min(priomove.prio, new_prio)
-        elif(first_silent is None):
-            first_silent = priomove
-    if(len(bad_captures) > 0 and count_of_good_captures == 0 and count_of_stormy == 0):
-        if(first_silent):
-            first_silent.prio = min(first_silent.prio, (new_prio + first_silent.prio % 10) - 10)
-        for capture in bad_captures:
-            capture.prio = min(capture.prio, new_prio + capture.prio % 10)
-    priomoves.sort(key=attrgetter('prio'))
-    return True
+    bool resort_exchange_or_stormy_moves(list<cPrioMove> *priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange){
+        if(only_exchange && last_pmove != NULL && last_pmove->has_domain(cTactic.DOMAINS["captures"]) == false){
+            return false;
+        }
+        int last_pmove_capture_bad_deal;
+        if(last_pmove != NULL && last_pmove->has_tactic_ext(cTactic(cTactic.DOMAINS["captures"], cTactic.WEIGHTS["bad-deal"]))){
+            last_pmove_capture_bad_deal = true;
+        }
+        else{
+            last_pmove_capture_bad_deal = false;
+        }
+        int count_of_stormy = 0;
+        int count_of_good_captures = 0;
+        cPrioMove first_silent = NULL;
+        list<cPrioMove> bad_captures;
+        for(list<cMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+            if(only_exchange == false && it->is_tactic_stormy()){
+                count_of_stormy += 1;
+                it->prio = min(it->prio, (new_prio + it->prio % 10) - 13);
+                continue;
+            }
+            if(it->has_domain(cTactic.DOMAINS["captures"])){
+                weight = (it->fetch_weight(cTactic.DOMAINS["captures"]);
+                if(weight > cTactic.WEIGHTS["bad-deal"]){
+                    count_of_good_captures += 1;
+                    (it->prio = min((it->prio, (new_prio  + (it->prio % 10) - 12);
+                }
+                if(last_pmove_capture_bad_deal){
+                    bad_captures.push_back(*it);
+                    // count_of_bad_captures += 1
+                    // priomove.prio = min(priomove.prio, new_prio)
+                }
+            if(first_silent == NULL){
+                first_silent = *it;
+            }
+        }
+        if(bad_captures.size() > 0 && count_of_good_captures == 0 && count_of_stormy == 0){
+            if(first_silent != NULL){
+                first_silent.prio = min(first_silent.prio, (new_prio + first_silent.prio % 10) - 10);
+            }
+            for(list<cMove>::iterator it = bad_captures.begin(); it != bad_captures.end(); ++it){
+                it->prio = min(it->prio, new_prio + it->prio % 10);
+            }
+        }
+        // priomoves.sort(key=attrgetter('prio'))
+        return true;
+    }
 
 
-def select_movecnt(match, priomoves, depth, slimits, last_pmove):
-    if(len(priomoves) == 0 or depth > slimits.dpth_max):
-        return 0
-    if(depth <= slimits.dpth_stage1 and priomoves[0].has_domain(cTactic.DOMAINS['defends-check'])):
-        return len(priomoves)
 
-    stormycnt = count_up_within_stormy(priomoves)
-    if(depth <= slimits.dpth_stage1):
-        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
-        if(count == 0):
-            count = slimits.mvcnt_stage1
-        else:
-            count = min(count, slimits.mvcnt_stage1)
-        return max(stormycnt, count)
-    elif(depth <= slimits.dpth_stage2):
-        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
-        if(count == 0):
-            count = slimits.mvcnt_stage2
-        else:
-            count = min(count, slimits.mvcnt_stage2)
-        return max(stormycnt, count)
-        """elif(depth <= slimits.dpth_stage3):
-        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, False)
-        count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
-        if(count == 0):
-            count = slimits.mvcnt_stage3
-        else:
-            count = min(count, slimits.mvcnt_stage3)
-        return max(stormycnt, count)"""
-    else:
-        if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, True)):
-            return count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
-            #return min(slimits.mvcnt_stage3, count)
-            #return min(2, count)
-        else:
+
+    int select_movecnt(cMatch *match, list<cPrioMove> *priomoves, int depth, cSlimits *slimits, cPrioMove *last_pmove){
+        if(len(priomoves) == 0 or depth > slimits.dpth_max):
             return 0
+        if(depth <= slimits.dpth_stage1 and priomoves[0].has_domain(cTactic.DOMAINS['defends-check'])):
+            return len(priomoves)
+
+        stormycnt = count_up_within_stormy(priomoves)
+        if(depth <= slimits.dpth_stage1):
+            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
+            count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
+            if(count == 0):
+                count = slimits.mvcnt_stage1
+            else:
+                count = min(count, slimits.mvcnt_stage1)
+            return max(stormycnt, count)
+        elif(depth <= slimits.dpth_stage2):
+            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
+            count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
+            if(count == 0):
+                count = slimits.mvcnt_stage2
+            else:
+                count = min(count, slimits.mvcnt_stage2)
+            return max(stormycnt, count)
+            """elif(depth <= slimits.dpth_stage3):
+            resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, False)
+            count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
+            if(count == 0):
+                count = slimits.mvcnt_stage3
+            else:
+                count = min(count, slimits.mvcnt_stage3)
+            return max(stormycnt, count)"""
+        else:
+            if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, True)):
+                return count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
+                #return min(slimits.mvcnt_stage3, count)
+                #return min(2, count)
+            else:
+                return 0
 
 
-def concat_fmtmoves(match, moves):
-    str_moves = ""
-    for move in moves:
-        if(move):
-            str_moves += " [" + move.format() + "] "
-    return str_moves
+    string concat_fmtmoves(cMatch *match, list<cPrioMove> *moves){
+        string str_moves = "";
+        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+            str_moves += " [" + it->format() + "] ";
+        return str_moves;
+    }
 
-def prnt_fmttime(msg, seconds):
-    minute, sec = divmod(seconds, 60)
-    hour, minute = divmod(minute, 60)
-    print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
+    void prnt_fmttime(string msg, int seconds){
+        int sec, minute, hour;
+        sec = seconds % 60;
+        minute = seconds % (60 * 60);
+        hour = seconds / (60 * 60);
+        
+        print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
 
 
+
+
+    
+
+    list<cPrioMove> *calc_move(cMatch *match, cMove *candidate);
 def calc_move(match, candidate):
     time_start = time.time()
     move = retrieve_move(match)
