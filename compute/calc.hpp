@@ -48,75 +48,11 @@
 
     bool resort_exchange_or_stormy_moves(list<cPrioMove> *priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange);
 
-    int select_movecnt(cMatch *match, list<cPrioMove> *priomoves, int depth, cSlimits *slimits, cPrioMove last_pmove);
-    if(len(priomoves) == 0 or depth > slimits.dpth_max):
-        return 0
-    if(depth <= slimits.dpth_stage1 and priomoves[0].has_domain(cTactic.DOMAINS['defends-check'])):
-        return len(priomoves)
+    int select_movecnt(cMatch *match, list<cPrioMove> *priomoves, int depth, cSlimits *slimits, cPrioMove *last_pmove);
 
-    stormycnt = count_up_within_stormy(priomoves)
-    if(depth <= slimits.dpth_stage1):
-        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
-        if(count == 0):
-            count = slimits.mvcnt_stage1
-        else:
-            count = min(count, slimits.mvcnt_stage1)
-        return max(stormycnt, count)
-    elif(depth <= slimits.dpth_stage2):
-        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio2'])
-        if(count == 0):
-            count = slimits.mvcnt_stage2
-        else:
-            count = min(count, slimits.mvcnt_stage2)
-        return max(stormycnt, count)
-        """elif(depth <= slimits.dpth_stage3):
-        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, False)
-        count = count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
-        if(count == 0):
-            count = slimits.mvcnt_stage3
-        else:
-            count = min(count, slimits.mvcnt_stage3)
-        return max(stormycnt, count)"""
-    else:
-        if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS['prio0'], last_pmove, True)):
-            return count_up_to_prio(priomoves, cPrioMove.PRIOS['prio0'])
-            #return min(slimits.mvcnt_stage3, count)
-            #return min(2, count)
-        else:
-            return 0
+    string concat_fmtmoves(cMatch *match, list<cPrioMove> *moves);
 
+    void prnt_fmttime(string msg, int seconds);
 
-def concat_fmtmoves(match, moves):
-    str_moves = ""
-    for move in moves:
-        if(move):
-            str_moves += " [" + move.format() + "] "
-    return str_moves
+    list<cPrioMove> *calc_move(cMatch *match, cMove *candidate);
 
-def prnt_fmttime(msg, seconds):
-    minute, sec = divmod(seconds, 60)
-    hour, minute = divmod(minute, 60)
-    print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
-
-
-def calc_move(match, candidate):
-    time_start = time.time()
-    move = retrieve_move(match)
-    candidates = []
-
-    if(move):
-        candidates.append(move)
-        score = match.score
-    else:
-        slimits = SearchLimits(match)
-        maximizing = match.next_color() == COLORS['white']
-        alpha = SCORES[PIECES['wKg']] * 10
-        beta = SCORES[PIECES['bKg']] * 10
-        score, candidates = mpcalc(match, 1, slimits, alpha, beta, maximizing, None, candidate)
-
-    msg = "result: " + str(score) + " match: " + str(match.created_at) + " "
-    print(msg + concat_fmtmoves(match, candidates))
-    prnt_fmttime("\ncalc-time: ", time.time() - time_start)
-    return candidates
