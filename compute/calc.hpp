@@ -23,46 +23,24 @@
 
     alphabeta(cMatch *match, int depth, cSlimits *slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, int *score, list<cPrioMove> *candidates);
 
-class SearchLimits:
-    def __init__(self, match):
-        self.add_mvcnt = 2
-        if(match.level == match.LEVELS['blitz']):
-            self.dpth_max = 8
-            self.dpth_stage1 = 2
-            self.dpth_stage2 = 4
-            #self.dpth_stage3 = 4
-            self.mvcnt_stage1 = 6
-            self.mvcnt_stage2 = 6
-            #self.mvcnt_stage3 = 2
-        if(match.level == match.LEVELS['low']):
-            self.dpth_max = 12
-            self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
-            #self.dpth_stage3 = 6
-            self.mvcnt_stage1 = 8
-            self.mvcnt_stage2 = 6
-            #self.mvcnt_stage3 = 2
-        elif(match.level == match.LEVELS['medium']):
-            self.dpth_max = 16
-            self.dpth_stage1 = 2
-            self.dpth_stage2 = 6
-            #self.dpth_stage3 = 8
-            self.mvcnt_stage1 = 10
-            self.mvcnt_stage2 = 6
-            #self.mvcnt_stage3 = 3
-        elif(match.level == match.LEVELS['high']):
-            self.dpth_max = 20
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
-            #self.dpth_stage3 = 8
-            self.mvcnt_stage1 = 12
-            self.mvcnt_stage2 = 6
-            #self.mvcnt_stage3 = 3
+    class SearchLimitsLevelBlitz{
+        public:
+            static int add_mvcnt;
+            static int dpth_max;
+            static int dpth_stage1;
+            static int dpth_stage2;
+            static int mvcnt_stage1;
+            static int mvcnt_stage2;
+    };
 
-        if(match.is_endgame()):
-            self.dpth_stage1 += 2
-            self.dpth_stage2 += 1
-# class end
+    class SearchLimitsLevelBlitz : public SearchLimitsLevelLow{
+    };
+
+    class SearchLimitsLevelBlitz : public SearchLimitsLevelMedium{
+    };
+
+    class SearchLimitsLevelBlitz : public SearchLimitsLevelHigh{
+    };
 
 
 def count_up_to_prio(priomoves, priolimit):
