@@ -231,8 +231,6 @@
     }
 
 
-
-
     int select_movecnt(cMatch *match, list<cPrioMove> *priomoves, int depth, cSlimits *slimits, cPrioMove *last_pmove){
         if(len(priomoves) == 0 or depth > slimits.dpth_max):
             return 0
@@ -282,34 +280,30 @@
 
     void prnt_fmttime(string msg, int seconds){
         int sec, minute, hour;
-        sec = seconds % 60;
-        minute = seconds % (60 * 60);
         hour = seconds / (60 * 60);
-        
-        print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
+        int remaining = seconds % (60 * 60);
+        min = remaining / 60;
+        sec = remaining % 60;
+        print( msg + "%02d:%02d:%02d" % (hour, minute, sec));
+    }
 
 
+    list<cPrioMove> *calc_move(cMatch *match, cMove *candidate){
+        t_time time_start = time(0);
+        // move = retrieve_move(match)
+        list<cPrioMove> candidates;
 
+        //if(move):
+        //    candidates.append(move)
+        //    score = match.score
+        //else:
+        cSearchLimits slimits = cSearchLimits(match);
+        bool maximizing = match->next_color() == COLORS["white"];
+        int alpha = SCORES[PIECES["wKg"]] * 10;
+        int beta = SCORES[PIECES["bKg"]] * 10;
 
-    
-
-    list<cPrioMove> *calc_move(cMatch *match, cMove *candidate);
-def calc_move(match, candidate):
-    time_start = time.time()
-    move = retrieve_move(match)
-    candidates = []
-
-    if(move):
-        candidates.append(move)
-        score = match.score
-    else:
-        slimits = SearchLimits(match)
-        maximizing = match.next_color() == COLORS['white']
-        alpha = SCORES[PIECES['wKg']] * 10
-        beta = SCORES[PIECES['bKg']] * 10
-        score, candidates = mpcalc(match, 1, slimits, alpha, beta, maximizing, None, candidate)
-
-    msg = "result: " + str(score) + " match: " + str(match.created_at) + " "
-    print(msg + concat_fmtmoves(match, candidates))
-    prnt_fmttime("\ncalc-time: ", time.time() - time_start)
-    return candidates
+        cout << "result: " << score << " match: " << match->created_at << " ";
+        cout << concat_fmtmoves(match, candidates));
+        prnt_fmttime("\ncalc-time: ", time(0) - time_start);
+        return candidates
+    }
