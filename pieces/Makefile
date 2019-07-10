@@ -2,32 +2,32 @@ CC = g++
 
 all: searchforpiece.o piece.o rook.o bishop.o knight.o queen.o pawn.o whitepawn.o blackpawn.o
 
-piece.o: piece.cpp piece.hpp
-	$(CC) -Wall -ggdb -c piece.cpp -o piece.o
+piece.o: piece.cpp piece.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c piece.cpp -o piece.o
 
-rook.o: rook.cpp rook.hpp
-	$(CC) -Wall -ggdb -c rook.cpp -o rook.o
+rook.o: rook.cpp rook.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c rook.cpp -o rook.o
 
-bishop.o: bishop.cpp bishop.hpp
-	$(CC) -Wall -ggdb -c bishop.cpp -o bishop.o
+bishop.o: bishop.cpp bishop.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c bishop.cpp -o bishop.o
 
-knight.o: knight.cpp knight.hpp
-	$(CC) -Wall -ggdb -c knight.cpp -o knight.o
+knight.o: knight.cpp knight.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c knight.cpp -o knight.o
 
-queen.o: queen.cpp queen.hpp
-	$(CC) -Wall -ggdb -c queen.cpp -o queen.o
+queen.o: queen.cpp queen.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c queen.cpp -o queen.o
 
-pawn.o: pawn.cpp pawn.hpp
-	$(CC) -Wall -ggdb -c pawn.cpp -o pawn.o
+pawn.o: pawn.cpp pawn.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c pawn.cpp -o pawn.o
 
-whitepawn.o: whitepawn.cpp whitepawn.hpp
-	$(CC) -Wall -ggdb -c whitepawn.cpp -o whitepawn.o
+whitepawn.o: whitepawn.cpp whitepawn.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c whitepawn.cpp -o whitepawn.o
 
-blackpawn.o: blackpawn.cpp blackpawn.hpp
-	$(CC) -Wall -ggdb -c blackpawn.cpp -o blackpawn.o
+blackpawn.o: blackpawn.cpp blackpawn.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c blackpawn.cpp -o blackpawn.o
 
-searchforpiece.o: searchforpiece.cpp searchforpiece.hpp
-	$(CC) -Wall -ggdb -c searchforpiece.cpp -o searchforpiece.o
+searchhelper.o: searchforpiece.cpp searchforpiece.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c searchforpiece.cpp -o searchforpiece.o
 
 clean:
 	rm -f *.o

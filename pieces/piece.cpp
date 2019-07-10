@@ -41,7 +41,7 @@
                         return false;
                     }
                     list<cTouch> frdlytouches, enmytouches;
-                    field_touches_for_both(match, pos1, color, &frdlytouches, &enmytouches);
+                    // field_touches_for_both(match, pos1, color, &frdlytouches, &enmytouches);
                     bool enmy_is_lower = false;
                     for(const cTouch enmy : enmytouches){
                         if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){

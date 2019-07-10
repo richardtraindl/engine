@@ -4,19 +4,19 @@
     using namespace std;
 
     MapStrInt PIECES = {
-        {"blk", 0x0}, 
-        {"wPw", 0x1}, 
-        {"wKn", 0x2}, 
-        {"wBp", 0x3}, 
-        {"wRk", 0x4}, 
-        {"wQu", 0x5}, 
-        {"wKg", 0x6},
-        {"bPw", 0x9}, 
-        {"bKn", 0xA}, 
-        {"bBp", 0xB}, 
-        {"bRk", 0xC}, 
-        {"bQu", 0xD}, 
-        {"bKg", 0xE}
+        {"blk", mBLK}, 
+        {"wPw", mWPW}, 
+        {"wKn", mWKN}, 
+        {"wBp", mWBP}, 
+        {"wRk", mWRK}, 
+        {"wQu", mWQU}, 
+        {"wKg", mWKG},
+        {"bPw", mBPW}, 
+        {"bKn", mBKN}, 
+        {"bBp", mBBP}, 
+        {"bRk", mBRK}, 
+        {"bQu", mBQU}, 
+        {"bKg", mBKG}
     };
 
     MapIntInt PIECES_BARE = {

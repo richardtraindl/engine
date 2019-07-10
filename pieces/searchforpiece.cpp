@@ -1,25 +1,21 @@
 
-#include <list> 
+
 #include "./searchforpiece.hpp"
-#include "../values.hpp"
 
 
     cTouch::cTouch(int _piece, int _pos){
         piece = _piece;
         pos = _pos;
     }
-
     cTouch::cTouch(){
     }
 
-    cSearchForPiece::cSearchForPiece(){
-    }
 
-    int cSearchForPiece::STEPS[1] = {0};
-    int cSearchForPiece::MAXCNT = 1;
-    int cSearchForPiece::TARGETS[1] = {-1};
+    int cSearchforRook::STEPS[4] = {8, -8, 1, -1};
+    int cSearchforRook::MAXCNT = 7;
+    int cSearchforRook::TARGETS[4] = {mWRK, mBRK, mWQU, mBQU};
 
-    bool cSearchForPiece::is_field_touched(cMatch *match, int src, int color, int mode){
+    bool cSearchforRook::_is_field_touched(cMatch *match, int src, int color, int mode){
         for(const int step : STEPS){
             int dst = match->board.search(src, step, MAXCNT);
             if(dst != -1){
@@ -59,18 +55,18 @@
         return false;
     }
 
-    void cSearchForPiece::field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches){
+    void cSearchforRook::_collect_touches_for_both_colors(cMatch *match, int src, int friendlycolor, list<cTouch> *frdlytouches, list<cTouch> *enmytouches){
         for(const int step : STEPS){
             int dst = match->board.search(src, step, MAXCNT);
             if(dst != -1){
                 int piece = match->board.getfield(dst);
                 for(const int target : TARGETS){
                     if(piece == target){
-                        /*cpiece = match.obj_for_piece(piece, dst);
-                        if(cpiece.is_move_stuck(src)){
-                            break;
-                        }*/
-                        if(match->color_of_piece(piece) == color){
+                        // cpiece = match.obj_for_piece(piece, dst);
+                        // if(cpiece.is_move_stuck(src)){
+                        //     break;
+                        // }
+                        if(match->color_of_piece(piece) == friendlycolor){
                             cTouch touch; //  = cTouch(piece, dst);
                             frdlytouches->push_back(touch);
                         }
@@ -84,7 +80,7 @@
         }
     }
 
-    void cSearchForPiece::field_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches){
+    void cSearchforRook::_collect_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches){
         for(const int step : STEPS){
             int dst = match->board.search(src, step, MAXCNT);
             if(dst != -1){
@@ -92,10 +88,10 @@
                 if(match->color_of_piece(piece) != color){
                     continue;
                 }
-                /*cpiece = match.obj_for_piece(piece, dst);
-                if(cpiece.is_move_stuck(src)){
-                    continue;
-                }*/
+                // cpiece = match.obj_for_piece(piece, dst);
+                //if(cpiece.is_move_stuck(src)){
+                //    continue;
+                //}
                 for(const int target : TARGETS){
                     if(piece == target){
                         touches->push_back(cTouch(piece, dst));
@@ -106,21 +102,15 @@
     }
 
 
-    int SearchforRook::STEPS[4] = {8, -8, 1, -1};
-    int SearchforRook::MAXCNT = 7;
-    int SearchforRook::TARGETS[4] = {PIECES["wRk"], PIECES["bRk"], PIECES["wQu"], PIECES["bQu"]};
+    int cSearchforBishop::STEPS[4] = {9, -9, 7, -7};
+    int cSearchforBishop::MAXCNT = 7;
+    int cSearchforBishop::TARGETS[4] = {mWBP, mBBP, mWQU, mBQU};
 
 
-    int SearchforBishop::STEPS[4] = {9, -9, 7, -7};
-    int SearchforBishop::MAXCNT = 7;
-    int SearchforBishop::TARGETS[4] = {PIECES["wBp"], PIECES["bBp"], PIECES["wQu"], PIECES["bQu"]};
-
-
-    int SearchforKing::STEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
-    int SearchforKing::MAXCNT = 1;
-    int SearchforKing::TARGETS[2] = {PIECES["wKg"], PIECES["bKg"]};
-
-    bool SearchforKing::is_field_touched(cMatch *match, int src, int color){
+    int cSearchforKing::STEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
+    int cSearchforKing::MAXCNT = 7;
+    int cSearchforKing::TARGETS[2] = {mWKG, mBKG};
+    bool cSearchforKing::_is_field_touched(cMatch *match, int src, int color){
         for(const int step : STEPS){
             int dst = match->board.search(src, step, MAXCNT);
             if(dst != -1){
@@ -139,73 +129,61 @@
     }
 
 
-    int SearchforKnight::STEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
-    int SearchforKnight::MAXCNT = 1;
-    int SearchforKnight::TARGETS[2] = {PIECES["wKn"], PIECES["bKn"]};
+    int cSearchforKnight::STEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
+    int cSearchforKnight::MAXCNT = 1;
+    int cSearchforKnight::TARGETS[2] = {mWKN, mBKN};
 
 
-    int SearchforWhitePawn::STEPS[2] = {-7, -9};
-    int SearchforWhitePawn::MAXCNT = 1;
-    int SearchforWhitePawn::TARGETS[1] = {PIECES["wPw"]};
+    int cSearchforWhitePawn::STEPS[2] = {-7, -9};
+    int cSearchforWhitePawn::MAXCNT = 1;
+    int cSearchforWhitePawn::TARGETS[1] = {mWPW};
 
 
-    int SearchforBlackPawn::STEPS[2] = {9, 7};
-    int SearchforBlackPawn::MAXCNT = 1;
-    int SearchforBlackPawn::TARGETS[1] = {PIECES["bPw"]};
+    int cSearchforBlackPawn::STEPS[2] = {9, 7};
+    int cSearchforBlackPawn::MAXCNT = 1;
+    int cSearchforBlackPawn::TARGETS[1] = {mBPW};
 
 
     bool is_field_touched(cMatch *match, int src, int color, int mode){
-        if(SearchforRook::is_field_touched(match, src, color, mode)){
+        if(cSearchforRook::_is_field_touched(match, src, color, mode)){
+          return true;
+        }
+        if(cSearchforBishop::_is_field_touched(match, src, color, mode)){
             return true;
         }
-        if(SearchforBishop::is_field_touched(match, src, color, mode)){
+        if(cSearchforKing::_is_field_touched(match, src, color)){
             return true;
         }
-        if(SearchforKing::is_field_touched(match, src, color)){
+        if(cSearchforKnight::_is_field_touched(match, src, color, mode)){
             return true;
         }
-        if(SearchforKnight::is_field_touched(match, src, color, mode)){
+        if(cSearchforWhitePawn::_is_field_touched(match, src, color, mode)){
             return true;
         }
-        if(SearchforWhitePawn::is_field_touched(match, src, color, mode)){
-            return true;
-        }
-        if(SearchforBlackPawn::is_field_touched(match, src, color, mode)){
+        if(cSearchforBlackPawn::_is_field_touched(match, src, color, mode)){
             return true;
         }
         return false;
     }
 
-    void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> *enmies){
-        // frdlytouches = []
-        // enmytouches = []
-        SearchforRook::field_touches_for_both(match, src, color, friends, enmies);
-        SearchforBishop::field_touches_for_both(match, src, color, friends, enmies);
-        SearchforKnight::field_touches_for_both(match, src, color, friends, enmies);
-        SearchforKing::field_touches_for_both(match, src, color, friends, enmies);
-        SearchforWhitePawn::field_touches_for_both(match, src, color, friends, enmies);
-        SearchforBlackPawn::field_touches_for_both(match, src, color, friends, enmies);
+    void collect_touches_for_both_colors(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> *enmies){
+        cSearchforRook::_collect_touches_for_both_colors(match, src, color, friends, enmies);
+        cSearchforBishop::_collect_touches_for_both_colors(match, src, color, friends, enmies);
+        cSearchforKnight::_collect_touches_for_both_colors(match, src, color, friends, enmies);
+        cSearchforKing::_collect_touches_for_both_colors(match, src, color, friends, enmies);
+        cSearchforWhitePawn::_collect_touches_for_both_colors(match, src, color, friends, enmies);
+        cSearchforBlackPawn::_collect_touches_for_both_colors(match, src, color, friends, enmies);
+    }
+
+    void collect_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches){
+        cSearchforRook::_collect_touches_for_color(match, src, color, touches);
+        cSearchforBishop::_collect_touches_for_color(match, src, color, touches);
+        cSearchforKnight::_collect_touches_for_color(match, src, color, touches);
+        cSearchforKing::_collect_touches_for_color(match, src, color, touches);
+        cSearchforWhitePawn::_collect_touches_for_color(match, src, color, touches);
+        cSearchforBlackPawn::_collect_touches_for_color(match, src, color, touches);
     }
 
     void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch){
-        list<cTouch> supporter_beyond = ctouch->supporter_beyond;
-        list<cTouch> attacker_beyond = ctouch->attacker_beyond;
-        SearchforRook::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforBishop::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforKnight::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforKing::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforWhitePawn::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
-        SearchforBlackPawn::field_touches_for_both(match, ctouch->pos, color, &supporter_beyond, &attacker_beyond);
+        collect_touches_for_both_colors(match, ctouch->pos, color, &(ctouch->supporter_beyond), &(ctouch->attacker_beyond));
     }
-
-    list<cTouch> field_touches_for_color(cMatch *match, int src, int color){
-        list<cTouch> touches;
-        SearchforRook::field_touches_for_color(match, src, color, &touches);
-        SearchforBishop::field_touches_for_color(match, src, color, &touches);
-        SearchforKnight::field_touches_for_color(match, src, color, &touches);
-        SearchforKing::field_touches_for_color(match, src, color, &touches);
-        SearchforWhitePawn::field_touches_for_color(match, src, color, &touches);
-        SearchforBlackPawn::field_touches_for_color(match, src, color, &touches);
-        return touches;
-    }
-

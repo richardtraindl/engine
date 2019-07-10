@@ -6,6 +6,9 @@
     #include "../match.hpp"
     #include "../values.hpp"
 
+    using namespace std;
+
+
     class cTouch{
         public:
             int piece;
@@ -17,65 +20,55 @@
             cTouch();
     };
 
-    class cSearchForPiece{
-        private:
-            static int STEPS[1];
-            static int MAXCNT;
-            static int TARGETS[1];
+
+    class cSearchforRook{
         public:
-            cSearchForPiece();
+            static int STEPS[4];
+            static int MAXCNT;
+            static int TARGETS[4];
 
-            static bool is_field_touched(cMatch *match, int src, int color, int mode);
-
-            static void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
-
-            static void field_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
+            static bool _is_field_touched(cMatch *match, int src, int color, int mode);
+            static void _collect_touches_for_both_colors(cMatch *match, int src, int friendlycolor, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
+            static void _collect_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
     };
 
 
-    class SearchforRook : public cSearchForPiece{
-         private:
+    class cSearchforBishop : public cSearchforRook{
+        public:
             static int STEPS[4];
             static int MAXCNT;
             static int TARGETS[4];
     };
 
 
-    class SearchforBishop : public cSearchForPiece{
-        private:
-            static int STEPS[4];
-            static int MAXCNT;
-            static int TARGETS[4];
-    };
-
-
-    class SearchforKing : public cSearchForPiece{
-        private:
-            static int STEPS[8];
-            static int MAXCNT;
-            static int TARGETS[2];
+    class cSearchforKing : public cSearchforRook{
         public:
-            static bool is_field_touched(cMatch *match, int src, int color);
+            static int STEPS[8];
+            static int MAXCNT;
+            static int TARGETS[2];
+
+            static bool _is_field_touched(cMatch *match, int src, int color);
     };
 
 
-    class SearchforKnight : public cSearchForPiece{
-        private:
+    class cSearchforKnight : public cSearchforRook{
+        public:
             static int STEPS[8];
             static int MAXCNT;
             static int TARGETS[2];
     };
 
-    class SearchforWhitePawn : public cSearchForPiece{
-        private:
+
+    class cSearchforWhitePawn : public cSearchforRook{
+        public:
             static int STEPS[2];
             static int MAXCNT;
             static int TARGETS[1];
     };
 
 
-    class SearchforBlackPawn : public cSearchForPiece{
-        private:
+    class cSearchforBlackPawn : public cSearchforRook{
+        public:
             static int STEPS[2];
             static int MAXCNT;
             static int TARGETS[1];
@@ -84,10 +77,10 @@
 
     bool is_field_touched(cMatch *match, int src, int color, int mode);
 
-    void field_touches_for_both(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
+    void collect_touches_for_both_colors(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
+
+    void collect_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
 
     void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
-
-    list<cTouch> field_touches_for_color(cMatch *match, int src, int color);
 
 #endif
