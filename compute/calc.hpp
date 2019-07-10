@@ -1,38 +1,46 @@
-import multiprocessing as mp
-import random, time, copy
-from operator import attrgetter
+#ifndef CALC_HPP
+    #define CALC_HPP
 
-from ..values import *
-from ..move import cPrioMove, cTactic
-from .openings import retrieve_move
-from .analyze_position import *
+    #include <iostream>
+    #include <list> 
+    #include <map>
+    #include <string>
+    #include <ctime>
+    #include "./board.hpp"
+    #include "./move.hpp"
+    #include "./match.hpp"
 
-
-def prnt_priomoves(match, priomoves):
-    print("------------------------------------------------")
-    idx = 1
-    for priomove in priomoves:
-        print(str(idx), end=".")
-        print(priomove.move.format() + " prio: " + str(priomove.prio) + " is_tactic_stormy: " + str(priomove.is_tactic_stormy()))
-        print(priomove.concat_fmttactics())
-        idx += 1
-    print("------------------------------------------------")
+    using namespace std;
 
 
-def prnt_search(match, label, score, move, candidates):
-    if(move):
-        str_gmove = " [" + move.format() + "] "
-    else:
-        str_gmove = ""
-    print(label + str(score).rjust(8, " ") + str_gmove + concat_fmtmoves(match, candidates))
+    void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves){
+        cout << "------------------------------------------------\n ";
+        int idx = 1;
+        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+            cout << idx << ". ";
+            cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << "\n";
+            cout << it->concat_fmttactics() << "\n";
+            idx += 1;
+        cout << "------------------------------------------------\n ";
+    }
 
 
-def concat_fmtmoves(match, moves):
-    str_gmoves = ""
-    for move in moves:
-        if(move):
-            str_moves += " [" + move.format() + "] "
-    return str_moves
+    void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]):
+        string str_gmove;
+        if(move != NULL){
+            str_gmove = " [" + move->format() + "] ";
+        else:
+            str_gmove = "";
+        cout << label << score << str_gmove << concat_fmtmoves(match, candidates));
+    }
+
+
+    def concat_fmtmoves(match, moves):
+        str_gmoves = ""
+        for move in moves:
+            if(move):
+                str_moves += " [" + move.format() + "] "
+        return str_moves
 
 
 def generate_moves(match, candidate, dbggmove, search_for_mate, mode):
