@@ -32,116 +32,27 @@
     }
 
 
-def generate_moves(match, candidate, dbggmove, search_for_mate, mode):
-    color = match.next_color()
-    moves = []
-    #for idx in range(64):
-    fields = match.board.fields
-    for idx in range(63, -1, -1):
-        piece = fields & 0xF
-        fields = fields >> 4
-        #piece = match.board.getfield(idx)
-        if(piece == PIECES['blk'] or color != match.color_of_piece(piece)):
-            continue
-        else:
-            cpiece = match.obj_for_piece(piece, idx)
-            piecemoves = cpiece.generate_moves(candidate, dbggmove, search_for_mate, mode)
-            if(len(piecemoves) > 0):
-                moves.extend(piecemoves)
-    return moves
+    list<cPrioMove> generate_moves(cMatch *match, int candidate, cMove *dbggmove, bool search_for_mate, int mode){
+        int color = match.next_color();
+        list<cPrioMove> moves;
+        for(int idx = 0; idx < 64; ++i){
+            int piece = match->board.getfield(idx);
+            if(piece == PIECES['blk'] || color != match->color_of_piece(piece)){
+                continue;
+            }
+            else{
+                cPiece cpiece = match->obj_for_piece(piece, idx);
+                cpiece.generate_moves(candidate, dbggmove, search_for_mate, mode, moves);
+            }
+        return moves;
+    }
 
 
-def append_newmove(move, candidates, newcandidates):
-    candidates.clear()
-    candidates.append(move)
-    for newcandidate in newcandidates:
-        if(newcandidate):
-            candidates.append(newcandidate)
-        else:
-            break
-
-
-def mpcalc(match, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
-    candidates = []
-    newcandidates = []
-
-    dbggmove = None
-    search_for_mate = match.is_endgame()
-    priomoves = generate_moves(match, candidate, dbggmove, search_for_mate, True)
-    priomoves.sort(key = attrgetter('prio'))
-    maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove)
-    print("************ maxcnt: " + str(maxcnt) + " ******************")
-    prnt_priomoves(match, priomoves)
-
-    if(len(priomoves) == 0 or maxcnt == 0):
-        return score_position(match, len(priomoves)), candidates
-    elif(len(priomoves) == 1):
-        priomove = priomoves[0]
-        candidates.append(priomove.move)
-        if(priomove.has_domain(cTactic.DOMAINS['is-tactical-draw'])):
-            return 0, candidates
-        else:
-            return score_position(match, len(priomoves)), candidates
-    else:
-        pool = mp.Pool(processes=maxcnt)
-        newmatch = copy.deepcopy(match)
-        results = [pool.apply_async(alphabeta_stage1, args=(newmatch, priomove, depth, slimits, alpha, beta, maximizing, priomove, None,)) for priomove in priomoves[:maxcnt]]
-        pool.close()
-        pool.join()
-        results = [p.get() for p in results]
-        if(maximizing):
-            candidate = [SCORES[PIECES['wKg']], None]
-        else:
-            candidate = [SCORES[PIECES['bKg']], None]
-        for result in results:
-            if(maximizing):
-                if(result[0] > candidate[0]):
-                    candidate = result
-            else:
-                if(result[0] < candidate[0]):
-                    candidate = result
-        return candidate
-
-
-def alphabeta_stage1(match, priomove, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
-    candidates = []
-    newcandidates = []
-
-    if(maximizing):
-        maxscore = alpha
-    else:
-        minscore = beta
-
-    move = priomove.move
-    print("\ncalculate 1st: " + move.format())
-    match.do_move(move.src, move.dst, move.prompiece)
-    if(maximizing):
-        newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, None)
-    else:
-        newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, None)
-    match.undo_move()
-
-    prnt_search(match, "CURRENT SEARCH: ", newscore, move, newcandidates)
-    if(candidates):
-        if(maximizing):
-            prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
-        else:
-            prnt_search(match, "CANDIDATE:      ", minscore, None, candidates)
-
-    if(maximizing):
-        if(newscore > maxscore):
-           maxscore = newscore
-           append_newmove(move, candidates, newcandidates)
-    else:
-        if(newscore < minscore):
-            minscore = newscore
-            append_newmove(move, candidates, newcandidates)
-
-    if(maximizing):
-        return maxscore, candidates
-    else:
-        return minscore, candidates
-
+    void append_newmove(cMove *move, list<cMove> candidates, list<cMove> newcandidates){
+        // candidates.clear()
+        candidates.push_back(move);
+        for(list<cMove>::iterator it = newcandidates.begin(); it != newcandidates.end(); ++it){
+            candidates.push_back(newcandidate);
 
 def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
     color = match.next_color()
