@@ -42,65 +42,13 @@
     class SearchLimitsLevelBlitz : public SearchLimitsLevelHigh{
     };
 
+    int count_up_to_prio(list<cPrioMove> *priomoves, int priolimit);
 
-def count_up_to_prio(priomoves, priolimit):
-    count = 0
-    for priomove in priomoves:
-        if(priomove.prio <= priolimit or priomove.is_tactic_stormy()):
-            count += 1
-        else:
-            break
-    return count
+    int count_up_within_stormy(list<cPrioMove> *priomoves);
 
+    bool resort_exchange_or_stormy_moves(list<cPrioMove> *priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange);
 
-def count_up_within_stormy(priomoves):
-    count = 0
-    for priomove in priomoves:
-        if(priomove.is_tactic_stormy()):
-            count += 1
-        else:
-            break
-    return count
-
-
-def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchange):
-    if(only_exchange and last_pmove is not None and 
-       last_pmove.has_domain(cTactic.DOMAINS['captures']) == False):
-        return False
-    if(last_pmove is not None and 
-       last_pmove.has_tactic_ext(cTactic(cTactic.DOMAINS['captures'], cTactic.WEIGHTS['bad-deal']))):
-        last_pmove_capture_bad_deal = True
-    else:
-        last_pmove_capture_bad_deal = False
-    count_of_stormy = 0
-    count_of_good_captures = 0
-    first_silent = None
-    bad_captures = []
-    for priomove in priomoves:
-        if(only_exchange == False and priomove.is_tactic_stormy()):
-            count_of_stormy += 1
-            priomove.prio = min(priomove.prio, (new_prio + priomove.prio % 10) - 13)
-        elif(priomove.has_domain(cTactic.DOMAINS['captures'])):
-            weight = priomove.fetch_weight(cTactic.DOMAINS['captures'])
-            if(weight > cTactic.WEIGHTS['bad-deal']):
-                count_of_good_captures += 1
-                priomove.prio = min(priomove.prio, (new_prio  + priomove.prio % 10) - 12)
-            elif(last_pmove_capture_bad_deal):
-                bad_captures.append(priomove)
-                #count_of_bad_captures += 1
-                #priomove.prio = min(priomove.prio, new_prio)
-        elif(first_silent is None):
-            first_silent = priomove
-    if(len(bad_captures) > 0 and count_of_good_captures == 0 and count_of_stormy == 0):
-        if(first_silent):
-            first_silent.prio = min(first_silent.prio, (new_prio + first_silent.prio % 10) - 10)
-        for capture in bad_captures:
-            capture.prio = min(capture.prio, new_prio + capture.prio % 10)
-    priomoves.sort(key=attrgetter('prio'))
-    return True
-
-
-def select_movecnt(match, priomoves, depth, slimits, last_pmove):
+    int select_movecnt(cMatch *match, list<cPrioMove> *priomoves, int depth, cSlimits *slimits, cPrioMove last_pmove);
     if(len(priomoves) == 0 or depth > slimits.dpth_max):
         return 0
     if(depth <= slimits.dpth_stage1 and priomoves[0].has_domain(cTactic.DOMAINS['defends-check'])):
