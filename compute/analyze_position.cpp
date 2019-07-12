@@ -17,9 +17,12 @@
         return score;
     }
 
-def score_controled_horizontal_files(match):
+/* def score_controled_horizontal_files(match):
     score = 0
-    row7_row8 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF
+    long long int row7_row8_0 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF;
+    long long int row7_row8_1 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF;
+    long long int row7_row8_2 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF;
+    long long int row7_row8_3 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF;
     wrooks = match.board.fields
     cBoard.mask_pieces(wrooks, PIECES['wRk'])
     wqueens = match.board.fields
@@ -64,41 +67,52 @@ def score_controled_vertical_files(match):
         cBoard.mask_pieces(bqueens, PIECES['bQu'])
         if(brooks & brkcolumn or bqueens & bqucolumn):
             score += ATTACKED_SCORES[PIECES['wKn']]
-    return score
+    return score */
 
 
-def score_kings_safety(match):
-    value = 0
-    cking = cKing(match, match.board.wKg)
-    if(cking.is_safe() == False):
-        value += ATTACKED_SCORES[PIECES['wQu']] * 5
-    cking = cKing(match, match.board.bKg)
-    if(cking.is_safe() == False):
-        value += ATTACKED_SCORES[PIECES['bQu']] * 5
-    return value
+    int score_kings_safety(cMatch *match){
+        int value = 0;
+        cKing cking = new cKing(match, match->board.wKg);
+        if(cking.is_safe() == false){
+            value += ATTACKED_SCORES[PIECES["wQu"]] * 5;
+        }
+        cking = cKing(match, match->board.bKg);
+        if(cking.is_safe() == false){
+            value += ATTACKED_SCORES[PIECES['bQu']] * 5;
+        }
+        return value;
+    }
 
 
-def score_penalty_for_lost_castlings(match):
-    score = 0
-    wcastling = False
-    bcastling = False
-    idx = 0
-    for move in match.minutes:
-        idx += 1
-        piece = move.getprevfield(move.src)
-        if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-            if(abs(move.src - move.dst) == 2):
-                if(idx % 2 == 1):
-                    wcastling = True
-                else:
-                    bcastling = True
-    if(wcastling == False and (match.board.wKg_first_move_on is not None or
-       (match.board.wRkA_first_move_on is not None or match.board.wRkH_first_move_on is not None))):
-        score += ATTACKED_SCORES[PIECES['wRk']] * 2
-    if(bcastling == False and (match.board.bKg_first_move_on is not None or
-       (match.board.bRkA_first_move_on is not None or match.board.bRkH_first_move_on is not None))):
-        score += ATTACKED_SCORES[PIECES['bRk']] * 2
-    return score
+    int score_penalty_for_lost_castlings(cMatch *match){
+        int score = 0;
+        bool wcastling = false;
+        bool bcastling = false;
+        int idx = 0;
+        for(list<cMove>::iterator it = match->minutes.begin(); it != match->minutes.end(); ++it){
+            idx += 1;
+            int piece = it->getprevfield(it->src);
+            if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
+                if(abs(it->src - it->dst) == 2){
+                    if(idx % 2 == 1){
+                        wcastling = true;
+                    }
+                    else{
+                        bcastling = true;
+                    }
+                }
+            }
+        }
+        if(wcastling == false && (match->board.wKg_first_move_on != -1 ||
+           (match->board.wRkA_first_move_on != -1 || match->board.wRkH_first_move_on != -1))){
+            score += ATTACKED_SCORES[PIECES["wRk"]] * 2;
+        }
+        if(bcastling == false && (match->board.bKg_first_move_on != -1 ||
+           (match->board.bRkA_first_move_on != -1 || match->board.bRkH_first_move_on  != -1))){
+            score += ATTACKED_SCORES[PIECES["bRk"]] * 2;
+        }
+        return score;
+    }
 
 
 """def score_penalty_for_multiple_moves(match):
