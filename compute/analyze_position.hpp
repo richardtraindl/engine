@@ -33,3 +33,5 @@
     int score_position(cMatch *match, int movecnt);
 
     bool is_stormy(cMatch *match);
+
+#endif
