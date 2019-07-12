@@ -1,26 +1,21 @@
+ 
+#include "../match.hpp"
 
-from ..match import *
-from ..board import cBoard
-from ..pieces.whitepawn import cWhitePawn
-from ..pieces.blackpawn import cBlackPawn
-from ..pieces.king import cKing
-
-
-def score_traps_and_touches(match):
-    score = 0
-    fields = match.board.fields
-    for idx in range(63, -1, -1):
-        piece = fields & 0xF
-        fields = fields >> 4
-        #piece = match.board.getfield(idx)
-        cpiece = match.obj_for_piece(piece, idx)
-        if(cpiece is None):
-            continue
-        score += cpiece.score_touches()
-        if(cpiece.is_trapped()):
-            score += SCORES[cpiece.piece] // 3
-    return score
-
+    int score_traps_and_touches(cMatch *match){
+        int score = 0;
+        for(int idx = 0; idx < 64; ++idx){
+            int piece = match->board.getfield(idx);
+            if(piece == PIECES["blk"]){
+                continue;
+            }
+            cPiece cpiece = match->obj_for_piece(piece, idx);
+            score += cpiece.score_touches();
+            if(cpiece.is_trapped()){
+                score += SCORES[cpiece.piece] / 3;
+            }
+        }
+        return score;
+    }
 
 def score_controled_horizontal_files(match):
     score = 0
