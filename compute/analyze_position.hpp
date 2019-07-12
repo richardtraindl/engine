@@ -26,10 +26,10 @@
 
     int def score_opening(cMatch *match);
 
-    int score_middlegame(match);
+    int score_middlegame(cMatch *match);
 
-    int score_endgame(match);
+    int score_endgame(cMatch *match);
 
-    int score_position(match, int movecnt);
+    int score_position(cMatch *match, int movecnt);
 
-    bool is_stormy(match);
+    bool is_stormy(cMatch *match);
