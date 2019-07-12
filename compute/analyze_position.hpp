@@ -1,8 +1,7 @@
 #ifndef ANALYZE_POSITION_HPP
     #define ANALYZE_POSITION_HPP
 
-    #include <map>
-    #include <string>
+    #include "../match.hpp"
 
     using namespace std;
 
