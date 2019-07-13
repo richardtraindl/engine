@@ -19,7 +19,7 @@
         {"bKg", mBKG}
     };
 
-    MapIntInt PIECES_BARE = {
+    map<unsigned, unsigned> PIECES_BARE = {
       {PIECES["blk"], 0}, 
       {PIECES["wPw"], 1}, 
       {PIECES["bPw"], 1}, 
@@ -36,7 +36,7 @@
     };
 
 
-    MapIntInt PIECES_RANK = {
+    map<unsigned, unsigned> PIECES_RANK = {
         {PIECES["blk"], 0}, 
         {PIECES["wPw"], 1}, 
         {PIECES["bPw"], 1}, 
@@ -90,13 +90,13 @@
         {"black", 9}
     };
 
-    MapIntInt REVERSED_COLORS = {
+    map<unsigned, unsigned> REVERSED_COLORS = {
         {COLORS["undef"], COLORS["undef"]},
         {COLORS["white"], COLORS["black"]},
         {COLORS["black"], COLORS["white"]} 
     };
 
-    MapIntInt PIECES_COLOR = {
+    map<unsigned, unsigned> PIECES_COLOR = {
         {PIECES["blk"], COLORS["undef"]},
         {PIECES["wPw"], COLORS["white"]},
         {PIECES["wKn"], COLORS["white"]},
@@ -132,7 +132,7 @@
         {"undef", 17}
     };
 
-    MapIntInt REVERSE_DIRS = {
+    map<unsigned, unsigned> REVERSE_DIRS = {
         {DIRS["nth"], DIRS["sth"]},
         {DIRS["sth"], DIRS["nth"]},
         {DIRS["est"], DIRS["wst"]},
@@ -152,7 +152,7 @@
         {DIRS["undef"], DIRS["undef"]}
     };
 
-    MapIntInt DIR_FOR_STEP = {
+    map<int, unsigned> DIR_FOR_STEP = {
         {8, DIRS["nth"]},
         {16, DIRS["nth"]},
         {-8, DIRS["sth"]},
@@ -175,7 +175,7 @@
         {15, DIRS["2nth-wst"]}
     };
 
-    MapIntInt SCORES = {
+    map<unsigned, int> SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], -100},
         {PIECES["wKn"], -340},
@@ -191,7 +191,7 @@
         {PIECES["bKg"], 20000}
     };
 
-    MapIntInt SUPPORTED_SCORES = {
+    map<unsigned, int> SUPPORTED_SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], 6},
         {PIECES["wKn"], 18},
@@ -207,7 +207,7 @@
         {PIECES["bKg"], 0}
     };
 
-    MapIntInt ATTACKED_SCORES = {
+    map<unsigned, int> ATTACKED_SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], -6},
         {PIECES["wKn"], -18},

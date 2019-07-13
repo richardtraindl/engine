@@ -13,9 +13,9 @@
 
 
     using namespace std;
-    using boost::multiprecision::cpp_int;
+    // using boost::multiprecision::cpp_int;
     
-    cPiece *obj_for_piece(cBoard *board, int pos);
+    cPiece *obj_for_piece(cBoard *board, unsigned pos);
         
 /*
     #if !defined(mOBJ_FOR_PIECE)

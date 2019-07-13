@@ -4,7 +4,7 @@
     
     using namespace std;
 
-    cBlackPawn::cBlackPawn(cBoard *board, int pos) : cPiece(board, pos), cPawn(board, pos){
+    cBlackPawn::cBlackPawn(cBoard *board, unsigned pos) : cPiece(board, pos), cPawn(board, pos){
     }
 
     int cBlackPawn::STEPS[2] = {-9, -7};
@@ -18,7 +18,7 @@
     vector<pair<int, unsigned>> cBlackPawn::MV_STEPS =
         {make_pair(-8, PIECES["blk"]), make_pair(-7, PIECES["blk"]), make_pair(-9, PIECES["blk"])};
 
-    int cBlackPawn::dir_for_move(int src, int dst){
+    int cBlackPawn::dir_for_move(unsigned src, unsigned dst){
         if(src == dst){
             return DIRS["undef"];
         }
@@ -37,7 +37,7 @@
         return DIRS["undef"];
     }
 
-    int cBlackPawn::step_for_dir(int dir){
+    int cBlackPawn::step_for_dir(unsigned dir){
         if(dir == DIRS["sth"]){
             return -8;
         }
@@ -50,7 +50,7 @@
         return DIRS["undef"];
     }
 
-    bool cBlackPawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
+    bool cBlackPawn::is_move_valid(unsigned dst, unsigned prompiece, list<cMove> *minutes){
         bool flag = false;
         int steps[4] = {-9, -7, -8, -16};
         for(const int step : steps){
@@ -115,7 +115,7 @@
         return true;
     }
 
-    bool cBlackPawn::is_ep_move_ok(int dst, list<cMove> *minutes){
+    bool cBlackPawn::is_ep_move_ok(unsigned dst, list<cMove> *minutes){
         cMove lastmove;
         if(minutes->empty()){
             return false;

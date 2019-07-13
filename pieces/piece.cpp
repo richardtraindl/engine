@@ -101,11 +101,11 @@
         return false;
     }
 
-    cMove cPiece::do_move(unsigned dst, unsigned prompiece, int movecnt, int *score){
+    cMove *cPiece::do_move(unsigned dst, unsigned prompiece, int movecnt, int *score){
         unsigned dstpiece = board->getfield(dst);
-        cMove move = cMove(board->fields, pos, dst, prompiece);
-        board->setfield(move.src, PIECES["blk"]);
-        board->setfield(move.dst, piece);
+        cMove *move = new cMove(board->fields, pos, dst, prompiece);
+        board->setfield(move->src, PIECES["blk"]);
+        board->setfield(move->dst, piece);
         *score += SCORES[dstpiece];
         return move;
     }

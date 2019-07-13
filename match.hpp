@@ -3,6 +3,7 @@
     #define MATCH_HPP
 
     #include <list> 
+    #include <vector> 
     #include <map>
     #include <string>
     #include <ctime>
@@ -33,10 +34,18 @@
             cMatch(const cMatch &obj);
             void update_attributes();
             int movecnt();
-            int next_color();
+            unsigned next_color();
             bool is_opening();
             bool is_endgame();
             bool is_fifty_moves_rule();
-            int is_move_repetition();
+            bool is_move_repetition();
+            cMove *do_move(unsigned src, unsigned dst, unsigned prompiece);
+            bool undo_move();
+            bool is_king_after_move_attacked(unsigned src, unsigned dst);
+            bool is_move_valid(unsigned src, unsigned dst, unsigned prompiece);
+            bool is_move_available();
+            unsigned evaluate_status();
+            unsigned eval_pin_dir(unsigned src);
+            unsigned eval_soft_pin_dir(unsigned src);
     };
 #endif

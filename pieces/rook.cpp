@@ -49,8 +49,8 @@ using namespace std;
         return 0;
     }
 
-    cMove cRook::do_move(int dst, int prompiece, int movecnt, int *score){
-        cMove move = cPiece::do_move(dst, prompiece, movecnt, score);
+    cMove *cRook::do_move(int dst, int prompiece, int movecnt, int *score){
+        cMove *move = cPiece::do_move(dst, prompiece, movecnt, score);
         int srcx = pos % 8;
         int srcy = pos / 8;
         if(color == COLORS["white"]){

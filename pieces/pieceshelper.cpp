@@ -26,8 +26,8 @@
     */
     
 
-    cPiece *obj_for_piece(cBoard *board, int pos){
-        int piece = board->getfield(pos);
+    cPiece *obj_for_piece(cBoard *board, unsigned pos){
+        unsigned piece = board->getfield(pos);
         if(piece == PIECES["wPw"]){
             return new cWhitePawn(board, pos);
         }

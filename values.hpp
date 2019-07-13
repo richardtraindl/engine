@@ -54,11 +54,9 @@
 
     extern map<string, unsigned> PIECES;
 
-    extern MapIntStr STR_PIECES;
+    extern map<unsigned, unsigned> PIECES_BARE;
 
-    extern MapIntInt PIECES_BARE;
-
-    extern MapIntInt PIECES_RANK;
+    extern map<unsigned, unsigned> PIECES_RANK;
 
     extern MapIntInt PIECES_MASK;
 
@@ -66,21 +64,21 @@
 
     extern map<string, unsigned> COLORS;
 
-    extern MapIntInt REVERSED_COLORS;
+    extern map<unsigned, unsigned> REVERSED_COLORS;
 
-    extern MapIntInt PIECES_COLOR;
+    extern map<unsigned, unsigned> PIECES_COLOR;
 
     extern map<string, unsigned> DIRS;
 
-    extern MapIntInt REVERSE_DIRS;
+    extern map<unsigned, unsigned> REVERSE_DIRS;
 
-    extern MapIntInt DIR_FOR_STEP;
+    extern map<int, unsigned> DIR_FOR_STEP;
 
-    extern MapIntInt SCORES;
+    extern map<unsigned, int> SCORES;
 
-    extern MapIntInt SUPPORTED_SCORES;
+    extern map<unsigned, int> SUPPORTED_SCORES;
 
-    extern MapIntInt ATTACKED_SCORES;
+    extern map<unsigned, int> ATTACKED_SCORES;
     
     extern map<string, unsigned> EVAL_MODES;
 #endif

@@ -13,9 +13,9 @@
             static vector<pair<int, unsigned>> MV_STEPS;
 
             cRook(cBoard *board, int pos);
-            int dir_for_move(int src, int dst);
-            int step_for_dir(int dir);
-            cMove do_move(int dst, int prompiece, int movecnt, int *score);
+            static int dir_for_move(int src, int dst);
+            static int step_for_dir(int dir);
+            cMove *do_move(int dst, int prompiece, int movecnt, int *score);
             bool undo_move(cMove *move, int movecnt, int *score);
     };
 

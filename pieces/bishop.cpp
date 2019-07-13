@@ -18,16 +18,16 @@
         if(cBoard::is_inbounds_core(src, dst) == false){
             return DIRS["undef"];
         }
-        if(board->is_nth_est(src, dst)){
+        if(cBoard::is_nth_est(src, dst)){
             return DIRS["nth-est"];
         }
-        if(board->is_sth_wst(src, dst)){
+        if(cBoard::is_sth_wst(src, dst)){
             return DIRS["sth-wst"];
         }
-        if(board->is_sth_est(src, dst) == true){
+        if(cBoard::is_sth_est(src, dst) == true){
             return DIRS["sth-est"];
         }
-        if(board->is_nth_wst(src, dst) == true){
+        if(cBoard::is_nth_wst(src, dst) == true){
             return DIRS["nth-wst"];
         }
         else{

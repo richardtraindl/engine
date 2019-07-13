@@ -98,7 +98,7 @@
         return minutes.size();
     }
 
-    int cMatch::next_color(){
+    unsigned cMatch::next_color(){
         if(minutes.size() % 2 == 0){
             return COLORS["white"];
         }
@@ -138,195 +138,294 @@
         return false;
     }
 
-    int cMatch::is_move_repetition(){
-        return false;
-        /* *cMatch newmatch = *this;
-        unsigned long long int fields[4];
-        newmatch.board.copyfields(fields);
+    bool cMatch::is_move_repetition(){
+        cMatch newmatch = *this;
         int count = 0;
         int maxcnt = min((int)newmatch.minutes.size(), 8);
         for(int i = 0; i < maxcnt; ++i){
-            newmatch.undo_move();
-            if(newmatch.board.comparefields(fields)){
+            //newmatch.undo_move();
+            if(newmatch.board.comparefields(board.fields)){
                 count += 2;
             }
         }
-        return count >= 2;*/
+        return count >= 2;
     }
 
-/*
+    cMove *cMatch::do_move(unsigned src, unsigned dst, unsigned prompiece){
+        cPiece *cpiece = obj_for_piece(&board, src);
+        if(cpiece != NULL){
+            cMove *move = cpiece->do_move(dst, prompiece, movecnt() + 1, &score);
+            minutes.push_back(*move);
+            return move;
+        }
+        else{
+            return NULL;
+        }
+    }
 
-    def is_move_valid(self, src, dst, prompiece):
-        piece = self.board.getfield(src)
-        cpiece = self.obj_for_piece(piece, src)
-        if(cpiece is None):
-            return False, self.RETURN_CODES['general-error']
-        ###
-        direction = cpiece.dir_for_move(src, dst)
-        step = cpiece.step_for_dir(direction)
-        if(not self.board.is_inbounds(src, dst, step)):
-            return False, self.RETURN_CODES['out-of-bounds']
-        if(self.next_color() != self.color_of_piece(piece)):
-            return False, self.RETURN_CODES['wrong-color']
-        if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
-            if(self.is_king_after_move_attacked(src, dst)):
-                return False, self.RETURN_CODES['king-attacked-error']
-        if(cpiece.is_move_valid(dst, prompiece)):
-            return True, self.RETURN_CODES['ok']
-        else:
-            return False, self.RETURN_CODES['piece-error']
+    bool cMatch::undo_move(){
+        cMove move;
+        if(minutes.size() > 0){
+            move = minutes.back();
+        }
+        else{
+            return false;
+        }
+        unsigned piece = board.getfield(move.dst);
+        if(move.prompiece != PIECES["blk"]){
+            bool flag;
+            if(PIECES_COLOR[piece] == COLORS["white"]){
+                cWhitePawn *cpawn = new cWhitePawn(&board, move.dst);
+                flag = cpawn->undo_move(&move, movecnt(), &score);
+            }
+            else{
+                cBlackPawn *cpawn = new cBlackPawn(&board, move.dst);
+                flag = cpawn->undo_move(&move, movecnt(), &score);
+            }
+            minutes.pop_back();
+            return flag;
+        }
+        else{
+            cPiece *cpiece = obj_for_piece(&board, move.dst);
+            if(cpiece != NULL){
+                bool flag = cpiece->undo_move(&move, movecnt(), &score);
+                minutes.pop_back();
+                return flag;
+            }
+            else{
+                minutes.pop_back();
+                return false;
+            }
+        }
+    }
 
-    def is_soft_pin(self, src):
-        piece = self.board.getfield(src)
-        color = self.color_of_piece(piece)
-        opp_color = self.oppcolor_of_piece(piece)
-        faces = [[cSearchForRook, cRook], [cSearchForBishop, cBishop]]
-        for i in range(2):
-            enemies = faces[i][0].list_field_touches(self, src, opp_color)        
-            for enemy in enemies:
-                enemy_dir = faces[i][1].dir_for_move(src, enemy.field)
-                step = faces[i][1].step_for_dir(REVERSE_DIRS[enemy_dir])
-                if(step is not None):
-                    dst = self.board.search(src, step, faces[i][1].MAXCNT)
-                    if(dst is not None):
-                        friend = self.board.getfield(dst)
-                        if(self.color_of_piece(friend) == color and 
-                           PIECES_RANK[friend] > PIECES_RANK[piece] and 
-                           PIECES_RANK[friend] > PIECES_RANK[enemy.piece]):
-                            return True, enemy_dir
-            enemies.clear()
-        return False, None
+    bool cMatch::is_king_after_move_attacked(unsigned src, unsigned dst){
+        unsigned srcpiece = board.getfield(src);
+        unsigned dstpiece;
+        unsigned pawnenmy = PIECES["blk"];
+        bool flag;
+        if(srcpiece == PIECES["wPw"]){
+            cWhitePawn *cpawn = new cWhitePawn(&board, src);
+            if(cpawn->is_ep_move_ok(dst, &minutes)){
+                pawnenmy = board.getfield(dst);
+                board.setfield(dst, PIECES["blk"]);
+            }
+        }
+        if(srcpiece == PIECES["bPw"]){
+            cBlackPawn *cpawn = new cBlackPawn(&board, src);
+            if(cpawn->is_ep_move_ok(dst, &minutes)){
+                pawnenmy = board.getfield(dst);
+                board.setfield(dst, PIECES["blk"]);
+            }
+        }
+        board.setfield(src, PIECES["blk"]);
+        dstpiece = board.getfield(dst);
+        board.setfield(dst, srcpiece);
+        if(PIECES_COLOR[srcpiece] == COLORS["white"]){
+            flag = is_field_touched(&board, board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
+        }
+        else{
+            flag = is_field_touched(&board, board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"]);
+        }
+        board.setfield(dst, dstpiece);
+        board.setfield(src, srcpiece);
+        if(pawnenmy != PIECES["blk"]){
+            board.setfield(dst, pawnenmy);
+        }
+        return flag;
+    }
 
-    def is_king_after_move_attacked(self, src, dst):
-        srcpiece = self.board.getfield(src)
-        if(self.color_of_piece(srcpiece) == COLORS['white']):
-            kg = self.board.wKg
-        else:
-            kg = self.board.bKg
-        pawnenmy = None
-        if(srcpiece == PIECES['wPw']):
-            cpawn = cWhitePawn(self, src)
-            if(cpawn.is_ep_move_ok(dst)):
-                pawnenmy = self.board.getfield(dst)
-                self.board.setfield(dst, PIECES['blk'])
-        elif(srcpiece == PIECES['bPw']):
-            cpawn = cBlackPawn(self, src)
-            if(cpawn.is_ep_move_ok(dst)):
-                pawnenmy = self.board.getfield(dst)
-                self.board.setfield(dst, PIECES['blk'])
-        self.board.setfield(src, PIECES['blk'])
-        dstpiece = self.board.getfield(dst)
-        self.board.setfield(dst, srcpiece)
-        if(self.color_of_piece(srcpiece) == COLORS['white']):
-            flag = is_field_touched(self, self.board.wKg, COLORS['black'], EVAL_MODES['ignore-pins'])
-        else:
-            flag = is_field_touched(self, self.board.bKg, COLORS['white'], EVAL_MODES['ignore-pins'])
-        self.board.setfield(dst, dstpiece)
-        self.board.setfield(src, srcpiece)
-        if(pawnenmy):
-            self.board.setfield(dst, pawnenmy)
-        return flag
+    bool cMatch::is_move_valid(unsigned src, unsigned dst, unsigned prompiece){
+        unsigned piece = board.getfield(src);
+        cPiece *cpiece = obj_for_piece(&board, src);
+        if(cpiece == NULL){
+            return false; // RETURN_CODES["general-error"]
+        }
+        unsigned direction = cpiece->dir_for_move(src, dst);
+        int step = cpiece->step_for_dir(direction);
+        if(board.is_inbounds(src, dst, step) == false){
+            return false; // RETURN_CODES["out-of-bounds"]
+        }
+        if(next_color() != PIECES_COLOR[piece]){
+            return false; // RETURN_CODES["wrong-color"]
+        }
+        if(piece != PIECES["wKg"] && piece != PIECES["bKg"]){
+            if(is_king_after_move_attacked(src, dst)){
+                return false; // RETURN_CODES["king-attacked-error"]
+            }
+        }
+        if(cpiece->is_move_valid(dst, prompiece)){
+            return true; // RETURN_CODES["ok"]
+        }
+        else{
+            return false; // RETURN_CODES["piece-error"]
+        }
+    }
 
-    def do_move(self, src, dst, prompiece):
-        piece = self.board.getfield(src)
-        cpiece = self.obj_for_piece(piece, src)
-        if(cpiece is not None):
-            move = cpiece.do_move(dst, prompiece, self.movecnt() + 1)
-            self.minutes.append(move)
-            return move
-        else:
-            return None
+    bool cMatch::is_move_available(){
+        unsigned color = next_color();
+        for(int idx = 0; idx < 64; ++idx){
+            unsigned piece = board.getfield(idx);
+            if(piece != PIECES["blk"] && color == PIECES_COLOR[piece]){
+                cPiece *cpiece = obj_for_piece(&board, idx);
+                for(vector<pair<int, unsigned>>::iterator it = cpiece->MV_STEPS.begin(); it != cpiece->MV_STEPS.end(); ++it){
+                    int count = 0;
+                    unsigned dst = cpiece->pos + it->first;
+                    while(board.is_inbounds(cpiece->pos, dst, it->first) && count < cpiece->MAXCNT){
+                        count += 1;
+                        if(is_move_valid(cpiece->pos, dst, it->second)){
+                            return true;
+                        }
+                        dst += it->first;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
-    def undo_move(self):
-        movecnt = self.movecnt()
-        if(len(self.minutes) > 0):
-            move = self.minutes.pop()
-        else:
-            return None
-        piece = self.board.getfield(move.dst)
-        if(move.prompiece and move.prompiece != PIECES['blk']):
-            if(self.color_of_piece(piece) == COLORS['white']):
-                cpawn = cWhitePawn(self, move.dst)
-            else:
-                cpawn = cBlackPawn(self, move.dst)
-            return cpawn.undo_move(move, movecnt)
-        else:
-            cpiece = self.obj_for_piece(piece, move.dst)
-            if(cpiece):
-                return cpiece.undo_move(move, movecnt)
-            else:
-                return None
-
-    def is_move_available(self):
-        color = self.next_color()
-        fields = self.board.fields
-        for idx in range(63, -1, -1):
-            piece = fields & 0xF
-            fields = fields >> 4
-            #for idx in range(64):
-            #piece = self.board.getfield(idx)
-            if(piece != PIECES['blk'] and color == self.color_of_piece(piece)):
-                cpiece = self.obj_for_piece(piece, idx)
-                for step in cpiece.MV_STEPS:
-                    count = 0
-                    dst = cpiece.pos + step[0]
-                    while(self.board.is_inbounds(cpiece.pos, dst, step[0]) and count < cpiece.MAXCNT):
-                        count += 1
-                        if(self.is_move_valid(cpiece.pos, dst, step[1])[0]):
-                            return True
-                        dst += step[0]
-        return False
-
-    def evaluate_status(self):
-        if(self.is_move_available()):
-            return self.STATUS['active']
-        else:
-            if(self.next_color() == COLORS['white']):
-                if(is_field_touched(self, self.board.wKg, COLORS['black'], EVAL_MODES['ignore-pins'])):
-                    return self.STATUS['winner_black']
-            else:
-                if(is_field_touched(self, self.board.bKg, COLORS['white'], EVAL_MODES['ignore-pins'])):
-                    return self.STATUS['winner_white']
-        return self.STATUS['draw']
+    unsigned cMatch::evaluate_status(){
+        if(is_move_available()){
+            return STATUS["active"];
+        }
+        else{
+            if(next_color() == COLORS["white"]){
+                if(is_field_touched(&board, board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
+                    return STATUS["winner_black"];
+                }
+            }
+            else{
+                if(is_field_touched(&board, board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
+                    return STATUS["winner_white"];
+                }
+            }
+        }
+        return STATUS["draw"];
+    }
  
-    def eval_pin_dir(self, src):
-        cpieces = [cRook, cBishop]
-        white_faces = [PIECES['wRk'], PIECES['wBp']]
-        black_faces = [PIECES['bRk'], PIECES['bBp']]
-        for idx in range(2):
-            piece = self.board.getfield(src)
-            color = self.color_of_piece(piece)
-            if(color == COLORS['white']):
-                kg = self.board.wKg
-            else:
-                kg = self.board.bKg
-            direction = cpieces[idx].dir_for_move(src, kg)
-            if(direction != DIRS['undef']):
-                step = cpieces[idx].step_for_dir(direction)
-                if(step is not None):
-                    dst = self.board.search(src, step, cpieces[idx].MAXCNT)
-                    if(dst is not None):
-                        piece = self.board.getfield(dst)
-                        if( (color == COLORS['white'] and piece == PIECES['wKg']) or
-                            (color == COLORS['black'] and piece == PIECES['bKg']) ):
-                            reverse_dir = REVERSE_DIRS[direction]
-                            step2 = cpieces[idx].step_for_dir(reverse_dir)
-                            if(step2 is not None):
-                                dst2 = self.board.search(src, step2, cpieces[idx].MAXCNT)
-                                if(dst2 is not None):
-                                    piece2 = self.board.getfield(dst2)
-                                    if(color == COLORS['white']):
-                                        if(piece2 == PIECES['bQu'] or piece2 == black_faces[idx]):
-                                            return direction
-                                        else:
-                                            return DIRS['undef']
-                                    else:
-                                        if(piece2 == PIECES['wQu'] or piece2 == white_faces[idx]):
-                                            return direction
-                                        else:
-                                            return DIRS['undef']
-        return DIRS['undef']
+    unsigned cMatch::eval_pin_dir(unsigned src){
+        unsigned piece = board.getfield(src);
+        unsigned color = PIECES_COLOR[piece];
+        unsigned kg_pos;
+        unsigned first, second, fstpiece, sndpiece;
+        unsigned enmyfaces[2];
+        unsigned dir_ary[2];
+        int step;
+        if(color == COLORS["white"]){
+            kg_pos = board.wKg;
+        }
+        else{
+            kg_pos = board.bKg;
+        }        
+        for(int j = 0; j < 2; ++j){
+            if(j == 0){
+                dir_ary[0] = cRook::DIRS_ARY[0];
+                dir_ary[1] = cRook::DIRS_ARY[2];
+                if(color == COLORS["white"]){
+                    enmyfaces[0] = PIECES["bRk"];
+                    enmyfaces[1] = PIECES["bQu"];
+                }
+                else{
+                    enmyfaces[0] = PIECES["wBp"];
+                    enmyfaces[1] = PIECES["wQu"];
+                }
+            }
+            else{
+                dir_ary[0] = cBishop::DIRS_ARY[0];
+                dir_ary[1] = cBishop::DIRS_ARY[2];
+                if(color == COLORS["white"]){
+                    enmyfaces[0] = PIECES["bBp"];
+                    enmyfaces[1] = PIECES["bQu"];
+                }
+                else{
+                    enmyfaces[0] = PIECES["wBp"];
+                    enmyfaces[1] = PIECES["wQu"];
+                }
+            }
+            for(unsigned i = 0; i < size(dir_ary); ++i){
+                if(j == 0){
+                    step = cRook::step_for_dir(dir_ary[i]);
+                }
+                else{
+                    step = cBishop::step_for_dir(dir_ary[i]);
+                }
+                if(board.search_bi_dirs(&first, &second, src, step, 6)){
+                    fstpiece = board.getfield(first);
+                    sndpiece = board.getfield(second);
+                    if(PIECES_COLOR[fstpiece] != PIECES_COLOR[sndpiece]){
+                        if(PIECES_COLOR[fstpiece] == color && kg_pos == first &&
+                           (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
+                            return dir_ary[i];
+                        }
+                        if(PIECES_COLOR[sndpiece] == color && kg_pos == second && 
+                           (enmyfaces[0] == fstpiece || enmyfaces[1] == fstpiece)){
+                            return REVERSE_DIRS[dir_ary[i]];
+                        }
+                    }
+                }
+            }
+        }
+        return DIRS["undef"];
+    }
 
-*/ 
-
-
+    unsigned cMatch::eval_soft_pin_dir(unsigned src){
+        unsigned piece = board.getfield(src);
+        unsigned color = PIECES_COLOR[piece];
+        unsigned first, second, fstpiece, sndpiece;
+        unsigned enmyfaces[2];
+        unsigned dir_ary[2];
+        int step;
+        for(int j = 0; j < 2; ++j){
+            if(j == 0){
+                dir_ary[0] = cRook::DIRS_ARY[0];
+                dir_ary[1] = cRook::DIRS_ARY[2];
+                if(color == COLORS["white"]){
+                    enmyfaces[0] = PIECES["bRk"];
+                    enmyfaces[1] = PIECES["bQu"];
+                }
+                else{
+                    enmyfaces[0] = PIECES["wBp"];
+                    enmyfaces[1] = PIECES["wQu"];
+                }
+            }
+            else{
+                dir_ary[0] = cBishop::DIRS_ARY[0];
+                dir_ary[1] = cBishop::DIRS_ARY[2];
+                if(color == COLORS["white"]){
+                    enmyfaces[0] = PIECES["bBp"];
+                    enmyfaces[1] = PIECES["bQu"];
+                }
+                else{
+                    enmyfaces[0] = PIECES["wBp"];
+                    enmyfaces[1] = PIECES["wQu"];
+                }
+            }
+            for(unsigned i = 0; i < size(dir_ary); ++i){
+                if(j == 0){
+                    step = cRook::step_for_dir(dir_ary[i]);
+                }
+                else{
+                    step = cBishop::step_for_dir(dir_ary[i]);
+                }
+                if(board.search_bi_dirs(&first, &second, src, step, 6)){
+                    fstpiece = board.getfield(first);
+                    sndpiece = board.getfield(second);
+                    if(PIECES_COLOR[fstpiece] != PIECES_COLOR[sndpiece]){
+                        if(PIECES_COLOR[fstpiece] == color && 
+                           PIECES_RANK[fstpiece] > PIECES_RANK[sndpiece] &&
+                           PIECES_RANK[fstpiece] > PIECES_RANK[piece] &&
+                           (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
+                            return dir_ary[i];
+                        }
+                        if(PIECES_COLOR[sndpiece] == color && 
+                           PIECES_RANK[sndpiece] > PIECES_RANK[fstpiece] &&
+                           PIECES_RANK[sndpiece] > PIECES_RANK[piece] &&
+                           (enmyfaces[0] == fstpiece || enmyfaces[1] == fstpiece)){
+                            return REVERSE_DIRS[dir_ary[i]];
+                        }
+                    }
+                }
+            }
+        }
+        return DIRS["undef"];
+    }

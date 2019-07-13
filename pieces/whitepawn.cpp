@@ -4,7 +4,7 @@
 
     using namespace std;
 
-    cWhitePawn::cWhitePawn(cBoard *board, int pos) : cPiece(board, pos), cPawn(board, pos){
+    cWhitePawn::cWhitePawn(cBoard *board, unsigned pos) : cPiece(board, pos), cPawn(board, pos){
     }
 
     int cWhitePawn::STEPS[2] = {9, 7};
@@ -18,7 +18,7 @@
     vector<pair<int, unsigned>> cWhitePawn::MV_STEPS =
         {{(int)8, (unsigned)PIECES["blk"]}, {(int)9, (unsigned)PIECES["blk"]}, {(int)7, (unsigned)PIECES["blk"]}};
 
-    int cWhitePawn::dir_for_move(int src, int dst){
+    int cWhitePawn::dir_for_move(unsigned src, unsigned dst){
         if(src == dst){
             return DIRS["undef"];
         }
@@ -37,7 +37,7 @@
         return DIRS["undef"];
     }
 
-    int cWhitePawn::step_for_dir(int dir){
+    int cWhitePawn::step_for_dir(unsigned dir){
         if(dir == DIRS["nth"]){
             return 8;
         }
@@ -50,7 +50,7 @@
         return 0;
     }
 
-    bool cWhitePawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
+    bool cWhitePawn::is_move_valid(unsigned dst, unsigned prompiece, list<cMove> *minutes){
         bool flag = false;
         int steps[4] = {9, 7, 8, 16};
         for(const int step : steps){
@@ -115,7 +115,7 @@
         return true;
     }
 
-    bool cWhitePawn::is_ep_move_ok(int dst, list<cMove> *minutes){
+    bool cWhitePawn::is_ep_move_ok(unsigned dst, list<cMove> *minutes){
         cMove lastmove;
         if(minutes->empty()){
             return false;

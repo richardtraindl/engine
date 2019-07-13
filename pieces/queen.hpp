@@ -15,8 +15,8 @@
             static vector<pair<int, unsigned>> MV_STEPS;
             
             cQueen(cBoard *board, int pos);
-            int dir_for_move(int src, int dst);
-            int step_for_dir(int dir);
+            static int dir_for_move(int src, int dst);
+            static int step_for_dir(int dir);
     };
 
 #endif
