@@ -11,8 +11,8 @@ using namespace std;
         {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
     int cRook::STEPS[4] = 
         {8, -8, 1, -1};
-    int cRook::MV_STEPS[4][2] = 
-        {{8, PIECES["blk"]}, {-8, PIECES["blk"]},  {1, PIECES["blk"]}, {-1, PIECES["blk"]}};
+    vector<pair<int, unsigned>> cRook::MV_STEPS = 
+        {make_pair(8, PIECES["blk"]), make_pair(-8, PIECES["blk"]), make_pair(1, PIECES["blk"]), make_pair(-1, PIECES["blk"])};
 
     int cRook::dir_for_move(int src, int dst){
         if(cBoard::is_inbounds_core(src, dst) == false){

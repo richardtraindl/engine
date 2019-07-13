@@ -11,7 +11,7 @@
 
     unsigned cPiece::DIRS_ARY[1] = {0};
     int cPiece::STEPS[1] = {0};
-    int cPiece::MV_STEPS[1] = {0};
+    vector<pair<int, unsigned>> cPiece::MV_STEPS = {make_pair(0, PIECES["blk"])};
     int cPiece::MAXCNT = 7;
 
     unsigned cPiece::dir_for_move(unsigned src, unsigned dst){

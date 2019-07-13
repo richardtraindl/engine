@@ -8,9 +8,10 @@
 
     unsigned cKnight::DIRS_ARY[1] = {0};
     int cKnight::STEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
-    int cKnight::MV_STEPS[8][2] = {{17, PIECES["blk"]},  {10, PIECES["blk"]},  {-6, PIECES["blk"]}, 
-                                   {-15, PIECES["blk"]}, {-17, PIECES["blk"]}, {-10, PIECES["blk"]}, 
-                                   {6, PIECES["blk"]},   {15, PIECES["blk"]}};
+    vector<pair<int, unsigned>> cKnight::MV_STEPS = 
+        {make_pair(17, PIECES["blk"]), make_pair(10, PIECES["blk"]), make_pair(-6, PIECES["blk"]), 
+         make_pair(-15, PIECES["blk"]),make_pair(-17, PIECES["blk"]), make_pair(-10, PIECES["blk"]), 
+         make_pair(6, PIECES["blk"]), make_pair(15, PIECES["blk"])};
     int cKnight::MAXCNT = 1;
 
     bool cKnight::is_trapped(){

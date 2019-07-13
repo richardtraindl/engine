@@ -10,7 +10,7 @@
         public:
             static unsigned DIRS_ARY[4];
             static int STEPS[4];
-            static int MV_STEPS[4][2];
+            static vector<pair<int, unsigned>> MV_STEPS;
 
             cBishop(cBoard *board, int pos);
             int dir_for_move(int src, int dst);

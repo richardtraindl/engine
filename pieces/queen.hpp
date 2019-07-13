@@ -12,7 +12,7 @@
         public:
             static unsigned DIRS_ARY[8];
             static int STEPS[8];
-            static int MV_STEPS[8][2];
+            static vector<pair<int, unsigned>> MV_STEPS;
             
             cQueen(cBoard *board, int pos);
             int dir_for_move(int src, int dst);

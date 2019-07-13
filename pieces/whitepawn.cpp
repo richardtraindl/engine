@@ -9,13 +9,13 @@
 
     int cWhitePawn::STEPS[2] = {9, 7};
     int cWhitePawn::MAXCNT = 1;
-    int cWhitePawn::MV_STEPS_RANK2[4][2] = 
+    vector<pair<int, unsigned>> cWhitePawn::MV_STEPS_RANK2 = 
         {{8, PIECES["blk"]}, {16, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
-    int cWhitePawn::MV_STEPS_RANK7[12][2] =
+    vector<pair<int, unsigned>> cWhitePawn::MV_STEPS_RANK7 =
         {{8, PIECES["wQu"]}, {8, PIECES["wRk"]}, {8, PIECES["wBp"]}, {8, PIECES["wKn"]},
          {9, PIECES["wQu"]}, {9, PIECES["wRk"]}, {9, PIECES["wBp"]}, {9, PIECES["wKn"]},
          {7, PIECES["wQu"]}, {7, PIECES["wRk"]}, {7, PIECES["wBp"]}, {7, PIECES["wKn"]}};
-    int cWhitePawn::MV_STEPS[3][2] =
+    vector<pair<int, unsigned>> cWhitePawn::MV_STEPS =
         {{(int)8, (unsigned)PIECES["blk"]}, {(int)9, (unsigned)PIECES["blk"]}, {(int)7, (unsigned)PIECES["blk"]}};
 
     int cWhitePawn::dir_for_move(int src, int dst){

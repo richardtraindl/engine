@@ -10,12 +10,16 @@
 
     using namespace std;
 
+    struct mvstep{
+        int step;
+        unsigned piece;
+    };
 
     class cPiece{
         public:
             static unsigned DIRS_ARY[1];
             static int STEPS[1];
-            static int MV_STEPS[1];
+            static vector<pair<int, unsigned>> MV_STEPS;
             static int MAXCNT;
 
             cBoard *board;

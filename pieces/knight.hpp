@@ -10,7 +10,7 @@
         public:
             static unsigned DIRS_ARY[1];
             static int STEPS[8];
-            static int MV_STEPS[8][2];
+            static vector<pair<int, unsigned>> MV_STEPS;
             static int MAXCNT;
 
             cKnight(cBoard *board, int pos);
