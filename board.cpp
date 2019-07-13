@@ -3,13 +3,9 @@
 #include "./values.hpp"
 #include "./helper.hpp"
 
-    using namespace std;
 
     cBoard::cBoard(){ 
-        fields[0] = BASE0;
-        fields[1] = BASE1;
-        fields[2] = BASE2;
-        fields[3] = BASE3;
+        fields = BASE;
         wKg = COLS["E"] + RANKS["1"] * 8;
         bKg = COLS["E"] + RANKS["8"] * 8;
         wKg_first_move_on = -1;
@@ -20,7 +16,7 @@
         bRkH_first_move_on = -1;
     }
 
-    map<string, int> cBoard::RANKS = {
+    map<string, unsigned> cBoard::RANKS = {
         {"1", 0},
         {"2", 1},
         {"3", 2},
@@ -31,7 +27,7 @@
         {"8", 7}
     };
 
-    map<string, int> cBoard::COLS = {
+    map<string, unsigned> cBoard::COLS = {
         {"A", 0},
         {"B", 1},
         {"C", 2},
@@ -42,35 +38,28 @@
         {"H", 7}
     };
 
-    int cBoard::getfield(int idx){ 
-        return ((fields[0] >> (63 - idx)) & 0x1) | 
-               ((fields[1] >> (62 - idx)) & 0x2) | 
-               ((fields[2] >> (61 - idx)) & 0x4) | 
-               ((fields[3] >> (60 - idx)) & 0x8);
+
+    unsigned cBoard::getfield(unsigned idx){
+        return (unsigned)(fields >> ((63 - idx) * 4)) & 0xF;
+    }
+        // return (fields >> ((63 - idx) * 4)); // & 0xF;
+
+    
+    void cBoard::setfield(unsigned idx, unsigned value){
+        uint256_t _value = value;
+        uint256_t tmpfields = SINGLE >> (idx * 4);
+        tmpfields = tmpfields ^ FULL;
+        tmpfields = tmpfields & fields;
+        _value = (_value << ((63 - idx) * 4));
+        fields = tmpfields | _value;
     }
 
-    void cBoard::setfield(int idx, int value){
-        int eraseval, setval;
-        for(int i = 0; i < 4; ++i){
-            eraseval = (0x0000000000000001 << (63 - (i + idx))) ^ 0xFFFFFFFFFFFFFFFF;
-            setval = value << (63 - (i + idx));
-            fields[i] = (fields[i] & eraseval) | setval;
-        }
+    void cBoard::copyfields(uint256_t *_fields){
+        *_fields = fields;
     }
 
-    void cBoard::copyfields(unsigned long long int _fields[]){
-        for(int i = 0; i < 4; ++i){
-            _fields[i] = fields[i];
-        }
-    }
-
-    bool cBoard::comparefields(unsigned long long int _fields[]){
-        for(int i = 0; i < 4; ++i){
-            if(_fields[i] != fields[i]){
-                return false;
-            }
-        }
-        return true;    
+    bool cBoard::comparefields(uint256_t _fields){
+        return _fields == fields;
     }
 
     bool cBoard::verify(){
@@ -81,7 +70,7 @@
         int wOfficer_cnt = 0;
         int bOfficer_cnt = 0;
         for(int idx = 0; idx < 64; ++idx){
-            int piece = getfield(idx);
+            unsigned piece = getfield(idx);
             if(piece == PIECES["wKg"]){
                 wKg_cnt += 1; 
                 continue;
@@ -130,7 +119,7 @@
         return true;
     }
 
-    bool cBoard::is_inbounds_core(int src, int dst){
+    bool cBoard::is_inbounds_core(unsigned src, unsigned dst){
         if(src < 0 || src > 63 || dst < 0 || dst > 63){
             return false;
         }
@@ -139,14 +128,14 @@
         }
     }
 
-    bool cBoard::is_inbounds(int src, int dst, int step){
+    bool cBoard::is_inbounds(unsigned src, unsigned dst, int step){
         if(src < 0 || src > 63 || dst < 0 || dst > 63){
             return false;
         }
         if(step == 0){
             return true;
         }
-        int dir = DIR_FOR_STEP[step];
+        unsigned dir = DIR_FOR_STEP[step];
         if(dir == 0){
             return false;
         }
@@ -170,11 +159,11 @@
         return false;
     }
 
-    int cBoard::search(int src, int step, int maxcnt){
+    unsigned cBoard::search(unsigned src, unsigned step, int maxcnt){
         int cnt = 0;
         int dst = src + step;
         while(is_inbounds(src, dst, step) && cnt < maxcnt){
-            int piece = getfield(dst);
+            unsigned piece = getfield(dst);
             if(piece != PIECES["blk"]){
                 return dst;
             }
@@ -184,16 +173,16 @@
         return PIECES["blk"];
     }
 
-    bool cBoard::search_bi_dirs(int *first, int *second, int src, int step, int maxcnt){
+    bool cBoard::search_bi_dirs(unsigned *first, unsigned *second, unsigned src, int step, int maxcnt){
         int cnt = 0;
-        *first = -1;
+        *first = 65;
         int bisteps[2] = {step, (step * -1)};
         for(const int bistep : bisteps){
             int dst = src + bistep;
             while(is_inbounds(src, dst, bistep) || cnt < maxcnt){
-                int piece = getfield(dst);
+                unsigned piece = getfield(dst);
                 if(piece != PIECES["blk"]){
-                    if(*first == -1){
+                    if(*first == 65){
                         *first = dst;
                         break;
                     }
@@ -205,15 +194,15 @@
                 cnt += 1;
                 dst += bistep;
             }
-            if(*first == -1){
+            if(*first == 65){
                 break;
             }
         }
         return false;
     }
 
-    bool cBoard::is_nth(int src, int dst){
-        if(src < dst && abs(src - dst) % 8 == 0){
+    bool cBoard::is_nth(unsigned src, unsigned dst){
+        if(src < dst && abs((int)src - (int)dst) % 8 == 0){
             return true;
         }
         else{
@@ -221,8 +210,8 @@
         }
     }
 
-    bool cBoard::is_sth(int src, int dst){
-        if(src > dst && abs(src - dst) % 8 == 0){
+    bool cBoard::is_sth(unsigned src, unsigned dst){
+        if(src > dst && abs((int)src - (int)dst) % 8 == 0){
             return true;
         }
         else{
@@ -230,7 +219,7 @@
         }
     }
 
-    bool cBoard::is_est(int src, int dst){
+    bool cBoard::is_est(unsigned src, unsigned dst){
         if(src % 8 < dst % 8 && src / 8 == dst / 8){
             return true;
         }
@@ -239,7 +228,7 @@
         }
     }
 
-    bool cBoard::is_wst(int src, int dst){
+    bool cBoard::is_wst(unsigned src, unsigned dst){
         if(src % 8 > dst % 8 && src / 8 == dst / 8){
             return true;
         }
@@ -248,8 +237,8 @@
         }
     }
 
-    bool cBoard::is_nth_est(int src, int dst){
-        if(abs(src - dst) % 9 == 0 && src < dst && src % 8 < dst % 8){
+    bool cBoard::is_nth_est(unsigned src, unsigned dst){
+        if(abs((int)src - (int)dst) % 9 == 0 && src < dst && src % 8 < dst % 8){
             return true;
         }
         else{
@@ -257,8 +246,8 @@
         }
     }
 
-    bool cBoard::is_sth_wst(int src, int dst){
-        if(abs(src - dst) % 9 == 0 && src > dst && src % 8 > dst % 8){
+    bool cBoard::is_sth_wst(unsigned src, unsigned dst){
+        if(abs((int)src - (int)dst) % 9 == 0 && src > dst && src % 8 > dst % 8){
             return true;
         }
         else{
@@ -266,8 +255,8 @@
         }
     }
 
-    bool cBoard::is_nth_wst(int src, int dst){
-        if(abs(src - dst) % 7 == 0 && src < dst && src % 8 > dst % 8){
+    bool cBoard::is_nth_wst(unsigned src, unsigned dst){
+        if(abs((int)src - (int)dst) % 7 == 0 && src < dst && src % 8 > dst % 8){
             return true;
         }
         else{
@@ -275,8 +264,8 @@
         }
     }
 
-    bool cBoard::is_sth_est(int src, int dst){
-        if(abs(src - dst) % 7 == 0 && src > dst && src % 8 < dst % 8){
+    bool cBoard::is_sth_est(unsigned src, unsigned dst){
+        if(abs((int)src - (int)dst) % 7 == 0 && src > dst && src % 8 < dst % 8){
             return true;
         }
         else{

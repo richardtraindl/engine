@@ -4,12 +4,15 @@
 
     #include <map>
     #include <string>
-
+    #include <boost/multiprecision/cpp_int.hpp>
+    
+    using namespace boost::multiprecision;
+    using namespace boost::multiprecision::literals;
     using namespace std;
 
     class cBoard{
         public:
-            unsigned long long int fields[4];
+            uint256_t fields;
             int wKg;
             int bKg;
             int wKg_first_move_on;
@@ -19,56 +22,35 @@
             int bRkA_first_move_on;
             int bRkH_first_move_on;
 
-            static map<string, int> RANKS;
-            static map<string, int> COLS;
-
-            const unsigned long long int BASE0  = 0b0000000000000000000000000000000000000000000000001111111111111111;
-            const unsigned long long int BASE1  = 0b1001100100000000000000000000000000000000000000000000000010011001;
-            const unsigned long long int BASE2  = 0b0110111000000000000000000000000000000000000000000000000001101110;
-            const unsigned long long int BASE3  = 0b0011010011111111000000000000000000000000000000001111111100110100;
-            const unsigned long long int FULL   = 0xFFFFFFFFFFFFFFFF;
-            const unsigned long long int SINGLE = 0b1000000000000000000000000000000000000000000000000000000000000000;
-            const int BITS1000 = 0xF; // 0x8888888888888888888888888888888888888888888888888888888888888888;
-            const int BITS1110 = 0xF; // 0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE;
-            const int BITS1100 = 0xF; // 0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;
-            const int BITS0111 = 0xF; // 0x7777777777777777777777777777777777777777777777777777777777777777;
-            const int BITS0011 = 0xF; // 0x3333333333333333333333333333333333333333333333333333333333333333; */
+            static map<string, unsigned> RANKS;
+            static map<string, unsigned> COLS;
+            const uint256_t BASE     = 0x42356324111111110000000000000000000000000000000099999999CABDEBAC_cppui;
+            const uint256_t FULL     = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui;
+            const uint256_t SINGLE   = 0xF000000000000000000000000000000000000000000000000000000000000000_cppui;
+            const uint256_t BITS1000 = 0x8888888888888888888888888888888888888888888888888888888888888888_cppui;
+            const uint256_t BITS1110 = 0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE_cppui;
+            const uint256_t BITS1100 = 0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC_cppui;
+            const uint256_t BITS0111 = 0x7777777777777777777777777777777777777777777777777777777777777777_cppui;
+            const uint256_t BITS0011 = 0x3333333333333333333333333333333333333333333333333333333333333333_cppui;
 
             cBoard();
-        
-            int getfield(int idx);
-
-            void setfield(int idx, int value);
-            
-            void copyfields(unsigned long long int _fields[]);
-            
-            bool comparefields(unsigned long long int _fields[]);
-            
+            unsigned getfield(unsigned idx);
+            void setfield(unsigned idx, unsigned value);
+            void copyfields(uint256_t *fields);
+            bool comparefields(uint256_t fields);
             bool verify();
-            
-            static bool is_inbounds_core(int src, int dst);
-
-            static bool is_inbounds(int src, int dst, int step);
-            
-            int search(int src, int step, int maxcnt);
-            
-            bool search_bi_dirs(int *first, int *second, int src, int step, int maxcnt);
-
-            static bool is_nth(int src, int dst);
-
-            static bool is_sth(int src, int dst);
-
-            static bool is_est(int src, int dst);
-
-            static bool is_wst(int src, int dst);
-
-            static bool is_nth_est(int src, int dst);
-
-            static bool is_sth_wst(int src, int dst);
-
-            static bool is_nth_wst(int src, int dst);
-
-            static bool is_sth_est(int src, int dst);
+            static bool is_inbounds_core(unsigned src, unsigned dst);
+            static bool is_inbounds(unsigned src, unsigned dst, int step);
+            unsigned search(unsigned src, unsigned step, int maxcnt);
+            bool search_bi_dirs(unsigned *first, unsigned *second, unsigned src, int step, int maxcnt);
+            static bool is_nth(unsigned src, unsigned dst);
+            static bool is_sth(unsigned src, unsigned dst);
+            static bool is_est(unsigned src, unsigned dst);
+            static bool is_wst(unsigned src, unsigned dst);
+            static bool is_nth_est(unsigned src, unsigned dst);
+            static bool is_sth_wst(unsigned src, unsigned dst);
+            static bool is_nth_wst(unsigned src, unsigned dst);
+            static bool is_sth_est(unsigned src, unsigned dst);
     };
 
 #endif

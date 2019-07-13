@@ -38,7 +38,7 @@ class cKing(cPiece):
         ###
         self.match.board.setfield(self.pos, PIECES['blk'])
         self.match.board.setfield(dst, self.piece)
-        attacked = is_field_touched(self.match, dst, opp_color, self.match.EVAL_MODES['ignore-pins'])
+        attacked = is_field_touched(self.match, dst, opp_color, EVAL_MODES['ignore-pins'])
         self.match.board.setfield(self.pos, self.piece)
         self.match.board.setfield(dst, captured)
         ##
@@ -72,7 +72,7 @@ class cKing(cPiece):
         self.match.board.setfield(self.pos, PIECES['blk'])
         for i in range(3):
             dst2 = self.pos + i
-            attacked = is_field_touched(self.match, dst2, self.match.oppcolor_of_piece(self.piece), self.match.EVAL_MODES['ignore-pins'])
+            attacked = is_field_touched(self.match, dst2, self.match.oppcolor_of_piece(self.piece), EVAL_MODES['ignore-pins'])
             if(attacked == True):
                 self.match.board.setfield(self.pos, self.piece)
                 return False
@@ -102,7 +102,7 @@ class cKing(cPiece):
         self.match.board.setfield(self.pos, PIECES['blk'])
         for i in range(3):
             dst2 = self.pos - i
-            attacked = is_field_touched(self.match, dst2, self.match.oppcolor_of_piece(self.piece), self.match.EVAL_MODES['ignore-pins'])
+            attacked = is_field_touched(self.match, dst2, self.match.oppcolor_of_piece(self.piece), EVAL_MODES['ignore-pins'])
             if(attacked == True):
                 self.match.board.setfield(self.pos, self.piece)
                 return False

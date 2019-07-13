@@ -1,13 +1,12 @@
 
 #include "./knight.hpp"
-#include "./searchforpiece.hpp"
-#include "../values.hpp"
-#include "../helper.hpp"
 
     using namespace std;
 
+    cKnight::cKnight(cBoard *board, int pos) : cPiece(board, pos){
+    }
 
-    int cKnight::DIRS_ARY[1] = {0};
+    unsigned cKnight::DIRS_ARY[1] = {0};
     int cKnight::STEPS[8] = {17, 10, -6, -15, -17, -10, 6, 15};
     int cKnight::MV_STEPS[8][2] = {{17, PIECES["blk"]},  {10, PIECES["blk"]},  {-6, PIECES["blk"]}, 
                                    {-15, PIECES["blk"]}, {-17, PIECES["blk"]}, {-10, PIECES["blk"]}, 
@@ -21,7 +20,7 @@
     bool cKnight::is_move_valid(int dst, int prompiece){
         bool flag = false;
         for(const int step : STEPS){
-            if(pos + step == dst && match->board.is_inbounds(pos, dst, step)){
+            if(pos + step == dst && board->is_inbounds(pos, dst, step)){
                 flag = true;
                 break;
             }
@@ -33,8 +32,8 @@
         if(pin_dir != DIRS["undef"]){
             return false;
         }
-        int dstpiece = match->board.getfield(dst);
-        if(match->color_of_piece(dstpiece) == color){
+        int dstpiece = board->getfield(dst);
+        if(PIECES_COLOR[dstpiece] == color){
             return false;
         }
         return true;

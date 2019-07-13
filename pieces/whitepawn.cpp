@@ -1,10 +1,11 @@
 
 #include "./whitepawn.hpp"
-#include "./searchforpiece.hpp"
-#include "../values.hpp"
-#include "../helper.hpp"
+#include "./piece.hpp"
 
     using namespace std;
+
+    cWhitePawn::cWhitePawn(cBoard *board, int pos) : cPiece(board, pos), cPawn(board, pos){
+    }
 
     int cWhitePawn::STEPS[2] = {9, 7};
     int cWhitePawn::MAXCNT = 1;
@@ -15,7 +16,7 @@
          {9, PIECES["wQu"]}, {9, PIECES["wRk"]}, {9, PIECES["wBp"]}, {9, PIECES["wKn"]},
          {7, PIECES["wQu"]}, {7, PIECES["wRk"]}, {7, PIECES["wBp"]}, {7, PIECES["wKn"]}};
     int cWhitePawn::MV_STEPS[3][2] =
-        {{8, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
+        {{(int)8, (unsigned)PIECES["blk"]}, {(int)9, (unsigned)PIECES["blk"]}, {(int)7, (unsigned)PIECES["blk"]}};
 
     int cWhitePawn::dir_for_move(int src, int dst){
         if(src == dst){
@@ -49,7 +50,7 @@
         return 0;
     }
 
-    bool cWhitePawn::is_move_valid(int dst, int prompiece){
+    bool cWhitePawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
         int steps[4] = {9, 7, 8, 16};
         for(const int step : steps){
@@ -66,7 +67,7 @@
             return false;
         }
         int pin_dir = DIRS["undef"]; // match->eval_pin_dir(pos);
-        int dstpiece = match->board.getfield(dst);
+        int dstpiece = board->getfield(dst);
         // check pins
         if(move_dir == DIRS["nth"]){
             if(pin_dir != DIRS["nth"] && pin_dir != DIRS["sth"] && pin_dir != DIRS["undef"]){
@@ -92,15 +93,15 @@
                 return false;
             }
             if(pos - dst == -16){
-                int midpiece = match->board.getfield(pos + 8);
+                int midpiece = board->getfield(pos + 8);
                 if(midpiece != PIECES["blk"]){
                     return false;
                 }
             }
         }
         if(move_dir == DIRS["nth-est"] || move_dir == DIRS["nth-wst"]){
-            if(match->color_of_piece(dstpiece) != COLORS["black"]){
-                return is_ep_move_ok(dst);
+            if(PIECES_COLOR[dstpiece] != COLORS["black"]){
+                return is_ep_move_ok(dst, minutes);
             }
         }
         // check promotion
@@ -114,16 +115,16 @@
         return true;
     }
 
-    bool cWhitePawn::is_ep_move_ok(int dst){
+    bool cWhitePawn::is_ep_move_ok(int dst, list<cMove> *minutes){
         cMove lastmove;
-        if(match->minutes.empty()){
+        if(minutes->empty()){
             return false;
         }
         else{
-            lastmove = match->minutes.back();
+            lastmove = minutes->back();
         }
-        int dstpiece = match->board.getfield(dst);
-        int enemy = match->board.getfield(lastmove.dst);
+        int dstpiece = board->getfield(dst);
+        int enemy = board->getfield(lastmove.dst);
         if(dstpiece == PIECES["blk"] && enemy == PIECES["bPw"]){
             if((lastmove.src / 8) - (lastmove.dst / 8) == 2 && 
                (lastmove.dst / 8) == (pos / 8) && 

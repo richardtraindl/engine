@@ -1,9 +1,6 @@
 
+#include <iostream>
 #include "./match.hpp"
-#include "./helper.hpp"
-#include "./values.hpp"
-
-using namespace std;
 
 
     cMatch::cMatch(){ 
@@ -15,34 +12,28 @@ using namespace std;
     cMatch::cMatch(const cMatch &obj){
     } // copy constructor
 
-    map<string, int> cMatch::STATUS = {
+    map<string, unsigned> cMatch::STATUS = {
         {"active", 10},
         {"draw", 11}, 
         {"winner-white", 12}, 
         {"winner-black", 13}
     };
 
-    map<string, int> cMatch::LEVELS = {
+    map<string, unsigned> cMatch::LEVELS = {
         {"blitz", 15}, 
         {"low", 30}, 
         {"medium", 60}, 
         {"high", 90}
     };
 
-    map<int, int> cMatch::SECS_PER_MOVE = {
+    map<int, unsigned> cMatch::SECS_PER_MOVE = {
         {LEVELS["blitz"], 15}, 
         {LEVELS["low"], 30}, 
         {LEVELS["medium"], 60}, 
         {LEVELS["high"], 90}
     };
 
-    map<string, int> cMatch::EVAL_MODES = {
-        {"ignore-pins", 0}, 
-        {"only-pins-to-king", 1}, 
-        {"all-pins", 2}
-    };
-
-    map<string, int> RETURN_CODES = {
+    map<string, unsigned> RETURN_CODES = {
         {"ok", 10}, 
         {"draw", 11}, 
         {"winner-white", 12}, 
@@ -91,8 +82,8 @@ using namespace std;
         }
         score = 0;
         for(int idx = 0; idx < 64; ++idx){
-            int piece = board.getfield(idx);
-            score -= SCORES[piece];
+            unsigned piece = board.getfield(idx);
+            score -= SCORES[(int)piece];
             if(piece == PIECES["wKg"]){
                 board.wKg = idx;
                 continue;
@@ -101,15 +92,6 @@ using namespace std;
                 board.bKg = idx;
             }
         }
-    }
-
-    int cMatch::color_of_piece(int piece){
-        return PIECES_COLOR[piece];
-    }
-
-    int cMatch::oppcolor_of_piece(int piece){
-        int color = PIECES_COLOR[piece];
-        return REVERSED_COLORS[color];
     }
 
     int cMatch::movecnt(){
@@ -138,9 +120,9 @@ using namespace std;
         int cnt = 0;
         int maxlen = minutes.size();
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
-            int srcpiece = it->getPrevfield(it->src);
-            int dstpiece = it->getPrevfield(it->dst);
-            if(srcpiece == PIECES["wPw"] or srcpiece == PIECES["bPw"] or dstpiece != PIECES["blk"]){
+            unsigned srcpiece = it->getprevfield(it->src);
+            unsigned dstpiece = it->getprevfield(it->dst);
+            if(srcpiece == PIECES["wPw"] || srcpiece == PIECES["bPw"] || dstpiece != PIECES["blk"]){
                 cnt = 0;
             }
             else{
@@ -157,18 +139,19 @@ using namespace std;
     }
 
     int cMatch::is_move_repetition(){
-        cMatch newmatch = *this;
+        return false;
+        /* *cMatch newmatch = *this;
         unsigned long long int fields[4];
         newmatch.board.copyfields(fields);
         int count = 0;
         int maxcnt = min((int)newmatch.minutes.size(), 8);
         for(int i = 0; i < maxcnt; ++i){
-            // newmatch.undo_move();
+            newmatch.undo_move();
             if(newmatch.board.comparefields(fields)){
                 count += 2;
             }
         }
-        return count >= 2;
+        return count >= 2;*/
     }
 
 /*
@@ -235,9 +218,9 @@ using namespace std;
         dstpiece = self.board.getfield(dst)
         self.board.setfield(dst, srcpiece)
         if(self.color_of_piece(srcpiece) == COLORS['white']):
-            flag = is_field_touched(self, self.board.wKg, COLORS['black'], self.EVAL_MODES['ignore-pins'])
+            flag = is_field_touched(self, self.board.wKg, COLORS['black'], EVAL_MODES['ignore-pins'])
         else:
-            flag = is_field_touched(self, self.board.bKg, COLORS['white'], self.EVAL_MODES['ignore-pins'])
+            flag = is_field_touched(self, self.board.bKg, COLORS['white'], EVAL_MODES['ignore-pins'])
         self.board.setfield(dst, dstpiece)
         self.board.setfield(src, srcpiece)
         if(pawnenmy):
@@ -299,10 +282,10 @@ using namespace std;
             return self.STATUS['active']
         else:
             if(self.next_color() == COLORS['white']):
-                if(is_field_touched(self, self.board.wKg, COLORS['black'], self.EVAL_MODES['ignore-pins'])):
+                if(is_field_touched(self, self.board.wKg, COLORS['black'], EVAL_MODES['ignore-pins'])):
                     return self.STATUS['winner_black']
             else:
-                if(is_field_touched(self, self.board.bKg, COLORS['white'], self.EVAL_MODES['ignore-pins'])):
+                if(is_field_touched(self, self.board.bKg, COLORS['white'], EVAL_MODES['ignore-pins'])):
                     return self.STATUS['winner_white']
         return self.STATUS['draw']
  
@@ -343,24 +326,7 @@ using namespace std;
                                         else:
                                             return DIRS['undef']
         return DIRS['undef']
- 
-    def obj_for_piece(self, piece, pos):
-        if(piece == PIECES['wPw']):
-            return cWhitePawn(self, pos)
-        if(piece == PIECES['bPw']):
-            return cBlackPawn(self, pos)
-        elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-            return cKnight(self, pos)
-        elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-            return cBishop(self, pos)
-        elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-            return cRook(self, pos)
-        elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-            return cQueen(self, pos)
-        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-            return cKing(self, pos)
-        else:
-            return None
 
-# class end
-*/
+*/ 
+
+

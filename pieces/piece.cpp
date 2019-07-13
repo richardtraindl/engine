@@ -1,39 +1,36 @@
 
 #include "./piece.hpp"
-#include "./searchforpiece.hpp"
-#include "../values.hpp"
-#include "../helper.hpp"
 
 
-    cPiece::cPiece(cMatch *_match, int _pos){
-        match = _match;
+    cPiece::cPiece(cBoard *_board, unsigned _pos){
+        board = _board;
         pos = _pos;
-        piece = match->board.getfield(pos);
-        color = match->color_of_piece(piece);
+        piece = board->getfield(pos);
+        color = PIECES_COLOR[piece];
     }
 
-    int cPiece::DIRS_ARY[1] = {0};
+    unsigned cPiece::DIRS_ARY[1] = {0};
     int cPiece::STEPS[1] = {0};
     int cPiece::MV_STEPS[1] = {0};
     int cPiece::MAXCNT = 7;
 
-    int cPiece::dir_for_move(int src, int dst){
+    unsigned cPiece::dir_for_move(unsigned src, unsigned dst){
         return DIRS["undef"];
     }
 
-    int cPiece::step_for_dir(int dir){
+    int cPiece::step_for_dir(unsigned dir){
         return 0;
     }
 
     bool cPiece::is_trapped(){
-        if(is_field_touched(match, pos, REVERSED_COLORS[color], match->EVAL_MODES["only-pins-to-king"])){
+        if(is_field_touched(board, pos, REVERSED_COLORS[color], EVAL_MODES["only-pins-to-king"])){
             return false;
         }
         for(const int step : STEPS){
             int pos1 = pos + step;
-            if(match->board.is_inbounds(pos, pos1, step)){
-                int dstpiece = match->board.getfield(pos1);
-                if(match->color_of_piece(dstpiece) == color){
+            if(board->is_inbounds(pos, pos1, step)){
+                int dstpiece = board->getfield(pos1);
+                if(PIECES_COLOR[dstpiece] == color){
                     continue;
                 }
                 else{
@@ -41,7 +38,7 @@
                         return false;
                     }
                     list<cTouch> frdlytouches, enmytouches;
-                    // field_touches_for_both(match, pos1, color, &frdlytouches, &enmytouches);
+                    collect_touches_for_both_colors(board, pos1, color, &frdlytouches, &enmytouches);
                     bool enmy_is_lower = false;
                     for(const cTouch enmy : enmytouches){
                         if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
@@ -58,9 +55,9 @@
         return true;
     }
 
-    bool cPiece::is_move_stuck(int dst){
-        int mv_dir = dir_for_move(pos, dst);
-        int pin_dir = 0; // match->eval_pin_dir(pos);
+    bool cPiece::is_move_stuck(unsigned dst){
+        unsigned mv_dir = dir_for_move(pos, dst);
+        unsigned pin_dir = 0; // match->eval_pin_dir(pos);
         if(pin_dir == DIRS["undef"] || mv_dir == pin_dir || REVERSE_DIRS[mv_dir] == pin_dir){
             return false;
         }
@@ -69,14 +66,14 @@
         }
     }
 
-    bool cPiece::is_move_valid(int dst, int prompiece){
-        int dir = dir_for_move(pos, dst);
+    bool cPiece::is_move_valid(unsigned dst, unsigned prompiece){
+        unsigned dir = dir_for_move(pos, dst);
         if(dir == DIRS["undef"]){
             return false;
         }
         int step = step_for_dir(dir);
         if(step == 0){
-            int pin_dir = 0; // match->eval_pin_dir(pos);
+            unsigned pin_dir = 0; // match->eval_pin_dir(pos);
             for(const int piecedir : DIRS_ARY){
                 if(dir == piecedir){
                     if(pin_dir != piecedir && pin_dir != REVERSE_DIRS[piecedir] && pin_dir != DIRS["undef"]){
@@ -86,10 +83,10 @@
             }
         }
         int newpos = pos + step;
-        while(match->board.is_inbounds(pos, newpos, 0)){
-            int newpiece = match->board.getfield(newpos);
+        while(board->is_inbounds(pos, newpos, 0)){
+            unsigned newpiece = board->getfield(newpos);
             if(newpos == dst){
-                if(match->color_of_piece(newpiece) == color){
+                if(PIECES_COLOR[newpiece] == color){
                     return false;
                 }
                 else{
@@ -104,19 +101,19 @@
         return false;
     }
 
-    cMove cPiece::do_move(int dst, int prompiece, int movecnt){
-        int dstpiece = match->board.getfield(dst);
-        cMove move = cMove(match->board.fields, pos, dst, prompiece);
-        match->board.setfield(move.src, PIECES["blk"]);
-        match->board.setfield(move.dst, piece);
-        match->score += SCORES[dstpiece];
+    cMove cPiece::do_move(unsigned dst, unsigned prompiece, int movecnt, int *score){
+        unsigned dstpiece = board->getfield(dst);
+        cMove move = cMove(board->fields, pos, dst, prompiece);
+        board->setfield(move.src, PIECES["blk"]);
+        board->setfield(move.dst, piece);
+        *score += SCORES[dstpiece];
         return move;
     }
 
-    bool cPiece::undo_move(cMove *move, int movecnt){
-        move->copyprevfields(match->board.fields);
-        int dstpiece_after_undo_mv = match->board.getfield(move->dst);
-        match->score -= SCORES[dstpiece_after_undo_mv];
+    bool cPiece::undo_move(cMove *move, int movecnt, int *score){
+        move->copyprevfields(board->fields);
+        int dstpiece_after_undo_mv = board->getfield(move->dst);
+        *score -= SCORES[dstpiece_after_undo_mv];
         return true;
     }
 
@@ -124,18 +121,18 @@
     def find_attacks_and_supports(self, attacked, supported):
         opp_color = REVERSED_COLORS[self.color]
         for step in self.STEPS:
-            dst2 = self.match.board.search(self.pos, step, self.MAXCNT)
+            dst2 = board->search(self.pos, step, self.MAXCNT)
             if(dst2 is not None):
                 if(self.is_move_stuck(dst2)):
                     continue
-                piece = self.match.board.getfield(dst2)
+                piece = board->getfield(dst2)
                 if(self.match.color_of_piece(piece) == opp_color):
                     ctouch = cTouch(piece, dst2)
                     attacked.append(ctouch)
                     ###
-                    self.match.board.setfield(dst2, PIECES['blk'])
+                    board->setfield(dst2, PIECES['blk'])
                     list_field_touches_beyond(self.match, ctouch, opp_color)
-                    self.match.board.setfield(dst2, piece)
+                    board->setfield(dst2, piece)
                     ###
                 elif(self.match.color_of_piece(piece) == self.color):
                     if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
@@ -143,9 +140,9 @@
                     ctouch = cTouch(piece, dst2)
                     supported.append(ctouch)
                     ###
-                    self.match.board.setfield(dst2, PIECES['blk'])
+                    board->setfield(dst2, PIECES['blk'])
                     list_field_touches_beyond(self.match, ctouch, self.color)
-                    self.match.board.setfield(dst2, piece)
+                    board->setfield(dst2, piece)
                     ###
 
     def score_touches(self):
@@ -167,19 +164,19 @@
             count = 0
             excludes = []
             dst = self.pos + step[0]
-            while(self.match.board.is_inbounds(self.pos, dst, step[0]) and count < self.MAXCNT):
+            while(board->is_inbounds(self.pos, dst, step[0]) and count < self.MAXCNT):
                 count += 1
                 flag, errcode = self.match.is_move_valid(self.pos, dst, step[1])
                 if(flag):
                     if(mode):
-                        move = cMove(self.match.board.fields, self.pos, dst, step[1])
+                        move = cMove(board->fields, self.pos, dst, step[1])
                         priomove = cPrioMove(move)
                         excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                         if(len(excluded) > 0):
                             excludes.extend(excluded)
                         moves.append(priomove)
                     else:
-                        moves.append(cMove(self.match.board.fields, self.pos, dst, step[1]))
+                        moves.append(cMove(board->fields, self.pos, dst, step[1]))
                 dst += step[0]
 
         if(mode and len(excludes) > 0):

@@ -5,29 +5,32 @@
     #include <map>
     #include <list> 
     #include <string>
+    #include <boost/multiprecision/cpp_int.hpp>
+    #include "./helper.hpp"
+    #include "./values.hpp"
 
+    using namespace boost::multiprecision;
     using namespace std;
 
     class cMove{
         public:
-            unsigned long long int prevfields[4];
-            int src;
-            int dst;
-            int prompiece;
+            uint256_t prevfields;
+            unsigned src;
+            unsigned dst;
+            unsigned prompiece;
 
-            cMove(unsigned long long int prevfields[], int src, int dst, int prompiece);
+            cMove(uint256_t prevfields, unsigned src, unsigned dst, unsigned prompiece);
             cMove();
 
-            int getPrevfield(int idx);
+            unsigned getprevfield(unsigned idx);
     
-            void copyprevfields(unsigned long long int _fields[]);
+            void copyprevfields(uint256_t _prevfields);
 
             string format();
     };
 
 
     class cTactic{
-        // private:
         public:
             int domain;
             int weight;
@@ -43,7 +46,6 @@
 
 
     class cPrioMove : public cMove{
-        // private:
         public:
             list<cTactic> tactics;
             int prio;

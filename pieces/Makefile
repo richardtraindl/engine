@@ -1,6 +1,6 @@
 CC = g++
 
-all: searchforpiece.o piece.o rook.o bishop.o knight.o queen.o pawn.o whitepawn.o blackpawn.o
+all: pieceshelper.o searchforpiece.o piece.o rook.o bishop.o knight.o queen.o pawn.o whitepawn.o blackpawn.o
 
 piece.o: piece.cpp piece.hpp helper.hpp values.hpp
 	$(CC) -Wall --std=c++17 -c piece.cpp -o piece.o
@@ -26,7 +26,10 @@ whitepawn.o: whitepawn.cpp whitepawn.hpp helper.hpp values.hpp
 blackpawn.o: blackpawn.cpp blackpawn.hpp helper.hpp values.hpp
 	$(CC) -Wall --std=c++17 -c blackpawn.cpp -o blackpawn.o
 
-searchhelper.o: searchforpiece.cpp searchforpiece.hpp helper.hpp values.hpp
+searchforpiece.o: searchforpiece.cpp searchforpiece.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c pieceshelper.cpp -o pieceshelper.o
+
+pieceshelper.o: pieceshelper.cpp pieceshelper.hpp helper.hpp values.hpp
 	$(CC) -Wall --std=c++17 -c searchforpiece.cpp -o searchforpiece.o
 
 clean:

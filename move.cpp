@@ -1,38 +1,30 @@
 
-#include <sstream>
-#include "./move.hpp"
-#include "./helper.hpp"
-#include "./values.hpp"
-    
+    #include <sstream>
+    #include "./move.hpp"
+
     using namespace std;
 
-    cMove::cMove(unsigned long long _prevfields[], int _src, int _dst, int _prompiece){ 
-        if(_prevfields != NULL){
-            for(int i = 0; i < 4; ++i){
-                prevfields[i] = *(_prevfields + i);
-            }
-        }
+    cMove::cMove(uint256_t _prevfields, unsigned _src, unsigned _dst, unsigned _prompiece){ 
+        prevfields = _prevfields;
         src = _src;
         dst = _dst;
         prompiece = _prompiece;
-    } 
+    }
     cMove::cMove(){
     }
 
-    int cMove::getPrevfield(int idx){
-        return ((prevfields[0] >> (63 - idx)) & 0x1) | ((prevfields[1] >> (62 - idx)) & 0x2) | ((prevfields[2] >> (61 - idx)) & 0x4) | ((prevfields[3] >> (60 - idx)) & 0x8);
+    unsigned cMove::getprevfield(unsigned idx){
+        return (unsigned)(prevfields >> ((63 - idx) * 4)) & 0xF;
     }
 
-    void cMove::copyprevfields(unsigned long long int _fields[]){
-        for(int i = 0; i < 4; ++i){
-            _fields[i] = prevfields[i];
-        }
+    void cMove::copyprevfields(uint256_t _prevfields){
+        _prevfields = prevfields;
     }
 
     string cMove::format(){
-        int piece = getPrevfield(src);
+        unsigned piece = getprevfield(src);
         if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
-            if(src % 8 - dst % 8 == -2){
+            if((int)(src % 8) - (int)(dst % 8 == -2)){
                 return "0-0";
             }
             if(src % 8 - dst % 8 == 2){
@@ -40,7 +32,7 @@
             }
         }
 
-        int dstpiece = getPrevfield(dst);
+        unsigned dstpiece = getprevfield(dst);
         string hyphen = "";
         string trailing = "";
         stringstream out;

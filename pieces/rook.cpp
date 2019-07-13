@@ -1,12 +1,13 @@
 
 #include "./rook.hpp"
-#include "./searchforpiece.hpp"
-#include "../values.hpp"
-#include "../helper.hpp"
+
 
 using namespace std;
 
-    int cRook::DIRS_ARY[4] = 
+    cRook::cRook(cBoard *board, int pos) : cPiece::cPiece(board, pos){
+    }
+
+    unsigned cRook::DIRS_ARY[4] = 
         {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
     int cRook::STEPS[4] = 
         {8, -8, 1, -1};
@@ -48,51 +49,51 @@ using namespace std;
         return 0;
     }
 
-    cMove cRook::do_move(int dst, int prompiece, int movecnt){
-        cMove move = cPiece::do_move(dst, prompiece, movecnt);
+    cMove cRook::do_move(int dst, int prompiece, int movecnt, int *score){
+        cMove move = cPiece::do_move(dst, prompiece, movecnt, score);
         int srcx = pos % 8;
         int srcy = pos / 8;
         if(color == COLORS["white"]){
             if(srcx == cBoard::COLS["A"] && srcy == cBoard::RANKS["1"] && 
-               match->board.wRkA_first_move_on == -1){
-                match->board.wRkA_first_move_on = movecnt;
+               board->wRkA_first_move_on == -1){
+                board->wRkA_first_move_on = movecnt;
             }
             if(srcx == cBoard::COLS["H"] && srcy == cBoard::RANKS["1"] && 
-                 match->board.wRkH_first_move_on == -1){
-                match->board.wRkH_first_move_on = movecnt;
+                 board->wRkH_first_move_on == -1){
+                board->wRkH_first_move_on = movecnt;
             }
         }
         else{
             if(srcx == cBoard::COLS["A"] && srcy == cBoard::RANKS["8"] && 
-               match->board.bRkA_first_move_on == -1){
-                match->board.bRkA_first_move_on = movecnt;
+               board->bRkA_first_move_on == -1){
+                board->bRkA_first_move_on = movecnt;
             }
             if(srcx == cBoard::COLS["H"] && srcy == cBoard::RANKS["8"] && 
-                 match->board.bRkH_first_move_on == -1){
-                match->board.bRkH_first_move_on = movecnt;
+                 board->bRkH_first_move_on == -1){
+                board->bRkH_first_move_on = movecnt;
             }
         }
         return move;
     }
 
-    bool cRook::undo_move(cMove *move, int movecnt){
-        if(cPiece::undo_move(move, movecnt) == false){
+    bool cRook::undo_move(cMove *move, int movecnt, int *score){
+        if(cPiece::undo_move(move, movecnt, score) == false){
             return false;
         }
         if(piece == PIECES["wRk"]){
-            if(match->board.wRkA_first_move_on != -1 && match->board.wRkA_first_move_on == movecnt){
-                match->board.wRkA_first_move_on = -1;
+            if(board->wRkA_first_move_on != -1 && board->wRkA_first_move_on == movecnt){
+                board->wRkA_first_move_on = -1;
             }
-            if(match->board.wRkH_first_move_on != -1 && match->board.wRkH_first_move_on == movecnt){
-                match->board.wRkH_first_move_on = -1;
+            if(board->wRkH_first_move_on != -1 && board->wRkH_first_move_on == movecnt){
+                board->wRkH_first_move_on = -1;
             }
         }
         else{
-            if(match->board.bRkA_first_move_on != -1 && match->board.bRkA_first_move_on == movecnt){
-                match->board.bRkA_first_move_on = -1;
+            if(board->bRkA_first_move_on != -1 && board->bRkA_first_move_on == movecnt){
+                board->bRkA_first_move_on = -1;
             }
-            if(match->board.bRkH_first_move_on != -1 && match->board.bRkH_first_move_on == movecnt){
-                match->board.bRkH_first_move_on = -1;
+            if(board->bRkH_first_move_on != -1 && board->bRkH_first_move_on == movecnt){
+                board->bRkH_first_move_on = -1;
             }
         }
         return true;

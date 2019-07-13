@@ -3,8 +3,6 @@
     #define WHITEPAWN_HPP
 
     #include "./pawn.hpp"
-    #include "../match.hpp"
-    #include "../values.hpp"
 
     using namespace std;
 
@@ -15,14 +13,12 @@
             static int MV_STEPS_RANK2[4][2];
             static int MV_STEPS_RANK7[12][2];
             static int MV_STEPS[3][2];
-
+            
+            cWhitePawn(cBoard *board, int pos);
             int dir_for_move(int src, int dst);
-
             int step_for_dir(int dir);
-
-            bool is_move_valid(int dst, int prompiece);
-
-            bool is_ep_move_ok(int dst);
+            bool is_move_valid(int dst, int prompiece, list<cMove> *minutes);
+            bool is_ep_move_ok(int dst, list<cMove> *minutes);
     };
 
 #endif

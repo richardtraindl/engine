@@ -3,7 +3,7 @@
 
     using namespace std;
 
-    MapStrInt PIECES = {
+    map<string, unsigned> PIECES = {
         {"blk", mBLK}, 
         {"wPw", mWPW}, 
         {"wKn", mWKN}, 
@@ -84,7 +84,7 @@
         {PIECES["bKg"], 0x1} // 0x1111111111111111111111111111111111111111111111111111111111111111 
     };
 
-    MapStrInt COLORS = {
+    map<string, unsigned> COLORS = {
         {"undef", 0},
         {"white", 1},
         {"black", 9}
@@ -112,7 +112,7 @@
         {PIECES["bKg"], COLORS["black"]}
     };
 
-    MapStrInt DIRS = {
+    map<string, unsigned> DIRS = {
         {"nth", 0},
         {"sth", 1},
         {"est", 2},
@@ -221,4 +221,10 @@
         {PIECES["bRk"], 24},
         {PIECES["bQu"], 30},
         {PIECES["bKg"], 0}
+    };
+
+    map<string, unsigned> EVAL_MODES = {
+        {"ignore-pins", 0}, 
+        {"only-pins-to-king", 1}, 
+        {"all-pins", 2}
     };

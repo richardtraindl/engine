@@ -8,8 +8,12 @@
     #include <ctime>
     #include "./board.hpp"
     #include "./move.hpp"
+    #include "./helper.hpp"
+    #include "./values.hpp"
+    #include "./pieces/pieceshelper.hpp"
 
     using namespace std;
+
 
     class cMatch{
         public:
@@ -20,32 +24,19 @@
             cBoard board;
             list<cMove> minutes;
 
-            static map<string, int> STATUS;
-            static map<string, int> LEVELS;
-            static map<int, int> SECS_PER_MOVE;
-            static map<string, int> EVAL_MODES;
-            static map<string, int> RETURN_CODES;
+            static map<string, unsigned> STATUS;
+            static map<string, unsigned> LEVELS;
+            static map<int, unsigned> SECS_PER_MOVE;
+            static map<string, unsigned> RETURN_CODES;
 
             cMatch();
             cMatch(const cMatch &obj);
-
             void update_attributes();
-
-            int color_of_piece(int piece);
-
-            int oppcolor_of_piece(int piece);
-
             int movecnt();
-
             int next_color();
-
             bool is_opening();
-
             bool is_endgame();
-
             bool is_fifty_moves_rule();
-
             int is_move_repetition();
-
     };
 #endif

@@ -1,10 +1,11 @@
 
 #include "./blackpawn.hpp"
-#include "./searchforpiece.hpp"
-#include "../values.hpp"
-#include "../helper.hpp"
-
+#include "./piece.hpp"
+    
     using namespace std;
+
+    cBlackPawn::cBlackPawn(cBoard *board, int pos) : cPiece(board, pos), cPawn(board, pos){
+    }
 
     int cBlackPawn::STEPS[2] = {-9, -7};
     int cBlackPawn::MAXCNT = 1;
@@ -49,7 +50,7 @@
         return DIRS["undef"];
     }
 
-    bool cBlackPawn::is_move_valid(int dst, int prompiece){
+    bool cBlackPawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
         int steps[4] = {-9, -7, -8, -16};
         for(const int step : steps){
@@ -66,7 +67,7 @@
             return false;
         }
         int pin_dir = DIRS["undef"]; // match->eval_pin_dir(pos);
-        int dstpiece = match->board.getfield(dst);
+        int dstpiece = board->getfield(dst);
         // check pins
         if(move_dir == DIRS["sth"]){
             if(pin_dir != DIRS["nth"] && pin_dir != DIRS["sth"] && pin_dir != DIRS["undef"]){
@@ -92,15 +93,15 @@
                 return false;
             }
             if(pos - dst == 16){
-                int midpiece = match->board.getfield(pos - 8);
+                int midpiece = board->getfield(pos - 8);
                 if(midpiece != PIECES["blk"]){
                     return false;
                 }
             }
         }
         if(move_dir == DIRS["sth-est"] || move_dir == DIRS["sth-wst"]){
-            if(match->color_of_piece(dstpiece) != COLORS["white"]){
-                return is_ep_move_ok(dst);
+            if(PIECES_COLOR[dstpiece] != COLORS["white"]){
+                return is_ep_move_ok(dst, minutes);
             }
         }
         // check promotion
@@ -114,16 +115,16 @@
         return true;
     }
 
-    bool cBlackPawn::is_ep_move_ok(int dst){
+    bool cBlackPawn::is_ep_move_ok(int dst, list<cMove> *minutes){
         cMove lastmove;
-        if(match->minutes.empty()){
+        if(minutes->empty()){
             return false;
         }
         else{
-            lastmove = match->minutes.back();
+            lastmove = minutes->back();
         }
-        int dstpiece = match->board.getfield(dst);
-        int enemy = match->board.getfield(lastmove.dst);
+        int dstpiece = board->getfield(dst);
+        int enemy = board->getfield(lastmove.dst);
         if(dstpiece == PIECES["blk"] && enemy == PIECES["wPw"]){
             if((lastmove.src / 8) - (lastmove.dst / 8) == -2 && 
                (lastmove.dst / 8) == (pos / 8) && 

@@ -3,7 +3,7 @@
     #define SEARCHFORPIECE_HPP
 
     #include <list> 
-    #include "../match.hpp"
+    #include "../board.hpp"
     #include "../values.hpp"
 
     using namespace std;
@@ -27,9 +27,9 @@
             static int MAXCNT;
             static int TARGETS[4];
 
-            static bool _is_field_touched(cMatch *match, int src, int color, int mode);
-            static void _collect_touches_for_both_colors(cMatch *match, int src, int friendlycolor, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
-            static void _collect_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
+            static bool _is_field_touched(cBoard *board, int src, int color, int mode);
+            static void _collect_touches_for_both_colors(cBoard *board, int src, int friendlycolor, list<cTouch> *frdlytouches, list<cTouch> *enmytouches);
+            static void _collect_touches_for_color(cBoard *board, int src, int color, list<cTouch> *touches);
     };
 
 
@@ -47,7 +47,7 @@
             static int MAXCNT;
             static int TARGETS[2];
 
-            static bool _is_field_touched(cMatch *match, int src, int color);
+            static bool _is_field_touched(cBoard *board, int src, int color);
     };
 
 
@@ -75,12 +75,12 @@
     };
 
 
-    bool is_field_touched(cMatch *match, int src, int color, int mode);
+    bool is_field_touched(cBoard *board, int src, int color, int mode);
 
-    void collect_touches_for_both_colors(cMatch *match, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
+    void collect_touches_for_both_colors(cBoard *board, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
 
-    void collect_touches_for_color(cMatch *match, int src, int color, list<cTouch> *touches);
+    void collect_touches_for_color(cBoard *board, int src, int color, list<cTouch> *touches);
 
-    void add_field_touches_beyond(cMatch *match, int color, cTouch *ctouch);
+    void add_field_touches_beyond(cBoard *board, int color, cTouch *ctouch);
 
 #endif

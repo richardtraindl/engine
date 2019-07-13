@@ -12,47 +12,47 @@
     typedef map<int, string> MapIntStr;
 
     #if !defined(mBLK)
-        #define mBLK    0xA // extern constexpr int BPW;
+        #define mBLK    0x0 // extern constexpr int BPW;
     #endif
     #if !defined(mWPW)
-        #define mWPW    0xA // extern constexpr int BPW;
+        #define mWPW    0x1 // extern constexpr int BPW;
     #endif
     #if !defined(mWKN)
-        #define mWKN    0xA // extern constexpr int BPW;
+        #define mWKN    0x2 // extern constexpr int BPW;
     #endif
     #if !defined(mWBP)
-        #define mWBP    0xA // extern constexpr int BPW;
+        #define mWBP    0x3 // extern constexpr int BPW;
     #endif
     #if !defined(mWRK)
-        #define mWRK    0xA // extern constexpr int BPW;
+        #define mWRK    0x4 // extern constexpr int BPW;
     #endif
     #if !defined(mWQU)
-        #define mWQU    0xA // extern constexpr int BPW;
+        #define mWQU    0x5 // extern constexpr int BPW;
     #endif
     #if !defined(mWKG)
-        #define mWKG    0xA // extern constexpr int BPW;
+        #define mWKG    0x6 // extern constexpr int BPW;
     #endif
 
     #if !defined(mBPW)
-        #define mBPW    0xA // extern constexpr int BPW;
+        #define mBPW    0x9 // extern constexpr int BPW;
     #endif
     #if !defined(mBKN)
         #define mBKN    0xA // extern constexpr int BPW;
     #endif
     #if !defined(mBBP)
-        #define mBBP    0xA // extern constexpr int BPW;
+        #define mBBP    0xB // extern constexpr int BPW;
     #endif
     #if !defined(mBRK)
-        #define mBRK    0xA // extern constexpr int BPW;
+        #define mBRK    0xC // extern constexpr int BPW;
     #endif
     #if !defined(mBQU)
-        #define mBQU    0xA // extern constexpr int BPW;
+        #define mBQU    0xD // extern constexpr int BPW;
     #endif
     #if !defined(mBKG)
-        #define mBKG    0xA // extern constexpr int BPW;
+        #define mBKG    0xE // extern constexpr int BPW;
     #endif
 
-    extern MapStrInt PIECES;
+    extern map<string, unsigned> PIECES;
 
     extern MapIntStr STR_PIECES;
 
@@ -64,13 +64,13 @@
 
     extern MapIntInt PIECES_NMASK;
 
-    extern MapStrInt COLORS;
+    extern map<string, unsigned> COLORS;
 
     extern MapIntInt REVERSED_COLORS;
 
     extern MapIntInt PIECES_COLOR;
 
-    extern MapStrInt DIRS;
+    extern map<string, unsigned> DIRS;
 
     extern MapIntInt REVERSE_DIRS;
 
@@ -81,4 +81,6 @@
     extern MapIntInt SUPPORTED_SCORES;
 
     extern MapIntInt ATTACKED_SCORES;
+    
+    extern map<string, unsigned> EVAL_MODES;
 #endif

@@ -1,13 +1,14 @@
 
 #include "./queen.hpp"
-#include "./searchforpiece.hpp"
-#include "../values.hpp"
-#include "../helper.hpp"
+#include "./rook.hpp"
+#include "./bishop.hpp"
+    
+    using namespace std;
 
-using namespace std;
+    cQueen::cQueen(cBoard *board, int pos) : cPiece(board, pos), cRook(board, pos), cBishop(board, pos){
+    }
 
-
-    int cQueen::DIRS_ARY[8] = 
+    unsigned cQueen::DIRS_ARY[8] = 
         {DIRS["nth"],     DIRS["sth"],     DIRS["est"],     DIRS["wst"],
          DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
     int cQueen::STEPS[8] = 
