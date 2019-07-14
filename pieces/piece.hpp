@@ -35,6 +35,9 @@
             bool is_move_valid(unsigned dst, unsigned prompiece);
             cMove *do_move(unsigned dst, unsigned prompiece, int movecnt, int *score);
             bool undo_move(cMove *move, int movecnt, int *score);
+            // void find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported);
+            // int score_touches();
+            // list<cTouch> *generate_moves(cMove *candidate, cMove *dbggmove, bool search_for_mate, int mode);
     };
 
 #endif

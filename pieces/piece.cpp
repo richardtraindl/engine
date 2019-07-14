@@ -118,7 +118,7 @@
     }
 
 /*
-    def find_attacks_and_supports(self, attacked, supported):
+    void find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported){
         opp_color = REVERSED_COLORS[self.color]
         for step in self.STEPS:
             dst2 = board->search(self.pos, step, self.MAXCNT)
@@ -145,7 +145,7 @@
                     board->setfield(dst2, piece)
                     ###
 
-    def score_touches(self):
+    int score_touches(){
         match = self.match
         score = 0
         frdlytouches, enmytouches = list_all_field_touches(match, self.pos, self.color)
@@ -157,7 +157,7 @@
             score += SUPPORTED_SCORES[self.piece]
         return score
 
-    def generate_moves(self, candidate, dbggmove, search_for_mate, mode):
+    list<cTouch> *generate_moves(cMove *candidate, cMove *dbggmove, bool search_for_mate, int mode){
         from ..compute.analyze_move import add_tactics
         moves = []
         for step in self.MV_STEPS:

@@ -23,9 +23,7 @@
             cMove();
 
             unsigned getprevfield(unsigned idx);
-    
             void copyprevfields(uint256_t _prevfields);
-
             string format();
     };
 

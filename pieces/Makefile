@@ -1,35 +1,38 @@
 CC = g++
 
-all: pieceshelper.o searchforpiece.o piece.o rook.o bishop.o knight.o queen.o pawn.o whitepawn.o blackpawn.o
+all: pieceshelper.o searchforpiece.o piece.o rook.o bishop.o knight.o queen.o king.o pawn.o whitepawn.o blackpawn.o
 
-piece.o: piece.cpp piece.hpp helper.hpp values.hpp
+piece.o: piece.cpp piece.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c piece.cpp -o piece.o
 
-rook.o: rook.cpp rook.hpp helper.hpp values.hpp
+rook.o: rook.cpp rook.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c rook.cpp -o rook.o
 
-bishop.o: bishop.cpp bishop.hpp helper.hpp values.hpp
+bishop.o: bishop.cpp bishop.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c bishop.cpp -o bishop.o
 
-knight.o: knight.cpp knight.hpp helper.hpp values.hpp
+knight.o: knight.cpp knight.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c knight.cpp -o knight.o
 
-queen.o: queen.cpp queen.hpp helper.hpp values.hpp
+queen.o: queen.cpp queen.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c queen.cpp -o queen.o
 
-pawn.o: pawn.cpp pawn.hpp helper.hpp values.hpp
+king.o: king.cpp king.hpp ../helper.hpp ../values.hpp
+	$(CC) -Wall --std=c++17 -c king.cpp -o king.o
+
+pawn.o: pawn.cpp pawn.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c pawn.cpp -o pawn.o
 
-whitepawn.o: whitepawn.cpp whitepawn.hpp helper.hpp values.hpp
+whitepawn.o: whitepawn.cpp whitepawn.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c whitepawn.cpp -o whitepawn.o
 
-blackpawn.o: blackpawn.cpp blackpawn.hpp helper.hpp values.hpp
+blackpawn.o: blackpawn.cpp blackpawn.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c blackpawn.cpp -o blackpawn.o
 
-searchforpiece.o: searchforpiece.cpp searchforpiece.hpp helper.hpp values.hpp
+searchforpiece.o: searchforpiece.cpp searchforpiece.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c pieceshelper.cpp -o pieceshelper.o
 
-pieceshelper.o: pieceshelper.cpp pieceshelper.hpp helper.hpp values.hpp
+pieceshelper.o: pieceshelper.cpp pieceshelper.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c searchforpiece.cpp -o searchforpiece.o
 
 clean:
