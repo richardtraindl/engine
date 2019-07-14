@@ -58,7 +58,7 @@
             int fetch_weight(int domain);
             bool has_domain(int domain);
             bool has_weight(int weight);
-            bool has_tactic_ext(cTactic tactic);
+            bool has_tactic_ext(int domain, int weight);
             bool is_tactic_stormy();
             string concat_fmttactics();
     };

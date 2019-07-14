@@ -20,10 +20,10 @@
     };
 
     map<string, unsigned> cMatch::LEVELS = {
-        {"blitz", 15}, 
-        {"low", 30}, 
-        {"medium", 60}, 
-        {"high", 90}
+        {"blitz", 0}, 
+        {"low", 1}, 
+        {"medium", 2}, 
+        {"high", 3}
     };
 
     map<int, unsigned> cMatch::SECS_PER_MOVE = {

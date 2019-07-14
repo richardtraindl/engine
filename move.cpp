@@ -219,9 +219,9 @@
         return false;
     }
 
-    bool cPrioMove::has_tactic_ext(cTactic tactic){
+    bool cPrioMove::has_tactic_ext(int domain, int weight){
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->domain == tactic.domain and it->weight == tactic.weight){
+            if(it->domain == domain and it->weight == weight){
                 return true;
             }
         }
