@@ -31,17 +31,17 @@
         match.undo_move();
         cout << "fields " << hex << match.board.fields << "\n";
 
-        cout << "is_king_after_move_attacked() " << match.is_king_after_move_attacked(11, 12) << "\n";
+        cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, &match.minutes) << "\n";
 
-        cout << "is_move_valid() " << match.is_move_valid(0, 9,PIECES["blk"]) << "\n";
+        cout << "is_move_valid() " << match.board.is_move_valid(0, 9,PIECES["blk"], &match.minutes) << "\n";
 
-        cout << "is_move_available() " << match.is_move_available() << "\n";
+        cout << "is_move_available() " << match.board.is_move_available(&match.minutes) << "\n";
         
-        cout << "evaluate_status() " << match.evaluate_status() << "\n";
+        cout << "eval_status() " << match.eval_status() << "\n";
 
-        cout << "eval_pin_dir() " << match.eval_pin_dir(40) << "\n";
+        cout << "eval_pin_dir() " << match.board.eval_pin_dir(40) << "\n";
 
-        cout << "eval_soft_pin_dir() " << match.eval_soft_pin_dir(42) << "\n";
+        cout << "eval_soft_pin_dir() " << match.board.eval_soft_pin_dir(42) << "\n";
         
         
         // cout << "match.board->fields " << match.board.getFields();

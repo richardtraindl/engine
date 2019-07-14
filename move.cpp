@@ -135,8 +135,21 @@
             {WEIGHTS["bad-deal"],    130}
         };
 
-    cPrioMove::cPrioMove(cMove *move, int _prio){
+
+        map<string, unsigned> cPrioMove::PRIOS = {
+            {"prio0", 100},
+            {"prio1", 200},
+            {"prio2", 250},
+            {"prio3", 300} 
+        };
+
+    cPrioMove::cPrioMove(cMove *move, unsigned _prio){
         cMove(move->prevfields, move->src, move->dst, move->prompiece);
+        prio = _prio;
+    }
+    
+    cPrioMove::cPrioMove(uint256_t prevfields, unsigned src, unsigned dst, unsigned prompiece, unsigned _prio){
+        cMove(prevfields, src, dst, prompiece);
         prio = _prio;
     }
 

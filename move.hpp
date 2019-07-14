@@ -47,32 +47,19 @@
         public:
             list<cTactic> tactics;
             int prio;
+            static map<string, unsigned> PRIOS;
+
+            cPrioMove(cMove *move, unsigned prio);
+            cPrioMove(uint256_t prevfields, unsigned src, unsigned dst, unsigned prompiece, unsigned prio);
             
-            map<string, int> PRIOS = {
-                {"prio0", 100},
-                {"prio1", 200},
-                {"prio2", 250},
-                {"prio3", 300} 
-            };
-
-            cPrioMove(cMove *move, int prio);
-
             void evaluate_priority();
-
             void downgrade(int domain);
-
             void upgrade(int domain);
-
             int fetch_weight(int domain);
-
             bool has_domain(int domain);
-
             bool has_weight(int weight);
-
             bool has_tactic_ext(cTactic tactic);
-
             bool is_tactic_stormy();
-
             string concat_fmttactics();
     };
 

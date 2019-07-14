@@ -4,50 +4,70 @@
     void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves){
         cout << "------------------------------------------------\n ";
         int idx = 1;
-        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+        for(list<cPrioMove>::iterator it = priomoves->begin(); it != priomoves->end(); ++it){
             cout << idx << ". ";
             cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << "\n";
             cout << it->concat_fmttactics() << "\n";
             idx += 1;
+        }
         cout << "------------------------------------------------\n ";
     }
 
 
-    void prnt_search(cMatch *match, string label, int score, cMove *move, int candidates[]){
+    void prnt_search(cMatch *match, string label, int score, cMove *move, list<cMove> *candidates){
         string str_gmove;
         if(move != NULL){
             str_gmove = " [" + move->format() + "] ";
-        else:
+        }
+        else{
             str_gmove = "";
-        cout << label << score << str_gmove << concat_fmtmoves(match, candidates));
+        }
+        cout << label << score << str_gmove << concat_fmtmoves(match, candidates);
     }
 
 
-    sting concat_fmtmoves(cMatch match, list<cMove> *moves){
-        string str_gmoves = "";
-        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-            if(*it != NULL){
-                str_moves += " [" + it->format() + "] ";
+    string concat_fmtmoves(cMatch match, list<cMove> *moves){
+        string str_moves = "";
+        for(list<cMove>::iterator it = moves->begin(); it != moves->end(); ++it){
+            str_moves += " [" + it->format() + "] ";
+        }
         return str_moves;
     }
 
 
-    list<cPrioMove> generate_moves(cMatch *match, int candidate, cMove *dbggmove, bool search_for_mate, int mode){
-        int color = match.next_color();
-        list<cPrioMove> moves;
-        for(int idx = 0; idx < 64; ++i){
-            int piece = match->board.getfield(idx);
-            if(piece == PIECES['blk'] || color != match->color_of_piece(piece)){
+    list<cMove> *generate_moves(cMatch *match){
+        unsigned color = match->next_color();
+        list<cMove> *moves;
+        for(int idx = 0; idx < 64; ++idx){
+            unsigned piece = match->board.getfield(idx);
+            if(piece == PIECES["blk"] || color != PIECES_COLOR[piece]){
                 continue;
             }
             else{
-                cPiece cpiece = match->obj_for_piece(piece, idx);
-                cpiece.generate_moves(candidate, dbggmove, search_for_mate, mode, moves);
+                cPiece *cpiece = obj_for_piece(&(match->board), idx);
+                moves = cpiece->generate_moves(&(match->minutes));
             }
+        }
         return moves;
     }
 
-
+    list<cPrioMove> *generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate){
+        unsigned color = match->next_color();
+        list<cPrioMove> *priomoves;
+        for(int idx = 0; idx < 64; ++idx){
+            unsigned piece = match->board.getfield(idx);
+            if(piece == PIECES["blk"] || color != PIECES_COLOR[piece]){
+                continue;
+            }
+            else{
+                cPiece *cpiece = obj_for_piece(&(match->board), idx);
+                priomoves = cpiece->generate_priomoves(&(match->minutes), candidate, dbggmove, search_for_mate);
+            }
+        }
+        return priomoves;
+    }
+    
+/*
     void append_newmove(cMove *move, list<cMove> candidates, list<cMove> newcandidates){
         // candidates.clear()
         candidates.push_back(move);
@@ -71,7 +91,7 @@
         cMove dbggmove = cMove(0x0, 3, 51, PIECES["blk"]);
         bool search_for_mate = match->is_endgame();
         list<cPrioMove> priomoves = generate_moves(match, candidate, dbggmove, search_for_mate, true);
-        // priomoves.sort(key = attrgetter('prio'))
+        // priomoves.sort(key = attrgetter("prio"))
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
 
         if(priomoves.size() == 0 || maxcnt == 0){
@@ -226,7 +246,7 @@
                 it->prio = min(it->prio, new_prio + it->prio % 10);
             }
         }
-        // priomoves.sort(key=attrgetter('prio'))
+        // priomoves.sort(key=attrgetter("prio"))
         return true;
     }
 
@@ -260,19 +280,17 @@
                 count = min(count, slimits.mvcnt_stage2);
             }
             return max(stormycnt, count);
-            /*
-            if(depth <= slimits.dpth_stage3):
-                resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio0"], last_pmove, false);
-                count = count_up_to_prio(priomoves, cPrioMove.PRIOS["prio0"]);
-                if(count == 0){
-                    count = slimits->mvcnt_stage3;
-                }
-                else{
-                    count = min(count, slimits.mvcnt_stage3);
-                }
-                return max(stormycnt, count) ;
-            }
-            */
+            //if(depth <= slimits.dpth_stage3):
+            //    resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio0"], last_pmove, false);
+            //    count = count_up_to_prio(priomoves, cPrioMove.PRIOS["prio0"]);
+            //    if(count == 0){
+            //        count = slimits->mvcnt_stage3;
+            //    }
+            //    else{
+            //        count = min(count, slimits.mvcnt_stage3);
+            //    }
+            //    return max(stormycnt, count) ;
+            //}
         else:
             if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio0"], last_pmove, True)){
                 return count_up_to_prio(priomoves, cPrioMove.PRIOS["prio0"]);
@@ -326,3 +344,4 @@
         prnt_fmttime("\ncalc-time: ", time(0) - time_start);
         return candidates
     }
+*/

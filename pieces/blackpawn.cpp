@@ -66,7 +66,7 @@
         if(move_dir == DIRS["undef"]){
             return false;
         }
-        int pin_dir = DIRS["undef"]; // match->eval_pin_dir(pos);
+        int pin_dir = board->eval_pin_dir(pos);
         int dstpiece = board->getfield(dst);
         // check pins
         if(move_dir == DIRS["sth"]){

@@ -5,6 +5,9 @@
     #include <map>
     #include <string>
     #include <boost/multiprecision/cpp_int.hpp>
+    #include "./move.hpp"
+    #include "./values.hpp"
+    #include "./helper.hpp"
     
     using namespace boost::multiprecision;
     using namespace boost::multiprecision::literals;
@@ -51,6 +54,11 @@
             static bool is_sth_wst(unsigned src, unsigned dst);
             static bool is_nth_wst(unsigned src, unsigned dst);
             static bool is_sth_est(unsigned src, unsigned dst);
+            unsigned eval_pin_dir(unsigned src);
+            unsigned eval_soft_pin_dir(unsigned src);
+            bool is_king_after_move_attacked(unsigned src, unsigned dst, list<cMove> *minutes);
+            bool is_move_valid(unsigned src, unsigned dst, unsigned prompiece, list<cMove> *minutes);
+            bool is_move_available(list<cMove> *minutes);
     };
 
 #endif

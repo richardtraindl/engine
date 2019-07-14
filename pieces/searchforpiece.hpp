@@ -77,7 +77,7 @@
 
     bool is_field_touched(cBoard *board, int src, int color, int mode);
 
-    void collect_touches_for_both_colors(cBoard *board, int src, int color, list<cTouch> *friends, list<cTouch> * enmies);
+    void collect_touches_for_both_colors(cBoard *board, int src, int color, list<cTouch> *friends, list<cTouch> *enmies);
 
     void collect_touches_for_color(cBoard *board, int src, int color, list<cTouch> *touches);
 

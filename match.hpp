@@ -41,11 +41,6 @@
             bool is_move_repetition();
             cMove *do_move(unsigned src, unsigned dst, unsigned prompiece);
             bool undo_move();
-            bool is_king_after_move_attacked(unsigned src, unsigned dst);
-            bool is_move_valid(unsigned src, unsigned dst, unsigned prompiece);
-            bool is_move_available();
-            unsigned evaluate_status();
-            unsigned eval_pin_dir(unsigned src);
-            unsigned eval_soft_pin_dir(unsigned src);
+            unsigned eval_status();
     };
 #endif
