@@ -7,12 +7,9 @@
     cBishop::cBishop(cBoard *board, int pos) : cPiece(board, pos){
     }
 
-    unsigned cBishop::DIRS_ARY[4] = 
-        {DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
-    int cBishop::STEPS[4] = 
-        {9, -9, 7, -7};
-    vector<pair<int, unsigned>> cBishop::MV_STEPS = 
-        {make_pair(9, PIECES["blk"]), make_pair(-9, PIECES["blk"]), make_pair(7, PIECES["blk"]), make_pair(-7, PIECES["blk"])};
+    int cBishop::DIRS_ARY[4] = {DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
+    int cBishop::STEPS[4] = {9, -9, 7, -7};
+    int cBishop::MV_STEPS = {{9, PIECES["blk"]}, {-9, PIECES["blk"]}, {7, PIECES["blk"]}, {-7, PIECES["blk"]}};
 
     int cBishop::dir_for_move(int src, int dst){
         if(cBoard::is_inbounds_core(src, dst) == false){
