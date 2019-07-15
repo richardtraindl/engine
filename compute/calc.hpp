@@ -20,7 +20,7 @@
             int mvcnt_stage1;
             int mvcnt_stage2;
             
-            cSearchLimits(unsigned level);
+            cSearchLimits(int level);
     };
 
     void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves);
