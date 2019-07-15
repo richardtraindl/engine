@@ -2,9 +2,7 @@
     #include <sstream>
     #include "./move.hpp"
 
-    using namespace std;
-
-    cMove::cMove(uint256_t _prevfields, unsigned _src, unsigned _dst, unsigned _prompiece){ 
+cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){ 
         prevfields = _prevfields;
         src = _src;
         dst = _dst;
@@ -13,8 +11,8 @@
     cMove::cMove(){
     }
 
-    unsigned cMove::getprevfield(unsigned idx){
-        return (unsigned)(prevfields >> ((63 - idx) * 4)) & 0xF;
+    int cMove::getprevfield(int idx){
+        return (int)(prevfields >> ((63 - idx) * 4)) & 0xF;
     }
 
     void cMove::copyprevfields(uint256_t _prevfields){
@@ -22,7 +20,7 @@
     }
 
     string cMove::format(){
-        unsigned piece = getprevfield(src);
+        int piece = getprevfield(src);
         if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
             if((int)(src % 8) - (int)((int)(dst % 8) == -2)){
                 return "0-0";
@@ -32,7 +30,7 @@
             }
         }
 
-        unsigned dstpiece = getprevfield(dst);
+        int dstpiece = getprevfield(dst);
         string hyphen = "";
         string trailing = "";
         stringstream out;
@@ -136,19 +134,19 @@
         };
 
 
-        map<string, unsigned> cPrioMove::PRIOS = {
+        map<string, int> cPrioMove::PRIOS = {
             {"prio0", 100},
             {"prio1", 200},
             {"prio2", 250},
             {"prio3", 300} 
         };
 
-    cPrioMove::cPrioMove(cMove *move, unsigned _prio){
+    cPrioMove::cPrioMove(cMove *move, int _prio){
         cMove(move->prevfields, move->src, move->dst, move->prompiece);
         prio = _prio;
     }
     
-    cPrioMove::cPrioMove(uint256_t prevfields, unsigned src, unsigned dst, unsigned prompiece, unsigned _prio){
+    cPrioMove::cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int _prio){
         cMove(prevfields, src, dst, prompiece);
         prio = _prio;
     }
@@ -262,5 +260,4 @@
         }
         return str_tactics;
     }
-
 
