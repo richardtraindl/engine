@@ -14,6 +14,6 @@
 
     using namespace std;
     
-    cPiece *obj_for_piece(cBoard *board, unsigned pos);
+    cPiece *obj_for_piece(cBoard *board, int pos);
         
 #endif
