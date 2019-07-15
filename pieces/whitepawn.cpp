@@ -9,16 +9,14 @@
 
     int cWhitePawn::STEPS[2] = {9, 7};
     int cWhitePawn::MAXCNT = 1;
-    vector<pair<int, unsigned>> cWhitePawn::MV_STEPS_RANK2 = 
-        {{8, PIECES["blk"]}, {16, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
-    vector<pair<int, unsigned>> cWhitePawn::MV_STEPS_RANK7 =
-        {{8, PIECES["wQu"]}, {8, PIECES["wRk"]}, {8, PIECES["wBp"]}, {8, PIECES["wKn"]},
-         {9, PIECES["wQu"]}, {9, PIECES["wRk"]}, {9, PIECES["wBp"]}, {9, PIECES["wKn"]},
-         {7, PIECES["wQu"]}, {7, PIECES["wRk"]}, {7, PIECES["wBp"]}, {7, PIECES["wKn"]}};
-    vector<pair<int, unsigned>> cWhitePawn::MV_STEPS =
-        {{(int)8, (unsigned)PIECES["blk"]}, {(int)9, (unsigned)PIECES["blk"]}, {(int)7, (unsigned)PIECES["blk"]}};
+    int cWhitePawn::MV_STEPS_RANK2[4][2] = {{8, PIECES["blk"]}, {16, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
+    int cWhitePawn::MV_STEPS_RANK7[12][2] = {{8, PIECES["wQu"]}, {8, PIECES["wRk"]}, {8, PIECES["wBp"]}, {8, PIECES["wKn"]},
+                                             {9, PIECES["wQu"]}, {9, PIECES["wRk"]}, {9, PIECES["wBp"]}, {9, PIECES["wKn"]},
+                                             {7, PIECES["wQu"]}, {7, PIECES["wRk"]}, {7, PIECES["wBp"]}, {7, PIECES["wKn"]}};
 
-    int cWhitePawn::dir_for_move(unsigned src, unsigned dst){
+    int cWhitePawn::MV_STEPS = [3][2] = {{8, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
+
+    int cWhitePawn::dir_for_move(int src, int dst){
         if(src == dst){
             return DIRS["undef"];
         }
@@ -37,7 +35,7 @@
         return DIRS["undef"];
     }
 
-    int cWhitePawn::step_for_dir(unsigned dir){
+    int cWhitePawn::step_for_dir(int dir){
         if(dir == DIRS["nth"]){
             return 8;
         }
@@ -50,7 +48,7 @@
         return 0;
     }
 
-    bool cWhitePawn::is_move_valid(unsigned dst, unsigned prompiece, list<cMove> *minutes){
+    bool cWhitePawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
         int steps[4] = {9, 7, 8, 16};
         for(const int step : steps){
@@ -66,7 +64,7 @@
         if(move_dir == DIRS["undef"]){
             return false;
         }
-        int pin_dir = DIRS["undef"]; // match->eval_pin_dir(pos);
+        int pin_dir = board->eval_pin_dir(pos);
         int dstpiece = board->getfield(dst);
         // check pins
         if(move_dir == DIRS["nth"]){
@@ -115,7 +113,7 @@
         return true;
     }
 
-    bool cWhitePawn::is_ep_move_ok(unsigned dst, list<cMove> *minutes){
+    bool cWhitePawn::is_ep_move_ok(int dst, list<cMove> *minutes){
         cMove lastmove;
         if(minutes->empty()){
             return false;
