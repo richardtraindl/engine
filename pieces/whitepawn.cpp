@@ -50,9 +50,8 @@
 
     bool cWhitePawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
-        int steps[4] = {9, 7, 8, 16};
-        for(const int step : steps){
-            if((pos + step) == dst && cBoard::is_inbounds(pos, dst, step)){
+        for(const int step : MV_STEPS_RANK2){
+            if((pos + step[0]) == dst && cBoard::is_inbounds(pos, dst, step[0])){
                 flag = true;
                 break;
             }
