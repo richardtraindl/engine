@@ -265,6 +265,7 @@
 
         for(list<cPrioMove>::iterator it = priomoves->begin(); it != priomoves->end(); ++it){
             count += 1;
+            // cMove *move = dynamic_case<cMove*>(&(*it));
 
             match->do_move(it->src, it->dst, it->prompiece);
             if(maximizing){
