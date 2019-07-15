@@ -8,9 +8,9 @@
 
     class cKnight : public cPiece{
         public:
-            static unsigned DIRS_ARY[1];
+            static int DIRS_ARY[1];
             static int STEPS[8];
-            static vector<pair<int, unsigned>> MV_STEPS;
+            static int MV_STEPS[8][2];
             static int MAXCNT;
 
             cKnight(cBoard *board, int pos);
