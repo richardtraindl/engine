@@ -6,33 +6,30 @@
     cKing::cKing(cBoard *board, unsigned pos) : cPiece(board, pos){
     }
 
-    unsigned cKing::DIRS_ARY[1] = {0};
+    int cKing::DIRS_ARY[1] = {0};
     int cKing::STEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
-    vector<pair<int, unsigned>> cKing::MV_STEPS = 
-        {make_pair(8, PIECES["blk"]),  make_pair(9, PIECES["blk"]), 
-         make_pair(1, PIECES["blk"]),  make_pair(-7, PIECES["blk"]),
-         make_pair(-8, PIECES["blk"]), make_pair(-9, PIECES["blk"]), 
-         make_pair(-1, PIECES["blk"]), make_pair(7, PIECES["blk"])};
+    int cKing::MV_STEPS[8][2] = {{8, PIECES["blk"]}, {9, PIECES["blk"]},  {1, PIECES["blk"]},  {-7, PIECES["blk"]},
+                                {-8, PIECES["blk"]}, {-9, PIECES["blk"]}, {-1, PIECES["blk"]}, {7, PIECES["blk"]}};
     int cKing::MAXCNT = 1;
 
     bool cKing::is_trapped(){
         return false; //king cannot be trapped
     }
     
-    bool cKing::is_move_stuck(unsigned dst){
+    bool cKing::is_move_stuck(int dst){
         return false; //king cannot be trapped
     }
 
 
-    bool cKing::is_move_valid(unsigned dst, unsigned prompiece){
+    bool cKing::is_move_valid(int dst, int prompiece){
         if(is_short_castling_ok(dst)){
             return true;
         }
-        /*if(is_long_castling_ok(dst)){
+        if(is_long_castling_ok(dst)){
             return true;
-        }*/
+        }
         //###
-        unsigned opp_color = REVERSED_COLORS[color];
+        int opp_color = REVERSED_COLORS[color];
         bool flag = false;
         for(const int step : STEPS){
             if(pos + step == dst && board->is_inbounds(pos, dst, step)){
@@ -44,7 +41,7 @@
             return false;
         }
         //###
-        unsigned captured = board->getfield(dst);
+        int captured = board->getfield(dst);
         board->setfield(pos, PIECES["blk"]);
         board->setfield(dst, piece);
         bool isattacked = is_field_touched(board, dst, REVERSED_COLORS[color], EVAL_MODES["ignore-pins"]);
@@ -54,14 +51,14 @@
         if(isattacked){
             return false;
         }
-        unsigned dstpiece = board->getfield(dst);
+        int dstpiece = board->getfield(dst);
         if(PIECES_COLOR[dstpiece] == color){
             return false;
         }
         return true;
     }
 
-    bool cKing::is_short_castling_ok(unsigned dst){
+    bool cKing::is_short_castling_ok(int dst){
         uint256_t shorttest, shortmask;
         if(pos - dst != -2){
             return false;
@@ -89,8 +86,8 @@
             }
         }
         board->setfield(pos, PIECES["blk"]);
-        for(unsigned i = 0; i < 3; ++i){
-            unsigned dst2 = pos + i;
+        for(int i = 0; i < 3; ++i){
+            int dst2 = pos + i;
             bool isattacked = is_field_touched(board, dst2, REVERSED_COLORS[color], EVAL_MODES["ignore-pins"]);
             if(isattacked){
                 board->setfield(pos, piece);
@@ -101,7 +98,7 @@
         return true;
     }
 
-    bool cKing::is_long_castling_ok(unsigned dst){
+    bool cKing::is_long_castling_ok(int dst){
         uint256_t longtest, longmask;
         if(pos - dst != 2){
             return false;
@@ -129,8 +126,8 @@
             }
         }
         board->setfield(pos, PIECES["blk"]);
-        for(unsigned i = 0; i < 3; ++i){
-            unsigned dst2 = pos - i;
+        for(int i = 0; i < 3; ++i){
+            int dst2 = pos - i;
             bool isattacked = is_field_touched(board, dst2, REVERSED_COLORS[color], EVAL_MODES["ignore-pins"]);
             if(isattacked){
                 board->setfield(pos, piece);
@@ -141,16 +138,16 @@
         return true;
     }
         
-    cMove *cKing::do_move(unsigned dst, unsigned prompiece, int movecnt, int *score){
+    cMove *cKing::do_move(int dst, int prompiece, int movecnt, int *score){
         cMove *move = cPiece::do_move(dst, prompiece, movecnt, score);
-        unsigned dstpiece = board->getfield(dst);
+        unsintigned dstpiece = board->getfield(dst);
         if(pos - dst == -2){
-            unsigned rook = board->getfield(pos + 3);
+            int rook = board->getfield(pos + 3);
             board->setfield(pos + 3, PIECES["blk"]);
             board->setfield(dst - 1, rook);
         }
         if(pos - dst == 2){
-            unsigned rook = board->getfield(pos - 4);
+            int rook = board->getfield(pos - 4);
             board->setfield(pos - 4, PIECES["blk"]);
             board->setfield(dst + 1, rook);
         }
