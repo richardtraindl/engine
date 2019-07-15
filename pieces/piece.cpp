@@ -2,23 +2,23 @@
 #include "./piece.hpp"
 
 
-    cPiece::cPiece(cBoard *_board, unsigned _pos){
+    cPiece::cPiece(cBoard *_board, int _pos){
         board = _board;
         pos = _pos;
         piece = board->getfield(pos);
         color = PIECES_COLOR[piece];
     }
 
-    unsigned cPiece::DIRS_ARY[1] = {0};
-    int cPiece::STEPS[1] = {0};
-    vector<pair<int, unsigned>> cPiece::MV_STEPS = {make_pair(0, PIECES["blk"])};
+    int cPiece::DIRS_ARY[] = {};
+    int cPiece::STEPS[] = {};
+    int cPiece::MV_STEPS[][] = {{}};
     int cPiece::MAXCNT = 7;
 
-    unsigned cPiece::dir_for_move(unsigned src, unsigned dst){
+    unsigned cPiece::dir_for_move(int src, int dst){
         return DIRS["undef"];
     }
 
-    int cPiece::step_for_dir(unsigned dir){
+    int cPiece::step_for_dir(int dir){
         return 0;
     }
 
@@ -26,7 +26,7 @@
         if(is_field_touched(board, pos, REVERSED_COLORS[color], EVAL_MODES["only-pins-to-king"])){
             return false;
         }
-        for(const int step : STEPS){
+        for(int step : STEPS){
             int pos1 = pos + step;
             if(board->is_inbounds(pos, pos1, step)){
                 int dstpiece = board->getfield(pos1);
@@ -56,8 +56,8 @@
     }
 
     bool cPiece::is_move_stuck(unsigned dst){
-        unsigned mv_dir = dir_for_move(pos, dst);
-        unsigned pin_dir = board->eval_pin_dir(pos);
+        int mv_dir = dir_for_move(pos, dst);
+        int pin_dir = board->eval_pin_dir(pos);
         if(pin_dir == DIRS["undef"] || mv_dir == pin_dir || REVERSE_DIRS[mv_dir] == pin_dir){
             return false;
         }
@@ -66,14 +66,14 @@
         }
     }
 
-    bool cPiece::is_move_valid(unsigned dst, unsigned prompiece){
-        unsigned dir = dir_for_move(pos, dst);
+    bool cPiece::is_move_valid(int dst, int prompiece){
+        int dir = dir_for_move(pos, dst);
         if(dir == DIRS["undef"]){
             return false;
         }
         int step = step_for_dir(dir);
         if(step == 0){
-            unsigned pin_dir = board->eval_pin_dir(pos);
+            int pin_dir = board->eval_pin_dir(pos);
             for(const int piecedir : DIRS_ARY){
                 if(dir == piecedir){
                     if(pin_dir != piecedir && pin_dir != REVERSE_DIRS[piecedir] && pin_dir != DIRS["undef"]){
@@ -84,7 +84,7 @@
         }
         int newpos = pos + step;
         while(board->is_inbounds(pos, newpos, 0)){
-            unsigned newpiece = board->getfield(newpos);
+            int newpiece = board->getfield(newpos);
             if(newpos == dst){
                 if(PIECES_COLOR[newpiece] == color){
                     return false;
@@ -101,8 +101,8 @@
         return false;
     }
 
-    cMove *cPiece::do_move(unsigned dst, unsigned prompiece, int movecnt, int *score){
-        unsigned dstpiece = board->getfield(dst);
+    cMove *cPiece::do_move(int dst, int prompiece, int movecnt, int *score){
+        int dstpiece = board->getfield(dst);
         cMove *move = new cMove(board->fields, pos, dst, prompiece);
         board->setfield(move->src, PIECES["blk"]);
         board->setfield(move->dst, piece);
@@ -121,12 +121,12 @@
     void cPiece::find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported){
         unsigned opp_color = REVERSED_COLORS[color];
         for(const int step : STEPS){
-            unsigned dst2 = board->search(pos, step, MAXCNT);
+            int dst2 = board->search(pos, step, MAXCNT);
             if(dst2 != PIECES["blk"]){
                 if(is_move_stuck(dst2)){
                     continue;
                 }
-                unsigned piece = board->getfield(dst2);
+                int piece = board->getfield(dst2);
                 if(PIECES_COLOR[piece] == opp_color){
                     cTouch *ctouch = new cTouch(piece, dst2);
                     attacked->push_back(*ctouch);
@@ -169,15 +169,15 @@
 
     list<cMove> *cPiece::generate_moves(list<cMove> *minutes){
         list<cMove> *moves = new list<cMove>;
-        for(vector<pair<int, unsigned>>::iterator it = MV_STEPS.begin(); it != MV_STEPS.end(); ++it){
+        for(int step : MV_STEPS){
             int count = 0;
-            unsigned dst = pos + it->first;
-            while(board->is_inbounds(pos, dst, it->first) && count < MAXCNT){
+            unsigned dst = pos + step[0];
+            while(board->is_inbounds(pos, dst, step[0]) && count < MAXCNT){
                 count += 1;
-                if(board->is_move_valid(pos, dst, it->second, minutes)){
-                    moves->push_back(cMove(board->fields, pos, dst, it->second));
+                if(board->is_move_valid(pos, dst, step[1], minutes)){
+                    moves->push_back(cMove(board->fields, pos, dst, step[1]);
                 }
-                dst += it->first;
+                dst += step[0];
             }
         }
         return moves;
@@ -187,19 +187,19 @@
         // from ..compute.analyze_move import add_tactics
         list<cPrioMove> *priomoves = new list<cPrioMove>;
         list<cPrioMove> excludes;
-        for(vector<pair<int, unsigned>>::iterator it = MV_STEPS.begin(); it != MV_STEPS.end(); ++it){
+        for(int step : MV_STEPS){
             int count = 0;
-            unsigned dst = pos + it->first;
-            while(board->is_inbounds(pos, dst, it->first) && count < MAXCNT){
+            unsigned dst = pos + step[0];
+            while(board->is_inbounds(pos, dst, step[0]) && count < MAXCNT){
                 count += 1;
-                if(board->is_move_valid(pos, dst, it->second, minutes)){
-                    cPrioMove *priomove = new cPrioMove(board->fields, pos, dst, it->second, cPrioMove::PRIOS["prio3"]);
+                if(board->is_move_valid(pos, dst, step[1], minutes)){
+                    cPrioMove *priomove = new cPrioMove(board->fields, pos, dst, step[1], cPrioMove::PRIOS["prio3"]);
                     //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                     //if(len(excluded) > 0):
                         //excludes.extend(excluded)
                     priomoves->push_back(*priomove);
                 }
-                dst += it->first;
+                dst += step[0];
             }
         }/*
         if(excludes.size() > 0){
