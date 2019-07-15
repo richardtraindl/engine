@@ -18,7 +18,7 @@
         bRkH_first_move_on = -1;
     }
 
-    map<string, unsigned> cBoard::RANKS = {
+    map<string, int> cBoard::RANKS = {
         {"1", 0},
         {"2", 1},
         {"3", 2},
@@ -29,7 +29,7 @@
         {"8", 7}
     };
 
-    map<string, unsigned> cBoard::COLS = {
+    map<string, int> cBoard::COLS = {
         {"A", 0},
         {"B", 1},
         {"C", 2},
@@ -41,13 +41,13 @@
     };
 
 
-    unsigned cBoard::getfield(unsigned idx){
-        return (unsigned)(fields >> ((63 - idx) * 4)) & 0xF;
+    int cBoard::getfield(int idx){
+        return (int)(fields >> ((63 - idx) * 4)) & 0xF;
     }
         // return (fields >> ((63 - idx) * 4)); // & 0xF;
 
     
-    void cBoard::setfield(unsigned idx, unsigned value){
+    void cBoard::setfield(int idx, int value){
         uint256_t _value = value;
         uint256_t tmpfields = SINGLE >> (idx * 4);
         tmpfields = tmpfields ^ FULL;
@@ -72,7 +72,7 @@
         int wOfficer_cnt = 0;
         int bOfficer_cnt = 0;
         for(int idx = 0; idx < 64; ++idx){
-            unsigned piece = getfield(idx);
+            int piece = getfield(idx);
             if(piece == PIECES["wKg"]){
                 wKg_cnt += 1; 
                 continue;
@@ -121,7 +121,7 @@
         return true;
     }
 
-    bool cBoard::is_inbounds_core(unsigned src, unsigned dst){
+    bool cBoard::is_inbounds_core(int src, int dst){
         if(src < 0 || src > 63 || dst < 0 || dst > 63){
             return false;
         }
@@ -130,14 +130,14 @@
         }
     }
 
-    bool cBoard::is_inbounds(unsigned src, unsigned dst, int step){
+    bool cBoard::is_inbounds(int src, int dst, int step){
         if(src < 0 || src > 63 || dst < 0 || dst > 63){
             return false;
         }
         if(step == 0){
             return true;
         }
-        unsigned dir = DIR_FOR_STEP[step];
+        int dir = DIR_FOR_STEP[step];
         if(dir == 0){
             return false;
         }
@@ -161,11 +161,11 @@
         return false;
     }
 
-    unsigned cBoard::search(unsigned src, unsigned step, int maxcnt){
+    int cBoard::search(int src, int step, int maxcnt){
         int cnt = 0;
         int dst = src + step;
         while(is_inbounds(src, dst, step) && cnt < maxcnt){
-            unsigned piece = getfield(dst);
+            int piece = getfield(dst);
             if(piece != PIECES["blk"]){
                 return dst;
             }
@@ -175,14 +175,14 @@
         return PIECES["blk"];
     }
 
-    bool cBoard::search_bi_dirs(unsigned *first, unsigned *second, unsigned src, int step, int maxcnt){
+    bool cBoard::search_bi_dirs(int *first, int *second, int src, int step, int maxcnt){
         int cnt = 0;
         *first = 65;
         int bisteps[2] = {step, (step * -1)};
         for(const int bistep : bisteps){
             int dst = src + bistep;
             while(is_inbounds(src, dst, bistep) || cnt < maxcnt){
-                unsigned piece = getfield(dst);
+                int piece = getfield(dst);
                 if(piece != PIECES["blk"]){
                     if(*first == 65){
                         *first = dst;
@@ -203,7 +203,7 @@
         return false;
     }
 
-    bool cBoard::is_nth(unsigned src, unsigned dst){
+    bool cBoard::is_nth(int src, int dst){
         if(src < dst && abs((int)src - (int)dst) % 8 == 0){
             return true;
         }
@@ -212,7 +212,7 @@
         }
     }
 
-    bool cBoard::is_sth(unsigned src, unsigned dst){
+    bool cBoard::is_sth(int src, int dst){
         if(src > dst && abs((int)src - (int)dst) % 8 == 0){
             return true;
         }
@@ -221,7 +221,7 @@
         }
     }
 
-    bool cBoard::is_est(unsigned src, unsigned dst){
+    bool cBoard::is_est(int src, int dst){
         if(src % 8 < dst % 8 && src / 8 == dst / 8){
             return true;
         }
@@ -230,7 +230,7 @@
         }
     }
 
-    bool cBoard::is_wst(unsigned src, unsigned dst){
+    bool cBoard::is_wst(int src, int dst){
         if(src % 8 > dst % 8 && src / 8 == dst / 8){
             return true;
         }
@@ -239,7 +239,7 @@
         }
     }
 
-    bool cBoard::is_nth_est(unsigned src, unsigned dst){
+    bool cBoard::is_nth_est(int src, int dst){
         if(abs((int)src - (int)dst) % 9 == 0 && src < dst && src % 8 < dst % 8){
             return true;
         }
@@ -248,7 +248,7 @@
         }
     }
 
-    bool cBoard::is_sth_wst(unsigned src, unsigned dst){
+    bool cBoard::is_sth_wst(int src, int dst){
         if(abs((int)src - (int)dst) % 9 == 0 && src > dst && src % 8 > dst % 8){
             return true;
         }
@@ -257,7 +257,7 @@
         }
     }
 
-    bool cBoard::is_nth_wst(unsigned src, unsigned dst){
+    bool cBoard::is_nth_wst(int src, int dst){
         if(abs((int)src - (int)dst) % 7 == 0 && src < dst && src % 8 > dst % 8){
             return true;
         }
@@ -266,7 +266,7 @@
         }
     }
 
-    bool cBoard::is_sth_est(unsigned src, unsigned dst){
+    bool cBoard::is_sth_est(int src, int dst){
         if(abs((int)src - (int)dst) % 7 == 0 && src > dst && src % 8 < dst % 8){
             return true;
         }
@@ -275,13 +275,13 @@
         }
     }
 
-    unsigned cBoard::eval_pin_dir(unsigned src){
-        unsigned piece = getfield(src);
-        unsigned color = PIECES_COLOR[piece];
-        unsigned kg_pos;
-        unsigned first, second, fstpiece, sndpiece;
-        unsigned enmyfaces[2];
-        unsigned dir_ary[2];
+    int cBoard::eval_pin_dir(int src){
+        int piece = getfield(src);
+        int color = PIECES_COLOR[piece];
+        int kg_pos;
+        int first, second, fstpiece, sndpiece;
+        int enmyfaces[2];
+        int dir_ary[2];
         int step;
         if(color == COLORS["white"]){
             kg_pos = wKg;
@@ -314,7 +314,7 @@
                     enmyfaces[1] = PIECES["wQu"];
                 }
             }
-            for(unsigned i = 0; i < size(dir_ary); ++i){
+            for(int i = 0; i < size(dir_ary); ++i){
                 if(j == 0){
                     step = cRook::step_for_dir(dir_ary[i]);
                 }
@@ -340,12 +340,12 @@
         return DIRS["undef"];
     }
 
-    unsigned cBoard::eval_soft_pin_dir(unsigned src){
-        unsigned piece = getfield(src);
-        unsigned color = PIECES_COLOR[piece];
-        unsigned first, second, fstpiece, sndpiece;
-        unsigned enmyfaces[2];
-        unsigned dir_ary[2];
+    int cBoard::eval_soft_pin_dir(int src){
+        int piece = getfield(src);
+        int color = PIECES_COLOR[piece];
+        int first, second, fstpiece, sndpiece;
+        int enmyfaces[2];
+        int dir_ary[2];
         int step;
         for(int j = 0; j < 2; ++j){
             if(j == 0){
@@ -372,7 +372,7 @@
                     enmyfaces[1] = PIECES["wQu"];
                 }
             }
-            for(unsigned i = 0; i < size(dir_ary); ++i){
+            for(int i = 0; i < size(dir_ary); ++i){
                 if(j == 0){
                     step = cRook::step_for_dir(dir_ary[i]);
                 }
@@ -402,10 +402,10 @@
         return DIRS["undef"];
     }
 
-    bool cBoard::is_king_after_move_attacked(unsigned src, unsigned dst, list<cMove> *minutes){
-        unsigned srcpiece = getfield(src);
-        unsigned dstpiece;
-        unsigned pawnenmy = PIECES["blk"];
+    bool cBoard::is_king_after_move_attacked(int src, int dst, list<cMove> *minutes){
+        int srcpiece = getfield(src);
+        int dstpiece;
+        int pawnenmy = PIECES["blk"];
         bool flag;
         if(srcpiece == PIECES["wPw"]){
             cWhitePawn *cpawn = new cWhitePawn(this, src);
@@ -438,13 +438,13 @@
         return flag;
     }
 
-    bool cBoard::is_move_valid(unsigned src, unsigned dst, unsigned prompiece, list<cMove> *minutes){
-        unsigned piece = getfield(src);
+    bool cBoard::is_move_valid(int src, int dst, int prompiece, list<cMove> *minutes){
+        int piece = getfield(src);
         cPiece *cpiece = obj_for_piece(this, src);
         if(cpiece == NULL){
             return false; // RETURN_CODES["general-error"]
         }
-        unsigned direction = cpiece->dir_for_move(src, dst);
+        int direction = cpiece->dir_for_move(src, dst);
         int step = cpiece->step_for_dir(direction);
         if(is_inbounds(src, dst, step) == false){
             return false; // RETURN_CODES["out-of-bounds"]
@@ -469,7 +469,7 @@
     }
 
     bool cBoard::is_move_available(list<cMove> *minutes){
-        unsigned color;
+        int color;
         if(minutes->size() % 2 == 0){
             color = COLORS["white"];
         }
@@ -477,12 +477,12 @@
             color = COLORS["black"];
         }
         for(int idx = 0; idx < 64; ++idx){
-            unsigned piece = getfield(idx);
+            int piece = getfield(idx);
             if(piece != PIECES["blk"] && color == PIECES_COLOR[piece]){
                 cPiece *cpiece = obj_for_piece(this, idx);
-                for(vector<pair<int, unsigned>>::iterator it = cpiece->MV_STEPS.begin(); it != cpiece->MV_STEPS.end(); ++it){
+                for(vector<pair<int, int>>::iterator it = cpiece->MV_STEPS.begin(); it != cpiece->MV_STEPS.end(); ++it){
                     int count = 0;
-                    unsigned dst = cpiece->pos + it->first;
+                    int dst = cpiece->pos + it->first;
                     while(is_inbounds(cpiece->pos, dst, it->first) && count < cpiece->MAXCNT){
                         count += 1;
                         if(is_move_valid(cpiece->pos, dst, it->second, minutes)){
