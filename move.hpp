@@ -15,14 +15,14 @@
     class cMove{
         public:
             uint256_t prevfields;
-            unsigned src;
-            unsigned dst;
-            unsigned prompiece;
+            int src;
+            int dst;
+            int prompiece;
 
-            cMove(uint256_t prevfields, unsigned src, unsigned dst, unsigned prompiece);
+            cMove(uint256_t prevfields, int src, int dst, int prompiece);
             cMove();
 
-            unsigned getprevfield(unsigned idx);
+            int getprevfield(int idx);
             void copyprevfields(uint256_t _prevfields);
             string format();
     };
@@ -47,10 +47,10 @@
         public:
             list<cTactic> tactics;
             int prio;
-            static map<string, unsigned> PRIOS;
+            static map<string, int> PRIOS;
 
-            cPrioMove(cMove *move, unsigned prio);
-            cPrioMove(uint256_t prevfields, unsigned src, unsigned dst, unsigned prompiece, unsigned prio);
+            cPrioMove(cMove *move, int prio);
+            cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int prio);
             
             void evaluate_priority();
             void downgrade(int domain);
