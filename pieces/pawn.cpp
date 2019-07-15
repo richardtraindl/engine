@@ -10,8 +10,8 @@
         return false; // pawn cannot be trapped
     }
 
-    cMove *cPawn::do_move(unsigned dst, unsigned prompiece, int movecnt, int *score){
-        unsigned dstpiece_before_mv = board->getfield(dst);
+    cMove *cPawn::do_move(int dst, int prompiece, int movecnt, int *score){
+        int dstpiece_before_mv = board->getfield(dst);
         cMove *move = cPiece::do_move(dst, prompiece, movecnt, score);
         if(prompiece != PIECES["blk"]){
             board->setfield(dst, prompiece);
