@@ -13,28 +13,28 @@
 
     struct mvstep{
         int step;
-        unsigned piece;
+        int piece;
     };
 
     class cPiece{
         public:
-            static unsigned DIRS_ARY[1];
-            static int STEPS[1];
-            static vector<pair<int, unsigned>> MV_STEPS;
+            static int DIRS_ARY[];
+            static int STEPS[];
+            static int MV_STEPS[][];
             static int MAXCNT;
 
             cBoard *board;
-            unsigned pos;
-            unsigned piece;
-            unsigned color;
+            int pos;
+            int piece;
+            int color;
             
-            cPiece(cBoard *board, unsigned pos);
-            static unsigned dir_for_move(unsigned src, unsigned dst);
-            static int step_for_dir(unsigned direction);
+            cPiece(cBoard *board, int pos);
+            static int dir_for_move(int src, int dst);
+            static int step_for_dir(int direction);
             bool is_trapped();
-            bool is_move_stuck(unsigned dst);
-            bool is_move_valid(unsigned dst, unsigned prompiece);
-            cMove *do_move(unsigned dst, unsigned prompiece, int movecnt, int *score);
+            bool is_move_stuck(int dst);
+            bool is_move_valid(int dst, int prompiece);
+            cMove *do_move(int dst, int prompiece, int movecnt, int *score);
             bool undo_move(cMove *move, int movecnt, int *score);
             void find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported);
             int score_touches();
