@@ -1,9 +1,7 @@
 
 #include "./values.hpp"
 
-    using namespace std;
-
-    map<string, unsigned> PIECES = {
+    map<string, int> PIECES = {
         {"blk", mBLK}, 
         {"wPw", mWPW}, 
         {"wKn", mWKN}, 
@@ -19,7 +17,7 @@
         {"bKg", mBKG}
     };
 
-    map<unsigned, unsigned> PIECES_BARE = {
+    map<int, int> PIECES_BARE = {
       {PIECES["blk"], 0}, 
       {PIECES["wPw"], 1}, 
       {PIECES["bPw"], 1}, 
@@ -36,7 +34,7 @@
     };
 
 
-    map<unsigned, unsigned> PIECES_RANK = {
+    map<int, int> PIECES_RANK = {
         {PIECES["blk"], 0}, 
         {PIECES["wPw"], 1}, 
         {PIECES["bPw"], 1}, 
@@ -84,19 +82,19 @@
         {PIECES["bKg"], 0x1} // 0x1111111111111111111111111111111111111111111111111111111111111111 
     };
 
-    map<string, unsigned> COLORS = {
+    map<string, int> COLORS = {
         {"undef", 0},
         {"white", 1},
         {"black", 9}
     };
 
-    map<unsigned, unsigned> REVERSED_COLORS = {
+    map<int, int> REVERSED_COLORS = {
         {COLORS["undef"], COLORS["undef"]},
         {COLORS["white"], COLORS["black"]},
         {COLORS["black"], COLORS["white"]} 
     };
 
-    map<unsigned, unsigned> PIECES_COLOR = {
+    map<int, int> PIECES_COLOR = {
         {PIECES["blk"], COLORS["undef"]},
         {PIECES["wPw"], COLORS["white"]},
         {PIECES["wKn"], COLORS["white"]},
@@ -112,7 +110,7 @@
         {PIECES["bKg"], COLORS["black"]}
     };
 
-    map<string, unsigned> DIRS = {
+    map<string, int> DIRS = {
         {"nth", 0},
         {"sth", 1},
         {"est", 2},
@@ -132,7 +130,7 @@
         {"undef", 17}
     };
 
-    map<unsigned, unsigned> REVERSE_DIRS = {
+    map<int, int> REVERSE_DIRS = {
         {DIRS["nth"], DIRS["sth"]},
         {DIRS["sth"], DIRS["nth"]},
         {DIRS["est"], DIRS["wst"]},
@@ -152,7 +150,7 @@
         {DIRS["undef"], DIRS["undef"]}
     };
 
-    map<int, unsigned> DIR_FOR_STEP = {
+    map<int, int> DIR_FOR_STEP = {
         {8, DIRS["nth"]},
         {16, DIRS["nth"]},
         {-8, DIRS["sth"]},
@@ -175,7 +173,7 @@
         {15, DIRS["2nth-wst"]}
     };
 
-    map<unsigned, int> SCORES = {
+    map<int, int> SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], -100},
         {PIECES["wKn"], -340},
@@ -191,7 +189,7 @@
         {PIECES["bKg"], 20000}
     };
 
-    map<unsigned, int> SUPPORTED_SCORES = {
+    map<int, int> SUPPORTED_SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], 6},
         {PIECES["wKn"], 18},
@@ -207,7 +205,7 @@
         {PIECES["bKg"], 0}
     };
 
-    map<unsigned, int> ATTACKED_SCORES = {
+    map<int, int> ATTACKED_SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], -6},
         {PIECES["wKn"], -18},
@@ -223,7 +221,7 @@
         {PIECES["bKg"], 0}
     };
 
-    map<string, unsigned> EVAL_MODES = {
+    map<string, int> EVAL_MODES = {
         {"ignore-pins", 0}, 
         {"only-pins-to-king", 1}, 
         {"all-pins", 2}
