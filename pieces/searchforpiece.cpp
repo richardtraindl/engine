@@ -29,24 +29,22 @@
                             return true;
                         }
                         if(mode == EVAL_MODES["only-pins-to-king"]){
-                            return true;
-                            /*cpiece = match.obj_for_piece(piece, dst);
+                            cPiece *cpiece = match.obj_for_piece(board, dst);
                             if(cpiece.is_move_stuck(src)){
                                 break;
                             }
                             else{
                                 return true;
-                            }*/
+                            }
                         }
                         else{ // mode == EVAL_MODES["all-pins"]
-                            return true;
-                            /*cpiece = match.obj_for_piece(piece, dst);
-                            if(cpiece.is_move_stuck(src) or match.is_soft_pin(src)[0]){
+                            cPiece *cpiece = match.obj_for_piece(board, dst);
+                            if(cpiece.is_move_stuck(src) || board->eval_soft_pin_dir(src) != DIRS["undef"]){
                                 break;
                             }
                             else{
                                 return true;
-                            }*/
+                            }
                         }
                     }
                 }
