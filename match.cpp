@@ -12,28 +12,28 @@
     cMatch::cMatch(const cMatch &obj){
     } // copy constructor
 
-    map<string, unsigned> cMatch::STATUS = {
+    map<string, int> cMatch::STATUS = {
         {"active", 10},
         {"draw", 11}, 
         {"winner-white", 12}, 
         {"winner-black", 13}
     };
 
-    map<string, unsigned> cMatch::LEVELS = {
+    map<string, int> cMatch::LEVELS = {
         {"blitz", 0}, 
         {"low", 1}, 
         {"medium", 2}, 
         {"high", 3}
     };
 
-    map<int, unsigned> cMatch::SECS_PER_MOVE = {
+    map<int, int> cMatch::SECS_PER_MOVE = {
         {LEVELS["blitz"], 15}, 
         {LEVELS["low"], 30}, 
         {LEVELS["medium"], 60}, 
         {LEVELS["high"], 90}
     };
 
-    map<string, unsigned> RETURN_CODES = {
+    map<string, int> RETURN_CODES = {
         {"ok", 10}, 
         {"draw", 11}, 
         {"winner-white", 12}, 
@@ -82,7 +82,7 @@
         }
         score = 0;
         for(int idx = 0; idx < 64; ++idx){
-            unsigned piece = board.getfield(idx);
+            int piece = board.getfield(idx);
             score -= SCORES[(int)piece];
             if(piece == PIECES["wKg"]){
                 board.wKg = idx;
@@ -98,7 +98,7 @@
         return minutes.size();
     }
 
-    unsigned cMatch::next_color(){
+    int cMatch::next_color(){
         if(minutes.size() % 2 == 0){
             return COLORS["white"];
         }
@@ -120,8 +120,8 @@
         int cnt = 0;
         int maxlen = minutes.size();
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
-            unsigned srcpiece = it->getprevfield(it->src);
-            unsigned dstpiece = it->getprevfield(it->dst);
+            int srcpiece = it->getprevfield(it->src);
+            int dstpiece = it->getprevfield(it->dst);
             if(srcpiece == PIECES["wPw"] || srcpiece == PIECES["bPw"] || dstpiece != PIECES["blk"]){
                 cnt = 0;
             }
@@ -151,7 +151,7 @@
         return count >= 2;
     }
 
-    cMove *cMatch::do_move(unsigned src, unsigned dst, unsigned prompiece){
+    cMove *cMatch::do_move(int src, int dst, int prompiece){
         cPiece *cpiece = obj_for_piece(&board, src);
         if(cpiece != NULL){
             cMove *move = cpiece->do_move(dst, prompiece, movecnt() + 1, &score);
@@ -171,7 +171,7 @@
         else{
             return false;
         }
-        unsigned piece = board.getfield(move.dst);
+        int piece = board.getfield(move.dst);
         if(move.prompiece != PIECES["blk"]){
             bool flag;
             if(PIECES_COLOR[piece] == COLORS["white"]){
@@ -199,7 +199,7 @@
         }
     }
 
-    unsigned cMatch::eval_status(){
+    int cMatch::eval_status(){
         if(board.is_move_available(&minutes)){
             return STATUS["active"];
         }
@@ -217,4 +217,3 @@
         }
         return STATUS["draw"];
     }
- 
