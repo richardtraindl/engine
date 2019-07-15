@@ -15,7 +15,6 @@
 
     using namespace std;
 
-
     class cMatch{
         public:
             time_t created_at;
@@ -25,22 +24,23 @@
             cBoard board;
             list<cMove> minutes;
 
-            static map<string, unsigned> STATUS;
-            static map<string, unsigned> LEVELS;
-            static map<int, unsigned> SECS_PER_MOVE;
-            static map<string, unsigned> RETURN_CODES;
+            static map<string, int> STATUS;
+            static map<string, int> LEVELS;
+            static map<int, int> SECS_PER_MOVE;
+            static map<string, int> RETURN_CODES;
 
             cMatch();
             cMatch(const cMatch &obj);
             void update_attributes();
             int movecnt();
-            unsigned next_color();
+            int next_color();
             bool is_opening();
             bool is_endgame();
             bool is_fifty_moves_rule();
             bool is_move_repetition();
-            cMove *do_move(unsigned src, unsigned dst, unsigned prompiece);
+            cMove *do_move(int src, int dst, int prompiece);
             bool undo_move();
-            unsigned eval_status();
+            int eval_status();
     };
+
 #endif
