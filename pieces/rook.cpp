@@ -7,14 +7,11 @@ using namespace std;
     cRook::cRook(cBoard *board, unsigned pos) : cPiece::cPiece(board, pos){
     }
 
-    unsigned cRook::DIRS_ARY[4] = 
-        {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
-    int cRook::STEPS[4] = 
-        {8, -8, 1, -1};
-    vector<pair<int, unsigned>> cRook::MV_STEPS = 
-        {make_pair(8, PIECES["blk"]), make_pair(-8, PIECES["blk"]), make_pair(1, PIECES["blk"]), make_pair(-1, PIECES["blk"])};
+    int cRook::DIRS_ARY[4] = {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
+    int cRook::STEPS[4] = {8, -8, 1, -1};
+    int Rook::MV_STEPS[4][2] = {{8, PIECES["blk"]}, {-8, PIECES["blk"]}, {1, PIECES["blk"]}, {-1, PIECES["blk"]}};
 
-    int cRook::dir_for_move(unsigned src, unsigned dst){
+    int cRook::dir_for_move(int src, int dst){
         if(cBoard::is_inbounds_core(src, dst) == false){
             return DIRS["undef"];
         }
@@ -33,7 +30,7 @@ using namespace std;
         return DIRS["undef"];
     }
 
-    int cRook::step_for_dir(unsigned dir){
+    int cRook::step_for_dir(int dir){
         if(dir == DIRS["nth"]){
             return 8;
         }
@@ -49,7 +46,7 @@ using namespace std;
         return 0;
     }
 
-    cMove *cRook::do_move(unsigned dst, unsigned prompiece, int movecnt, int *score){
+    cMove *cRook::do_move(int dst, unsigintned prompiece, int movecnt, int *score){
         cMove *move = cPiece::do_move(dst, prompiece, movecnt, score);
         int srcx = pos % 8;
         int srcy = pos / 8;
