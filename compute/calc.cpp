@@ -1,7 +1,7 @@
 
 #include "./calc.hpp"
 
-    cSearchLimits::cSearchLimits(unsigned level){
+    cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
             add_mvcnt = 2;
             dpth_max = 8;
@@ -65,10 +65,10 @@
 
 
     list<cMove> *generate_moves(cMatch *match){
-        unsigned color = match->next_color();
+        int color = match->next_color();
         list<cMove> *moves;
         for(int idx = 0; idx < 64; ++idx){
-            unsigned piece = match->board.getfield(idx);
+            int piece = match->board.getfield(idx);
             if(piece == PIECES["blk"] || color != PIECES_COLOR[piece]){
                 continue;
             }
@@ -81,10 +81,10 @@
     }
 
     list<cPrioMove> *generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate){
-        unsigned color = match->next_color();
+        int color = match->next_color();
         list<cPrioMove> *priomoves;
         for(int idx = 0; idx < 64; ++idx){
-            unsigned piece = match->board.getfield(idx);
+            int piece = match->board.getfield(idx);
             if(piece == PIECES["blk"] || color != PIECES_COLOR[piece]){
                 continue;
             }
