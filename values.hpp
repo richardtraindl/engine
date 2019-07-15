@@ -7,78 +7,74 @@
 
     using namespace std;
 
-    typedef map<string, int> MapStrInt;
-    typedef map<int, int> MapIntInt;
-    typedef map<int, string> MapIntStr;
-
     #if !defined(mBLK)
-        #define mBLK    0x0 // extern constexpr int BPW;
+        #define mBLK    0x0
     #endif
     #if !defined(mWPW)
-        #define mWPW    0x1 // extern constexpr int BPW;
+        #define mWPW    0x1
     #endif
     #if !defined(mWKN)
-        #define mWKN    0x2 // extern constexpr int BPW;
+        #define mWKN    0x2
     #endif
     #if !defined(mWBP)
-        #define mWBP    0x3 // extern constexpr int BPW;
+        #define mWBP    0x3
     #endif
     #if !defined(mWRK)
-        #define mWRK    0x4 // extern constexpr int BPW;
+        #define mWRK    0x4
     #endif
     #if !defined(mWQU)
-        #define mWQU    0x5 // extern constexpr int BPW;
+        #define mWQU    0x5
     #endif
     #if !defined(mWKG)
-        #define mWKG    0x6 // extern constexpr int BPW;
+        #define mWKG    0x6
     #endif
 
     #if !defined(mBPW)
-        #define mBPW    0x9 // extern constexpr int BPW;
+        #define mBPW    0x9
     #endif
     #if !defined(mBKN)
-        #define mBKN    0xA // extern constexpr int BPW;
+        #define mBKN    0xA
     #endif
     #if !defined(mBBP)
-        #define mBBP    0xB // extern constexpr int BPW;
+        #define mBBP    0xB
     #endif
     #if !defined(mBRK)
-        #define mBRK    0xC // extern constexpr int BPW;
+        #define mBRK    0xC
     #endif
     #if !defined(mBQU)
-        #define mBQU    0xD // extern constexpr int BPW;
+        #define mBQU    0xD
     #endif
     #if !defined(mBKG)
-        #define mBKG    0xE // extern constexpr int BPW;
+        #define mBKG    0xE
     #endif
 
-    extern map<string, unsigned> PIECES;
+    extern map<string, int> PIECES;
 
-    extern map<unsigned, unsigned> PIECES_BARE;
+    extern map<int, int> PIECES_BARE;
 
-    extern map<unsigned, unsigned> PIECES_RANK;
+    extern map<int, int> PIECES_RANK;
 
     extern MapIntInt PIECES_MASK;
 
     extern MapIntInt PIECES_NMASK;
 
-    extern map<string, unsigned> COLORS;
+    extern map<string, int> COLORS;
 
-    extern map<unsigned, unsigned> REVERSED_COLORS;
+    extern map<int, int> REVERSED_COLORS;
 
-    extern map<unsigned, unsigned> PIECES_COLOR;
+    extern map<int, int> PIECES_COLOR;
 
-    extern map<string, unsigned> DIRS;
+    extern map<string, int> DIRS;
 
-    extern map<unsigned, unsigned> REVERSE_DIRS;
+    extern map<int, int> REVERSE_DIRS;
 
-    extern map<int, unsigned> DIR_FOR_STEP;
+    extern map<int, int> DIR_FOR_STEP;
 
-    extern map<unsigned, int> SCORES;
+    extern map<int, int> SCORES;
 
-    extern map<unsigned, int> SUPPORTED_SCORES;
+    extern map<int, int> SUPPORTED_SCORES;
 
-    extern map<unsigned, int> ATTACKED_SCORES;
+    extern map<int, int> ATTACKED_SCORES;
     
-    extern map<string, unsigned> EVAL_MODES;
+    extern map<string, int> EVAL_MODES;
 #endif
