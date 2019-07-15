@@ -25,8 +25,8 @@
             int bRkA_first_move_on;
             int bRkH_first_move_on;
 
-            static map<string, unsigned> RANKS;
-            static map<string, unsigned> COLS;
+            static map<string, int> RANKS;
+            static map<string, int> COLS;
             const uint256_t BASE     = 0x42356324111111110000000000000000000000000000000099999999CABDEBAC_cppui;
             const uint256_t FULL     = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui;
             const uint256_t SINGLE   = 0xF000000000000000000000000000000000000000000000000000000000000000_cppui;
@@ -37,27 +37,27 @@
             const uint256_t BITS0011 = 0x3333333333333333333333333333333333333333333333333333333333333333_cppui;
 
             cBoard();
-            unsigned getfield(unsigned idx);
-            void setfield(unsigned idx, unsigned value);
+            int getfield(int idx);
+            void setfield(int idx, int value);
             void copyfields(uint256_t *fields);
             bool comparefields(uint256_t fields);
             bool verify();
-            static bool is_inbounds_core(unsigned src, unsigned dst);
-            static bool is_inbounds(unsigned src, unsigned dst, int step);
-            unsigned search(unsigned src, unsigned step, int maxcnt);
-            bool search_bi_dirs(unsigned *first, unsigned *second, unsigned src, int step, int maxcnt);
-            static bool is_nth(unsigned src, unsigned dst);
-            static bool is_sth(unsigned src, unsigned dst);
-            static bool is_est(unsigned src, unsigned dst);
-            static bool is_wst(unsigned src, unsigned dst);
-            static bool is_nth_est(unsigned src, unsigned dst);
-            static bool is_sth_wst(unsigned src, unsigned dst);
-            static bool is_nth_wst(unsigned src, unsigned dst);
-            static bool is_sth_est(unsigned src, unsigned dst);
-            unsigned eval_pin_dir(unsigned src);
-            unsigned eval_soft_pin_dir(unsigned src);
-            bool is_king_after_move_attacked(unsigned src, unsigned dst, list<cMove> *minutes);
-            bool is_move_valid(unsigned src, unsigned dst, unsigned prompiece, list<cMove> *minutes);
+            static bool is_inbounds_core(int src, int dst);
+            static bool is_inbounds(int src, int dst, int step);
+            int search(int src, int step, int maxcnt);
+            bool search_bi_dirs(int *first, int *second, int src, int step, int maxcnt);
+            static bool is_nth(int src, int dst);
+            static bool is_sth(int src, int dst);
+            static bool is_est(int src, int dst);
+            static bool is_wst(int src, int dst);
+            static bool is_nth_est(int src, int dst);
+            static bool is_sth_wst(int src, int dst);
+            static bool is_nth_wst(int src, int dst);
+            static bool is_sth_est(int src, int dst);
+            int eval_pin_dir(int src);
+            int eval_soft_pin_dir(int src);
+            bool is_king_after_move_attacked(int src, int dst, list<cMove> *minutes);
+            bool is_move_valid(int src, int dst, int prompiece, list<cMove> *minutes);
             bool is_move_available(list<cMove> *minutes);
     };
 
