@@ -50,9 +50,9 @@
 
     extern map<string, int> PIECES;
 
-    extern map<int, int> PIECES_BARE;
+    extern map<int, int> PIECES_BARES;
 
-    extern map<int, int> PIECES_RANK;
+    extern map<int, int> PIECES_RANKS;
 
     extern map<int, int> PIECES_MASK;
 
