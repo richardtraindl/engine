@@ -1,10 +1,10 @@
 
 #include "./board.hpp"
-#include "./pieces/pieceshelper.hpp"
 #include "./pieces/rook.hpp"
 #include "./pieces/bishop.hpp"
 #include "./pieces/whitepawn.hpp"
 #include "./pieces/blackpawn.hpp"
+#include "./pieces/pieceshelper.hpp"
 
 
     cBoard::cBoard(){ 
