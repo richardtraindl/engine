@@ -12,7 +12,12 @@ cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){
     }
 
     int cMove::getprevfield(int idx){
-        return (int)(prevfields >> ((63 - idx) * 4)) & 0xF;
+        if(prevfields != NULL){
+            return (int)(prevfields >> ((63 - idx) * 4)) & 0xF;
+        }
+        else{
+            return mBLK;
+        }
     }
 
     void cMove::copyprevfields(uint256_t _prevfields){
