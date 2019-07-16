@@ -25,9 +25,9 @@ cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){
     }
 
     string cMove::format(){
-        int piece = getprevfield(src);
+        int piece = getfield(dst);
         if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
-            if((int)(src % 8) - (int)((int)(dst % 8) == -2)){
+            if(src % 8 - dst % 8 == -2){
                 return "0-0";
             }
             if(src % 8 - dst % 8 == 2){
