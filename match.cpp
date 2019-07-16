@@ -84,11 +84,11 @@
         for(int idx = 0; idx < 64; ++idx){
             int piece = board.getfield(idx);
             score -= SCORES[(int)piece];
-            if(piece == PIECES["wKg"]){
+            if(piece == mWKG){
                 board.wKg = idx;
                 continue;
             }
-            if(piece == PIECES["bKg"]){
+            if(piece == mBKG){
                 board.bKg = idx;
             }
         }
@@ -122,7 +122,7 @@
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
             int srcpiece = it->getprevfield(it->src);
             int dstpiece = it->getprevfield(it->dst);
-            if(srcpiece == PIECES["wPw"] || srcpiece == PIECES["bPw"] || dstpiece != PIECES["blk"]){
+            if(srcpiece == mWPW || srcpiece == mBPW || dstpiece != mBLK){
                 cnt = 0;
             }
             else{
@@ -172,7 +172,7 @@
             return false;
         }
         int piece = board.getfield(move.dst);
-        if(move.prompiece != PIECES["blk"]){
+        if(move.prompiece != mBLK){
             bool flag;
             if(PIECES_COLOR[piece] == COLORS["white"]){
                 cWhitePawn *cpawn = new cWhitePawn(&board, move.dst);
