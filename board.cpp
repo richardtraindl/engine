@@ -43,10 +43,8 @@
 
 
     int cBoard::getfield(int idx){
-        return (int)(fields >> ((63 - idx) * 4)) & 0xF;
+        return (fields >> ((63 - idx) * 4)) & 0xF;
     }
-        // return (fields >> ((63 - idx) * 4)); // & 0xF;
-
     
     void cBoard::setfield(int idx, int value){
         uint256_t _value = value;
@@ -74,29 +72,27 @@
         int bOfficer_cnt = 0;
         for(int idx = 0; idx < 64; ++idx){
             int piece = getfield(idx);
-            if(piece == PIECES["wKg"]){
+            if(piece == mWKG){
                 wKg_cnt += 1; 
                 continue;
             }
-            if(piece == PIECES["bKg"]){
+            if(piece == mBKG){
                 bKg_cnt += 1;
                 continue;
             }
-            if(piece == PIECES["wPw"]){
+            if(piece == mWPW){
                 wPw_cnt += 1;
                 continue;
             }
-            if(piece == PIECES["bPw"]){
+            if(piece == mBPW){
                 bPw_cnt += 1;
                 continue; 
             }
-            if(piece == PIECES["wRk"] || piece == PIECES["wBp"] || 
-               piece == PIECES["wKn"] || piece == PIECES["wQu"]){
+            if(piece == mWRK || piece == mWBP || piece == mWKN || piece == mWQU){
                 wOfficer_cnt += 1;
                 continue;
             }
-            if(piece == PIECES["bRk"] || piece == PIECES["bBp"] || 
-               piece == PIECES["bKn"] || piece == PIECES["bQu"]){
+            if(piece == mBRK || piece == mBBP || piece == mBKN || piece == mBQU){
                 bOfficer_cnt += 1;
                 continue;
             }
@@ -138,7 +134,7 @@
         if(step == 0){
             return true;
         }
-        int dir = DIR_FOR_STEP[step];
+        int dir = DIRS_FOR_STEP[step];
         if(dir == 0){
             return false;
         }
@@ -167,13 +163,13 @@
         int dst = src + step;
         while(is_inbounds(src, dst, step) && cnt < maxcnt){
             int piece = getfield(dst);
-            if(piece != PIECES["blk"]){
+            if(piece != mBLK){
                 return dst;
             }
             cnt += 1;
             dst += step;
         }
-        return PIECES["blk"];
+        return mBLK;
     }
 
     bool cBoard::search_bi_dirs(int *first, int *second, int src, int step, int maxcnt){
@@ -184,7 +180,7 @@
             int dst = src + bistep;
             while(is_inbounds(src, dst, bistep) || cnt < maxcnt){
                 int piece = getfield(dst);
-                if(piece != PIECES["blk"]){
+                if(piece != mBLK){
                     if(*first == 65){
                         *first = dst;
                         break;
@@ -278,7 +274,7 @@
 
     int cBoard::eval_pin_dir(int src){
         int piece = getfield(src);
-        int color = PIECES_COLOR[piece];
+        int color = PIECES_COLORS[piece];
         int kg_pos;
         int first, second, fstpiece, sndpiece;
         int enmyfaces[2];
@@ -326,11 +322,11 @@
                     fstpiece = getfield(first);
                     sndpiece = getfield(second);
                     if(PIECES_COLOR[fstpiece] != PIECES_COLOR[sndpiece]){
-                        if(PIECES_COLOR[fstpiece] == color && kg_pos == first &&
+                        if(PIECES_COLORS[fstpiece] == color && kg_pos == first &&
                            (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
                             return dir_ary[i];
                         }
-                        if(PIECES_COLOR[sndpiece] == color && kg_pos == second && 
+                        if(PIECES_COLORS[sndpiece] == color && kg_pos == second && 
                            (enmyfaces[0] == fstpiece || enmyfaces[1] == fstpiece)){
                             return REVERSE_DIRS[dir_ary[i]];
                         }
@@ -353,24 +349,24 @@
                 dir_ary[0] = cRook::DIRS_ARY[0];
                 dir_ary[1] = cRook::DIRS_ARY[2];
                 if(color == COLORS["white"]){
-                    enmyfaces[0] = PIECES["bRk"];
-                    enmyfaces[1] = PIECES["bQu"];
+                    enmyfaces[0] = mBRK;
+                    enmyfaces[1] = mBQU;
                 }
                 else{
-                    enmyfaces[0] = PIECES["wBp"];
-                    enmyfaces[1] = PIECES["wQu"];
+                    enmyfaces[0] = mWRK;
+                    enmyfaces[1] = mWQU;
                 }
             }
             else{
                 dir_ary[0] = cBishop::DIRS_ARY[0];
                 dir_ary[1] = cBishop::DIRS_ARY[2];
                 if(color == COLORS["white"]){
-                    enmyfaces[0] = PIECES["bBp"];
-                    enmyfaces[1] = PIECES["bQu"];
+                    enmyfaces[0] = mBBP;
+                    enmyfaces[1] = mBQU;
                 }
                 else{
-                    enmyfaces[0] = PIECES["wBp"];
-                    enmyfaces[1] = PIECES["wQu"];
+                    enmyfaces[0] = mWBP;
+                    enmyfaces[1] = mWQU;
                 }
             }
             for(int i = 0; i < 2; ++i){
@@ -383,14 +379,14 @@
                 if(search_bi_dirs(&first, &second, src, step, 6)){
                     fstpiece = getfield(first);
                     sndpiece = getfield(second);
-                    if(PIECES_COLOR[fstpiece] != PIECES_COLOR[sndpiece]){
-                        if(PIECES_COLOR[fstpiece] == color && 
+                    if(PIECES_COLORS[fstpiece] != PIECES_COLOR[sndpiece]){
+                        if(PIECES_COLORS[fstpiece] == color && 
                            PIECES_RANK[fstpiece] > PIECES_RANK[sndpiece] &&
                            PIECES_RANK[fstpiece] > PIECES_RANK[piece] &&
                            (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
                             return dir_ary[i];
                         }
-                        if(PIECES_COLOR[sndpiece] == color && 
+                        if(PIECES_COLORS[sndpiece] == color && 
                            PIECES_RANK[sndpiece] > PIECES_RANK[fstpiece] &&
                            PIECES_RANK[sndpiece] > PIECES_RANK[piece] &&
                            (enmyfaces[0] == fstpiece || enmyfaces[1] == fstpiece)){
@@ -412,14 +408,14 @@
             cWhitePawn *cpawn = new cWhitePawn(this, src);
             if(cpawn->is_ep_move_ok(dst, minutes)){
                 pawnenmy = getfield(dst);
-                setfield(dst, PIECES["blk"]);
+                setfield(dst, mBLK);
             }
         }
         if(srcpiece == PIECES["bPw"]){
             cBlackPawn *cpawn = new cBlackPawn(this, src);
             if(cpawn->is_ep_move_ok(dst, minutes)){
                 pawnenmy = getfield(dst);
-                setfield(dst, PIECES["blk"]);
+                setfield(dst, mBLK);
             }
         }
         setfield(src, PIECES["blk"]);
@@ -433,7 +429,7 @@
         }
         setfield(dst, dstpiece);
         setfield(src, srcpiece);
-        if(pawnenmy != PIECES["blk"]){
+        if(pawnenmy != mBLK){
             setfield(dst, pawnenmy);
         }
         return flag;
@@ -450,13 +446,13 @@
         if(is_inbounds(src, dst, step) == false){
             return false; // RETURN_CODES["out-of-bounds"]
         }
-        if(minutes->size() % 2 == 0 && PIECES_COLOR[piece] != COLORS["white"]){
+        if(minutes->size() % 2 == 0 && PIECES_COLORS[piece] != COLORS["white"]){
             return false; // RETURN_CODES["wrong-color"]
         }
-        if(minutes->size() % 2 == 1 && PIECES_COLOR[piece] != COLORS["black"]){
+        if(minutes->size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
             return false; // RETURN_CODES["wrong-color"]
         }
-        if(piece != PIECES["wKg"] && piece != PIECES["bKg"]){
+        if(piece != mWKG && piece != mBKG){
             if(is_king_after_move_attacked(src, dst, minutes)){
                 return false; // RETURN_CODES["king-attacked-error"]
             }
@@ -479,7 +475,7 @@
         }
         for(int idx = 0; idx < 64; ++idx){
             int piece = getfield(idx);
-            if(piece != PIECES["blk"] && color == PIECES_COLOR[piece]){
+            if(piece != mBLK && color == PIECES_COLORS[piece]){
                 cPiece *cpiece = obj_for_piece(this, idx);
                 for(int *step : cpiece->MV_STEPS){
                     int count = 0;
