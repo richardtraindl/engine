@@ -18,9 +18,9 @@
 
     class cPiece{
         public:
-            static int DIRS_ARY[];
-            static int STEPS[];
-            static int MV_STEPS[][];
+            static int DIRS_ARY[0];
+            static int STEPS[0];
+            static int MV_STEPS[1][2];
             static int MAXCNT;
 
             cBoard *board;

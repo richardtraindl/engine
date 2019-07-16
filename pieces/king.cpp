@@ -3,7 +3,7 @@
 
     using namespace std;
 
-    cKing::cKing(cBoard *board, unsigned pos) : cPiece(board, pos){
+    cKing::cKing(cBoard *board, int pos) : cPiece(board, pos){
     }
 
     int cKing::DIRS_ARY[1] = {0};
@@ -29,7 +29,6 @@
             return true;
         }
         //###
-        int opp_color = REVERSED_COLORS[color];
         bool flag = false;
         for(const int step : STEPS){
             if(pos + step == dst && board->is_inbounds(pos, dst, step)){
@@ -140,7 +139,6 @@
         
     cMove *cKing::do_move(int dst, int prompiece, int movecnt, int *score){
         cMove *move = cPiece::do_move(dst, prompiece, movecnt, score);
-        unsintigned dstpiece = board->getfield(dst);
         if(pos - dst == -2){
             int rook = board->getfield(pos + 3);
             board->setfield(pos + 3, PIECES["blk"]);

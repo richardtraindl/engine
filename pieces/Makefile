@@ -1,6 +1,7 @@
 CC = g++
 
-all: pieceshelper.o searchforpiece.o piece.o rook.o bishop.o knight.o queen.o king.o pawn.o whitepawn.o blackpawn.o
+all: pieceshelper.o searchforpiece.o \
+	 piece.o rook.o bishop.o knight.o queen.o king.o pawn.o whitepawn.o blackpawn.o
 
 piece.o: piece.cpp piece.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c piece.cpp -o piece.o

@@ -54,9 +54,9 @@
 
     extern map<int, int> PIECES_RANK;
 
-    extern MapIntInt PIECES_MASK;
+    extern map<int, int> PIECES_MASK;
 
-    extern MapIntInt PIECES_NMASK;
+    extern map<int, int> PIECES_NMASK;
 
     extern map<string, int> COLORS;
 

@@ -9,12 +9,12 @@
         color = PIECES_COLOR[piece];
     }
 
-    int cPiece::DIRS_ARY[] = {};
-    int cPiece::STEPS[] = {};
-    int cPiece::MV_STEPS[][] = {{}};
+    int cPiece::DIRS_ARY[0] = {};
+    int cPiece::STEPS[0] = {};
+    int cPiece::MV_STEPS[1][2] = {{mBLK, mBLK}};
     int cPiece::MAXCNT = 7;
 
-    unsigned cPiece::dir_for_move(int src, int dst){
+    int cPiece::dir_for_move(int src, int dst){
         return DIRS["undef"];
     }
 
@@ -55,7 +55,7 @@
         return true;
     }
 
-    bool cPiece::is_move_stuck(unsigned dst){
+    bool cPiece::is_move_stuck(int dst){
         int mv_dir = dir_for_move(pos, dst);
         int pin_dir = board->eval_pin_dir(pos);
         if(pin_dir == DIRS["undef"] || mv_dir == pin_dir || REVERSE_DIRS[mv_dir] == pin_dir){
@@ -119,7 +119,7 @@
 
 
     void cPiece::find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported){
-        unsigned opp_color = REVERSED_COLORS[color];
+        int opp_color = REVERSED_COLORS[color];
         for(const int step : STEPS){
             int dst2 = board->search(pos, step, MAXCNT);
             if(dst2 != PIECES["blk"]){
@@ -169,15 +169,15 @@
 
     list<cMove> *cPiece::generate_moves(list<cMove> *minutes){
         list<cMove> *moves = new list<cMove>;
-        for(int step : MV_STEPS){
+        for(int *step : MV_STEPS){
             int count = 0;
-            unsigned dst = pos + step[0];
-            while(board->is_inbounds(pos, dst, step[0]) && count < MAXCNT){
+            unsigned dst = pos + *step;
+            while(board->is_inbounds(pos, dst, *step) && count < MAXCNT){
                 count += 1;
-                if(board->is_move_valid(pos, dst, step[1], minutes)){
-                    moves->push_back(cMove(board->fields, pos, dst, step[1]);
+                if(board->is_move_valid(pos, dst, *(step + 1), minutes)){
+                    moves->push_back(cMove(board->fields, pos, dst, *(step + 1)));
                 }
-                dst += step[0];
+                dst += *step;
             }
         }
         return moves;
@@ -187,19 +187,19 @@
         // from ..compute.analyze_move import add_tactics
         list<cPrioMove> *priomoves = new list<cPrioMove>;
         list<cPrioMove> excludes;
-        for(int step : MV_STEPS){
+        for(int *step : MV_STEPS){
             int count = 0;
-            unsigned dst = pos + step[0];
-            while(board->is_inbounds(pos, dst, step[0]) && count < MAXCNT){
+            unsigned dst = pos + *step;
+            while(board->is_inbounds(pos, dst, *step) && count < MAXCNT){
                 count += 1;
-                if(board->is_move_valid(pos, dst, step[1], minutes)){
-                    cPrioMove *priomove = new cPrioMove(board->fields, pos, dst, step[1], cPrioMove::PRIOS["prio3"]);
+                if(board->is_move_valid(pos, dst, *(step + 1), minutes)){
+                    cPrioMove *priomove = new cPrioMove(board->fields, pos, dst, *(step + 1), cPrioMove::PRIOS["prio3"]);
                     //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                     //if(len(excluded) > 0):
                         //excludes.extend(excluded)
                     priomoves->push_back(*priomove);
                 }
-                dst += step[0];
+                dst += *step;
             }
         }/*
         if(excludes.size() > 0){

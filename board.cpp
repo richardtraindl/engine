@@ -6,6 +6,7 @@
 #include "./pieces/whitepawn.hpp"
 #include "./pieces/blackpawn.hpp"
 
+
     cBoard::cBoard(){ 
         fields = BASE;
         wKg = COLS["E"] + RANKS["1"] * 8;
@@ -314,7 +315,7 @@
                     enmyfaces[1] = PIECES["wQu"];
                 }
             }
-            for(int i = 0; i < size(dir_ary); ++i){
+            for(int i = 0; i < 2; ++i){
                 if(j == 0){
                     step = cRook::step_for_dir(dir_ary[i]);
                 }
@@ -372,7 +373,7 @@
                     enmyfaces[1] = PIECES["wQu"];
                 }
             }
-            for(int i = 0; i < size(dir_ary); ++i){
+            for(int i = 0; i < 2; ++i){
                 if(j == 0){
                     step = cRook::step_for_dir(dir_ary[i]);
                 }
@@ -480,15 +481,15 @@
             int piece = getfield(idx);
             if(piece != PIECES["blk"] && color == PIECES_COLOR[piece]){
                 cPiece *cpiece = obj_for_piece(this, idx);
-                for(vector<pair<int, int>>::iterator it = cpiece->MV_STEPS.begin(); it != cpiece->MV_STEPS.end(); ++it){
+                for(int *step : cpiece->MV_STEPS){
                     int count = 0;
-                    int dst = cpiece->pos + it->first;
-                    while(is_inbounds(cpiece->pos, dst, it->first) && count < cpiece->MAXCNT){
+                    int dst = cpiece->pos + *step;
+                    while(is_inbounds(cpiece->pos, dst, *step) && count < cpiece->MAXCNT){
                         count += 1;
-                        if(is_move_valid(cpiece->pos, dst, it->second, minutes)){
+                        if(is_move_valid(cpiece->pos, dst, *(step + 1), minutes)){
                             return true;
                         }
-                        dst += it->first;
+                        dst += *step;
                     }
                 }
             }

@@ -20,16 +20,18 @@
 
         cout << "is_fifty_moves_rule() " << match.is_fifty_moves_rule() << "\n";
         
-        cMove *move = match.do_move(12, 20, PIECES["blk"]);
-        cout << "fields " << hex << match.board.fields << "\n";
+        match.board.setfield(8, PIECES["blk"]);
+        cMove *move = match.do_move(0, 16, PIECES["blk"]);
+        cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        move = match.do_move(52, 44, PIECES["blk"]);
-        cout << "fields " << hex << match.board.fields << "\n";
+        //move = match.do_move(52, 44, PIECES["blk"]);
+        move = match.do_move(9, 17, PIECES["blk"]);
+        cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
         match.undo_move();
-        cout << "fields " << hex << match.board.fields << "\n";
+        cout << "undo_move " << hex << match.board.fields << "\n";
 
         cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, &match.minutes) << "\n";
 

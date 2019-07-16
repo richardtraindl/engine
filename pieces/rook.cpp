@@ -9,7 +9,7 @@ using namespace std;
 
     int cRook::DIRS_ARY[4] = {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
     int cRook::STEPS[4] = {8, -8, 1, -1};
-    int Rook::MV_STEPS[4][2] = {{8, PIECES["blk"]}, {-8, PIECES["blk"]}, {1, PIECES["blk"]}, {-1, PIECES["blk"]}};
+    int cRook::MV_STEPS[4][2] = {{8, PIECES["blk"]}, {-8, PIECES["blk"]}, {1, PIECES["blk"]}, {-1, PIECES["blk"]}};
 
     int cRook::dir_for_move(int src, int dst){
         if(cBoard::is_inbounds_core(src, dst) == false){
@@ -46,7 +46,7 @@ using namespace std;
         return 0;
     }
 
-    cMove *cRook::do_move(int dst, unsigintned prompiece, int movecnt, int *score){
+    cMove *cRook::do_move(int dst, int prompiece, int movecnt, int *score){
         cMove *move = cPiece::do_move(dst, prompiece, movecnt, score);
         int srcx = pos % 8;
         int srcy = pos / 8;

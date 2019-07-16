@@ -11,8 +11,8 @@
             static int STEPS[2];
             static int MAXCNT;
             static int MV_STEPS_RANK2[4][2];
-            static int MV_STEPS[3][2];
             static int MV_STEPS_RANK7[12][2];
+            static int MV_STEPS[3][2];
 
             cWhitePawn(cBoard *board, int pos);
             static int dir_for_move(int src, int dst);

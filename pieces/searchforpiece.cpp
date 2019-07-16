@@ -1,7 +1,7 @@
 
 
 #include "./searchforpiece.hpp"
-
+#include "./pieceshelper.hpp"
 
     cTouch::cTouch(int _piece, int _pos){
         piece = _piece;
@@ -29,8 +29,8 @@
                             return true;
                         }
                         if(mode == EVAL_MODES["only-pins-to-king"]){
-                            cPiece *cpiece = match.obj_for_piece(board, dst);
-                            if(cpiece.is_move_stuck(src)){
+                            cPiece *cpiece = obj_for_piece(board, dst);
+                            if(cpiece->is_move_stuck(src)){
                                 break;
                             }
                             else{
@@ -38,8 +38,8 @@
                             }
                         }
                         else{ // mode == EVAL_MODES["all-pins"]
-                            cPiece *cpiece = match.obj_for_piece(board, dst);
-                            if(cpiece.is_move_stuck(src) || board->eval_soft_pin_dir(src) != DIRS["undef"]){
+                            cPiece *cpiece = obj_for_piece(board, dst);
+                            if(cpiece->is_move_stuck(src) || board->eval_soft_pin_dir(src) != DIRS["undef"]){
                                 break;
                             }
                             else{

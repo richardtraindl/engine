@@ -237,12 +237,12 @@
 
 
     void alphabeta(cMatch *match, int depth, cSearchLimits *slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, int *result_score, list<cPrioMove> *result_candidates){
-        int color = match->next_color();
-        list<cPrioMove> *newcandidates, *candidates;
+        list<cPrioMove> *newcandidates = NULL;
+        list<cPrioMove> *candidates = NULL;
         int newscore;
         int score;
         int count = 0;
-        time_t starttime = time(0);
+        //time_t starttime = time(0);
 
         if(maximizing){
             score = alpha;
@@ -319,7 +319,7 @@
         time_t time_start = time(0);
         // move = retrieve_move(match)
         int result_score;
-        list<cPrioMove> *result_candidates;
+        list<cPrioMove> *result_candidates = NULL;
 
         //if(move):
         //    candidates.append(move)

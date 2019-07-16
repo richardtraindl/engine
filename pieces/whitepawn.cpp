@@ -4,7 +4,7 @@
 
     using namespace std;
 
-    cWhitePawn::cWhitePawn(cBoard *board, unsigned pos) : cPiece(board, pos), cPawn(board, pos){
+    cWhitePawn::cWhitePawn(cBoard *board, int pos) : cPiece(board, pos), cPawn(board, pos){
     }
 
     int cWhitePawn::STEPS[2] = {9, 7};
@@ -13,8 +13,7 @@
     int cWhitePawn::MV_STEPS_RANK7[12][2] = {{8, PIECES["wQu"]}, {8, PIECES["wRk"]}, {8, PIECES["wBp"]}, {8, PIECES["wKn"]},
                                              {9, PIECES["wQu"]}, {9, PIECES["wRk"]}, {9, PIECES["wBp"]}, {9, PIECES["wKn"]},
                                              {7, PIECES["wQu"]}, {7, PIECES["wRk"]}, {7, PIECES["wBp"]}, {7, PIECES["wKn"]}};
-
-    int cWhitePawn::MV_STEPS = [3][2] = {{8, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
+    int cWhitePawn::MV_STEPS[3][2] = {{8, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
 
     int cWhitePawn::dir_for_move(int src, int dst){
         if(src == dst){
@@ -50,8 +49,8 @@
 
     bool cWhitePawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
-        for(const int step : MV_STEPS_RANK2){
-            if((pos + step[0]) == dst && cBoard::is_inbounds(pos, dst, step[0])){
+        for(int *step : MV_STEPS_RANK2){
+            if((pos + *step) == dst && cBoard::is_inbounds(pos, dst, *step)){
                 flag = true;
                 break;
             }

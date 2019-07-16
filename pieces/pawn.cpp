@@ -13,7 +13,7 @@
     cMove *cPawn::do_move(int dst, int prompiece, int movecnt, int *score){
         int dstpiece_before_mv = board->getfield(dst);
         cMove *move = cPiece::do_move(dst, prompiece, movecnt, score);
-        if(prompiece != PIECES["blk"]){
+        /*if(prompiece != PIECES["blk"]){
             board->setfield(dst, prompiece);
             *score -= SCORES[prompiece] - SCORES[piece];
         }
@@ -28,7 +28,7 @@
             int captpiece = board->getfield(enpass);
             board->setfield(enpass, PIECES["blk"]);
             *score += SCORES[captpiece];
-        }
+        }*/
         return move;
     }
 

@@ -49,8 +49,8 @@
 
     bool cBlackPawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
-        for(int step : MV_STEPS_RANK7){
-            if((pos + step[0]) == dst && cBoard::is_inbounds(pos, dst, step[0])){
+        for(int *step : MV_STEPS_RANK7){
+            if((pos + *step) == dst && cBoard::is_inbounds(pos, dst, *step)){
                 flag = true;
                 break;
             }
