@@ -1,7 +1,5 @@
 
-#include <iostream>
 #include "./match.hpp"
-
 
     cMatch::cMatch(){ 
         created_at = time(0); 
