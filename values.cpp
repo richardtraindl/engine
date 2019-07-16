@@ -17,7 +17,7 @@
         {"bKg", mBKG}
     };
 
-    map<int, int> PIECES_BARE = {
+    map<int, int> PIECES_BARES = {
       {PIECES["blk"], 0}, 
       {PIECES["wPw"], 1}, 
       {PIECES["bPw"], 1}, 
@@ -34,7 +34,7 @@
     };
 
 
-    map<int, int> PIECES_RANK = {
+    map<int, int> PIECES_RANKS = {
         {PIECES["blk"], 0}, 
         {PIECES["wPw"], 1}, 
         {PIECES["bPw"], 1}, 
