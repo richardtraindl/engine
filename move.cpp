@@ -1,8 +1,7 @@
 
-    #include <sstream>
-    #include "./move.hpp"
+#include "./move.hpp"
 
-cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){ 
+    cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){ 
         prevfields = _prevfields;
         src = _src;
         dst = _dst;
