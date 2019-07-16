@@ -94,7 +94,7 @@
         {COLORS["black"], COLORS["white"]} 
     };
 
-    map<int, int> PIECES_COLOR = {
+    map<int, int> PIECES_COLORS = {
         {PIECES["blk"], COLORS["undef"]},
         {PIECES["wPw"], COLORS["white"]},
         {PIECES["wKn"], COLORS["white"]},
@@ -150,7 +150,7 @@
         {DIRS["undef"], DIRS["undef"]}
     };
 
-    map<int, int> DIR_FOR_STEP = {
+    map<int, int> DIRS_FOR_STEP = {
         {8, DIRS["nth"]},
         {16, DIRS["nth"]},
         {-8, DIRS["sth"]},
