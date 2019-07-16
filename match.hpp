@@ -7,6 +7,7 @@
     #include <map>
     #include <string>
     #include <ctime>
+    #include <iostream>
     #include "./board.hpp"
     #include "./move.hpp"
     #include "./helper.hpp"
