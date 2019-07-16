@@ -62,13 +62,13 @@
 
     extern map<int, int> REVERSED_COLORS;
 
-    extern map<int, int> PIECES_COLOR;
+    extern map<int, int> PIECES_COLORS;
 
     extern map<string, int> DIRS;
 
     extern map<int, int> REVERSE_DIRS;
 
-    extern map<int, int> DIR_FOR_STEP;
+    extern map<int, int> DIRS_FOR_STEP;
 
     extern map<int, int> SCORES;
 
