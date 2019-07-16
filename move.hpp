@@ -5,12 +5,13 @@
     #include <map>
     #include <list> 
     #include <string>
+    #include <sstream>
     #include <boost/multiprecision/cpp_int.hpp>
     #include "./helper.hpp"
     #include "./values.hpp"
 
-    using namespace boost::multiprecision;
     using namespace std;
+    using namespace boost::multiprecision;
 
     class cMove{
         public:
