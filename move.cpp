@@ -26,7 +26,7 @@ cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){
 
     string cMove::format(){
         int piece = getfield(dst);
-        if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
+        if(piece == mWKG || piece == mBKG){
             if(src % 8 - dst % 8 == -2){
                 return "0-0";
             }
@@ -39,19 +39,19 @@ cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){
         string hyphen = "";
         string trailing = "";
         stringstream out;
-        if(dstpiece == PIECES["blk"]){
+        if(dstpiece == mBLK){
             hyphen = "-";
         }
         else{
             hyphen = "x";
         }
-        if(piece == PIECES["wPw"] || piece == PIECES["bPw"]){
-            if(prompiece != PIECES["blk"]){ // prompiece != NULL && 
+        if(piece == mWPW || piece == mBPW){
+            if(prompiece != mBLK){
                 out << prompiece;
-                trailing = ", " + out.str(); // STR_PIECES(prompiece);
+                trailing = ", " + out.str();
             }
             else{
-                if(dstpiece == PIECES["blk"] && src % 8 != dst % 8){
+                if(dstpiece == mBLK && src % 8 != dst % 8){
                     trailing = " e.p.";
                 }
             }
