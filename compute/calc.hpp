@@ -31,6 +31,8 @@
 
     void prnt_fmttime(string msg, int seconds);
 
+    bool sortByPrio(cPrioMove &A, cPrioMove &B);
+
     list<cMove> *generate_moves(cMatch *match);
     
     list<cPrioMove> *generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate);

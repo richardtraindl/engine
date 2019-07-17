@@ -20,7 +20,7 @@
             int dst = board->search(src, step, MAXCNT);
             if(dst != -1){
                 int piece = board->getfield(dst);
-                if(PIECES_COLOR[piece] != color){
+                if(PIECES_COLORS[piece] != color){
                     continue;
                 }
                 for(const int target : TARGETS){
@@ -64,7 +64,7 @@
                         // if(cpiece.is_move_stuck(src)){
                         //     break;
                         // }
-                        if(PIECES_COLOR[piece] == friendlycolor){
+                        if(PIECES_COLORS[piece] == friendlycolor){
                             cTouch touch; //  = cTouch(piece, dst);
                             frdlytouches->push_back(touch);
                         }
@@ -83,7 +83,7 @@
             int dst = board->search(src, step, MAXCNT);
             if(dst != -1){
                 int piece = board->getfield(dst);
-                if(PIECES_COLOR[piece] != color){
+                if(PIECES_COLORS[piece] != color){
                     continue;
                 }
                 // cpiece = match.obj_for_piece(piece, dst);
@@ -113,7 +113,7 @@
             int dst = board->search(src, step, MAXCNT);
             if(dst != -1){
                 int piece = board->getfield(dst);
-                if(PIECES_COLOR[piece] != color){
+                if(PIECES_COLORS[piece] != color){
                     continue;
                 }
                 for(const int target : TARGETS){

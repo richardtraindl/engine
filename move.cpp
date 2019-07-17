@@ -24,9 +24,9 @@
     }
 
     string cMove::format(){
-        int piece = getfield(dst);
-        if(piece == mWKG || piece == mBKG){
-            if(src % 8 - dst % 8 == -2){
+        int piece = getprevfield(src);
+        if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
+            if((int)(src % 8) - (int)((int)(dst % 8) == -2)){
                 return "0-0";
             }
             if(src % 8 - dst % 8 == 2){
@@ -38,19 +38,19 @@
         string hyphen = "";
         string trailing = "";
         stringstream out;
-        if(dstpiece == mBLK){
+        if(dstpiece == PIECES["blk"]){
             hyphen = "-";
         }
         else{
             hyphen = "x";
         }
-        if(piece == mWPW || piece == mBPW){
-            if(prompiece != mBLK){
+        if(piece == PIECES["wPw"] || piece == PIECES["bPw"]){
+            if(prompiece != PIECES["blk"]){
                 out << prompiece;
                 trailing = ", " + out.str();
             }
             else{
-                if(dstpiece == mBLK && src % 8 != dst % 8){
+                if(dstpiece == PIECES["blk"] && src % 8 != dst % 8){
                     trailing = " e.p.";
                 }
             }

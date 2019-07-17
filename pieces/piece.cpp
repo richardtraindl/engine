@@ -6,7 +6,7 @@
         board = _board;
         pos = _pos;
         piece = board->getfield(pos);
-        color = PIECES_COLOR[piece];
+        color = PIECES_COLORS[piece];
     }
 
     int cPiece::DIRS_ARY[0] = {};
@@ -30,18 +30,18 @@
             int pos1 = pos + step;
             if(board->is_inbounds(pos, pos1, step)){
                 int dstpiece = board->getfield(pos1);
-                if(PIECES_COLOR[dstpiece] == color){
+                if(PIECES_COLORS[dstpiece] == color){
                     continue;
                 }
                 else{
-                    if(dstpiece != PIECES["blk"] && PIECES_RANK[piece] <= PIECES_RANK[dstpiece]){
+                    if(dstpiece != PIECES["blk"] && PIECES_RANKS[piece] <= PIECES_RANKS[dstpiece]){
                         return false;
                     }
                     list<cTouch> frdlytouches, enmytouches;
                     collect_touches_for_both_colors(board, pos1, color, &frdlytouches, &enmytouches);
                     bool enmy_is_lower = false;
                     for(const cTouch enmy : enmytouches){
-                        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
+                        if(PIECES_RANKS[enmy.piece] < PIECES_RANKS[piece]){
                             enmy_is_lower = true;
                             break;
                         }
@@ -86,7 +86,7 @@
         while(board->is_inbounds(pos, newpos, 0)){
             int newpiece = board->getfield(newpos);
             if(newpos == dst){
-                if(PIECES_COLOR[newpiece] == color){
+                if(PIECES_COLORS[newpiece] == color){
                     return false;
                 }
                 else{
@@ -127,7 +127,7 @@
                     continue;
                 }
                 int piece = board->getfield(dst2);
-                if(PIECES_COLOR[piece] == opp_color){
+                if(PIECES_COLORS[piece] == opp_color){
                     cTouch *ctouch = new cTouch(piece, dst2);
                     attacked->push_back(*ctouch);
                     //###
@@ -135,7 +135,7 @@
                     add_field_touches_beyond(board, opp_color, ctouch);
                     board->setfield(dst2, piece);
                 }
-                if(PIECES_COLOR[piece] == color){
+                if(PIECES_COLORS[piece] == color){
                     if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
                         continue;
                     }

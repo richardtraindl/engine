@@ -172,7 +172,7 @@
         int piece = board.getfield(move.dst);
         if(move.prompiece != mBLK){
             bool flag;
-            if(PIECES_COLOR[piece] == COLORS["white"]){
+            if(PIECES_COLORS[piece] == COLORS["white"]){
                 cWhitePawn *cpawn = new cWhitePawn(&board, move.dst);
                 flag = cpawn->undo_move(&move, movecnt(), &score);
             }

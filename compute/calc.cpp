@@ -69,7 +69,7 @@
         list<cMove> *moves;
         for(int idx = 0; idx < 64; ++idx){
             int piece = match->board.getfield(idx);
-            if(piece == PIECES["blk"] || color != PIECES_COLOR[piece]){
+            if(piece == PIECES["blk"] || color != PIECES_COLORS[piece]){
                 continue;
             }
             else{
@@ -85,7 +85,7 @@
         list<cPrioMove> *priomoves;
         for(int idx = 0; idx < 64; ++idx){
             int piece = match->board.getfield(idx);
-            if(piece == PIECES["blk"] || color != PIECES_COLOR[piece]){
+            if(piece == PIECES["blk"] || color != PIECES_COLORS[piece]){
                 continue;
             }
             else{
@@ -254,12 +254,15 @@
         cMove *dbggmove = new cMove(0x0, 3, 51, PIECES["blk"]);
         bool search_for_mate = match->is_endgame();
         list<cPrioMove> *priomoves = generate_priomoves(match, candidate, dbggmove, search_for_mate);
-        // priomoves.sort(key = attrgetter("prio"))
+        priomoves->sort(sortByPrio);
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
+        
+        prnt_priomoves(match, priomoves);
+        cout << priomoves->size();
 
         if(priomoves->size() == 0 || maxcnt == 0){
             *result_score = 0; // score_position(match, priomoves->size());
-            result_candidates->clear();
+            // result_candidates->clear();
             return;
         }
 

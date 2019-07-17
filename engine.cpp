@@ -2,6 +2,7 @@
 #include <iostream>
 #include "./match.hpp"
 #include "./values.hpp"
+#include "./compute/calc.hpp"
 
     using namespace std;
 
@@ -20,13 +21,11 @@
 
         cout << "is_fifty_moves_rule() " << match.is_fifty_moves_rule() << "\n";
         
-        match.board.setfield(8, mBLK);
-        cMove *move = match.do_move(0, 16, mBLK);
+        cMove *move = match.do_move(8, 16, mBLK);
         cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        //move = match.do_move(52, 44, mBLK);
-        move = match.do_move(9, 17, mBLK;
+        move = match.do_move(52, 44, mBLK);
         cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
@@ -44,6 +43,10 @@
         cout << "eval_pin_dir() " << match.board.eval_pin_dir(40) << "\n";
 
         cout << "eval_soft_pin_dir() " << match.board.eval_soft_pin_dir(42) << "\n";
+        
+        
+        list<cPrioMove> *priomove;
+        priomove = calc_move(&match, NULL);
         
         return 0;
     }

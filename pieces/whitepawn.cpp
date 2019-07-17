@@ -96,7 +96,7 @@
             }
         }
         if(move_dir == DIRS["nth-est"] || move_dir == DIRS["nth-wst"]){
-            if(PIECES_COLOR[dstpiece] != COLORS["black"]){
+            if(PIECES_COLORS[dstpiece] != COLORS["black"]){
                 return is_ep_move_ok(dst, minutes);
             }
         }

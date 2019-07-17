@@ -43,7 +43,7 @@
 
 
     int cBoard::getfield(int idx){
-        return (fields >> ((63 - idx) * 4)) & 0xF;
+        return (int)((fields >> ((63 - idx) * 4)) & 0xF);
     }
     
     void cBoard::setfield(int idx, int value){
@@ -321,7 +321,7 @@
                 if(search_bi_dirs(&first, &second, src, step, 6)){
                     fstpiece = getfield(first);
                     sndpiece = getfield(second);
-                    if(PIECES_COLOR[fstpiece] != PIECES_COLOR[sndpiece]){
+                    if(PIECES_COLORS[fstpiece] != PIECES_COLORS[sndpiece]){
                         if(PIECES_COLORS[fstpiece] == color && kg_pos == first &&
                            (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
                             return dir_ary[i];
@@ -339,7 +339,7 @@
 
     int cBoard::eval_soft_pin_dir(int src){
         int piece = getfield(src);
-        int color = PIECES_COLOR[piece];
+        int color = PIECES_COLORS[piece];
         int first, second, fstpiece, sndpiece;
         int enmyfaces[2];
         int dir_ary[2];
@@ -379,16 +379,16 @@
                 if(search_bi_dirs(&first, &second, src, step, 6)){
                     fstpiece = getfield(first);
                     sndpiece = getfield(second);
-                    if(PIECES_COLORS[fstpiece] != PIECES_COLOR[sndpiece]){
+                    if(PIECES_COLORS[fstpiece] != PIECES_COLORS[sndpiece]){
                         if(PIECES_COLORS[fstpiece] == color && 
-                           PIECES_RANK[fstpiece] > PIECES_RANK[sndpiece] &&
-                           PIECES_RANK[fstpiece] > PIECES_RANK[piece] &&
+                           PIECES_RANKS[fstpiece] > PIECES_RANKS[sndpiece] &&
+                           PIECES_RANKS[fstpiece] > PIECES_RANKS[piece] &&
                            (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
                             return dir_ary[i];
                         }
                         if(PIECES_COLORS[sndpiece] == color && 
-                           PIECES_RANK[sndpiece] > PIECES_RANK[fstpiece] &&
-                           PIECES_RANK[sndpiece] > PIECES_RANK[piece] &&
+                           PIECES_RANKS[sndpiece] > PIECES_RANKS[fstpiece] &&
+                           PIECES_RANKS[sndpiece] > PIECES_RANKS[piece] &&
                            (enmyfaces[0] == fstpiece || enmyfaces[1] == fstpiece)){
                             return REVERSE_DIRS[dir_ary[i]];
                         }
@@ -421,7 +421,7 @@
         setfield(src, PIECES["blk"]);
         dstpiece = getfield(dst);
         setfield(dst, srcpiece);
-        if(PIECES_COLOR[srcpiece] == COLORS["white"]){
+        if(PIECES_COLORS[srcpiece] == COLORS["white"]){
             flag = is_field_touched(this, wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
         }
         else{

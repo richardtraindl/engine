@@ -32,7 +32,7 @@
             return false;
         }
         int dstpiece = board->getfield(dst);
-        if(PIECES_COLOR[dstpiece] == color){
+        if(PIECES_COLORS[dstpiece] == color){
             return false;
         }
         return true;
