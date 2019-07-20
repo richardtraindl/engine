@@ -4,16 +4,26 @@
     
     using namespace std;
 
+    array<int, 8> cBlackPawn::STEPS = {-9, -7, 0, 0, 0, 0, 0, 0};
+
+    array<int, 3> cBlackPawn::MV_STEPS = {-8, -7, -9};
+
+    array<int, 4> cBlackPawn::MV_STEPS_START = {-8, -16, -7, -9};
+    
+    array<int, 4> cBlackPawn::PROM_PIECES = {mBQU, mBRK, mBBP, mBKN};
+
+    int cBlackPawn::MAXCNT = 1;
+
     cBlackPawn::cBlackPawn(cBoard *board, int pos) : cPiece(board, pos), cPawn(board, pos){
     }
 
-    int cBlackPawn::STEPS[2] = {-9, -7};
-    int cBlackPawn::MAXCNT = 1;
-    int cBlackPawn::MV_STEPS_RANK7[4][2] = {{-8, PIECES["blk"]},  {-16, PIECES["blk"]}, {-7, PIECES["blk"]}, {-9, PIECES["blk"]}};
-    int cBlackPawn::MV_STEPS_RANK2[12][2] = {{-8, PIECES["bQu"]}, {-8, PIECES["bRk"]},  {-8, PIECES["bBp"]}, {-8, PIECES["bKn"]},
-                                             {-9, PIECES["bQu"]}, {-9, PIECES["bRk"]},  {-9, PIECES["bBp"]}, {-9, PIECES["bKn"]},
-                                             {-7, PIECES["bQu"]}, {-7, PIECES["bRk"]},  {-7, PIECES["bBp"]}, {-7, PIECES["bKn"]}};
-    int cBlackPawn::MV_STEPS[3][2] = {{-8, PIECES["blk"]}, {-7, PIECES["blk"]}, {-9, PIECES["blk"]}};
+    array<int, 8> cBlackPawn::get_steps() { return STEPS; }
+
+    array<int, 3> cBlackPawn::get_mv_steps() { return MV_STEPS; }
+
+    array<int, 4> cBlackPawn::get_mv_steps_start() { return MV_STEPS_START; }
+
+    int cBlackPawn::get_maxcnt() { return MAXCNT; }
 
     int cBlackPawn::dir_for_move(int src, int dst){
         if(src == dst){
@@ -49,8 +59,8 @@
 
     bool cBlackPawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
-        for(int *step : MV_STEPS_RANK7){
-            if((pos + *step) == dst && cBoard::is_inbounds(pos, dst, *step)){
+        for(auto &step : MV_STEPS_START){
+            if((pos + step) == dst && cBoard::is_inbounds(pos, dst, step)){
                 flag = true;
                 break;
             }

@@ -5,16 +5,21 @@
     
     using namespace std;
 
-    cQueen::cQueen(cBoard *board, int pos) : cPiece(board, pos), cRook(board, pos), cBishop(board, pos){
+    array<int, 8> cQueen::DIRS_ARY = {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"],
+                                      DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
+
+    array<int, 8> cQueen::STEPS = {8, -8, 1, -1, 9, -9, 7, -7};
+
+    int cQueen::MAXCNT = 7;
+
+    cQueen::cQueen(cBoard *board, int pos) : cPiece(board, pos){
     }
 
-    int cQueen::DIRS_ARY[8] = 
-        {DIRS["nth"],     DIRS["sth"],     DIRS["est"],     DIRS["wst"],
-         DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
-    int cQueen::STEPS[8] = 
-        {8, -8, 1, -1, 9, -9, 7, -7};
-    int cQueen::MV_STEPS[8][2] = {{8, PIECES["blk"]}, {-8, PIECES["blk"]}, {1, PIECES["blk"]}, {-1, PIECES["blk"]}, 
-                                  {9, PIECES["blk"]}, {-9, PIECES["blk"]}, {7, PIECES["blk"]}, {-7, PIECES["blk"]}};
+    array<int, 8> cQueen::get_dirs_ary() { return DIRS_ARY; }
+
+    array<int, 8> cQueen::get_steps() { return STEPS; }
+
+    int cQueen::get_maxcnt() { return MAXCNT; }
 
     int cQueen::dir_for_move(int src, int dst){
         int dir = cRook::dir_for_move(src, dst);

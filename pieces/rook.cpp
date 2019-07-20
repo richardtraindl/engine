@@ -4,12 +4,21 @@
 
 using namespace std;
 
-    cRook::cRook(cBoard *board, unsigned pos) : cPiece::cPiece(board, pos){
+    array<int, 8> cRook::DIRS_ARY = {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"],
+                                     DIRS["undef"], DIRS["undef"], DIRS["undef"], DIRS["undef"]};
+
+    array<int, 8> cRook::STEPS = {8, -8, 1, -1, 0, 0, 0, 0};
+
+    int cRook::MAXCNT = 7;
+
+    cRook::cRook(cBoard *board, int pos) : cPiece(board, pos){
     }
 
-    int cRook::DIRS_ARY[4] = {DIRS["nth"], DIRS["sth"], DIRS["est"], DIRS["wst"]};
-    int cRook::STEPS[4] = {8, -8, 1, -1};
-    int cRook::MV_STEPS[4][2] = {{8, PIECES["blk"]}, {-8, PIECES["blk"]}, {1, PIECES["blk"]}, {-1, PIECES["blk"]}};
+    array<int, 8> cRook::get_dirs_ary() { return DIRS_ARY; }
+
+    array<int, 8> cRook::get_steps() { return STEPS; }
+
+    int cRook::get_maxcnt() { return MAXCNT; }
 
     int cRook::dir_for_move(int src, int dst){
         if(cBoard::is_inbounds_core(src, dst) == false){

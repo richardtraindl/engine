@@ -44,9 +44,14 @@
 
         cout << "eval_soft_pin_dir() " << match.board.eval_soft_pin_dir(42) << "\n";
         
+        list<cPrioMove> *priomoves = NULL;
+        priomoves = calc_move(&match, NULL);
         
-        list<cPrioMove> *priomove;
-        priomove = calc_move(&match, NULL);
-        
+        if(priomoves != NULL){
+            cout << priomoves->size() << endl;
+            for(list<cPrioMove>::iterator it = priomoves->begin(); it != priomoves->end(); ++it){
+                cout << it->src << endl;
+            }
+        }
         return 0;
     }

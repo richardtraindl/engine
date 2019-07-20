@@ -4,16 +4,26 @@
 
     using namespace std;
 
+    array<int, 8> cWhitePawn::STEPS = {9, 7, 0, 0, 0, 0, 0, 0};
+
+    array<int, 3> cWhitePawn::MV_STEPS = {8, 9, 7};
+
+    array<int, 4> cWhitePawn::MV_STEPS_START = {8, 16, 9, 7};
+
+    array<int, 4> cWhitePawn::PROM_PIECES = {mWQU, mWRK, mWBP, mWKN};
+
+    int cWhitePawn::MAXCNT = 1;
+
     cWhitePawn::cWhitePawn(cBoard *board, int pos) : cPiece(board, pos), cPawn(board, pos){
     }
 
-    int cWhitePawn::STEPS[2] = {9, 7};
-    int cWhitePawn::MAXCNT = 1;
-    int cWhitePawn::MV_STEPS_RANK2[4][2] = {{8, PIECES["blk"]}, {16, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
-    int cWhitePawn::MV_STEPS_RANK7[12][2] = {{8, PIECES["wQu"]}, {8, PIECES["wRk"]}, {8, PIECES["wBp"]}, {8, PIECES["wKn"]},
-                                             {9, PIECES["wQu"]}, {9, PIECES["wRk"]}, {9, PIECES["wBp"]}, {9, PIECES["wKn"]},
-                                             {7, PIECES["wQu"]}, {7, PIECES["wRk"]}, {7, PIECES["wBp"]}, {7, PIECES["wKn"]}};
-    int cWhitePawn::MV_STEPS[3][2] = {{8, PIECES["blk"]}, {9, PIECES["blk"]}, {7, PIECES["blk"]}};
+    array<int, 8> cWhitePawn::get_steps() { return STEPS; }
+
+    array<int, 3> cWhitePawn::get_mv_steps() { return MV_STEPS; }
+
+    array<int, 4> cWhitePawn::get_mv_steps_start() { return MV_STEPS_START; }
+
+    int cWhitePawn::get_maxcnt() { return MAXCNT; }
 
     int cWhitePawn::dir_for_move(int src, int dst){
         if(src == dst){
@@ -49,8 +59,8 @@
 
     bool cWhitePawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
-        for(int *step : MV_STEPS_RANK2){
-            if((pos + *step) == dst && cBoard::is_inbounds(pos, dst, *step)){
+        for(auto &step : MV_STEPS_START){
+            if((pos + step) == dst && cBoard::is_inbounds(pos, dst, step)){
                 flag = true;
                 break;
             }

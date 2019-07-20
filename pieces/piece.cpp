@@ -1,6 +1,14 @@
 
 #include "./piece.hpp"
 
+    array<int, 8> cPiece::DIRS_ARY = {DIRS["undef"], DIRS["undef"], DIRS["undef"], DIRS["undef"],
+                                      DIRS["undef"], DIRS["undef"], DIRS["undef"], DIRS["undef"]};
+
+    array<int, 8> cPiece::STEPS = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    int cPiece::MAXCNT = 0;
+
+    array<int, 4> cPiece::PROM_PIECES = {mBLK, mBLK, mBLK, mBLK};
 
     cPiece::cPiece(cBoard *_board, int _pos){
         board = _board;
@@ -9,10 +17,13 @@
         color = PIECES_COLORS[piece];
     }
 
-    int cPiece::DIRS_ARY[0] = {};
-    int cPiece::STEPS[0] = {};
-    int cPiece::MV_STEPS[1][2] = {{mBLK, mBLK}};
-    int cPiece::MAXCNT = 7;
+    array<int, 8> cPiece::get_dirs_ary() { return DIRS_ARY; }
+
+    array<int, 8> cPiece::get_steps() { return STEPS; }
+    
+    array<int, 4> cPiece::get_prom_pieces() { return PROM_PIECES; }
+    
+    int cPiece::get_maxcnt() { return MAXCNT; }
 
     int cPiece::dir_for_move(int src, int dst){
         return DIRS["undef"];
@@ -74,7 +85,10 @@
         int step = step_for_dir(dir);
         if(step == 0){
             int pin_dir = board->eval_pin_dir(pos);
-            for(const int piecedir : DIRS_ARY){
+            for(auto &piecedir : get_dirs_ary()){
+                if(piecedir == DIRS["undef"]){
+                    break;
+                }
                 if(dir == piecedir){
                     if(pin_dir != piecedir && pin_dir != REVERSE_DIRS[piecedir] && pin_dir != DIRS["undef"]){
                         return false;
@@ -169,37 +183,55 @@
 
     list<cMove> *cPiece::generate_moves(list<cMove> *minutes){
         list<cMove> *moves = new list<cMove>;
-        for(int *step : MV_STEPS){
+        for(auto &step : get_steps()){
+            if(step == 0){ 
+                break; 
+            }
             int count = 0;
-            unsigned dst = pos + *step;
-            while(board->is_inbounds(pos, dst, *step) && count < MAXCNT){
+            int dst = pos + step;
+            while(board->is_inbounds(pos, dst, step && count < get_maxcnt())){
                 count += 1;
-                if(board->is_move_valid(pos, dst, *(step + 1), minutes)){
-                    moves->push_back(cMove(board->fields, pos, dst, *(step + 1)));
+                for(auto &prompiece : get_prom_pieces()){
+                    if(board->is_move_valid(pos, dst, prompiece, minutes)){
+                        moves->push_back(cMove(board->fields, pos, dst, prompiece));
+                    }
+                    if(prompiece == mBLK){
+                        break;
+                    }
                 }
-                dst += *step;
+                dst += step;
             }
         }
         return moves;
     }
 
     list<cPrioMove> *cPiece::generate_priomoves(list<cMove> *minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate){
-        // from ..compute.analyze_move import add_tactics
         list<cPrioMove> *priomoves = new list<cPrioMove>;
         list<cPrioMove> excludes;
-        for(int *step : MV_STEPS){
+        for(auto &step : get_steps()){
+            if(step == 0){ 
+                break; 
+            }
             int count = 0;
-            unsigned dst = pos + *step;
-            while(board->is_inbounds(pos, dst, *step) && count < MAXCNT){
+            int dst = pos + step;
+            while(board->is_inbounds(pos, dst, step && count < get_maxcnt())){
+                cout << "1\n" << endl;
                 count += 1;
-                if(board->is_move_valid(pos, dst, *(step + 1), minutes)){
-                    cPrioMove *priomove = new cPrioMove(board->fields, pos, dst, *(step + 1), cPrioMove::PRIOS["prio3"]);
-                    //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
-                    //if(len(excluded) > 0):
-                        //excludes.extend(excluded)
-                    priomoves->push_back(*priomove);
+                for(auto &prompiece : get_prom_pieces()){
+                    cout << "2\n" << endl;
+                    if(board->is_move_valid(pos, dst, prompiece, minutes)){
+                        cout << "3\n" << endl;
+                        cPrioMove *priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
+                        //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
+                        //if(len(excluded) > 0):
+                            //excludes.extend(excluded)
+                        priomoves->push_back(*priomove);
+                    }
+                    if(prompiece == mBLK){
+                        break;
+                    }
                 }
-                dst += *step;
+                dst += step;
             }
         }/*
         if(excludes.size() > 0){

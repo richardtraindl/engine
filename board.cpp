@@ -288,8 +288,8 @@
         }        
         for(int j = 0; j < 2; ++j){
             if(j == 0){
-                dir_ary[0] = cRook::DIRS_ARY[0];
-                dir_ary[1] = cRook::DIRS_ARY[2];
+                dir_ary[0] = DIRS["nth"];
+                dir_ary[1] = DIRS["est"];
                 if(color == COLORS["white"]){
                     enmyfaces[0] = PIECES["bRk"];
                     enmyfaces[1] = PIECES["bQu"];
@@ -300,8 +300,8 @@
                 }
             }
             else{
-                dir_ary[0] = cBishop::DIRS_ARY[0];
-                dir_ary[1] = cBishop::DIRS_ARY[2];
+                dir_ary[0] = DIRS["nth-est"];
+                dir_ary[1] = DIRS["nth-wst"];
                 if(color == COLORS["white"]){
                     enmyfaces[0] = PIECES["bBp"];
                     enmyfaces[1] = PIECES["bQu"];
@@ -346,8 +346,8 @@
         int step;
         for(int j = 0; j < 2; ++j){
             if(j == 0){
-                dir_ary[0] = cRook::DIRS_ARY[0];
-                dir_ary[1] = cRook::DIRS_ARY[2];
+                dir_ary[0] = DIRS["nth"];
+                dir_ary[1] = DIRS["est"];
                 if(color == COLORS["white"]){
                     enmyfaces[0] = mBRK;
                     enmyfaces[1] = mBQU;
@@ -358,8 +358,8 @@
                 }
             }
             else{
-                dir_ary[0] = cBishop::DIRS_ARY[0];
-                dir_ary[1] = cBishop::DIRS_ARY[2];
+                dir_ary[0] = DIRS["nth-est"];
+                dir_ary[1] = DIRS["nth-wst"];
                 if(color == COLORS["white"]){
                     enmyfaces[0] = mBBP;
                     enmyfaces[1] = mBQU;
@@ -452,11 +452,13 @@
         if(minutes->size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
             return false; // RETURN_CODES["wrong-color"]
         }
+        cout << "9\n" << endl;
         if(piece != mWKG && piece != mBKG){
             if(is_king_after_move_attacked(src, dst, minutes)){
                 return false; // RETURN_CODES["king-attacked-error"]
             }
         }
+        cout << dec << cpiece->pos << dec << dst << dec << prompiece << endl;
         if(cpiece->is_move_valid(dst, prompiece)){
             return true; // RETURN_CODES["ok"]
         }
@@ -477,15 +479,24 @@
             int piece = getfield(idx);
             if(piece != mBLK && color == PIECES_COLORS[piece]){
                 cPiece *cpiece = obj_for_piece(this, idx);
-                for(int *step : cpiece->MV_STEPS){
+                for(auto &step : cpiece->get_steps()){
+                    if(step == 0){
+                        break;
+                    }
                     int count = 0;
-                    int dst = cpiece->pos + *step;
-                    while(is_inbounds(cpiece->pos, dst, *step) && count < cpiece->MAXCNT){
+                    int dst = cpiece->pos + step;
+                    while(is_inbounds(cpiece->pos, dst, step) && count < cpiece->MAXCNT){
                         count += 1;
-                        if(is_move_valid(cpiece->pos, dst, *(step + 1), minutes)){
+                        int prompiece;
+                        switch(piece){
+                            case mWPW: prompiece = mWQU; break;
+                            case mBPW: prompiece = mBQU; break;
+                            default: prompiece = mBLK;
+                        }
+                        if(is_move_valid(cpiece->pos, dst, prompiece, minutes)){
                             return true;
                         }
-                        dst += *step;
+                        dst += step;
                     }
                 }
             }

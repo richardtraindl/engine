@@ -8,14 +8,22 @@
 
     using namespace std;
 
-    class cQueen : public cRook, public cBishop{
+    class cQueen : virtual public cPiece{
         public:
-            static int DIRS_ARY[8];
-            static int STEPS[8];
-            static int MV_STEPS[8][2];
-            
+            static array<int, 8> DIRS_ARY;
+            static array<int, 8> STEPS;
+            static int MAXCNT;
+
             cQueen(cBoard *board, int pos);
+
+            array<int, 8> get_dirs_ary() override;
+
+            array<int, 8> get_steps() override;
+
+            int get_maxcnt() override;
+
             static int dir_for_move(int src, int dst);
+
             static int step_for_dir(int dir);
     };
 

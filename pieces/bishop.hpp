@@ -8,12 +8,20 @@
 
     class cBishop : virtual public cPiece{
         public:
-            static int DIRS_ARY[4];
-            static int STEPS[4];
-            static int MV_STEPS[4][2];
+            static array<int, 8> DIRS_ARY;
+            static array<int, 8> STEPS;
+            static int MAXCNT;
 
             cBishop(cBoard *board, int pos);
+
+            array<int, 8> get_dirs_ary() override;
+
+            array<int, 8> get_steps() override;
+
+            int get_maxcnt() override;
+
             static int dir_for_move(int src, int dst);
+
             static int step_for_dir(int dir);
     };
 

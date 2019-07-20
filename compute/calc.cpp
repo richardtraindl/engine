@@ -95,7 +95,7 @@
         }
         return priomoves;
     }
-    
+
 
     void append_newmove(cPrioMove *move, list<cPrioMove> *candidates, list<cPrioMove> *newcandidates){
         candidates->push_back(*move);

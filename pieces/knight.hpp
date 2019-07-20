@@ -6,15 +6,19 @@
 
     using namespace std;
 
-    class cKnight : public cPiece{
+    class cKnight : virtual public cPiece{
         public:
-            static int DIRS_ARY[1];
-            static int STEPS[8];
-            static int MV_STEPS[8][2];
+            static array<int, 8> STEPS;
             static int MAXCNT;
 
             cKnight(cBoard *board, int pos);
+
+            array<int, 8> get_steps() override;
+
+            int get_maxcnt() override;
+
             bool is_trapped();
+
             bool is_move_valid(int dst, int prompiece);
     };
 

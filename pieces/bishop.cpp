@@ -4,12 +4,21 @@
 
     using namespace std;
 
+    array<int, 8> cBishop::DIRS_ARY = {DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"],
+                                       DIRS["undef"], DIRS["undef"], DIRS["undef"], DIRS["undef"]};
+
+    array<int, 8> cBishop::STEPS = {9, -9, 7, -7, 0, 0, 0, 0};
+
+    int cBishop::MAXCNT = 7;
+
     cBishop::cBishop(cBoard *board, int pos) : cPiece(board, pos){
     }
+    
+    array<int, 8> cBishop::get_dirs_ary() { return DIRS_ARY; }
 
-    int cBishop::DIRS_ARY[4] = {DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
-    int cBishop::STEPS[4] = {9, -9, 7, -7};
-    int cBishop::MV_STEPS[4][2] = {{9, PIECES["blk"]}, {-9, PIECES["blk"]}, {7, PIECES["blk"]}, {-7, PIECES["blk"]}};
+    array<int, 8> cBishop::get_steps() { return STEPS; }
+
+    int cBishop::get_maxcnt() { return MAXCNT; }
 
     int cBishop::dir_for_move(int src, int dst){
         if(cBoard::is_inbounds_core(src, dst) == false){

@@ -3,14 +3,16 @@
 
     using namespace std;
 
+    array<int, 8> cKing::STEPS = {8, 9, 1, -7, -8, -9, -1, 7};
+
+    int cKing::MAXCNT = 1;
+
     cKing::cKing(cBoard *board, int pos) : cPiece(board, pos){
     }
 
-    int cKing::DIRS_ARY[1] = {0};
-    int cKing::STEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
-    int cKing::MV_STEPS[8][2] = {{8, PIECES["blk"]}, {9, PIECES["blk"]},  {1, PIECES["blk"]},  {-7, PIECES["blk"]},
-                                {-8, PIECES["blk"]}, {-9, PIECES["blk"]}, {-1, PIECES["blk"]}, {7, PIECES["blk"]}};
-    int cKing::MAXCNT = 1;
+    array<int, 8> cKing::get_steps() { return STEPS; }
+
+    int cKing::get_maxcnt() { return MAXCNT; }
 
     bool cKing::is_trapped(){
         return false; //king cannot be trapped
