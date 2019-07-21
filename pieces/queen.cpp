@@ -1,7 +1,7 @@
 
-#include "./queen.hpp"
-#include "./rook.hpp"
-#include "./bishop.hpp"
+    #include "./queen.hpp"
+    #include "./rook.hpp"
+    #include "./bishop.hpp"
     
     using namespace std;
 
@@ -9,6 +9,8 @@
                                       DIRS["nth-est"], DIRS["sth-wst"], DIRS["nth-wst"], DIRS["sth-est"]};
 
     array<int, 8> cQueen::STEPS = {8, -8, 1, -1, 9, -9, 7, -7};
+
+    array<int, 10> cQueen::MV_STEPS = {8, -8, 1, -1, 9, -9, 7, -7, 0, 0};
 
     int cQueen::MAXCNT = 7;
 
@@ -18,6 +20,8 @@
     array<int, 8> cQueen::get_dirs_ary() { return DIRS_ARY; }
 
     array<int, 8> cQueen::get_steps() { return STEPS; }
+
+    array<int, 10> cQueen::get_mv_steps() { return MV_STEPS; }
 
     int cQueen::get_maxcnt() { return MAXCNT; }
 

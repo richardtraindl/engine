@@ -1,10 +1,13 @@
 
-#include "./board.hpp"
-#include "./pieces/rook.hpp"
-#include "./pieces/bishop.hpp"
-#include "./pieces/whitepawn.hpp"
-#include "./pieces/blackpawn.hpp"
-#include "./pieces/pieceshelper.hpp"
+    #include "./board.hpp"
+    #include "./pieces/searchforpiece.hpp"
+    #include "./pieces/pieceshelper.hpp"
+    #include "./pieces/rook.hpp"
+    #include "./pieces/bishop.hpp"
+    #include "./pieces/whitepawn.hpp"
+    #include "./pieces/blackpawn.hpp"
+    #include "./values.hpp"
+    #include "./helper.hpp"
 
 
     cBoard::cBoard(){ 
@@ -452,13 +455,11 @@
         if(minutes->size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
             return false; // RETURN_CODES["wrong-color"]
         }
-        cout << "9\n" << endl;
         if(piece != mWKG && piece != mBKG){
             if(is_king_after_move_attacked(src, dst, minutes)){
                 return false; // RETURN_CODES["king-attacked-error"]
             }
         }
-        cout << dec << cpiece->pos << dec << dst << dec << prompiece << endl;
         if(cpiece->is_move_valid(dst, prompiece)){
             return true; // RETURN_CODES["ok"]
         }
@@ -479,7 +480,7 @@
             int piece = getfield(idx);
             if(piece != mBLK && color == PIECES_COLORS[piece]){
                 cPiece *cpiece = obj_for_piece(this, idx);
-                for(auto &step : cpiece->get_steps()){
+                for(auto &step : cpiece->get_mv_steps()){
                     if(step == 0){
                         break;
                     }
@@ -503,6 +504,17 @@
         }
         return false;
     }
+    
+    void cBoard::prnt(){
+        for(int y = 7; y >=0; --y){
+            cout << " | ";
+            for(int x = 0; x < 8; ++x){
+                cout << hex << getfield(y * 8 + x) << " | ";
+            }
+            cout << endl;
+        }
+    }
+
 
 /*
 

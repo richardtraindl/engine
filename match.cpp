@@ -1,5 +1,11 @@
 
-#include "./match.hpp"
+    #include "./match.hpp"
+    #include "./helper.hpp"
+    #include "./values.hpp"
+    #include "./pieces/searchforpiece.hpp"
+    #include "./pieces/pieceshelper.hpp"
+    #include "./pieces/whitepawn.hpp"
+    #include "./pieces/blackpawn.hpp"
 
     cMatch::cMatch(){ 
         created_at = time(0); 

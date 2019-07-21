@@ -5,9 +5,8 @@
     #include <list> 
     #include <string>
     #include <ctime>
-    #include "../board.hpp"
-    #include "../move.hpp"
     #include "../match.hpp"
+    #include "../move.hpp"
 
     using namespace std;
 
@@ -33,9 +32,9 @@
 
     bool sortByPrio(cPrioMove &A, cPrioMove &B);
 
-    list<cMove> *generate_moves(cMatch *match);
+    void generate_moves(cMatch *match, list<cMove> *moves);
     
-    list<cPrioMove> *generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate);
+    void generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> *priomoves);
 
     void append_newmove(cPrioMove *move, list<cPrioMove> *candidates, list<cPrioMove> *newcandidates);
 

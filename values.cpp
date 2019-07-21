@@ -111,18 +111,18 @@
     };
 
     map<string, int> DIRS = {
-        {"nth", 0},
-        {"sth", 1},
-        {"est", 2},
-        {"wst", 3},
-        {"nth-est", 4},
-        {"sth-wst", 5},
-        {"nth-wst", 6},
-        {"sth-est", 7},
+        {"nth", 1},
+        {"sth", 2},
+        {"est", 3},
+        {"wst", 4},
+        {"nth-est", 5},
+        {"sth-wst", 6},
+        {"nth-wst", 7},
+        {"sth-est", 8},
         {"2nth-est", 9},
         {"nth-2est", 10},
         {"sth-2est", 11},
-        {"2sth-est",  12},
+        {"2sth-est", 12},
         {"2sth-wst", 13}, 
         {"sth-2wst", 14},
         {"nth-2wst", 15},
@@ -222,7 +222,7 @@
     };
 
     map<string, int> EVAL_MODES = {
-        {"ignore-pins", 0}, 
-        {"only-pins-to-king", 1}, 
-        {"all-pins", 2}
+        {"ignore-pins", 1}, 
+        {"only-pins-to-king", 2}, 
+        {"all-pins", 3}
     };

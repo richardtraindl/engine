@@ -2,25 +2,12 @@
 #ifndef SEARCHFORPIECE_HPP
     #define SEARCHFORPIECE_HPP
 
-    #include <list> 
+    #include <list>
+    #include "./touch.hpp"
     #include "../board.hpp"
     #include "../values.hpp"
 
-
     using namespace std;
-
-
-    class cTouch{
-        public:
-            int piece;
-            int pos;
-            list<cTouch> attacker_beyond;
-            list<cTouch> supporter_beyond;
-            
-            cTouch(int piece, int pos);
-            cTouch();
-    };
-
 
     class cSearchforRook{
         public:

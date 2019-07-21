@@ -1,5 +1,7 @@
 
-#include "./calc.hpp"
+    #include "./calc.hpp"
+    #include "../pieces/piece.hpp"
+    #include "../pieces/pieceshelper.hpp"
 
     cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
@@ -64,9 +66,8 @@
     }
 
 
-    list<cMove> *generate_moves(cMatch *match){
+    void generate_moves(cMatch *match, list<cMove> *moves){
         int color = match->next_color();
-        list<cMove> *moves;
         for(int idx = 0; idx < 64; ++idx){
             int piece = match->board.getfield(idx);
             if(piece == PIECES["blk"] || color != PIECES_COLORS[piece]){
@@ -74,15 +75,13 @@
             }
             else{
                 cPiece *cpiece = obj_for_piece(&(match->board), idx);
-                moves = cpiece->generate_moves(&(match->minutes));
+                cpiece->generate_moves(&(match->minutes), moves);
             }
         }
-        return moves;
     }
 
-    list<cPrioMove> *generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate){
+    void generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> *priomoves){
         int color = match->next_color();
-        list<cPrioMove> *priomoves;
         for(int idx = 0; idx < 64; ++idx){
             int piece = match->board.getfield(idx);
             if(piece == PIECES["blk"] || color != PIECES_COLORS[piece]){
@@ -90,10 +89,9 @@
             }
             else{
                 cPiece *cpiece = obj_for_piece(&(match->board), idx);
-                priomoves = cpiece->generate_priomoves(&(match->minutes), candidate, dbggmove, search_for_mate);
+                cpiece->generate_priomoves(&(match->minutes), candidate, dbggmove, search_for_mate, priomoves);
             }
         }
-        return priomoves;
     }
 
 
@@ -253,20 +251,21 @@
 
         cMove *dbggmove = new cMove(0x0, 3, 51, PIECES["blk"]);
         bool search_for_mate = match->is_endgame();
-        list<cPrioMove> *priomoves = generate_priomoves(match, candidate, dbggmove, search_for_mate);
-        priomoves->sort(sortByPrio);
-        int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
+        list<cPrioMove> priomoves;
+        generate_priomoves(match, candidate, dbggmove, search_for_mate, &priomoves);
+        priomoves.sort(sortByPrio);
+        int maxcnt = select_movecnt(match, &priomoves, depth, slimits, last_pmove);
         
-        prnt_priomoves(match, priomoves);
-        cout << priomoves->size();
+        prnt_priomoves(match, &priomoves);
+        cout << priomoves.size();
 
-        if(priomoves->size() == 0 || maxcnt == 0){
-            *result_score = 0; // score_position(match, priomoves->size());
+        if(priomoves.size() == 0 || maxcnt == 0){
+            *result_score = 0; // score_position(match, priomoves.size());
             // result_candidates->clear();
             return;
         }
 
-        for(list<cPrioMove>::iterator it = priomoves->begin(); it != priomoves->end(); ++it){
+        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             count += 1;
             // cMove *move = dynamic_case<cMove*>(&(*it));
 

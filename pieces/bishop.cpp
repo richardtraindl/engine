@@ -9,6 +9,8 @@
 
     array<int, 8> cBishop::STEPS = {9, -9, 7, -7, 0, 0, 0, 0};
 
+    array<int, 10> cBishop::MV_STEPS = {9, -9, 7, -7, 0, 0, 0, 0, 0, 0};
+
     int cBishop::MAXCNT = 7;
 
     cBishop::cBishop(cBoard *board, int pos) : cPiece(board, pos){
@@ -17,6 +19,8 @@
     array<int, 8> cBishop::get_dirs_ary() { return DIRS_ARY; }
 
     array<int, 8> cBishop::get_steps() { return STEPS; }
+
+    array<int, 10> cBishop::get_mv_steps() { return MV_STEPS; }
 
     int cBishop::get_maxcnt() { return MAXCNT; }
 

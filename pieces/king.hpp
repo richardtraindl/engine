@@ -2,19 +2,24 @@
 #ifndef KING_HPP
     #define KING_HPP
 
-    #include <boost/multiprecision/cpp_int.hpp>
+    #include <array> 
     #include "./piece.hpp"
+    #include "../board.hpp"
+    #include "../move.hpp"
 
     using namespace std;
 
     class cKing : public cPiece{
         public:
             static array<int, 8> STEPS;
+            static array<int, 10> MV_STEPS;
             static int MAXCNT;
 
             cKing(cBoard *board, int pos);
 
             array<int, 8> get_steps() override;
+            
+            array<int, 10> get_mv_steps() override;
 
             int get_maxcnt() override;
 

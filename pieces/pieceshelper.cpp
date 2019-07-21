@@ -1,5 +1,12 @@
 
-#include "./pieceshelper.hpp"
+    #include "./pieceshelper.hpp"
+    #include "./rook.hpp"
+    #include "./bishop.hpp"
+    #include "./queen.hpp"
+    #include "./king.hpp"
+    #include "./knight.hpp"
+    #include "./whitepawn.hpp"
+    #include "./blackpawn.hpp"
 
     cPiece *obj_for_piece(cBoard *board, int pos){
         int piece = board->getfield(pos);

@@ -3,14 +3,7 @@
     #define PIECESHELPER_HPP
 
     #include "./piece.hpp"
-    #include "./rook.hpp"
-    #include "./bishop.hpp"
-    #include "./queen.hpp"
-    #include "./king.hpp"
-    #include "./knight.hpp"
-    #include "./whitepawn.hpp"
-    #include "./blackpawn.hpp"
-
+    #include "../board.hpp"
 
     using namespace std;
     

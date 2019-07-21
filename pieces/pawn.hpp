@@ -3,6 +3,7 @@
     #define PAWN_HPP
 
     #include "./piece.hpp"
+    #include "../move.hpp"
 
     using namespace std;
 

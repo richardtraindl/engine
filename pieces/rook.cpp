@@ -8,6 +8,8 @@ using namespace std;
                                      DIRS["undef"], DIRS["undef"], DIRS["undef"], DIRS["undef"]};
 
     array<int, 8> cRook::STEPS = {8, -8, 1, -1, 0, 0, 0, 0};
+    
+    array<int, 10> cRook::MV_STEPS = {8, -8, 1, -1, 0, 0, 0, 0, 0, 0};
 
     int cRook::MAXCNT = 7;
 
@@ -17,6 +19,8 @@ using namespace std;
     array<int, 8> cRook::get_dirs_ary() { return DIRS_ARY; }
 
     array<int, 8> cRook::get_steps() { return STEPS; }
+
+    array<int, 10> cRook::get_mv_steps() { return MV_STEPS; }
 
     int cRook::get_maxcnt() { return MAXCNT; }
 

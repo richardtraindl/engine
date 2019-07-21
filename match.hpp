@@ -10,9 +10,6 @@
     #include <iostream>
     #include "./board.hpp"
     #include "./move.hpp"
-    #include "./helper.hpp"
-    #include "./values.hpp"
-    #include "./pieces/pieceshelper.hpp"
 
     using namespace std;
 

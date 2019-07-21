@@ -1,12 +1,12 @@
 CC = g++
 
 all: values.o helper.o move.o board.o match.o \
-	 ./pieces/pieceshelper.o ./pieces/searchforpiece.o \
+	 ./pieces/pieceshelper.o ./pieces/searchforpiece.o ./pieces/touch.o \
 	 ./pieces/piece.o ./pieces/rook.o ./pieces/bishop.o ./pieces/knight.o \
 	 ./pieces/queen.o ./pieces/king.o ./pieces/pawn.o ./pieces/whitepawn.o ./pieces/blackpawn.o \
 	 ./compute/calc.o engine.o 
 	$(CC) -Wall --std=c++17 values.o helper.o move.o board.o match.o \
-		./pieces/pieceshelper.o ./pieces/searchforpiece.o \
+		./pieces/pieceshelper.o ./pieces/searchforpiece.o ./pieces/touch.o \
 		./pieces/piece.o ./pieces/rook.o ./pieces/bishop.o ./pieces/knight.o \
 		./pieces/queen.o ./pieces/king.o ./pieces/pawn.o ./pieces/whitepawn.o ./pieces/blackpawn.o \
 		./compute/calc.o engine.o -o engine

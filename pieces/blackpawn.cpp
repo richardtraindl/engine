@@ -1,14 +1,13 @@
 
-#include "./blackpawn.hpp"
-#include "./piece.hpp"
+    #include "./blackpawn.hpp"
     
     using namespace std;
 
     array<int, 8> cBlackPawn::STEPS = {-9, -7, 0, 0, 0, 0, 0, 0};
 
-    array<int, 3> cBlackPawn::MV_STEPS = {-8, -7, -9};
+    array<int, 10> cBlackPawn::MV_STEPS = {-8, -16, -7, -9, 0, 0, 0, 0, 0, 0};
 
-    array<int, 4> cBlackPawn::MV_STEPS_START = {-8, -16, -7, -9};
+    //array<int, 4> cBlackPawn::MV_STEPS_START = {-8, -16, -7, -9};
     
     array<int, 4> cBlackPawn::PROM_PIECES = {mBQU, mBRK, mBBP, mBKN};
 
@@ -19,9 +18,18 @@
 
     array<int, 8> cBlackPawn::get_steps() { return STEPS; }
 
-    array<int, 3> cBlackPawn::get_mv_steps() { return MV_STEPS; }
+    array<int, 10> cBlackPawn::get_mv_steps() { return MV_STEPS; }
 
-    array<int, 4> cBlackPawn::get_mv_steps_start() { return MV_STEPS_START; }
+    //array<int, 4> cBlackPawn::get_mv_steps_start() { return MV_STEPS_START; }
+
+    array<int, 4> cBlackPawn::get_prom_pieces(){
+        if(pos <= 15){
+            return PROM_PIECES;
+        }
+        else{
+            return cPiece::PROM_PIECES;
+        }
+    }
 
     int cBlackPawn::get_maxcnt() { return MAXCNT; }
 
@@ -59,13 +67,17 @@
 
     bool cBlackPawn::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
-        for(auto &step : MV_STEPS_START){
+        for(auto &step : MV_STEPS){
             if((pos + step) == dst && cBoard::is_inbounds(pos, dst, step)){
                 flag = true;
                 break;
             }
         }
         if(flag == false){
+            return false;
+        }
+        // check double step from seventh renk
+        if(pos - dst == 16 && pos < 48){
             return false;
         }
         int move_dir = dir_for_move(pos, dst);

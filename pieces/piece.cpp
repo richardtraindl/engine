@@ -1,10 +1,17 @@
 
-#include "./piece.hpp"
+    //#include "./piece.hpp"
+
+    #include "./piece.hpp"
+    #include "./searchforpiece.hpp"
+    #include "../values.hpp"
+    #include "../helper.hpp"
 
     array<int, 8> cPiece::DIRS_ARY = {DIRS["undef"], DIRS["undef"], DIRS["undef"], DIRS["undef"],
                                       DIRS["undef"], DIRS["undef"], DIRS["undef"], DIRS["undef"]};
 
     array<int, 8> cPiece::STEPS = {0, 0, 0, 0, 0, 0, 0, 0};
+
+    array<int, 10> cPiece::MV_STEPS = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     int cPiece::MAXCNT = 0;
 
@@ -20,7 +27,9 @@
     array<int, 8> cPiece::get_dirs_ary() { return DIRS_ARY; }
 
     array<int, 8> cPiece::get_steps() { return STEPS; }
-    
+
+    array<int, 10> cPiece::get_mv_steps() { return MV_STEPS; }
+
     array<int, 4> cPiece::get_prom_pieces() { return PROM_PIECES; }
     
     int cPiece::get_maxcnt() { return MAXCNT; }
@@ -181,19 +190,21 @@
         return score;
     }
 
-    list<cMove> *cPiece::generate_moves(list<cMove> *minutes){
-        list<cMove> *moves = new list<cMove>;
-        for(auto &step : get_steps()){
+    void cPiece::generate_moves(list<cMove> *minutes, list<cMove> *moves){
+        cMove *move;
+        for(auto &step : get_mv_steps()){
             if(step == 0){ 
                 break; 
             }
             int count = 0;
             int dst = pos + step;
-            while(board->is_inbounds(pos, dst, step && count < get_maxcnt())){
+            while(board->is_inbounds(pos, dst, step) && count < get_maxcnt()){
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, minutes)){
-                        moves->push_back(cMove(board->fields, pos, dst, prompiece));
+                        cout << "!" << endl;
+                        move = new cMove(board->fields, pos, dst, prompiece);
+                        moves->push_back(*move);
                     }
                     if(prompiece == mBLK){
                         break;
@@ -202,26 +213,28 @@
                 dst += step;
             }
         }
-        return moves;
     }
 
-    list<cPrioMove> *cPiece::generate_priomoves(list<cMove> *minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate){
-        list<cPrioMove> *priomoves = new list<cPrioMove>;
-        list<cPrioMove> excludes;
-        for(auto &step : get_steps()){
+    void cPiece::generate_priomoves(list<cMove> *minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> *priomoves){
+        cPrioMove *priomove;
+        list<cPrioMove> excludes;        
+        for(auto &step : get_mv_steps()){
             if(step == 0){ 
                 break; 
             }
             int count = 0;
             int dst = pos + step;
-            while(board->is_inbounds(pos, dst, step && count < get_maxcnt())){
-                cout << "1\n" << endl;
+            while(board->is_inbounds(pos, dst, step) && count < get_maxcnt()){
+                int dstpiece = board->getfield(dst);
+                if(PIECES_COLORS[dstpiece] == color){
+                    break;
+                }
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
-                    cout << "2\n" << endl;
+                    cout << dec << pos << " " << dec << dst << " " << dec << prompiece << endl;
                     if(board->is_move_valid(pos, dst, prompiece, minutes)){
-                        cout << "3\n" << endl;
-                        cPrioMove *priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
+                        cout << "!" << endl;
+                        priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
                         //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                         //if(len(excluded) > 0):
                             //excludes.extend(excluded)
@@ -233,7 +246,8 @@
                 }
                 dst += step;
             }
-        }/*
+        }
+        /*
         if(excludes.size() > 0){
             includes = []
             sorted(excludes, key=lambda x: x.tactic.weight)
@@ -248,6 +262,6 @@
                             excl.priomove.downgrade(excl.tactic)
                             excl.priomove.evaluate_priority()
                         else:
-                            includes.append(excl)*/
-        return priomoves;
+                            includes.append(excl)
+        */
     }

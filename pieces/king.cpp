@@ -1,9 +1,13 @@
 
-#include "./king.hpp"
+    #include <boost/multiprecision/cpp_int.hpp>
+    #include "./king.hpp"
+    #include "./searchforpiece.hpp"
 
     using namespace std;
 
     array<int, 8> cKing::STEPS = {8, 9, 1, -7, -8, -9, -1, 7};
+
+    array<int, 10> cKing::MV_STEPS = {8, 9, 1, -7, -8, -9, -1, 7, 2, -2};
 
     int cKing::MAXCNT = 1;
 
@@ -11,6 +15,8 @@
     }
 
     array<int, 8> cKing::get_steps() { return STEPS; }
+    
+    array<int, 10> cKing::get_mv_steps() { return MV_STEPS; }
 
     int cKing::get_maxcnt() { return MAXCNT; }
 

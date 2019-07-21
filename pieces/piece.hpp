@@ -6,9 +6,7 @@
     #include <array> 
     #include "../board.hpp"
     #include "../move.hpp"
-    #include "./searchforpiece.hpp"
-    #include "../values.hpp"
-    #include "../helper.hpp"
+    #include "./touch.hpp"
 
     using namespace std;
 
@@ -16,6 +14,7 @@
         public:
             static array<int, 8> DIRS_ARY;
             static array<int, 8> STEPS;
+            static array<int, 10> MV_STEPS;
             static array<int, 4> PROM_PIECES;
             static int MAXCNT;
             cBoard *board;
@@ -28,7 +27,9 @@
             virtual array<int, 8> get_dirs_ary(); 
 
             virtual array<int, 8> get_steps(); 
-            
+
+            virtual array<int, 10> get_mv_steps();
+
             virtual array<int, 4> get_prom_pieces(); 
 
             virtual int get_maxcnt();
@@ -51,9 +52,9 @@
 
             int score_touches();
 
-            list<cMove> *generate_moves(list<cMove> *minutes);
+            void generate_moves(list<cMove> *minutes, list<cMove> *moves);
 
-            list<cPrioMove> *generate_priomoves(list<cMove> *minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate);
+            void generate_priomoves(list<cMove> *minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> *priomoves);
     };
 
 #endif
