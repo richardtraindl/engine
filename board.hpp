@@ -13,16 +13,6 @@
 
     class cBoard{
         public:
-            uint256_t fields;
-            int wKg;
-            int bKg;
-            int wKg_first_move_on;
-            int bKg_first_move_on;
-            int wRkA_first_move_on;
-            int wRkH_first_move_on;
-            int bRkA_first_move_on;
-            int bRkH_first_move_on;
-
             static map<string, int> RANKS;
             static map<string, int> COLS;
             const uint256_t BASE     = 0x42356324111111110000000000000000000000000000000099999999CABDEBAC_cppui;
@@ -33,6 +23,16 @@
             const uint256_t BITS1100 = 0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC_cppui;
             const uint256_t BITS0111 = 0x7777777777777777777777777777777777777777777777777777777777777777_cppui;
             const uint256_t BITS0011 = 0x3333333333333333333333333333333333333333333333333333333333333333_cppui;
+
+            uint256_t fields;
+            int wKg;
+            int bKg;
+            int wKg_first_move_on;
+            int bKg_first_move_on;
+            int wRkA_first_move_on;
+            int wRkH_first_move_on;
+            int bRkA_first_move_on;
+            int bRkH_first_move_on;
 
             cBoard();
 
