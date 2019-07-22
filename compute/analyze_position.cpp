@@ -1,11 +1,16 @@
  
-#include "./analyze_position.hpp"
+    #include <boost/multiprecision/cpp_int.hpp>
+    #include "./analyze_position.hpp"
+
+    using namespace boost::multiprecision;
+    using namespace boost::multiprecision::literals;
+
 
     int score_traps_and_touches(cMatch *match){
         int score = 0;
         for(int idx = 0; idx < 64; ++idx){
             int piece = match->board.getfield(idx);
-            if(piece == PIECES["blk"]){
+            if(piece == mBLK){
                 continue;
             }
             cPiece cpiece = match->obj_for_piece(piece, idx);
@@ -17,6 +22,7 @@
         return score;
     }
 
+
     int score_controled_horizontal_files(cMatch *match){
         int score = 0;
         const uint256_t row7_row8_0 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
@@ -24,20 +30,20 @@
         const uint256_t row7_row8_2 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
         const uint256_t row7_row8_3 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
         uint256_t wrooks = match->board.fields;
-        cBoard::mask_pieces(wrooks, PIECES["wRk"]);
+        cBoard::mask_pieces(wrooks, mWRK);
         uint256_t wqueens = match->board.fields;
-        cBoard::mask_pieces(wqueens, PIECES["wQu"]);
+        cBoard::mask_pieces(wqueens, mWQU);
         if(wrooks & row7_row8 || wqueens & row7_row8){
-            score += ATTACKED_SCORES[PIECES["bKn"]];
+            score += ATTACKED_SCORES[mBKN];
         }
 
         const uint256_t row1_row2 = 0xFFFFFFFFFFFFFFFF000000000000000000000000000000000000000000000000_cppui;
         uint256_t brooks = match.board.fields;
-        cBoard::mask_pieces(brooks, PIECES["bRk"]);
+        cBoard::mask_pieces(brooks, mBRK);
         uint256_t bqueens = match->board.fields;
-        cBoard::mask_pieces(bqueens, PIECES["bQu"]);
+        cBoard::mask_pieces(bqueens, mBQU);
         if(brooks & row1_row2 || bqueens & row1_row2){
-            score += ATTACKED_SCORES[PIECES["wKn"]];
+            score += ATTACKED_SCORES[mWKN];
         }
         return score;
     }
