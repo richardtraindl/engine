@@ -3,12 +3,8 @@
     #define MOVE_HPP
 
     #include <map>
-    #include <list> 
     #include <string>
-    #include <sstream>
     #include <boost/multiprecision/cpp_int.hpp>
-    #include "./helper.hpp"
-    #include "./values.hpp"
 
     using namespace std;
     using namespace boost::multiprecision;
@@ -31,14 +27,14 @@
 
     class cTactic{
         public:
-            int domain;
-            int weight;
-            int addition;
-
             static map<string, int> DOMAINS;
             static map<string, int> WEIGHTS;
             static map<int, int> DOMAINS_TO_PRIOS;
             static map<int, int> WEIGHTS_TO_ADJUST;
+
+            int domain;
+            int weight;
+            int addition;
 
             cTactic(int domain, int weight, int addition);
     };
@@ -50,17 +46,24 @@
             int prio;
             static map<string, int> PRIOS;
 
-            cPrioMove(cMove *move, int prio);
             cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int prio);
-            
+
             void evaluate_priority();
+
             void downgrade(int domain);
+
             void upgrade(int domain);
+
             int fetch_weight(int domain);
+
             bool has_domain(int domain);
+
             bool has_weight(int weight);
+
             bool has_tactic_ext(int domain, int weight);
+
             bool is_tactic_stormy();
+
             string concat_fmttactics();
     };
 
