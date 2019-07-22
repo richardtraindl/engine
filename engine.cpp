@@ -51,12 +51,10 @@
 
         list<cMove> moves;        
         generate_moves(&match, &moves);
-        //moves.push_back(cMove(0, 1, 3, 0));
-        //priomoves = calc_move(&match, NULL);
 
-        cout << "size " << moves.size() << endl;
-        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-            cout << it->src << it->dst << endl;
+        cout << "size " << priomoves.size() << endl;
+        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+            cout << it->src << it->dst << it->prio << endl;
         }
         
 

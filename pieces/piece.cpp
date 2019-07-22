@@ -86,7 +86,7 @@
         }
     }
 
-    bool cPiece::is_move_valid(int dst, int prompiece){
+    bool cPiece::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         int dir = dir_for_move(pos, dst);
         if(dir == DIRS["undef"]){
             return false;
@@ -202,7 +202,6 @@
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, minutes)){
-                        cout << "!" << endl;
                         move = new cMove(board->fields, pos, dst, prompiece);
                         moves->push_back(*move);
                     }
@@ -233,8 +232,8 @@
                 for(auto &prompiece : get_prom_pieces()){
                     cout << dec << pos << " " << dec << dst << " " << dec << prompiece << endl;
                     if(board->is_move_valid(pos, dst, prompiece, minutes)){
-                        cout << "!" << endl;
                         priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
+                        cout << "src " << pos << " " << priomove->src << endl;
                         //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                         //if(len(excluded) > 0):
                             //excludes.extend(excluded)

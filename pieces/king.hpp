@@ -27,7 +27,7 @@
 
             bool is_move_stuck(int dst);
 
-            bool is_move_valid(int dst, int prompiece);
+            bool is_move_valid(int dst, int prompiece, list<cMove> *minutes);
 
             bool is_short_castling_ok(int dst);
 

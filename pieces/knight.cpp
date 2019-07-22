@@ -22,8 +22,7 @@
         return false; //knight cannot be trapped
     }
 
-    bool cKnight::is_move_valid(int dst, int prompiece){
-        cout << "TTTT" << endl;
+    bool cKnight::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;
         for(const int step : STEPS){
             if(pos + step == dst && board->is_inbounds(pos, dst, step)){
@@ -31,7 +30,6 @@
                 break;
             }
         }
-        cout << "FFFF" << endl;
         if(flag == false){
             return false;
         }
@@ -39,13 +37,9 @@
         if(pin_dir != DIRS["undef"]){
             return false;
         }
-        cout << "KKK" << endl;
         int dstpiece = board->getfield(dst);
         if(PIECES_COLORS[dstpiece] == color){
             return false;
         }
         return true;
     }
-
-
-

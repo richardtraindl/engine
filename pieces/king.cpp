@@ -29,7 +29,7 @@
     }
 
 
-    bool cKing::is_move_valid(int dst, int prompiece){
+    bool cKing::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
         if(is_short_castling_ok(dst)){
             return true;
         }

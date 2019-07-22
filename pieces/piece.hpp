@@ -38,15 +38,15 @@
 
             static int step_for_dir(int direction);
 
-            bool is_trapped();
+            virtual bool is_trapped();
 
-            bool is_move_stuck(int dst);
+            virtual bool is_move_stuck(int dst);
 
-            bool is_move_valid(int dst, int prompiece);
+            virtual bool is_move_valid(int dst, int prompiece, list<cMove> *minutes);
 
-            cMove *do_move(int dst, int prompiece, int movecnt, int *score);
+            virtual cMove *do_move(int dst, int prompiece, int movecnt, int *score);
 
-            bool undo_move(cMove *move, int movecnt, int *score);
+            virtual bool undo_move(cMove *move, int movecnt, int *score);
 
             void find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported);
 

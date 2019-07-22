@@ -21,9 +21,9 @@
 
             int get_maxcnt() override;
 
-            bool is_trapped();
+            bool is_trapped() override;
 
-            bool is_move_valid(int dst, int prompiece);
+            bool is_move_valid(int dst, int prompiece, list<cMove> *minutes) override;
     };
 
 #endif

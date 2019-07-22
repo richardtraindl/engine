@@ -460,7 +460,7 @@
                 return false; // RETURN_CODES["king-attacked-error"]
             }
         }
-        if(cpiece->is_move_valid(dst, prompiece)){
+        if(cpiece->is_move_valid(dst, prompiece, minutes)){
             return true; // RETURN_CODES["ok"]
         }
         else{
