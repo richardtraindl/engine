@@ -1,7 +1,8 @@
 
     #include <list>
     #include "./analyze_helper.hpp"
-
+    #include "../pieces/searchforpiece.hpp"
+    #include "../pieces/pieceshelper.hpp"
 
     int lowest_piece(list<cTouch> *touches){
         if(touches.size() == 0){
