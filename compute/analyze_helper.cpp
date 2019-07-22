@@ -212,26 +212,31 @@
     }
 
 
-def weight_for_attacking_king(match, move, weight){
-    if(check_mates_deep_search(match, move)){
-        return cTactic.WEIGHTS['stormy']
-    else{
-        return weight
+    int weight_for_attacking_king(cMatch *match, cMove *move, int weight){
+        if(check_mates_deep_search(match, move)){
+            return cTactic::WEIGHTS["stormy"];
+	}
+        return weight;
+    }
 
 
-def weight_for_attacking(match, piece, move, attacked, weight){
-    friends_on_dstfield, enmies_on_dstfield = find_touches_on_dstfield_after_move(match, piece, move)
-    ###
-    if(is_touched_field_within_move(match, piece, move, attacked.field)){
-        return weight
-    if(weight == cTactic.WEIGHTS['good-deal'] or 
-       weight == cTactic.WEIGHTS['better-deal']){
-        if(PIECES_RANK[piece] < PIECES_RANK[attacked.piece] or 
-           len(attacked.supporter_beyond) == 0 or 
-           (are_fairy_equal(piece, attacked.piece) and match.is_soft_pin(attacked.field)[0])){ 
-            return cTactic.WEIGHTS['stormy']
-        elif(PIECES_RANK[piece] < PIECES_RANK[attacked.piece] and 
-             PIECES_RANK[piece] == PIECES_RANK[PIECES['wPw']] and
-             (len(friends_on_dstfield) > 0 or len(enmies_on_dstfield) == 0)){ 
-            return cTactic.WEIGHTS['better-deal']
-    return cTactic.WEIGHTS['bad-deal']
+    def weight_for_attacking(cMatch *match, cMove *move, cTouch *attacked, int weight){
+        list <cTouch> friends_on_dstfield, enmies_on_dstfield;
+        find_touches_on_dstfield_after_move(match, piece, move, friends_on_dstfield, enmies_on_dstfield);
+        //###
+        if(is_touched_field_within_move(match, piece, move, attacked->pos)){
+            return weight;
+	}
+        if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
+            if(PIECES_RANK[piece] < PIECES_RANK[attacked->piece] || attacked->supporter_beyond.size() == 0 || 
+               (are_fairy_equal(piece, attacked->piece) && eval_soft_pin_dir(attacked->pos) != DIRS["undef"])){ 
+                return cTactic::WEIGHTS["stormy"];
+	    }
+            if(PIECES_RANK[piece] < PIECES_RANK[attacked->piece] && PIECES_RANK[piece] == PIECES_RANK[mWPW] &&
+                (friends_on_dstfield.size() > 0 || (enmies_on_dstfield.size() == 0)){ 
+                return cTactic::WEIGHTS["better-deal"];
+            }
+        }
+        return cTactic::WEIGHTS["bad-deal"];
+    }
+
