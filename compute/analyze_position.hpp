@@ -23,7 +23,7 @@
 
     int score_penalty_for_weak_fianchetto(cMatch *match);
 
-    int def score_opening(cMatch *match);
+    int score_opening(cMatch *match);
 
     int score_middlegame(cMatch *match);
 
