@@ -1,11 +1,8 @@
 #ifndef ANALYZE_POSITION_HPP
     #define ANALYZE_POSITION_HPP
 
-    #include <boost/multiprecision/cpp_int.hpp>
     #include "../match.hpp"
 
-    using namespace boost::multiprecision;
-    using namespace boost::multiprecision::literals;
     using namespace std;
 
     int score_traps_and_touches(cMatch *match);
