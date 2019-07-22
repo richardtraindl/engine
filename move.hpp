@@ -3,6 +3,7 @@
     #define MOVE_HPP
 
     #include <map>
+    #include <list> 
     #include <string>
     #include <boost/multiprecision/cpp_int.hpp>
 
