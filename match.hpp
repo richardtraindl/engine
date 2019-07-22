@@ -3,11 +3,9 @@
     #define MATCH_HPP
 
     #include <list> 
-    #include <vector> 
     #include <map>
     #include <string>
     #include <ctime>
-    #include <iostream>
     #include "./board.hpp"
     #include "./move.hpp"
 
