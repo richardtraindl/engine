@@ -145,13 +145,7 @@
             {"prio3", 300} 
         };
 
-    cPrioMove::cPrioMove(cMove *move, int _prio){
-        cMove(move->prevfields, move->src, move->dst, move->prompiece);
-        prio = _prio;
-    }
-    
-    cPrioMove::cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int _prio){
-        cMove(prevfields, src, dst, prompiece);
+    cPrioMove::cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int _prio) :  cMove(prevfields, src, dst, prompiece){
         prio = _prio;
     }
 
