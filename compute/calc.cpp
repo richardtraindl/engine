@@ -1,4 +1,5 @@
 
+    #include <iostream>    
     #include "./calc.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/pieceshelper.hpp"
