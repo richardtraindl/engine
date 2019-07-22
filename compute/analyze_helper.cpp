@@ -88,30 +88,30 @@
         return false;
     }
 
-bool is_touched_field_within_move(cMatch *match, int piece, cMove *move, int touched_field){
-    cPiece *cpiece = obj_for_piece(&(match->board), move->src);
-    int mvdir1 = cpiece->dir_for_move(move->src, move->dst);
-    int mvdir2 = cpiece->dir_for_move(move->dst, touched_field);
-    return (mvdir1 != DIRS["undef"] && (mvdir1 == mvdir2 || REVERSE_DIRS[mvdir1] == mvdir2));
-}
+    bool is_touched_field_within_move(cMatch *match, int piece, cMove *move, int touched_field){
+        cPiece *cpiece = obj_for_piece(&(match->board), move->src);
+        int mvdir1 = cpiece->dir_for_move(move->src, move->dst);
+        int mvdir2 = cpiece->dir_for_move(move->dst, touched_field);
+        return (mvdir1 != DIRS["undef"] && (mvdir1 == mvdir2 || REVERSE_DIRS[mvdir1] == mvdir2));
+    }
 
-
-int weight_for_standard(cMatch *match, int piece, cMove *move){
-    list<cTouch> friends_on_dstfield, enmies_on_dstfield, 
-    find_touches_on_dstfield_after_move(match, piece, move, &friends_on_dstfield, &enmies_on_dstfield);
-    int lowest_enemy_on_dstfield = lowest_piece(enmies_on_dstfield);
-    //###
-    if(is_soft_pinned_move(match, move)){
+    int weight_for_standard(cMatch *match, int piece, cMove *move){
+        list<cTouch> friends_on_dstfield, enmies_on_dstfield, 
+        find_touches_on_dstfield_after_move(match, piece, move, &friends_on_dstfield, &enmies_on_dstfield);
+        int lowest_enemy_on_dstfield = lowest_piece(enmies_on_dstfield);
+        //###
+        if(is_soft_pinned_move(match, move)){
+            return cTactic::WEIGHTS["bad-deal"];
+        }
+        if(enmies_on_dstfield.size() == 0){
+            return cTactic::WEIGHTS["good-deal"];
+        }
+        if((lowest_enemy_on_dstfield == mBLK || PIECES_RANK[piece] <= PIECES_RANK[lowest_enemy_on_dstfield]) && 
+           friends_on_dstfield.size() >= enmies_on_dstfield.size()){
+            return cTactic::WEIGHTS["good-deal"];
+        }
         return cTactic::WEIGHTS["bad-deal"];
     }
-    if(enmies_on_dstfield.size() == 0){
-        return cTactic::WEIGHTS["good-deal"];
-    }
-    if((lowest_enemy_on_dstfield is None or PIECES_RANK[piece] <= PIECES_RANK[lowest_enemy_on_dstfield]) and
-         len(friends_on_dstfield) >= len(enmies_on_dstfield)){
-        return cTactic.WEIGHTS['good-deal']
-    else{
-        return cTactic.WEIGHTS['bad-deal']
 
 
 def weight_for_capture(match, piece, move, weight){
