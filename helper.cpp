@@ -1,7 +1,8 @@
 
-#include <sstream>
+    #include <sstream>
+    #include "./helper.hpp"
 
-using namespace std;
+    using namespace std;
 
     int coord_to_index(string coord){
         int x = stoi(coord.substr(0, 1), nullptr, 10);
@@ -17,10 +18,8 @@ using namespace std;
     };
 
     string index_to_coord(int idx){
-        string coord;
-        stringstream out;
-        out << (idx % 8 + (int)'a') << (idx / 8 + (int)'1');
-        coord = out.str();
-        return coord;
+        ostringstream outstream;
+        outstream << (char)(idx % 8 + (int)'a' ) << (char)(idx / 8 + (int)'1');
+        return outstream.str();
     };
 

@@ -24,9 +24,11 @@
 
             int get_maxcnt() override;
 
-            static int dir_for_move(int src, int dst);
+            int dir_for_move(int src, int dst) override;
 
-            static int step_for_dir(int dir);
+            int step_for_dir(int dir) override;
+
+            //bool is_move_valid(int dst, int prompiece, list<cMove> *minutes) override;
     };
 
 #endif

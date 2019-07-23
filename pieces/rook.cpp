@@ -1,5 +1,6 @@
 
-#include "./rook.hpp"
+    #include "./rook.hpp"
+    #include "../values.hpp"
 
 
 using namespace std;
@@ -90,7 +91,7 @@ using namespace std;
         if(cPiece::undo_move(move, movecnt, score) == false){
             return false;
         }
-        if(piece == PIECES["wRk"]){
+        if(piece == mWRK){
             if(board->wRkA_first_move_on != -1 && board->wRkA_first_move_on == movecnt){
                 board->wRkA_first_move_on = -1;
             }

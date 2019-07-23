@@ -181,7 +181,7 @@
         int bisteps[2] = {step, (step * -1)};
         for(const int bistep : bisteps){
             int dst = src + bistep;
-            while(is_inbounds(src, dst, bistep) || cnt < maxcnt){
+            while(is_inbounds(src, dst, bistep) && cnt < maxcnt){
                 int piece = getfield(dst);
                 if(piece != mBLK){
                     if(*first == 65){
@@ -294,32 +294,34 @@
                 dir_ary[0] = DIRS["nth"];
                 dir_ary[1] = DIRS["est"];
                 if(color == COLORS["white"]){
-                    enmyfaces[0] = PIECES["bRk"];
-                    enmyfaces[1] = PIECES["bQu"];
+                    enmyfaces[0] = mBRK;
+                    enmyfaces[1] = mBQU;
                 }
                 else{
-                    enmyfaces[0] = PIECES["wBp"];
-                    enmyfaces[1] = PIECES["wQu"];
+                    enmyfaces[0] = mWRK;
+                    enmyfaces[1] = mWQU;
                 }
             }
             else{
                 dir_ary[0] = DIRS["nth-est"];
                 dir_ary[1] = DIRS["nth-wst"];
                 if(color == COLORS["white"]){
-                    enmyfaces[0] = PIECES["bBp"];
-                    enmyfaces[1] = PIECES["bQu"];
+                    enmyfaces[0] = mBBP;
+                    enmyfaces[1] = mBQU;
                 }
                 else{
-                    enmyfaces[0] = PIECES["wBp"];
-                    enmyfaces[1] = PIECES["wQu"];
+                    enmyfaces[0] = mWBP;
+                    enmyfaces[1] = mWQU;
                 }
             }
             for(int i = 0; i < 2; ++i){
                 if(j == 0){
-                    step = cRook::step_for_dir(dir_ary[i]);
+                    cRook crook = cRook(this, src);
+                    step = crook.step_for_dir(dir_ary[i]);
                 }
                 else{
-                    step = cBishop::step_for_dir(dir_ary[i]);
+                    cBishop cpishop = cBishop(this, src);
+                    step = cpishop.step_for_dir(dir_ary[i]);
                 }
                 if(search_bi_dirs(&first, &second, src, step, 6)){
                     fstpiece = getfield(first);
@@ -374,10 +376,12 @@
             }
             for(int i = 0; i < 2; ++i){
                 if(j == 0){
-                    step = cRook::step_for_dir(dir_ary[i]);
+                    cRook crook = cRook(this, src);
+                    step = crook.step_for_dir(dir_ary[i]);
                 }
                 else{
-                    step = cBishop::step_for_dir(dir_ary[i]);
+                    cBishop cbishop = cBishop(this, src);
+                    step = cbishop.step_for_dir(dir_ary[i]);
                 }
                 if(search_bi_dirs(&first, &second, src, step, 6)){
                     fstpiece = getfield(first);
@@ -405,23 +409,23 @@
     bool cBoard::is_king_after_move_attacked(int src, int dst, list<cMove> *minutes){
         int srcpiece = getfield(src);
         int dstpiece;
-        int pawnenmy = PIECES["blk"];
+        int pawnenmy = mBLK;
         bool flag;
-        if(srcpiece == PIECES["wPw"]){
+        if(srcpiece == mWPW){
             cWhitePawn *cpawn = new cWhitePawn(this, src);
             if(cpawn->is_ep_move_ok(dst, minutes)){
                 pawnenmy = getfield(dst);
                 setfield(dst, mBLK);
             }
         }
-        if(srcpiece == PIECES["bPw"]){
+        if(srcpiece == mBPW){
             cBlackPawn *cpawn = new cBlackPawn(this, src);
             if(cpawn->is_ep_move_ok(dst, minutes)){
                 pawnenmy = getfield(dst);
                 setfield(dst, mBLK);
             }
         }
-        setfield(src, PIECES["blk"]);
+        setfield(src, mBLK);
         dstpiece = getfield(dst);
         setfield(dst, srcpiece);
         if(PIECES_COLORS[srcpiece] == COLORS["white"]){
@@ -455,11 +459,11 @@
         if(minutes->size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
             return false; // RETURN_CODES["wrong-color"]
         }
-        if(piece != mWKG && piece != mBKG){
-            if(is_king_after_move_attacked(src, dst, minutes)){
-                return false; // RETURN_CODES["king-attacked-error"]
-            }
-        }
+        //if(piece != mWKG && piece != mBKG){
+        //    if(is_king_after_move_attacked(src, dst, minutes)){
+        //        return false; // RETURN_CODES["king-attacked-error"]
+        //    }
+        //}
         if(cpiece->is_move_valid(dst, prompiece, minutes)){
             return true; // RETURN_CODES["ok"]
         }

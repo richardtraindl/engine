@@ -30,10 +30,10 @@
         int piece = getprevfield(src);
         if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
             if((int)(src % 8) - (int)((int)(dst % 8) == -2)){
-                return "0-0";
+                return string("0-0");
             }
             if(src % 8 - dst % 8 == 2){
-                return "0-0-0";
+                return string("0-0-0");
             }
         }
 

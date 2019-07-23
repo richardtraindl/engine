@@ -23,6 +23,7 @@
             int color;
             
             cPiece(cBoard *board, int pos);
+            virtual ~cPiece();
 
             virtual array<int, 8> get_dirs_ary(); 
 
@@ -34,13 +35,13 @@
 
             virtual int get_maxcnt();
 
-            static int dir_for_move(int src, int dst);
+            virtual int dir_for_move(int src, int dst);
 
-            static int step_for_dir(int direction);
+            virtual int step_for_dir(int direction);
 
-            virtual bool is_trapped();
+            bool is_trapped();
 
-            virtual bool is_move_stuck(int dst);
+            bool is_move_stuck(int dst);
 
             virtual bool is_move_valid(int dst, int prompiece, list<cMove> *minutes);
 

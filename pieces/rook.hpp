@@ -25,13 +25,14 @@
 
             int get_maxcnt() override;
 
-            static int dir_for_move(int src, int dst);
+            int dir_for_move(int src, int dst) override;
 
-            static int step_for_dir(int dir);
+            int step_for_dir(int dir) override;
 
             cMove *do_move(int dst, int prompiece, int movecnt, int *score);
 
             bool undo_move(cMove *move, int movecnt, int *score);
+
     };
 
 #endif

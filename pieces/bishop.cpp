@@ -1,6 +1,6 @@
 
-#include "./bishop.hpp"
-
+    #include "./bishop.hpp"
+    #include "../values.hpp"
 
     using namespace std;
 
@@ -63,3 +63,6 @@
         }
     }
 
+    //bool cBishop::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
+    //    return cPiece::is_move_valid(dst, prompiece, minutes);
+    //}

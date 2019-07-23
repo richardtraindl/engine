@@ -3,6 +3,7 @@
     #include "./calc.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/pieceshelper.hpp"
+    #include "../values.hpp"
 
     cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
@@ -71,7 +72,7 @@
         int color = match->next_color();
         for(int idx = 0; idx < 64; ++idx){
             int piece = match->board.getfield(idx);
-            if(piece == PIECES["blk"] || color != PIECES_COLORS[piece]){
+            if(piece == mBLK || color != PIECES_COLORS[piece]){
                 continue;
             }
             else{

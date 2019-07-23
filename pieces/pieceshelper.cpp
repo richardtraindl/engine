@@ -7,28 +7,29 @@
     #include "./knight.hpp"
     #include "./whitepawn.hpp"
     #include "./blackpawn.hpp"
+    #include "../values.hpp"
 
     cPiece *obj_for_piece(cBoard *board, int pos){
         int piece = board->getfield(pos);
-        if(piece == PIECES["wPw"]){
+        if(piece == mWPW){
             return new cWhitePawn(board, pos);
         }
-        if(piece == PIECES["bPw"]){
+        if(piece == mBPW){
             return new cBlackPawn(board, pos);
         }
-        if(piece == PIECES["wKn"] || piece == PIECES["bKn"]){
+        if(piece == mWKN || piece == mBKN){
             return new cKnight(board, pos);
         }
-        if(piece == PIECES["wBp"] || piece == PIECES["bBp"]){
+        if(piece == mWBP || piece == mBBP){
             return new cBishop(board, pos);
         }
-        if(piece == PIECES["wRk"] || piece == PIECES["bRk"]){
+        if(piece == mWRK || piece == mBRK){
             return new cRook(board, pos);
         }
-        if(piece == PIECES["wQu"] || piece == PIECES["bQu"]){
+        if(piece == mWQU || piece == mBQU){
             return new cQueen(board, pos);
         }
-        if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
+        if(piece == mWKG || piece == mBKG){
             return new cKing(board, pos);
         }
         return NULL;

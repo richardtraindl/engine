@@ -1,5 +1,6 @@
 
     #include "./blackpawn.hpp"
+    #include "../values.hpp"
     
     using namespace std;
 

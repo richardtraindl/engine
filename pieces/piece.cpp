@@ -24,6 +24,8 @@
         color = PIECES_COLORS[piece];
     }
 
+    cPiece::~cPiece(){ }
+
     array<int, 8> cPiece::get_dirs_ary() { return DIRS_ARY; }
 
     array<int, 8> cPiece::get_steps() { return STEPS; }
@@ -54,7 +56,7 @@
                     continue;
                 }
                 else{
-                    if(dstpiece != PIECES["blk"] && PIECES_RANKS[piece] <= PIECES_RANKS[dstpiece]){
+                    if(dstpiece != mBLK && PIECES_RANKS[piece] <= PIECES_RANKS[dstpiece]){
                         return false;
                     }
                     list<cTouch> frdlytouches, enmytouches;
@@ -116,7 +118,7 @@
                     return true;
                 }
             }
-            if(newpiece != PIECES["blk"]){
+            if(newpiece != mBLK){
                 return false;
             }
             newpos += step;
@@ -127,7 +129,7 @@
     cMove *cPiece::do_move(int dst, int prompiece, int movecnt, int *score){
         int dstpiece = board->getfield(dst);
         cMove *move = new cMove(board->fields, pos, dst, prompiece);
-        board->setfield(move->src, PIECES["blk"]);
+        board->setfield(move->src, mBLK);
         board->setfield(move->dst, piece);
         *score += SCORES[dstpiece];
         return move;
@@ -145,7 +147,7 @@
         int opp_color = REVERSED_COLORS[color];
         for(const int step : STEPS){
             int dst2 = board->search(pos, step, MAXCNT);
-            if(dst2 != PIECES["blk"]){
+            if(dst2 != mBLK){
                 if(is_move_stuck(dst2)){
                     continue;
                 }
@@ -154,7 +156,7 @@
                     cTouch *ctouch = new cTouch(piece, dst2);
                     attacked->push_back(*ctouch);
                     //###
-                    board->setfield(dst2, PIECES["blk"]);
+                    board->setfield(dst2, mBLK);
                     add_field_touches_beyond(board, opp_color, ctouch);
                     board->setfield(dst2, piece);
                 }
@@ -165,7 +167,7 @@
                     cTouch *ctouch = new cTouch(piece, dst2);
                     supported->push_back(*ctouch);
                     //###
-                    board->setfield(dst2, PIECES["blk"]);
+                    board->setfield(dst2, mBLK);
                     add_field_touches_beyond(board, color, ctouch);
                     board->setfield(dst2, piece);
                 }
@@ -230,10 +232,8 @@
                 }
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
-                    cout << dec << pos << " " << dec << dst << " " << dec << prompiece << endl;
                     if(board->is_move_valid(pos, dst, prompiece, minutes)){
                         priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
-                        cout << "src " << pos << " " << priomove->src << endl;
                         //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                         //if(len(excluded) > 0):
                             //excludes.extend(excluded)
