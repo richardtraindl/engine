@@ -6,7 +6,7 @@
     #include <array> 
     #include "./board.hpp"
     #include "./move.hpp"
-    #include "./pieces/touch.hpp"
+    #include "./touch.hpp"
 
     using namespace std;
 
@@ -53,6 +53,11 @@
             void generate_moves(list<cMove> *minutes, list<cMove> *moves);
 
             void generate_priomoves(list<cMove> *minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> *priomoves);
+            
+            bool is_running_pawn();
+            
+            bool is_safe_king();
+
     };
 
 #endif

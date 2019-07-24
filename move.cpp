@@ -41,19 +41,19 @@
         string hyphen = "";
         string trailing = "";
         stringstream out;
-        if(dstpiece == PIECES["blk"]){
+        if(dstpiece == mBLK){
             hyphen = "-";
         }
         else{
             hyphen = "x";
         }
-        if(piece == PIECES["wPw"] || piece == PIECES["bPw"]){
-            if(prompiece != PIECES["blk"]){
+        if(piece == mWPW || piece == mBPW){
+            if(prompiece != mBLK){
                 out << prompiece;
                 trailing = ", " + out.str();
             }
             else{
-                if(dstpiece == PIECES["blk"] && src % 8 != dst % 8){
+                if(dstpiece == mBLK && src % 8 != dst % 8){
                     trailing = " e.p.";
                 }
             }

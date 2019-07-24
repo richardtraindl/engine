@@ -1,10 +1,10 @@
 CC = g++
 
 all: values.o helper.o move.o board.o match.o \
-	 ./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o \
+	 ./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o ./piece_valid.o \
 	 ./compute/calc.o engine.o 
 	$(CC) -Wall --std=c++17 values.o helper.o move.o board.o match.o \
-		./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o \
+		./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o ./piece_valid.o \
 		./compute/calc.o engine.o -o engine
 
 engine.o: engine.cpp
@@ -36,6 +36,9 @@ piece.o: piece.cpp piece.hpp helper.hpp values.hpp
 
 piece_ext.o: piece_ext.cpp piece_ext.hpp helper.hpp values.hpp
 	$(CC) -Wall --std=c++17 -c piece_ext.cpp -o piece_ext.o
+
+piece_valid.o: piece_valid.cpp piece_valid.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c piece_valid.cpp -o piece_valid.o
 
 make: 
 	make ./compute/Makefile

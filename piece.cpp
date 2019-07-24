@@ -1,6 +1,7 @@
 
     #include "./piece.hpp"
     #include "./piece_ext.hpp"
+    #include "./piece_valid.hpp"
     #include "./searchforpiece.hpp"
     #include "./values.hpp"
     #include "./helper.hpp"
@@ -177,69 +178,24 @@
     }
 
     bool cPiece::is_trapped(){
-        if(is_field_touched(board, pos, REVERSED_COLORS[color], EVAL_MODES["only-pins-to-king"])){
-            return false;
-        }
-        for(int step : get_steps()){
-            int pos1 = pos + step;
-            if(board->is_inbounds(pos, pos1, step)){
-                int dstpiece = board->getfield(pos1);
-                if(PIECES_COLORS[dstpiece] == color){
-                    continue;
-                }
-                else{
-                    if(dstpiece != mBLK && PIECES_RANKS[piece] <= PIECES_RANKS[dstpiece]){
-                        return false;
-                    }
-                    list<cTouch> frdlytouches, enmytouches;
-                    collect_touches_for_both_colors(board, pos1, color, &frdlytouches, &enmytouches);
-                    bool enmy_is_lower = false;
-                    for(const cTouch enmy : enmytouches){
-                        if(PIECES_RANKS[enmy.piece] < PIECES_RANKS[piece]){
-                            enmy_is_lower = true;
-                            break;
-                        }
-                    }
-                    if(frdlytouches.size() >= enmytouches.size() && enmy_is_lower == false){
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return is_trapped_from_valid(this);
     }
 
     bool cPiece::is_move_stuck(int dst){
-        int mv_dir = dir_for_move(piece, pos, dst);
-        int pin_dir = board->eval_pin_dir(pos);
-        if(pin_dir == DIRS["undef"] || mv_dir == pin_dir || REVERSE_DIRS[mv_dir] == pin_dir){
-            return false;
-        }
-        else{
-            return true;
-        }
+        return is_move_stuck_from_valid(this, dst);
     }
 
     bool cPiece::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
-        return is_move_valid_from_ext(this, dst, prompiece, minutes);
+        return is_move_valid_from_valid(this, dst, prompiece, minutes);
     }
 
     cMove *cPiece::do_move(int dst, int prompiece, int movecnt, int *score){
-        int dstpiece = board->getfield(dst);
-        cMove *move = new cMove(board->fields, pos, dst, prompiece);
-        board->setfield(move->src, mBLK);
-        board->setfield(move->dst, piece);
-        *score += SCORES[dstpiece];
-        return move;
+        return do_move_from_ext(this, dst, prompiece, movecnt, score);
     }
 
     bool cPiece::undo_move(cMove *move, int movecnt, int *score){
-        move->copyprevfields(board->fields);
-        int dstpiece_after_undo_mv = board->getfield(move->dst);
-        *score -= SCORES[dstpiece_after_undo_mv];
-        return true;
+        return undo_move_from_ext(this, move, movecnt, score);
     }
-
 
     void cPiece::find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported){
         int opp_color = REVERSED_COLORS[color];
@@ -275,6 +231,9 @@
 
 
     int cPiece::score_touches(){
+        if(piece == mWKG || piece == mBKG){
+            return 0; // king touches score 0
+        }
         int score = 0;
         list<cTouch>friends, enmies;
         collect_touches_for_both_colors(board, pos, color, &friends, &enmies);
@@ -361,4 +320,87 @@
                         else:
                             includes.append(excl)
         */
+    }
+
+    bool cPiece::is_running_pawn(){
+        return false;
+        /*
+            bool cWhitePawn::is_running(){
+        int step = 8;
+        int opp_pawn = mBPW;
+        for(int idx = -1; idx < 2; ++idx){
+            int src = pos + idx;
+            int dst = board->search(src, step, 5);
+            while(dst != mBLK){
+                int piece = board->getfield(dst);
+                if(piece == opp_pawn){
+                    return false;
+                }
+                dst = board->search(dst, step, 5);
+            }
+        }
+        return true;
+    }
+    bool cBlackPawn::is_running(){
+        int step = -8;
+        int opp_pawn = mWPW;
+        for(int idx = -1; idx < 2; ++idx){
+            int src = pos + idx;
+            int dst = board->search(src, step, 5);
+            while(dst != mBLK){
+                int piece = board->getfield(dst);
+                if(piece == opp_pawn){
+                    return false;
+                }
+                dst = board->search(dst, step, 5);
+            }
+        }
+        return true;
+    }
+    */
+    }
+            
+    bool cPiece::is_safe_king(){
+        return true;
+        
+        /* 
+    def is_safe(self){
+        count = 0
+        for step in self.STEPS:
+            dst = self.pos + step
+            if(board->is_inbounds(self.pos, dst, step)){
+                friends, enemies = list_all_field_touches(self.match, dst, self.color)
+                if(len(friends) < len(enemies)){
+                    return false;
+                if(len(enemies) > 0){
+                    count += 1
+        if(count > 2){
+            return false;
+        friends.clear()
+        enemies.clear()
+        friends, enemies = list_all_field_touches(self.match, self.pos, self.color)
+        if(len(enemies) == 0){
+            return True
+        if(len(enemies) >= 2){
+            return false;
+        else{
+            enemy = enemies[0]
+            friends_beyond, enemies_beyond = list_all_field_touches(self.match, enemy.field, self.color)
+            if(len(friends_beyond) >= len(enemies_beyond)){
+                return True
+            cenemy = self.match.obj_for_piece(enemy.piece, enemy.field)
+            direction = cenemy.dir_for_move(self.pos, enemy.field)
+            if(direction == DIRS["undef"]){
+                return True
+            else{
+                step = cenemy.step_for_dir(direction)
+            dst = self.pos + step
+            while(board->is_inbounds(self.pos, dst, step)){
+                blocking_friends, blocking_enemies = list_all_field_touches(self.match, dst, self.color)
+                if(len(blocking_friends) > 0){
+                    return True
+                dst += step
+        return false;
+*/
+
     }

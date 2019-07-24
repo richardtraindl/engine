@@ -2,7 +2,7 @@
     #include "./board.hpp"
     #include "./searchforpiece.hpp"
     #include "./piece.hpp"
-    #include "./piece_ext.hpp"
+    #include "./piece_valid.hpp"
     #include "./values.hpp"
     #include "./helper.hpp"
 
@@ -45,7 +45,7 @@
     int cBoard::getfield(int idx){
         return (int)((fields >> ((63 - idx) * 4)) & 0xF);
     }
-    
+
     void cBoard::setfield(int idx, int value){
         uint256_t _value = value;
         uint256_t tmpfields = SINGLE >> (idx * 4);

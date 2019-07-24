@@ -1,331 +1,178 @@
 
     #include "./piece_ext.hpp"
-    #include "./searchforpiece.hpp"
     #include "./values.hpp"
 
-    bool is_move_valid_from_ext(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes){
-        bool flag = false;
-        for(auto &step : cpiece->get_mv_steps()){
-            if(cpiece->pos + step == dst && cBoard::is_inbounds(cpiece->pos, dst, step)){
-                flag = true;
-                break;
-            }
-        }
-        if(flag == false){
-            return false;
-        }
-         if(cpiece->piece == mWPW){
-            return is_move_valid_for_whitepawn(cpiece, dst, prompiece, minutes);
-        }
-        if(cpiece->piece == mBPW){
-            return is_move_valid_for_blackpawn(cpiece, dst, prompiece, minutes);
-        }
-        if(cpiece->piece == mWKN || cpiece->piece == mBKN){
-            return is_move_valid_for_knight(cpiece, dst, prompiece);
-        }
-        if(cpiece->piece == mWKG || cpiece->piece == mBKG){
-            return is_move_valid_for_king(cpiece, dst, prompiece);
-        }
-        else{
-            return is_move_valid_for_long_distance_piece(cpiece, dst, prompiece);
-        }
-    }
-
-    // White Pawn
-    bool is_move_valid_for_whitepawn(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes){
-        // check double step from second renk
-        if(dst - cpiece->pos == 16 && cpiece->pos > 15){ return false; }
-
-        int move_dir = cPiece::dir_for_move(mWPW, cpiece->pos, dst);
-        if(move_dir == DIRS["undef"]){ return false; }
-
-        int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
+    cMove *do_move_from_ext(cPiece *cpiece, int dst, int prompiece, int movecnt, int *score){
         int dstpiece = cpiece->board->getfield(dst);
-        // check pins
-        if(pin_dir != DIRS["undef"]){
-            if(move_dir == DIRS["nth"]){
-                if(pin_dir != DIRS["nth"] && pin_dir != DIRS["sth"] && pin_dir != DIRS["undef"]){
-                    return false;
-                }
-            }
-            if(move_dir == DIRS["nth-wst"]){
-                if(pin_dir != DIRS["nth-wst"] && pin_dir != DIRS["sth-est"] && pin_dir != DIRS["undef"]){
-                    return false;
-                }
-            }
-            if(move_dir == DIRS["nth-est"]){
-                if(pin_dir != DIRS["nth-est"] && pin_dir != DIRS["sth-wst"] && pin_dir != DIRS["undef"]){
-                    return false;
-                }
-            }
-        }
-        // check fields
-        if(move_dir == DIRS["nth"]){ 
-            if(dstpiece != mBLK){ return false; }
-            if(dst - cpiece->pos == 16){
-                int midpiece = cpiece->board->getfield(cpiece->pos + 8);
-                if(midpiece != mBLK){ return false; }
-            }
-        }
-        if(move_dir == DIRS["nth-est"] || move_dir == DIRS["nth-wst"]){
-            if(PIECES_COLORS[dstpiece] != COLORS["black"]){
-                return is_ep_move_ok_for_whitepawn(cpiece, dst, minutes);
-            }
-        }
-        // check promotion
-        if((dst / 8) == 7 && prompiece != mWQU && prompiece != mWRK && 
-           prompiece != mWBP && prompiece != mWKN){ return false; }
-
-        if((dst / 8) < 7 && prompiece != PIECES["blk"]){ return false; }
-
-        return true;
-    }
-
-    bool is_ep_move_ok_for_whitepawn(cPiece *piece, int dst, list<cMove> *minutes){
-        cMove lastmove;
-        if(minutes->empty()){ 
-            return false; 
-        }
-        else{
-            lastmove = minutes->back();
+        cMove *move = new cMove(cpiece->board->fields, cpiece->pos, dst, prompiece);
+        cpiece->board->setfield(move->src, mBLK);
+        cpiece->board->setfield(move->dst, cpiece->piece);
+        *score += SCORES[dstpiece];
+        
+        if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
+           cpiece->piece == mWKN || cpiece->piece == mBKN ||
+           cpiece->piece == mWQU || cpiece->piece == mBQU){
+            return move;
         }
 
-        int dstpiece = piece->board->getfield(dst);
-        int enemy = piece->board->getfield(lastmove.dst);
-        if(dstpiece == mBLK && enemy == mBPW){
-            if((lastmove.src / 8) - (lastmove.dst / 8) == 2 && 
-               (lastmove.dst / 8) == (piece->pos / 8) && 
-               (lastmove.dst % 8) == (dst % 8) && 
-               (lastmove.dst / 8) - (dst / 8) == -1){
-                return true;
+        if(cpiece->piece == mWPW){
+            if(prompiece != mBLK){
+                cpiece->board->setfield(dst, prompiece);
+                *score -= SCORES[prompiece] - SCORES[cpiece->piece];
             }
-        }
-        return false;
-    }
-    // White Pawn end
-
-
-    // Black Pawn
-    bool is_move_valid_for_blackpawn(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes){
-        // check double step from seventh renk
-        if(cpiece->pos - dst == 16 && cpiece->pos < 48){ return false; }
-
-        int move_dir = cPiece::dir_for_move(mBPW, cpiece->pos, dst);
-        if(move_dir == DIRS["undef"]){ return false; }
-
-        int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
-        int dstpiece = cpiece->board->getfield(dst);
-        // check pins
-        if(pin_dir != DIRS["undef"]){
-            if(move_dir == DIRS["sth"]){
-                if(pin_dir != DIRS["nth"] && pin_dir != DIRS["sth"] && pin_dir != DIRS["undef"]){
-                    return false;
-                }
-            }
-            if(move_dir == DIRS["sth-wst"]){
-                if(pin_dir != DIRS["nth-est"] && pin_dir != DIRS["sth-wst"] && pin_dir != DIRS["undef"]){
-                    return false;
-                }
-            }
-            if(move_dir == DIRS["sth-est"]){
-                if(pin_dir != DIRS["nth-wst"] && pin_dir != DIRS["sth-est"] && pin_dir != DIRS["undef"]){
-                    return false;
-                }
-            }
-        }
-        // check fields
-        if(move_dir == DIRS["sth"]){
-            if(dstpiece != PIECES["blk"]){
-                return false;
-            }
-            if(cpiece->pos - dst == 16){
-                int midpiece = cpiece->board->getfield(cpiece->pos - 8);
-                if(midpiece != PIECES["blk"]){
-                    return false;
-                }
-            }
-        }
-        if(move_dir == DIRS["sth-est"] || move_dir == DIRS["sth-wst"]){
-            if(PIECES_COLORS[dstpiece] != COLORS["white"]){
-                return is_ep_move_ok_for_blackpawn(cpiece, dst, minutes);
-            }
-        }
-        // check promotion
-        if((dst / 8) == 0 && prompiece != mBQU && prompiece != mBRK && 
-           prompiece != mBBP && prompiece != mBKN){ return false; }
-
-        if((dst / 8) > 0 && prompiece != mBLK){ return false; }
-
-        return true;
-    }
-
-    bool is_ep_move_ok_for_blackpawn(cPiece *piece, int dst, list<cMove> *minutes){
-        cMove lastmove;
-        if(minutes->empty()){
-            return false;
-        }
-        else{
-            lastmove = minutes->back();
-        }
-        int dstpiece = piece->board->getfield(dst);
-        int enemy = piece->board->getfield(lastmove.dst);
-        if(dstpiece == mBLK && enemy == mWPW){
-            if((lastmove.src / 8) - (lastmove.dst / 8) == -2 && 
-               (lastmove.dst / 8) == (piece->pos / 8) && 
-               (lastmove.dst % 8) == (dst % 8) && 
-               (lastmove.dst / 8) - (dst / 8) == 1){
-                return true;
-            }
-        }
-        return false;
-    }
-    // Black Pawn end
-
-    
-    // Knight
-    bool is_move_valid_for_knight(cPiece *cpiece, int dst, int prompiece){
-        int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
-        if(pin_dir != DIRS["undef"]){ return false; }
-
-        int dstpiece = cpiece->board->getfield(dst);
-        if(PIECES_COLORS[dstpiece] == cpiece->color){ return false; }
-
-        return true;
-    }
-    // Knight end
-
-
-    // King
-    bool is_move_valid_for_king(cPiece *cpiece, int dst, int prompiece){
-        if(is_short_castling_ok(cpiece, dst)){ return true; }
-
-        if(is_long_castling_ok(cpiece, dst)){ return true; }
-
-        int captured = cpiece->board->getfield(dst);
-        cpiece->board->setfield(cpiece->pos, PIECES["blk"]);
-        cpiece->board->setfield(dst, cpiece->piece);
-        bool isattacked = is_field_touched(cpiece->board, dst, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
-        cpiece->board->setfield(cpiece->pos, cpiece->piece);
-        cpiece->board->setfield(dst, captured);
-        if(isattacked){ return false; }
-
-        int dstpiece = cpiece->board->getfield(dst);
-        if(PIECES_COLORS[dstpiece] == cpiece->color){ return false; }
-
-        return true;
-    }
-
-    bool is_short_castling_ok(cPiece *cpiece, int dst){
-        uint256_t shorttest, shortmask;
-        if(cpiece->pos - dst != -2){ return false; }
-
-        if(cpiece->color == COLORS["white"]){
-            if(cpiece->board->wKg_first_move_on != -1 || cpiece->board->wRkH_first_move_on != -1){
-                return false;
-            }
-            shorttest  = 0x0000600400000000000000000000000000000000000000000000000000000000_cppui;
-            shortmask  = 0x0000FFFF00000000000000000000000000000000000000000000000000000000_cppui;
-            uint256_t fields = cpiece->board->fields & shortmask;
-            if(fields != shorttest){ return false; }
-        }
-        else{
-            if(cpiece->board->bKg_first_move_on != -1 || cpiece->board->bRkH_first_move_on != -1){
-                return false;
-            }
-            shorttest  = 0x000000000000000000000000000000000000000000000000000000000000E00C_cppui;
-            shortmask  = 0x000000000000000000000000000000000000000000000000000000000000FFFF_cppui;
-            uint256_t fields = cpiece->board->fields & shortmask;
-            if(fields != shorttest){ return false; }
-        }            
-
-        cpiece->board->setfield(cpiece->pos, PIECES["blk"]);
-        for(int i = 0; i < 3; ++i){
-            int dst2 = cpiece->pos + i;
-            bool isattacked = is_field_touched(cpiece->board, dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
-            if(isattacked){
-                cpiece->board->setfield(cpiece->pos, cpiece->piece);
-                return false;
-            }
-        }
-        cpiece->board->setfield(cpiece->pos, cpiece->piece);
-        return true;
-    }
-
-    bool is_long_castling_ok(cPiece *cpiece, int dst){
-        uint256_t longtest, longmask;
-        if(cpiece->pos - dst != 2){ return false; }
-
-        if(cpiece->color == COLORS["white"]){
-            if(cpiece->board->wKg_first_move_on != -1 || cpiece->board->wRkA_first_move_on != -1){
-                return false;
-            }
-            longtest  = 0x4000600000000000000000000000000000000000000000000000000000000000_cppui;
-            longmask  = 0xFFFFF00000000000000000000000000000000000000000000000000000000000_cppui;
-            uint256_t fields = cpiece->board->fields & longmask;
-            if(fields != longtest){ return false; }
-        }
-        else{
-            if(cpiece->board->bKg_first_move_on != -1 || cpiece->board->bRkA_first_move_on != -1){
-                return false;
-            }
-            longtest  = 0x00000000000000000000000000000000000000000000000000000000C000E000_cppui;
-            longmask  = 0x00000000000000000000000000000000000000000000000000000000FFFFF000_cppui;
-            uint256_t fields = cpiece->board->fields & longmask;
-            if(fields != longtest){ return false; }
-        }
-
-        cpiece->board->setfield(cpiece->pos, PIECES["blk"]);
-        for(int i = 0; i < 3; ++i){
-            int dst2 = cpiece->pos - i;
-            bool isattacked = is_field_touched(cpiece->board, dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
-            if(isattacked){
-                cpiece->board->setfield(cpiece->pos, cpiece->piece);
-                return false;
-            }
-        }
-        cpiece->board->setfield(cpiece->pos, cpiece->piece);
-        return true;
-    }
-    // King end
-
-
-    // Rook, Bishop, Queen
-    bool is_move_valid_for_long_distance_piece(cPiece *cpiece, int dst, int prompiece){
-        int dir = cPiece::dir_for_move(cpiece->piece, cpiece->pos, dst);
-        if(dir == DIRS["undef"]){
-            return false;
-        }
-        int step = cPiece::step_for_dir(cpiece->piece, dir);
-        if(step == 0){
-            int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
-            for(auto &piecedir : cpiece->get_dirs_ary()){
-                if(piecedir == DIRS["undef"]){ break; }
-
-                if(dir == piecedir){
-                    if(pin_dir != piecedir && pin_dir != REVERSE_DIRS[piecedir] && pin_dir != DIRS["undef"]){
-                        return false;
-                    }
-                }
-            }
-        }
-        int newpos = cpiece->pos + step;
-        while(cpiece->board->is_inbounds(cpiece->pos, newpos, 0)){
-            int newpiece = cpiece->board->getfield(newpos);
-            if(newpos == dst){
-                if(PIECES_COLORS[newpiece] == cpiece->color){
-                    return false;
+            if(dstpiece == mBLK && cpiece->pos % 8 != dst % 8){
+                int enpass;
+                if(cpiece->pos % 8 < dst % 8){
+                    enpass = cpiece->pos + 1;
                 }
                 else{
-                    return true;
+                    enpass = cpiece->pos - 1;
                 }
+                int captpiece = cpiece->board->getfield(enpass);
+                cpiece->board->setfield(enpass, mBLK);
+                *score += SCORES[captpiece];
             }
-            if(newpiece != mBLK){
-                return false;
-            }
-            newpos += step;
+            return move;
         }
-        return false;
-    }
-    // Rook, Bishop, Queen end
 
+        if(cpiece->piece == mBPW){
+            if(prompiece != mBLK){
+                cpiece->board->setfield(dst, prompiece);
+                *score -= SCORES[prompiece] - SCORES[cpiece->piece];
+            }
+            if(dstpiece == mBLK && cpiece->pos % 8 != dst % 8){
+                int enpass;
+                if(cpiece->pos % 8 < dst % 8){
+                    enpass = cpiece->pos + 1;
+                }
+                else{
+                    enpass = cpiece->pos - 1;
+                }
+                int captpiece = cpiece->board->getfield(enpass);
+                cpiece->board->setfield(enpass, mBLK);
+                *score += SCORES[captpiece];
+            }
+            return move;
+        }
+
+        if(cpiece->piece == mWKG || cpiece->piece == mBKG){
+            if(cpiece->pos - dst == -2){
+                int rook = cpiece->board->getfield(cpiece->pos + 3);
+                cpiece->board->setfield(cpiece->pos + 3, mBLK);
+                cpiece->board->setfield(dst - 1, rook);
+            }
+            if(cpiece->pos - dst == 2){
+                int rook = cpiece->board->getfield(cpiece->pos - 4);
+                cpiece->board->setfield(cpiece->pos - 4, mBLK);
+                cpiece->board->setfield(dst + 1, rook);
+            }
+            if(cpiece->piece == mWKG){
+                if(cpiece->board->wKg_first_move_on == -1){
+                    cpiece->board->wKg_first_move_on = movecnt;
+                }
+                cpiece->board->wKg = dst;
+            }
+            else{
+                if(cpiece->board->bKg_first_move_on == -1){
+                    cpiece->board->bKg_first_move_on = movecnt;
+                }
+                cpiece->board->bKg = dst;
+            }
+            return move;
+        }
+
+        if(cpiece->piece == mWRK){
+            int srcx = cpiece->pos % 8;
+            int srcy = cpiece->pos / 8;
+            if(srcx == cBoard::COLS["A"] && srcy == cBoard::RANKS["1"] && 
+               cpiece->board->wRkA_first_move_on == -1){
+                cpiece->board->wRkA_first_move_on = movecnt;
+            }
+            if(srcx == cBoard::COLS["H"] && srcy == cBoard::RANKS["1"] && 
+                 cpiece->board->wRkH_first_move_on == -1){
+                cpiece->board->wRkH_first_move_on = movecnt;
+            }
+        }
+        if(cpiece->piece == mBRK){
+            int srcx = cpiece->pos % 8;
+            int srcy = cpiece->pos / 8;
+            if(srcx == cBoard::COLS["A"] && srcy == cBoard::RANKS["8"] && 
+               cpiece->board->bRkA_first_move_on == -1){
+                cpiece->board->bRkA_first_move_on = movecnt;
+            }
+            if(srcx == cBoard::COLS["H"] && srcy == cBoard::RANKS["8"] && 
+                 cpiece->board->bRkH_first_move_on == -1){
+                cpiece->board->bRkH_first_move_on = movecnt;
+            }
+        }
+        return move;
+    }
+
+
+    bool undo_move_from_ext(cPiece *cpiece, cMove *move, int movecnt, int *score){
+        move->copyprevfields(cpiece->board->fields);
+        int dstpiece_after_undo_mv = cpiece->board->getfield(move->dst);
+        *score -= SCORES[dstpiece_after_undo_mv];
+
+        if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
+           cpiece->piece == mWKN || cpiece->piece == mBKN ||
+           cpiece->piece == mWQU || cpiece->piece == mBQU){
+            return true;
+        }
+
+        if(cpiece->piece == mWPW){
+            int dstpiece_after_undo_mv = cpiece->board->getfield(move->dst);
+            if(move->prompiece && move->prompiece != mBLK){
+                *score += SCORES[move->prompiece] - SCORES[mWPW];
+            }
+            if(dstpiece_after_undo_mv == mBLK && move->src % 8 != move->dst % 8){
+                *score -= SCORES[mBPW];
+            }
+            return true;
+        }
+
+        if(cpiece->piece == mWPW){
+            int dstpiece_after_undo_mv = cpiece->board->getfield(move->dst);
+            if(move->prompiece && move->prompiece != mBLK){
+                *score += SCORES[move->prompiece] - SCORES[mBPW];
+            }
+            if(dstpiece_after_undo_mv == mBLK && move->src % 8 != move->dst % 8){
+                *score -= SCORES[mWPW];
+            }
+            return true;
+        }
+
+        if(cpiece->piece == mWRK){
+            if(cpiece->board->wRkA_first_move_on != -1 && cpiece->board->wRkA_first_move_on == movecnt){
+                cpiece->board->wRkA_first_move_on = -1;
+            }
+            if(cpiece->board->wRkH_first_move_on != -1 && cpiece->board->wRkH_first_move_on == movecnt){
+                cpiece->board->wRkH_first_move_on = -1;
+            }
+        }
+
+        if(cpiece->piece == mBRK){
+            if(cpiece->board->bRkA_first_move_on != -1 && cpiece->board->bRkA_first_move_on == movecnt){
+                cpiece->board->bRkA_first_move_on = -1;
+            }
+            if(cpiece->board->bRkH_first_move_on != -1 && cpiece->board->bRkH_first_move_on == movecnt){
+                cpiece->board->bRkH_first_move_on = -1;
+            }
+        }
+
+        if(cpiece->piece == mWKG){
+            if(cpiece->board->wKg_first_move_on != -1 && cpiece->board->wKg_first_move_on == movecnt){
+                cpiece->board->wKg_first_move_on = -1;
+            }
+            cpiece->board->wKg = move->src;
+        }
+        
+        if(cpiece->piece == mBKG){
+            if(cpiece->board->bKg_first_move_on != -1 && cpiece->board->bKg_first_move_on == movecnt){
+                cpiece->board->bKg_first_move_on = -1;
+            }
+            cpiece->board->bKg = move->src;
+        }
+        return true;
+    }
 
