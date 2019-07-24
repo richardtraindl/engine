@@ -240,7 +240,7 @@
             score = beta;
         }
 
-        cMove *dbggmove = new cMove(0x0, 3, 51, PIECES["blk"]);
+        cMove *dbggmove = NULL; //new cMove(0x0, 3, 51, PIECES["blk"]);
         bool search_for_mate = match.is_endgame();
         list<cPrioMove> priomoves;
         generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);
@@ -258,7 +258,6 @@
 
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             count += 1;
-            // cMove *move = dynamic_case<cMove*>(&(*it));
 
             match.do_move(it->src, it->dst, it->prompiece);
             if(maximizing){
