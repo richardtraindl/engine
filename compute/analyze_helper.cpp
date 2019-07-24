@@ -74,7 +74,7 @@
 
     bool is_soft_pinned_move(cMatch *match, cMove *move){
 	int pindir = match->board.eval_soft_pin_dir(move->src);
-        cpiece = match.obj_for_piece(&(match->board), move->src);
+        cPiece cpiece(&(match->board), move->src);
         int mvdir = cpiece.dir_for_move(move->src, move->dst);
         return (pindir != DIRS["undef"] && pindir != mvdir && pindir != REVERSE_DIRS[mvdir]);
     }
@@ -99,9 +99,9 @@
 
 
     bool is_touched_field_within_move(cMatch *match, int piece, cMove *move, int touched_field){
-        cPiece *cpiece = obj_for_piece(&(match->board), move->src);
-        int mvdir1 = cpiece->dir_for_move(move->src, move->dst);
-        int mvdir2 = cpiece->dir_for_move(move->dst, touched_field);
+        cPiece cpiece(&(match->board), move->src);
+        int mvdir1 = cpiece.dir_for_move(move->src, move->dst);
+        int mvdir2 = cpiece.dir_for_move(move->dst, touched_field);
         return (mvdir1 != DIRS["undef"] && (mvdir1 == mvdir2 || REVERSE_DIRS[mvdir1] == mvdir2));
     }
 

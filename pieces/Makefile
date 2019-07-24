@@ -31,10 +31,10 @@ touch.o: touch.cpp touch.hpp ../helper.hpp ../values.hpp
 	$(CC) -Wall --std=c++17 -c touch.cpp -o touch.o
 
 searchforpiece.o: searchforpiece.cpp searchforpiece.hpp ../helper.hpp ../values.hpp
-	$(CC) -Wall --std=c++17 -c pieceshelper.cpp -o pieceshelper.o
+	$(CC) -Wall --std=c++17 -c searchforpiece.cpp -o searchforpiece.o
 
 pieceshelper.o: pieceshelper.cpp pieceshelper.hpp ../helper.hpp ../values.hpp
-	$(CC) -Wall --std=c++17 -c searchforpiece.cpp -o searchforpiece.o
+	$(CC) -Wall --std=c++17 -c pieceshelper.cpp -o pieceshelper.o
 
 clean:
 	rm -f *.o

@@ -156,15 +156,10 @@
     }
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
-        cPiece *cpiece = obj_for_piece(&board, src);
-        if(cpiece != NULL){
-            cMove *move = cpiece->do_move(dst, prompiece, movecnt() + 1, &score);
-            minutes.push_back(*move);
-            return move;
-        }
-        else{
-            return NULL;
-        }
+        cPiece cpiece(&board, src);
+        cMove *move = cpiece.do_move(dst, prompiece, movecnt() + 1, &score);
+        minutes.push_back(*move);
+        return move;
     }
 
     bool cMatch::undo_move(){
@@ -179,27 +174,21 @@
         if(move.prompiece != mBLK){
             bool flag;
             if(PIECES_COLORS[piece] == COLORS["white"]){
-                cWhitePawn *cpawn = new cWhitePawn(&board, move.dst);
-                flag = cpawn->undo_move(&move, movecnt(), &score);
+                cPiece piece(&board, move.dst);
+                flag = piece.undo_move(&move, movecnt(), &score);
             }
             else{
-                cBlackPawn *cpawn = new cBlackPawn(&board, move.dst);
-                flag = cpawn->undo_move(&move, movecnt(), &score);
+                cPiece piece(&board, move.dst);
+                flag = piece.undo_move(&move, movecnt(), &score);
             }
             minutes.pop_back();
             return flag;
         }
         else{
-            cPiece *cpiece = obj_for_piece(&board, move.dst);
-            if(cpiece != NULL){
-                bool flag = cpiece->undo_move(&move, movecnt(), &score);
-                minutes.pop_back();
-                return flag;
-            }
-            else{
-                minutes.pop_back();
-                return false;
-            }
+            cPiece cpiece(&board, move.dst);
+            bool flag = cpiece.undo_move(&move, movecnt(), &score);
+            minutes.pop_back();
+            return flag;
         }
     }
 

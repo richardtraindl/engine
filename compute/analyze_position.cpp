@@ -13,7 +13,7 @@
             if(piece == mBLK){
                 continue;
             }
-            cPiece cpiece = match->obj_for_piece(piece, idx);
+            cPiece cpiece(&(match->board), idx);
             score += cpiece.score_touches();
             if(cpiece.is_trapped()){
                 score += SCORES[cpiece.piece] / 3;

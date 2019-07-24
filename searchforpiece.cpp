@@ -1,6 +1,7 @@
 
     #include "./searchforpiece.hpp"
-    #include "./pieceshelper.hpp"
+    #include "./piece.hpp"
+    #include "./values.hpp"
 
     int cSearchforRook::STEPS[4] = {8, -8, 1, -1};
     int cSearchforRook::MAXCNT = 7;

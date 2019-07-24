@@ -1,8 +1,7 @@
 
     #include <iostream>    
     #include "./calc.hpp"
-    #include "../pieces/piece.hpp"
-    #include "../pieces/pieceshelper.hpp"
+    #include "../piece.hpp"
     #include "../values.hpp"
 
     cSearchLimits::cSearchLimits(int level){
@@ -76,8 +75,8 @@
                 continue;
             }
             else{
-                cPiece *cpiece = obj_for_piece(&(match->board), idx);
-                cpiece->generate_moves(&(match->minutes), moves);
+                cPiece cpiece(&(match->board), idx);
+                cpiece.generate_moves(&(match->minutes), moves);
             }
         }
     }
@@ -90,8 +89,8 @@
                 continue;
             }
             else{
-                cPiece *cpiece = obj_for_piece(&(match->board), idx);
-                cpiece->generate_priomoves(&(match->minutes), candidate, dbggmove, search_for_mate, priomoves);
+                cPiece cpiece(&(match->board), idx);
+                cpiece.generate_priomoves(&(match->minutes), candidate, dbggmove, search_for_mate, priomoves);
             }
         }
     }

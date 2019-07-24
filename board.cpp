@@ -1,11 +1,8 @@
 
     #include "./board.hpp"
-    #include "./pieces/searchforpiece.hpp"
-    #include "./pieces/pieceshelper.hpp"
-    #include "./pieces/rook.hpp"
-    #include "./pieces/bishop.hpp"
-    #include "./pieces/whitepawn.hpp"
-    #include "./pieces/blackpawn.hpp"
+    #include "./searchforpiece.hpp"
+    #include "./piece.hpp"
+    #include "./piece_ext.hpp"
     #include "./values.hpp"
     #include "./helper.hpp"
 
@@ -316,12 +313,10 @@
             }
             for(int i = 0; i < 2; ++i){
                 if(j == 0){
-                    cRook crook = cRook(this, src);
-                    step = crook.step_for_dir(dir_ary[i]);
+                    step = cPiece::step_for_dir(mWRK, dir_ary[i]);
                 }
                 else{
-                    cBishop cpishop = cBishop(this, src);
-                    step = cpishop.step_for_dir(dir_ary[i]);
+                    step = cPiece::step_for_dir(mWBP, dir_ary[i]);
                 }
                 if(search_bi_dirs(&first, &second, src, step, 6)){
                     fstpiece = getfield(first);
@@ -376,12 +371,10 @@
             }
             for(int i = 0; i < 2; ++i){
                 if(j == 0){
-                    cRook crook = cRook(this, src);
-                    step = crook.step_for_dir(dir_ary[i]);
+                    step = cPiece::step_for_dir(mWRK, dir_ary[i]);
                 }
                 else{
-                    cBishop cbishop = cBishop(this, src);
-                    step = cbishop.step_for_dir(dir_ary[i]);
+                    step = cPiece::step_for_dir(mWBP, dir_ary[i]);
                 }
                 if(search_bi_dirs(&first, &second, src, step, 6)){
                     fstpiece = getfield(first);
@@ -412,19 +405,20 @@
         int pawnenmy = mBLK;
         bool flag;
         if(srcpiece == mWPW){
-            cWhitePawn *cpawn = new cWhitePawn(this, src);
-            if(cpawn->is_ep_move_ok(dst, minutes)){
+            cPiece cpiece(this, src);
+            if(is_ep_move_ok_for_whitepawn(&cpiece, dst, minutes)){
                 pawnenmy = getfield(dst);
                 setfield(dst, mBLK);
             }
         }
         if(srcpiece == mBPW){
-            cBlackPawn *cpawn = new cBlackPawn(this, src);
-            if(cpawn->is_ep_move_ok(dst, minutes)){
+        cPiece cpiece(this, src);
+            if(is_ep_move_ok_for_blackpawn(&cpiece, dst, minutes)){
                 pawnenmy = getfield(dst);
                 setfield(dst, mBLK);
             }
         }
+
         setfield(src, mBLK);
         dstpiece = getfield(dst);
         setfield(dst, srcpiece);
@@ -444,12 +438,8 @@
 
     bool cBoard::is_move_valid(int src, int dst, int prompiece, list<cMove> *minutes){
         int piece = getfield(src);
-        cPiece *cpiece = obj_for_piece(this, src);
-        if(cpiece == NULL){
-            return false; // RETURN_CODES["general-error"]
-        }
-        int direction = cpiece->dir_for_move(src, dst);
-        int step = cpiece->step_for_dir(direction);
+        int direction = cPiece::dir_for_move(piece, src, dst);
+        int step = cPiece::step_for_dir(piece, direction);
         if(is_inbounds(src, dst, step) == false){
             return false; // RETURN_CODES["out-of-bounds"]
         }
@@ -464,7 +454,8 @@
         //        return false; // RETURN_CODES["king-attacked-error"]
         //    }
         //}
-        if(cpiece->is_move_valid(dst, prompiece, minutes)){
+        cPiece cpiece(this, src);
+        if(cpiece.is_move_valid(dst, prompiece, minutes)){
             return true; // RETURN_CODES["ok"]
         }
         else{
@@ -483,14 +474,14 @@
         for(int idx = 0; idx < 64; ++idx){
             int piece = getfield(idx);
             if(piece != mBLK && color == PIECES_COLORS[piece]){
-                cPiece *cpiece = obj_for_piece(this, idx);
-                for(auto &step : cpiece->get_mv_steps()){
+                cPiece cpiece(this, idx);
+                for(auto &step : cpiece.get_mv_steps()){
                     if(step == 0){
                         break;
                     }
                     int count = 0;
-                    int dst = cpiece->pos + step;
-                    while(is_inbounds(cpiece->pos, dst, step) && count < cpiece->MAXCNT){
+                    int dst = cpiece.pos + step;
+                    while(is_inbounds(cpiece.pos, dst, step) && count < cpiece.get_maxcnt()){
                         count += 1;
                         int prompiece;
                         switch(piece){
@@ -498,7 +489,7 @@
                             case mBPW: prompiece = mBQU; break;
                             default: prompiece = mBLK;
                         }
-                        if(is_move_valid(cpiece->pos, dst, prompiece, minutes)){
+                        if(is_move_valid(cpiece.pos, dst, prompiece, minutes)){
                             return true;
                         }
                         dst += step;

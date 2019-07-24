@@ -1,14 +1,10 @@
 CC = g++
 
 all: values.o helper.o move.o board.o match.o \
-	 ./pieces/pieceshelper.o ./pieces/searchforpiece.o ./pieces/touch.o \
-	 ./pieces/piece.o ./pieces/rook.o ./pieces/bishop.o ./pieces/knight.o \
-	 ./pieces/queen.o ./pieces/king.o ./pieces/whitepawn.o ./pieces/blackpawn.o \
+	 ./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o \
 	 ./compute/calc.o engine.o 
 	$(CC) -Wall --std=c++17 values.o helper.o move.o board.o match.o \
-		./pieces/pieceshelper.o ./pieces/searchforpiece.o ./pieces/touch.o \
-		./pieces/piece.o ./pieces/rook.o ./pieces/bishop.o ./pieces/knight.o \
-		./pieces/queen.o ./pieces/king.o ./pieces/whitepawn.o ./pieces/blackpawn.o \
+		./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o \
 		./compute/calc.o engine.o -o engine
 
 engine.o: engine.cpp
@@ -29,8 +25,19 @@ board.o: board.cpp board.hpp helper.hpp values.hpp
 match.o: match.cpp match.hpp board.hpp helper.hpp values.hpp
 	$(CC) -Wall --std=c++17 --std=c++17  -c match.cpp
 
+searchforpiece.o: searchforpiece.cpp searchforpiece.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c searchforpiece.cpp -o searchforpiece.o
+
+touch.o: touch.cpp touch.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c touch.cpp -o touch.o
+
+piece.o: piece.cpp piece.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c piece.cpp -o piece.o
+
+piece_ext.o: piece_ext.cpp piece_ext.hpp helper.hpp values.hpp
+	$(CC) -Wall --std=c++17 -c piece_ext.cpp -o piece_ext.o
+
 make: 
-	make ./pieces/Makefile
 	make ./compute/Makefile
 
 clean:

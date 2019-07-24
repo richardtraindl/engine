@@ -62,13 +62,13 @@
             cout << it->format() << endl; // << " prio: " << it->prio 
         }
 
-        list<cPrioMove> priomoves;
+        /*list<cPrioMove> priomoves;
         generate_priomoves(&match, NULL, NULL, true, &priomoves);
         
         cout << "size " << priomoves.size() << endl;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             cout << it->format() << " prio: " << it->prio << endl;;
-        }
+        }*/
 
         return 0;
     }
