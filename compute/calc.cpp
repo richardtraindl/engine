@@ -120,11 +120,9 @@
     }
 
     bool resort_exchange_or_stormy_moves(list<cPrioMove> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange){
-        cout << "RR1" << endl;
         if(only_exchange && last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["captures"]) == false){
             return false;
         }
-        cout << "RR2" << endl;
         bool last_pmove_capture_bad_deal;
         if(last_pmove != NULL && last_pmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["bad-deal"])){
             last_pmove_capture_bad_deal = true;
@@ -136,25 +134,19 @@
         int count_of_good_captures = 0;
         cPrioMove *first_silent = NULL;
         list<cPrioMove> bad_captures;
-        cout << "RR4" << priomoves.size() << endl;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
-            cout << "RR4444" << priomoves.size() << endl;
             if(only_exchange == false && it->is_tactic_stormy()){
                 count_of_stormy += 1;
-                cout << "RR41" << endl;
                 it->prio = min(it->prio, (new_prio + it->prio % 10) - 13);
-                cout << "RR42" << endl;
                 continue;
             }
             cout << "after" << endl;
             if(it->has_domain(cTactic::DOMAINS["captures"])){
-                cout << "RR8" << endl;
                 int weight = it->fetch_weight(cTactic::DOMAINS["captures"]);
                 if(weight > cTactic::WEIGHTS["bad-deal"]){
                     count_of_good_captures += 1;
                     it->prio = min(it->prio, (new_prio + it->prio % 10) - 12);
                 }
-                cout << "RR9" << endl;
                 if(last_pmove_capture_bad_deal){
                     bad_captures.push_back(*it);
                     // count_of_bad_captures += 1
@@ -162,23 +154,18 @@
                 }
                 cout << "RR10" << endl;
             }
-            cout << "after 2" << endl;
             if(first_silent == NULL){
                 first_silent = &(*it);
             }
         }
-        cout << "after 3" << endl;
         if(bad_captures.size() > 0 && count_of_good_captures == 0 && count_of_stormy == 0){
             if(first_silent != NULL){
                 first_silent->prio = min(first_silent->prio, (new_prio + first_silent->prio % 10) - 10);
             }
-            cout << "after 4" << endl;
             for(list<cPrioMove>::iterator it = bad_captures.begin(); it != bad_captures.end(); ++it){
                 it->prio = min(it->prio, new_prio + it->prio % 10);
             }
         }
-        cout << "after 5" << endl;
-        cout << "sort" << endl;
         priomoves.sort(sortByPrio);
         return true;
     }
@@ -187,19 +174,14 @@
         if(priomoves.size() == 0 || depth > slimits.dpth_max){
             return 0;
         }
-        cout << "DD" << endl;
         int count;
         if(depth <= slimits.dpth_stage1 && priomoves.front().has_domain(cTactic::DOMAINS["defends-check"])){
             return priomoves.size();
         }
         int stormycnt = count_up_within_stormy(priomoves);
-        cout << "HH" << endl;
         if(depth <= slimits.dpth_stage1){
-            cout << "HH1" << endl;
             resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false);
-            cout << "HH2" << endl;
             count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
-            cout << "HH3" << endl;
             if(count == 0){
                 count = slimits.mvcnt_stage1;
             }
@@ -208,10 +190,8 @@
             }
             return max(stormycnt, count);
         }
-        cout << "KK" << endl;
         if(depth <= slimits.dpth_stage2){
             resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false);
-            cout << "DD4" << endl;
             count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
             if(count == 0){
                 count = slimits.mvcnt_stage2;
@@ -264,16 +244,12 @@
         bool search_for_mate = match.is_endgame();
         list<cPrioMove> priomoves;
         generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);
-        cout << "1" << endl;
         priomoves.sort(sortByPrio);
-        cout << "2" << endl;
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
-        cout << "3" << endl;
         
         prnt_priomoves(priomoves);
         cout << priomoves.size();
 
-        cout << "4" << endl;
         if(priomoves.size() == 0 || maxcnt == 0){
             result_score = 0; // score_position(match, priomoves.size());
             // result_candidates->clear();
@@ -284,16 +260,13 @@
             count += 1;
             // cMove *move = dynamic_case<cMove*>(&(*it));
 
-            cout << "A" << endl;
             match.do_move(it->src, it->dst, it->prompiece);
-            cout << "B" << endl;
             if(maximizing){
                 alphabeta(match, depth + 1, slimits, newscore, beta, false, &(*it), NULL, newscore, newcandidates);
             }
             else{
                 alphabeta(match, depth + 1, slimits, alpha, newscore, true, &(*it), NULL, newscore, newcandidates);
             }
-            cout << "C" << endl;
             match.undo_move();
 
             if(depth == 1){
@@ -309,7 +282,6 @@
                        break; // beta cut-off
                    }
                    else{
-                       cout << "X1" << endl;
                        append_newmove((*it), candidates, newcandidates);
                    }
                 }
@@ -321,7 +293,6 @@
                         break; // alpha cut-off
                     }
                     else{
-                        cout << "X2" << endl;
                         append_newmove((*it), candidates, newcandidates);
                     }
                 }
@@ -331,7 +302,6 @@
             }
         }
         result_score = score;
-        cout << "WW" << endl;
         for(list<cPrioMove>::iterator it = candidates.begin(); it != candidates.end(); ++it){
             cPrioMove *pmv = new cPrioMove(it->prevfields, it->src, it->dst, it->prompiece, it->prio);
             result_candidates.push_back(*pmv);
