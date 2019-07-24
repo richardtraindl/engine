@@ -181,10 +181,10 @@
     void cPrioMove::upgrade(int domain){
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
             if(it->domain == domain){
-                if(it->weight != it->WEIGHTS["stormy"] && 
-                   it->weight != it->WEIGHTS["better-deal"] && 
-                   it->weight != it->WEIGHTS["good-deal"]){
-                    it->weight = it->WEIGHTS["upgraded"];
+                if(it->weight != cTactic::WEIGHTS["stormy"] && 
+                   it->weight != cTactic::WEIGHTS["better-deal"] && 
+                   it->weight != cTactic::WEIGHTS["good-deal"]){
+                    it->weight = cTactic::WEIGHTS["upgraded"];
                     return;
                 }
             }
@@ -201,6 +201,9 @@
     }
 
     bool cPrioMove::has_domain(int domain){
+        if(tactics.size() == 0){
+            return false;
+        }
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
             if(it->domain == domain){
                 return true;
@@ -228,12 +231,16 @@
     }
 
     bool cPrioMove::is_tactic_stormy(){
+        cout << "stormy" <<  tactics.size() << endl;
+        if(tactics.size() == 0){
+            return false;
+        }
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->weight == it->WEIGHTS["stormy"] || 
-               ((it->domain == it->DOMAINS["promotes"] || 
-                 it->domain == it->DOMAINS["captures"]) &&  
-                (it->weight == it->WEIGHTS["better-deal"] || 
-                 it->weight == it->WEIGHTS["good-deal"]))){
+            if(it->weight == cTactic::WEIGHTS["stormy"] || 
+               ((it->domain == cTactic::DOMAINS["promotes"] || 
+                 it->domain == cTactic::DOMAINS["captures"]) &&  
+                (it->weight == cTactic::WEIGHTS["better-deal"] || 
+                 it->weight == cTactic::WEIGHTS["good-deal"]))){
                 return true;
             }
         }

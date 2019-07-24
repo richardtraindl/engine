@@ -323,84 +323,87 @@
     }
 
     bool cPiece::is_running_pawn(){
+        if(piece == mWPW){
+            int step = 8;
+            int opp_pawn = mBPW;
+            for(int idx = -1; idx < 2; ++idx){
+                int src = pos + idx;
+                int dst = board->search(src, step, 5);
+                while(dst != mBLK){
+                    int newpiece = board->getfield(dst);
+                    if(newpiece == opp_pawn){
+                        return false;
+                    }
+                    dst = board->search(dst, step, 5);
+                }
+            }
+            return true;
+        }
+        if(piece == mBPW){
+            int step = -8;
+            int opp_pawn = mWPW;
+            for(int idx = -1; idx < 2; ++idx){
+                int src = pos + idx;
+                int dst = board->search(src, step, 5);
+                while(dst != mBLK){
+                    int newpiece = board->getfield(dst);
+                    if(newpiece == opp_pawn){
+                        return false;
+                    }
+                    dst = board->search(dst, step, 5);
+                }
+            }
+            return true;
+        }
         return false;
-        /*
-            bool cWhitePawn::is_running(){
-        int step = 8;
-        int opp_pawn = mBPW;
-        for(int idx = -1; idx < 2; ++idx){
-            int src = pos + idx;
-            int dst = board->search(src, step, 5);
-            while(dst != mBLK){
-                int piece = board->getfield(dst);
-                if(piece == opp_pawn){
-                    return false;
-                }
-                dst = board->search(dst, step, 5);
-            }
-        }
-        return true;
     }
-    bool cBlackPawn::is_running(){
-        int step = -8;
-        int opp_pawn = mWPW;
-        for(int idx = -1; idx < 2; ++idx){
-            int src = pos + idx;
-            int dst = board->search(src, step, 5);
-            while(dst != mBLK){
-                int piece = board->getfield(dst);
-                if(piece == opp_pawn){
-                    return false;
-                }
-                dst = board->search(dst, step, 5);
-            }
-        }
-        return true;
-    }
-    */
-    }
+
             
     bool cPiece::is_safe_king(){
-        return true;
-        
-        /* 
-    def is_safe(self){
-        count = 0
-        for step in self.STEPS:
-            dst = self.pos + step
-            if(board->is_inbounds(self.pos, dst, step)){
-                friends, enemies = list_all_field_touches(self.match, dst, self.color)
-                if(len(friends) < len(enemies)){
-                    return false;
-                if(len(enemies) > 0){
-                    count += 1
-        if(count > 2){
+        if(piece != mWKG && piece != mBKG){
             return false;
-        friends.clear()
-        enemies.clear()
-        friends, enemies = list_all_field_touches(self.match, self.pos, self.color)
-        if(len(enemies) == 0){
-            return True
-        if(len(enemies) >= 2){
-            return false;
+        }
         else{
-            enemy = enemies[0]
-            friends_beyond, enemies_beyond = list_all_field_touches(self.match, enemy.field, self.color)
-            if(len(friends_beyond) >= len(enemies_beyond)){
-                return True
-            cenemy = self.match.obj_for_piece(enemy.piece, enemy.field)
-            direction = cenemy.dir_for_move(self.pos, enemy.field)
-            if(direction == DIRS["undef"]){
-                return True
-            else{
-                step = cenemy.step_for_dir(direction)
-            dst = self.pos + step
-            while(board->is_inbounds(self.pos, dst, step)){
-                blocking_friends, blocking_enemies = list_all_field_touches(self.match, dst, self.color)
-                if(len(blocking_friends) > 0){
-                    return True
-                dst += step
-        return false;
-*/
-
+            return true;
+                    /* 
+                def is_safe(self){
+                    count = 0
+                    for step in self.STEPS:
+                        dst = self.pos + step
+                        if(board->is_inbounds(self.pos, dst, step)){
+                            friends, enemies = list_all_field_touches(self.match, dst, self.color)
+                            if(len(friends) < len(enemies)){
+                                return false;
+                            if(len(enemies) > 0){
+                                count += 1
+                    if(count > 2){
+                        return false;
+                    friends.clear()
+                    enemies.clear()
+                    friends, enemies = list_all_field_touches(self.match, self.pos, self.color)
+                    if(len(enemies) == 0){
+                        return True
+                    if(len(enemies) >= 2){
+                        return false;
+                    else{
+                        enemy = enemies[0]
+                        friends_beyond, enemies_beyond = list_all_field_touches(self.match, enemy.field, self.color)
+                        if(len(friends_beyond) >= len(enemies_beyond)){
+                            return True
+                        cenemy = self.match.obj_for_piece(enemy.piece, enemy.field)
+                        direction = cenemy.dir_for_move(self.pos, enemy.field)
+                        if(direction == DIRS["undef"]){
+                            return True
+                        else{
+                            step = cenemy.step_for_dir(direction)
+                        dst = self.pos + step
+                        while(board->is_inbounds(self.pos, dst, step)){
+                            blocking_friends, blocking_enemies = list_all_field_touches(self.match, dst, self.color)
+                            if(len(blocking_friends) > 0){
+                                return True
+                            dst += step
+                    return false;
+            */
+        }
     }
+

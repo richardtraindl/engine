@@ -21,32 +21,30 @@
             cSearchLimits(int level);
     };
 
-    void prnt_priomoves(cMatch *match, list<cPrioMove> *priomoves);
+    void prnt_priomoves(list<cPrioMove> &priomoves);
 
-    void prnt_search(cMatch *match, string label, int score, cPrioMove *move, list<cPrioMove> *candidates);
-    
-    string concat_fmtmoves(cMatch *match, list<cPrioMove> *priomoves);
+    string concat_fmtmoves(list<cPrioMove> &priomoves);
 
     void prnt_fmttime(string msg, int seconds);
 
     bool sortByPrio(cPrioMove &A, cPrioMove &B);
 
-    void generate_moves(cMatch *match, list<cMove> *moves);
+    void generate_moves(cMatch &match, list<cMove> &moves);
     
-    void generate_priomoves(cMatch *match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> *priomoves);
+    void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves);
 
-    void append_newmove(cPrioMove *move, list<cPrioMove> *candidates, list<cPrioMove> *newcandidates);
+    void append_newmove(cPrioMove &move, list<cPrioMove> &candidates, list<cPrioMove> &newcandidates);
 
-    int count_up_to_prio(list<cPrioMove> *priomoves, int priolimit);
+    int count_up_to_prio(list<cPrioMove> &priomoves, int priolimit);
 
-    int count_up_within_stormy(list<cPrioMove> *priomoves);
+    int count_up_within_stormy(list<cPrioMove> &priomoves);
 
-    bool resort_exchange_or_stormy_moves(list<cPrioMove> *priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange);
+    bool resort_exchange_or_stormy_moves(list<cPrioMove> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange);
 
-    int select_movecnt(cMatch *match, list<cPrioMove> *priomoves, int depth, cSearchLimits *slimits, cPrioMove *last_pmove);
+    int select_movecnt(cMatch &match, list<cPrioMove> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove);
 
-    void alphabeta(cMatch *match, int depth, cSearchLimits *slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, int *score, list<cPrioMove> *candidates);
+    void alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, int &score, list<cPrioMove> &candidates);
 
-    list<cPrioMove> *calc_move(cMatch *match, cPrioMove *candidate);
+    list<cPrioMove> *calc_move(cMatch &match, cPrioMove *candidate);
 
 #endif

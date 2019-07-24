@@ -36,8 +36,8 @@
         cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        match.undo_move();
-        cout << "undo_move " << hex << match.board.fields << "\n";
+        //match.undo_move();
+        //cout << "undo_move " << hex << match.board.fields << "\n";
 
         cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, &match.minutes) << "\n";
 
@@ -55,20 +55,22 @@
         cout << "minutes size " << match.minutes.size() << endl;
 
         list<cMove> moves;        
-        generate_moves(&match, &moves);
+        generate_moves(match, moves);
 
         cout << "size " << moves.size() << endl;
         for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
             cout << it->format() << endl; // << " prio: " << it->prio 
         }
 
-        /*list<cPrioMove> priomoves;
-        generate_priomoves(&match, NULL, NULL, true, &priomoves);
-        
+        list<cPrioMove> priomoves;
+        generate_priomoves(match, NULL, NULL, true, priomoves);
+
         cout << "size " << priomoves.size() << endl;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
-            cout << it->format() << " prio: " << it->prio << endl;;
-        }*/
+            cout << it->format() << " prio: " << dec << it->prio << endl;;
+        }
+
+        list<cPrioMove> *result_candidates = calc_move(match, NULL);
 
         return 0;
     }
