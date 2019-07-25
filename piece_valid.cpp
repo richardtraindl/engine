@@ -135,12 +135,12 @@
         }
         // check fields
         if(move_dir == DIRS["sth"]){
-            if(dstpiece != PIECES["blk"]){
+            if(dstpiece != mBLK){
                 return false;
             }
             if(cpiece->pos - dst == 16){
                 int midpiece = cpiece->board->getfield(cpiece->pos - 8);
-                if(midpiece != PIECES["blk"]){
+                if(midpiece != mBLK){
                     return false;
                 }
             }
@@ -238,7 +238,7 @@
             if(fields != shorttest){ return false; }
         }            
 
-        cpiece->board->setfield(cpiece->pos, PIECES["blk"]);
+        cpiece->board->setfield(cpiece->pos, mBLK);
         for(int i = 0; i < 3; ++i){
             int dst2 = cpiece->pos + i;
             bool isattacked = is_field_touched(cpiece->board, dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
