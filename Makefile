@@ -23,7 +23,7 @@ board.o: board.cpp board.hpp helper.hpp values.hpp
 	$(CC) -Wall --std=c++17 -c board.cpp
 
 match.o: match.cpp match.hpp board.hpp helper.hpp values.hpp
-	$(CC) -Wall --std=c++17 --std=c++17  -c match.cpp
+	$(CC) -Wall --std=c++17 -c match.cpp
 
 searchforpiece.o: searchforpiece.cpp searchforpiece.hpp helper.hpp values.hpp
 	$(CC) -Wall --std=c++17 -c searchforpiece.cpp -o searchforpiece.o

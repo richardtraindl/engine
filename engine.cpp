@@ -24,20 +24,20 @@
         cout << "is_fifty_moves_rule() " << match.is_fifty_moves_rule() << "\n";
         
         cMove *move;
-        move = match.do_move(8, 16, mBLK);
+        move = match.do_move(8, 24, mBLK);
         cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        /*move = match.do_move(52, 44, mBLK);
+        move = match.do_move(49, 33, mBLK);
         cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        move = match.do_move(16, 24, mBLK);
-        cout << "do_move " << hex << match.board.fields << "\n";
-        cout << "move " << hex << move->format() << "\n";*/
+        //move = match.do_move(24, 33, mBLK);
+        //cout << "do_move " << hex << match.board.fields << "\n";
+        //cout << "move " << hex << move->format() << "\n";
 
-        match.undo_move();
-        cout << "undo_move " << hex << match.board.fields << "\n";
+        //match.undo_move();
+        //cout << "undo_move " << hex << match.board.fields << "\n";
 
         cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, &match.minutes) << "\n";
 
@@ -70,7 +70,9 @@
             cout << it->format() << " prio: " << dec << it->prio << endl;;
         }
 
-        list<cPrioMove> *result_candidates = calc_move(match, NULL);
+        list<cPrioMove> candidates;
+        int score = calc_move(match, NULL, candidates);
+        cout << dec << score << endl;
 
         return 0;
     }

@@ -11,7 +11,7 @@
             dpth_max = 8;
             dpth_stage1 = 2;
             dpth_stage2 = 4;
-            mvcnt_stage1 = 6;
+            mvcnt_stage1 = 30; // 6;
             mvcnt_stage2 = 6;
         }
         else{
@@ -26,15 +26,15 @@
 
 
     void prnt_priomoves(list<cPrioMove> &priomoves){
-        cout << "------------------------------------------------\n ";
+        cout << "-------------------------------------------" << endl;
         int idx = 1;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             cout << idx << ". ";
-            cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << "\n";
-            cout << it->concat_fmttactics() << "\n";
+            cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << endl;
+            cout << it->concat_fmttactics() << endl;
             idx += 1;
         }
-        cout << "------------------------------------------------\n ";
+        cout << "-------------------------------------------" << endl;
     }
 
 
@@ -88,6 +88,7 @@
 
 
     void append_newmove(cPrioMove &move, list<cPrioMove> &candidates, list<cPrioMove> &newcandidates){
+        candidates.clear();
         candidates.push_back(move);
         for(list<cPrioMove>::iterator it = newcandidates.begin(); it != newcandidates.end(); ++it){
             candidates.push_back((*it));
@@ -230,7 +231,7 @@
     }
 
 
-    void alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, int &result_score, list<cPrioMove> &result_candidates){
+    int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &result_candidates){
         list<cPrioMove> newcandidates;
         list<cPrioMove> candidates;
         int newscore;
@@ -251,32 +252,33 @@
         generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);
         priomoves.sort(sortByPrio);
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
-        
-        prnt_priomoves(priomoves);
-        cout << priomoves.size();
+        if(depth == 1){
+            cout << priomoves.size();
+            prnt_priomoves(priomoves);
+        }
 
         if(priomoves.size() == 0 || maxcnt == 0){
-            result_score = 0; // score_position(match, priomoves.size());
+            return 0; // score_position(match, priomoves.size());
             // result_candidates->clear();
-            return;
         }
 
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             count += 1;
+            newcandidates.clear();
 
             match.do_move(it->src, it->dst, it->prompiece);
             if(maximizing){
-                alphabeta(match, depth + 1, slimits, newscore, beta, false, &(*it), NULL, newscore, newcandidates);
+                newscore = alphabeta(match, depth + 1, slimits, score, beta, false, &(*it), NULL, newcandidates);
             }
             else{
-                alphabeta(match, depth + 1, slimits, alpha, newscore, true, &(*it), NULL, newscore, newcandidates);
+                newscore = alphabeta(match, depth + 1, slimits, alpha, score, true, &(*it), NULL, newcandidates);
             }
             match.undo_move();
 
             if(depth == 1){
-                cout << "CURRENT SEARCH: " << dec << newscore << " [" + it->format() + "] " << concat_fmtmoves(newcandidates);
+                cout << "CURRENT SEARCH: " << dec << newscore << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;;
                 if(candidates.size() > 0){
-                    cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(newcandidates);
+                    cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(candidates) << endl;
                 }
             }
             if(maximizing){
@@ -305,19 +307,18 @@
                 break;
             }
         }
-        result_score = score;
         for(list<cPrioMove>::iterator it = candidates.begin(); it != candidates.end(); ++it){
             cPrioMove *pmv = new cPrioMove(it->prevfields, it->src, it->dst, it->prompiece, it->prio);
             result_candidates.push_back(*pmv);
         }
+        return score;
     }
 
 
-    list<cPrioMove> *calc_move(cMatch &match, cPrioMove *candidate){
+    int calc_move(cMatch &match, cPrioMove *candidate, list<cPrioMove> &candidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
-        int result_score;
-        list<cPrioMove> result_candidates;
+        int score;
 
         //if(move):
         //    candidates.append(move)
@@ -328,10 +329,10 @@
         int alpha = SCORES[PIECES["wKg"]] * 10;
         int beta = SCORES[PIECES["bKg"]] * 10;
 
-        alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, candidate, result_score, result_candidates);
+        score = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, candidate, candidates);
 
-        cout << "result: " << result_score << " match: " << match.created_at << " ";
-        // cout << concat_fmtmoves(match, result_candidates);
+        cout << "result: " << score << " match: " << match.created_at << " ";
+        cout << concat_fmtmoves(candidates) << endl;
         prnt_fmttime("\ncalc-time: ", time(0) - time_start);
-        return &result_candidates;
+        return score;
     }

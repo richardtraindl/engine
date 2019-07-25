@@ -158,7 +158,7 @@
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
             int newprio = it->DOMAINS_TO_PRIOS[it->domain] + it->WEIGHTS_TO_ADJUST[it->weight];
             prio = min(prio, newprio);
-            if(it->weight <= it->WEIGHTS["downgraded"]){
+            if(it->weight <= cTactic::WEIGHTS["downgraded"]){
                 count += 2;
             }
         }
@@ -168,10 +168,10 @@
     void cPrioMove::downgrade(int domain){
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
             if(it->domain == domain){
-                if(it->weight == it->WEIGHTS["stormy"] ||
-                   it->weight == it->WEIGHTS["better-deal"] ||
-                   it->weight == it->WEIGHTS["good-deal"]){
-                    it->weight = it->WEIGHTS["downgraded"];
+                if(it->weight == cTactic::WEIGHTS["stormy"] ||
+                   it->weight == cTactic::WEIGHTS["better-deal"] ||
+                   it->weight == cTactic::WEIGHTS["good-deal"]){
+                    it->weight = cTactic::WEIGHTS["downgraded"];
                     return;
                 }
             }
@@ -201,9 +201,6 @@
     }
 
     bool cPrioMove::has_domain(int domain){
-        if(tactics.size() == 0){
-            return false;
-        }
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
             if(it->domain == domain){
                 return true;
@@ -231,10 +228,6 @@
     }
 
     bool cPrioMove::is_tactic_stormy(){
-        cout << "stormy" <<  tactics.size() << endl;
-        if(tactics.size() == 0){
-            return false;
-        }
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
             if(it->weight == cTactic::WEIGHTS["stormy"] || 
                ((it->domain == cTactic::DOMAINS["promotes"] || 
