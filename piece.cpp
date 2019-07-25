@@ -215,7 +215,7 @@
                     board->setfield(dst2, piece);
                 }
                 if(PIECES_COLORS[piece] == color){
-                    if(piece == PIECES["wKg"] || piece == PIECES["bKg"]){
+                    if(piece == mWKG || piece == mBKG){
                         continue;
                     }
                     cTouch *ctouch = new cTouch(piece, dst2);
