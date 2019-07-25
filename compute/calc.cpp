@@ -1,7 +1,7 @@
 
     #include <iostream>    
     #include "./calc.hpp"
-    #include "../piece.hpp"
+    #include "../pieces/piece.hpp"
     #include "./analyze_position.hpp"
     #include "../values.hpp"
 

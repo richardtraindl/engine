@@ -1,6 +1,6 @@
 
-    #include "./piece_ext.hpp"
-    #include "./values.hpp"
+    #include "./piece_ext1.hpp"
+    #include "../values.hpp"
 
     cMove *do_move_from_ext(cPiece *cpiece, int dst, int prompiece, int movecnt, int *score){
         int dstpiece = cpiece->board->getfield(dst);

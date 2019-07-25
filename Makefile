@@ -1,10 +1,10 @@
 CC = g++
 
 all: values.o helper.o move.o board.o match.o \
-	 ./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o ./piece_valid.o \
+	 ./pieces/searchforpiece.o ./pieces/touch.o ./pieces/piece.o ./pieces/piece_ext1.o ./pieces/piece_ext2.o \
 	 ./compute/analyze_position.o ./compute/calc.o engine.o 
 	$(CC) -Wall --std=c++17 values.o helper.o move.o board.o match.o \
-		./searchforpiece.o ./touch.o ./piece.o ./piece_ext.o ./piece_valid.o \
+		./pieces/searchforpiece.o ./pieces/touch.o ./pieces/piece.o ./pieces/piece_ext1.o ./pieces/piece_ext2.o \
 		./compute/analyze_position.o ./compute/calc.o engine.o -o engine
 
 engine.o: engine.cpp

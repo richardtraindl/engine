@@ -1,8 +1,8 @@
 
     #include <boost/multiprecision/cpp_int.hpp>
     #include "./match.hpp"
-    #include "./piece.hpp"
-    #include "./searchforpiece.hpp"
+    #include "./pieces/piece.hpp"
+    #include "./pieces/searchforpiece.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
 

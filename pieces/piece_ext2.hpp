@@ -1,10 +1,10 @@
 
-#ifndef PIECEVALID_HPP
-    #define PIECEVALID_HPP
+#ifndef PIECE_EXT2_HPP
+    #define PIECE_EXT2_HPP
 
     #include <list> 
     #include "./piece.hpp"
-    #include "./move.hpp"
+    #include "../move.hpp"
      
     bool is_move_valid_from_valid(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes);
 

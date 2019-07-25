@@ -4,7 +4,7 @@
 
     #include <list>
     #include "./touch.hpp"
-    #include "./board.hpp"
+    #include "../board.hpp"
 
     using namespace std;
 

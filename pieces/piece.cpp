@@ -1,10 +1,10 @@
 
     #include "./piece.hpp"
-    #include "./piece_ext.hpp"
-    #include "./piece_valid.hpp"
+    #include "./piece_ext1.hpp"
+    #include "./piece_ext2.hpp"
     #include "./searchforpiece.hpp"
-    #include "./values.hpp"
-    #include "./helper.hpp"
+    #include "../values.hpp"
+    #include "../helper.hpp"
 
     cPiece::cPiece(cBoard *_board, int _pos){
         board = _board;

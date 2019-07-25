@@ -1,7 +1,7 @@
 
-    #include "./piece_valid.hpp"
+    #include "./piece_ext2.hpp"
     #include "./searchforpiece.hpp"
-    #include "./values.hpp"
+    #include "../values.hpp"
 
     bool is_move_valid_from_valid(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes){
         bool flag = false;

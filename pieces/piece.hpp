@@ -4,8 +4,8 @@
 
     #include <list> 
     #include <array> 
-    #include "./board.hpp"
-    #include "./move.hpp"
+    #include "../board.hpp"
+    #include "../move.hpp"
     #include "./touch.hpp"
 
     using namespace std;

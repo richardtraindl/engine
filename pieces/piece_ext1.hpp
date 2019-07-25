@@ -1,9 +1,9 @@
-#ifndef PIECEEXT_HPP
-    #define PIECEEXT_HPP
+#ifndef PIECE_EXT1_HPP
+    #define PIECE_EXT1_HPP
 
     #include <list> 
     #include "./piece.hpp"
-    #include "./move.hpp"
+    #include "../move.hpp"
 
     cMove *do_move_from_ext(cPiece *cpiece, int dst, int prompiece, int movecnt, int *score);
 

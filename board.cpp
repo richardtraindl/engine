@@ -1,8 +1,8 @@
 
     #include "./board.hpp"
-    #include "./searchforpiece.hpp"
-    #include "./piece.hpp"
-    #include "./piece_valid.hpp"
+    #include "./pieces/searchforpiece.hpp"
+    #include "./pieces/piece.hpp"
+    #include "./pieces/piece_ext2.hpp"
     #include "./values.hpp"
     #include "./helper.hpp"
 
