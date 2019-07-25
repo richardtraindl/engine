@@ -4,6 +4,7 @@
     #include "../piece.hpp"
     #include "../values.hpp"
 
+
     cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
             add_mvcnt = 2;
@@ -22,6 +23,7 @@
             mvcnt_stage2 = 8;
         }
     }
+
 
     void prnt_priomoves(list<cPrioMove> &priomoves){
         cout << "------------------------------------------------\n ";
@@ -69,6 +71,7 @@
         }
     }
 
+
     void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves){
         int color = match.next_color();
         for(int idx = 0; idx < 64; ++idx){
@@ -90,6 +93,7 @@
             candidates.push_back((*it));
         }
     }
+
 
     int count_up_to_prio(list<cPrioMove> &priomoves, int priolimit){
         int count = 0;
@@ -115,9 +119,11 @@
         return count;
     }
 
+
     bool sortByPrio(cPrioMove &A, cPrioMove &B){
         return (A.prio < B.prio);
     }
+
 
     bool resort_exchange_or_stormy_moves(list<cPrioMove> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange){
         if(only_exchange && last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["captures"]) == false){
@@ -140,7 +146,6 @@
                 it->prio = min(it->prio, (new_prio + it->prio % 10) - 13);
                 continue;
             }
-            cout << "after" << endl;
             if(it->has_domain(cTactic::DOMAINS["captures"])){
                 int weight = it->fetch_weight(cTactic::DOMAINS["captures"]);
                 if(weight > cTactic::WEIGHTS["bad-deal"]){
@@ -152,7 +157,6 @@
                     // count_of_bad_captures += 1
                     // priomove.prio = min(priomove.prio, new_prio)
                 }
-                cout << "RR10" << endl;
             }
             if(first_silent == NULL){
                 first_silent = &(*it);
@@ -169,6 +173,7 @@
         priomoves.sort(sortByPrio);
         return true;
     }
+
 
     int select_movecnt(cMatch &match, list<cPrioMove> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove){
         if(priomoves.size() == 0 || depth > slimits.dpth_max){
@@ -233,11 +238,11 @@
         int count = 0;
         //time_t starttime = time(0);
 
-        if(maximizing){
-            score = alpha;
+        if(maximizing){ 
+            score = alpha; 
         }
-        else{
-            score = beta;
+        else{ 
+            score = beta; 
         }
 
         cMove *dbggmove = NULL; //new cMove(0x0, 3, 51, PIECES["blk"]);
