@@ -40,10 +40,6 @@
 
             void setfield(int idx, int value);
 
-            void copyfields(uint256_t *fields);
-
-            bool comparefields(uint256_t fields);
-
             bool verify();
 
             static bool is_inbounds_core(int src, int dst);

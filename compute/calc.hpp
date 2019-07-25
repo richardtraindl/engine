@@ -33,7 +33,7 @@
     
     void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves);
 
-    void append_newmove(cPrioMove &move, list<cPrioMove> &candidates, list<cPrioMove> &newcandidates);
+    void append_newmove(cPrioMove &move, list<cPrioMove> &newcandidates, list<cPrioMove> &rcandidates);
 
     int count_up_to_prio(list<cPrioMove> &priomoves, int priolimit);
 

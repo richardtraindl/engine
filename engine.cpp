@@ -23,21 +23,24 @@
 
         cout << "is_fifty_moves_rule() " << match.is_fifty_moves_rule() << "\n";
         
+        
+        cout << "before do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        
         cMove *move;
         move = match.do_move(8, 24, mBLK);
-        cout << "do_move " << hex << match.board.fields << "\n";
+        cout << "1st do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
         move = match.do_move(49, 33, mBLK);
-        cout << "do_move " << hex << match.board.fields << "\n";
+        cout << "2nd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        //move = match.do_move(24, 33, mBLK);
-        //cout << "do_move " << hex << match.board.fields << "\n";
-        //cout << "move " << hex << move->format() << "\n";
+        move = match.do_move(24, 33, mBLK);
+        cout << "3rd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        cout << "move " << hex << move->format() << "\n";
 
         //match.undo_move();
-        //cout << "undo_move " << hex << match.board.fields << "\n";
+        //cout << "undo_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
 
         cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, &match.minutes) << "\n";
 
@@ -54,7 +57,7 @@
         match.board.prnt();
         cout << "minutes size " << match.minutes.size() << endl;
 
-        list<cMove> moves;        
+        /*list<cMove> moves;        
         generate_moves(match, moves);
 
         cout << "size " << moves.size() << endl;
@@ -68,7 +71,7 @@
         cout << "size " << priomoves.size() << endl;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             cout << it->format() << " prio: " << dec << it->prio << endl;;
-        }
+        }*/
 
         list<cPrioMove> candidates;
         int score = calc_move(match, NULL, candidates);

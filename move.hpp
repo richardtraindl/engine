@@ -22,8 +22,6 @@
 
             int getprevfield(int idx);
 
-            void copyprevfields(uint256_t _prevfields);
-
             string format();
     };
 

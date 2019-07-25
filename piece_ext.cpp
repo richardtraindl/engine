@@ -110,9 +110,9 @@
 
 
     bool undo_move_from_ext(cPiece *cpiece, cMove *move, int movecnt, int *score){
-        move->copyprevfields(cpiece->board->fields);
-        int dstpiece_after_undo_mv = cpiece->board->getfield(move->dst);
-        *score -= SCORES[dstpiece_after_undo_mv];
+        cpiece->board->fields = move->prevfields;
+        int dstpiece = cpiece->board->getfield(move->dst);
+        *score -= SCORES[dstpiece];
 
         if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
            cpiece->piece == mWKN || cpiece->piece == mBKN ||
@@ -121,22 +121,20 @@
         }
 
         if(cpiece->piece == mWPW){
-            int dstpiece_after_undo_mv = cpiece->board->getfield(move->dst);
-            if(move->prompiece && move->prompiece != mBLK){
+            if(move->prompiece != mBLK){
                 *score += SCORES[move->prompiece] - SCORES[mWPW];
             }
-            if(dstpiece_after_undo_mv == mBLK && move->src % 8 != move->dst % 8){
+            if(dstpiece == mBLK && move->src % 8 != move->dst % 8){
                 *score -= SCORES[mBPW];
             }
             return true;
         }
 
         if(cpiece->piece == mWPW){
-            int dstpiece_after_undo_mv = cpiece->board->getfield(move->dst);
-            if(move->prompiece && move->prompiece != mBLK){
+            if(move->prompiece != mBLK){
                 *score += SCORES[move->prompiece] - SCORES[mBPW];
             }
-            if(dstpiece_after_undo_mv == mBLK && move->src % 8 != move->dst % 8){
+            if(dstpiece == mBLK && move->src % 8 != move->dst % 8){
                 *score -= SCORES[mWPW];
             }
             return true;

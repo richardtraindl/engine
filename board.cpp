@@ -55,14 +55,6 @@
         fields = tmpfields | _value;
     }
 
-    void cBoard::copyfields(uint256_t *_fields){
-        *_fields = fields;
-    }
-
-    bool cBoard::comparefields(uint256_t _fields){
-        return _fields == fields;
-    }
-
     bool cBoard::verify(){
         int wKg_cnt = 0;
         int bKg_cnt = 0;
@@ -473,24 +465,21 @@
         }
         for(int idx = 0; idx < 64; ++idx){
             int piece = getfield(idx);
-            if(piece != mBLK && color == PIECES_COLORS[piece]){
+            if(color == PIECES_COLORS[piece]){
                 cPiece cpiece(this, idx);
                 for(auto &step : cpiece.get_mv_steps()){
-                    if(step == 0){
-                        break;
-                    }
+                    if(step == 0){ break; }
                     int count = 0;
                     int dst = cpiece.pos + step;
                     while(is_inbounds(cpiece.pos, dst, step) && count < cpiece.get_maxcnt()){
+                        int dstpiece = getfield(dst);
+                        if(PIECES_COLORS[dstpiece] == cpiece.color){ break; }
                         count += 1;
-                        int prompiece;
-                        switch(piece){
-                            case mWPW: prompiece = mWQU; break;
-                            case mBPW: prompiece = mBQU; break;
-                            default: prompiece = mBLK;
-                        }
-                        if(is_move_valid(cpiece.pos, dst, prompiece, minutes)){
-                            return true;
+                        for(auto &prompiece : cpiece.get_prom_pieces()){
+                            if(is_move_valid(cpiece.pos, dst, prompiece, minutes)){
+                                return true;
+                            }
+                            if(prompiece == mBLK){ break; }
                         }
                         dst += step;
                     }
@@ -499,7 +488,7 @@
         }
         return false;
     }
-    
+
     void cBoard::prnt(){
         for(int y = 7; y >=0; --y){
             cout << " | ";

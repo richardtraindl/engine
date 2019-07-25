@@ -277,9 +277,7 @@
         cPrioMove *priomove;
         list<cPrioMove> excludes;        
         for(auto &step : get_mv_steps()){
-            if(step == 0){ 
-                break; 
-            }
+            if(step == 0){ break; }
             int count = 0;
             int dst = pos + step;
             while(board->is_inbounds(pos, dst, step) && count < get_maxcnt()){
@@ -296,9 +294,7 @@
                             //excludes.extend(excluded)
                         priomoves->push_back(*priomove);
                     }
-                    if(prompiece == mBLK){
-                        break;
-                    }
+                    if(prompiece == mBLK){ break; }
                 }
                 dst += step;
             }

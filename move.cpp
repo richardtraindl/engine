@@ -22,10 +22,6 @@
         }
     }
 
-    void cMove::copyprevfields(uint256_t _prevfields){
-        _prevfields = prevfields;
-    }
-
     string cMove::format(){
         int piece = getprevfield(src);
         if(piece == mWKG || piece == mBKG){

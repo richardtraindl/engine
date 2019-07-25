@@ -2,17 +2,18 @@
     #include <iostream>    
     #include "./calc.hpp"
     #include "../piece.hpp"
+    #include "./analyze_position.hpp"
     #include "../values.hpp"
 
 
     cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
             add_mvcnt = 2;
-            dpth_max = 8;
+            dpth_max = 10;
             dpth_stage1 = 2;
-            dpth_stage2 = 4;
+            dpth_stage2 = 5;
             mvcnt_stage1 = 30; // 6;
-            mvcnt_stage2 = 6;
+            mvcnt_stage2 = 30; //6;
         }
         else{
             add_mvcnt = 2;
@@ -87,11 +88,11 @@
     }
 
 
-    void append_newmove(cPrioMove &move, list<cPrioMove> &candidates, list<cPrioMove> &newcandidates){
-        candidates.clear();
-        candidates.push_back(move);
+    void append_newmove(cPrioMove &move, list<cPrioMove> &newcandidates, list<cPrioMove> &rcandidates){
+        rcandidates.clear();
+        rcandidates.push_back(move);
         for(list<cPrioMove>::iterator it = newcandidates.begin(); it != newcandidates.end(); ++it){
-            candidates.push_back((*it));
+            rcandidates.push_back((*it));
         }
     }
 
@@ -231,9 +232,9 @@
     }
 
 
-    int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &result_candidates){
+    int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
-        list<cPrioMove> candidates;
+        //list<cPrioMove> candidates;
         int newscore;
         int score;
         int count = 0;
@@ -258,8 +259,8 @@
         }
 
         if(priomoves.size() == 0 || maxcnt == 0){
-            return 0; // score_position(match, priomoves.size());
-            // result_candidates->clear();
+            return score_position(&match, priomoves.size());
+            // rcandidates.clear();
         }
 
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
@@ -277,8 +278,8 @@
 
             if(depth == 1){
                 cout << "CURRENT SEARCH: " << dec << newscore << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;;
-                if(candidates.size() > 0){
-                    cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(candidates) << endl;
+                if(rcandidates.size() > 0){
+                    cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
                 }
             }
             if(maximizing){
@@ -288,7 +289,7 @@
                        break; // beta cut-off
                    }
                    else{
-                       append_newmove((*it), candidates, newcandidates);
+                       append_newmove((*it), newcandidates, rcandidates);
                    }
                 }
             }
@@ -299,7 +300,7 @@
                         break; // alpha cut-off
                     }
                     else{
-                        append_newmove((*it), candidates, newcandidates);
+                        append_newmove((*it), newcandidates, rcandidates);
                     }
                 }
             }
@@ -307,15 +308,15 @@
                 break;
             }
         }
-        for(list<cPrioMove>::iterator it = candidates.begin(); it != candidates.end(); ++it){
+        /*for(list<cPrioMove>::iterator it = candidates.begin(); it != candidates.end(); ++it){
             cPrioMove *pmv = new cPrioMove(it->prevfields, it->src, it->dst, it->prompiece, it->prio);
             result_candidates.push_back(*pmv);
-        }
+        }*/
         return score;
     }
 
 
-    int calc_move(cMatch &match, cPrioMove *candidate, list<cPrioMove> &candidates){
+    int calc_move(cMatch &match, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         int score;
@@ -329,10 +330,10 @@
         int alpha = SCORES[PIECES["wKg"]] * 10;
         int beta = SCORES[PIECES["bKg"]] * 10;
 
-        score = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, candidate, candidates);
+        score = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, candidate, rcandidates);
 
         cout << "result: " << score << " match: " << match.created_at << " ";
-        cout << concat_fmtmoves(candidates) << endl;
+        cout << concat_fmtmoves(rcandidates) << endl;
         prnt_fmttime("\ncalc-time: ", time(0) - time_start);
         return score;
     }

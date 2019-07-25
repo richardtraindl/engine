@@ -1,9 +1,13 @@
 
+    #include <boost/multiprecision/cpp_int.hpp>
     #include "./match.hpp"
-    #include "./searchforpiece.hpp"    
+    #include "./piece.hpp"
+    #include "./searchforpiece.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
 
+
+    using namespace boost::multiprecision;
 
     cMatch::cMatch(){ 
         created_at = time(0); 
@@ -146,7 +150,7 @@
         int maxcnt = min((int)newmatch.minutes.size(), 8);
         for(int i = 0; i < maxcnt; ++i){
             newmatch.undo_move();
-            if(newmatch.board.comparefields(board.fields)){
+            if(newmatch.board.fields == board.fields){
                 count += 2;
             }
         }
