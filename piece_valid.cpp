@@ -76,7 +76,7 @@
         if((dst / 8) == 7 && prompiece != mWQU && prompiece != mWRK && 
            prompiece != mWBP && prompiece != mWKN){ return false; }
 
-        if((dst / 8) < 7 && prompiece != PIECES["blk"]){ return false; }
+        if((dst / 8) < 7 && prompiece != mBLK){ return false; }
 
         return true;
     }
@@ -202,7 +202,7 @@
         if(is_long_castling_ok(cpiece, dst)){ return true; }
 
         int captured = cpiece->board->getfield(dst);
-        cpiece->board->setfield(cpiece->pos, PIECES["blk"]);
+        cpiece->board->setfield(cpiece->pos, mBLK);
         cpiece->board->setfield(dst, cpiece->piece);
         bool isattacked = is_field_touched(cpiece->board, dst, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
         cpiece->board->setfield(cpiece->pos, cpiece->piece);
@@ -274,7 +274,7 @@
             if(fields != longtest){ return false; }
         }
 
-        cpiece->board->setfield(cpiece->pos, PIECES["blk"]);
+        cpiece->board->setfield(cpiece->pos, mBLK);
         for(int i = 0; i < 3; ++i){
             int dst2 = cpiece->pos - i;
             bool isattacked = is_field_touched(cpiece->board, dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
