@@ -28,16 +28,16 @@
         cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        move = match.do_move(52, 44, mBLK);
+        /*move = match.do_move(52, 44, mBLK);
         cout << "do_move " << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
         move = match.do_move(16, 24, mBLK);
         cout << "do_move " << hex << match.board.fields << "\n";
-        cout << "move " << hex << move->format() << "\n";
+        cout << "move " << hex << move->format() << "\n";*/
 
-        //match.undo_move();
-        //cout << "undo_move " << hex << match.board.fields << "\n";
+        match.undo_move();
+        cout << "undo_move " << hex << match.board.fields << "\n";
 
         cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, &match.minutes) << "\n";
 
