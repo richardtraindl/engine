@@ -296,7 +296,7 @@
         }
         else{
             score = match->score;
-            //score += score_traps_and_touches(match);
+            score += score_traps_and_touches(match);
             //score += score_kings_safety(match);
             //score += score_controled_horizontal_files(match);
             //score += score_controled_vertical_files(match);

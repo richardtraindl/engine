@@ -14,12 +14,7 @@
     }
 
     int cMove::getprevfield(int idx){
-        if(prevfields != NULL){
-            return (int)(prevfields >> ((63 - idx) * 4)) & 0xF;
-        }
-        else{
-            return mBLK;
-        }
+        return (int)((prevfields >> ((63 - idx) * 4)) & 0xF);
     }
 
     string cMove::format(){

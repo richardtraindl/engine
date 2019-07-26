@@ -493,7 +493,7 @@
         for(int y = 7; y >=0; --y){
             cout << " | ";
             for(int x = 0; x < 8; ++x){
-                cout << hex << getfield(y * 8 + x) << " | ";
+                cout << hex << PIECES_STR[getfield(y * 8 + x)] << " | ";
             }
             cout << endl;
         }

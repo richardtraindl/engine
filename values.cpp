@@ -33,6 +33,21 @@
       {PIECES["bKg"], 6}
     };
 
+    map<int, string> PIECES_STR = {
+      {PIECES["blk"], "  "}, 
+      {PIECES["wPw"], "wp"}, 
+      {PIECES["bPw"], "bp"}, 
+      {PIECES["wKn"], "wk"}, 
+      {PIECES["bKn"], "bk"}, 
+      {PIECES["wBp"], "wb"}, 
+      {PIECES["bBp"], "bb"}, 
+      {PIECES["wRk"], "wr"}, 
+      {PIECES["bRk"], "br"}, 
+      {PIECES["wQu"], "wq"}, 
+      {PIECES["bQu"], "bq"}, 
+      {PIECES["wKg"], "wK"}, 
+      {PIECES["bKg"], "bK"}
+    };
 
     map<int, int> PIECES_RANKS = {
         {PIECES["blk"], 0}, 

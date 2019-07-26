@@ -52,6 +52,8 @@
 
     extern map<int, int> PIECES_BARES;
 
+    extern map<int, string> PIECES_STR;
+
     extern map<int, int> PIECES_RANKS;
 
     extern map<int, int> PIECES_MASK;

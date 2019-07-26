@@ -35,9 +35,9 @@
         cout << "2nd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        move = match.do_move(24, 33, mBLK);
-        cout << "3rd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
-        cout << "move " << hex << move->format() << "\n";
+        //move = match.do_move(24, 33, mBLK);
+        //cout << "3rd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        //cout << "move " << hex << move->format() << "\n";
 
         //match.undo_move();
         //cout << "undo_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
@@ -73,6 +73,7 @@
             cout << it->format() << " prio: " << dec << it->prio << endl;;
         }*/
 
+        match.board.prnt();
         list<cPrioMove> candidates;
         int score = calc_move(match, NULL, candidates);
         cout << dec << score << endl;

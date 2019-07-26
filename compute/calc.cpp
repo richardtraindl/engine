@@ -11,9 +11,9 @@
             add_mvcnt = 2;
             dpth_max = 10;
             dpth_stage1 = 2;
-            dpth_stage2 = 5;
-            mvcnt_stage1 = 30; // 6;
-            mvcnt_stage2 = 30; //6;
+            dpth_stage2 = 6;
+            mvcnt_stage1 = 32; // 6;
+            mvcnt_stage2 = 12; //6;
         }
         else{
             add_mvcnt = 2;
@@ -266,6 +266,10 @@
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             count += 1;
             newcandidates.clear();
+            
+            if(depth == 1){
+                cout << "CURRENT SEARCH: " << dec << newscore << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;;
+            }
 
             match.do_move(it->src, it->dst, it->prompiece);
             if(maximizing){
@@ -276,21 +280,18 @@
             }
             match.undo_move();
 
-            if(depth == 1){
-                cout << "CURRENT SEARCH: " << dec << newscore << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;;
-                if(rcandidates.size() > 0){
-                    cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
-                }
-            }
             if(maximizing){
                 if(newscore > score){
-                   score = newscore;
-                   if(score >= beta){
-                       break; // beta cut-off
-                   }
-                   else{
-                       append_newmove((*it), newcandidates, rcandidates);
-                   }
+                    score = newscore;
+                    if(score >= beta){
+                        break; // beta cut-off
+                    }
+                    else{
+                        append_newmove((*it), newcandidates, rcandidates);
+                        if(depth == 1){
+                            cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
+                        }
+                    }
                 }
             }
             else{
@@ -301,6 +302,9 @@
                     }
                     else{
                         append_newmove((*it), newcandidates, rcandidates);
+                        if(depth == 1){
+                            cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
+                        }
                     }
                 }
             }
