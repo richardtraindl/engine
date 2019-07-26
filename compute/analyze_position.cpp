@@ -92,8 +92,8 @@
         if(cpiece->is_safe_king() == false){
             value += ATTACKED_SCORES[mWQU] * 5;
         }
-        cpiece = new cPiece(&(match->board), match->board.bKg);
-        if(cpiece->is_safe_king() == false){
+        cPiece cpiece(&(match->board), match->board.bKg);
+        if(cpiece.is_safe_king() == false){
             value += ATTACKED_SCORES[mBQU] * 5;
         }
         return value;
@@ -261,15 +261,15 @@
         for(int idx = 0; idx < 64; ++idx){
             int piece = match->board.getfield(idx);
             if(piece == mWPW){
-                cPiece *cpiece = new cPiece(&(match->board), idx);
-                if(cpiece->is_running_pawn()){
+                cPiece cpiece(&(match->board), idx);
+                if(cpiece.is_running_pawn()){
                     score += whiterate;
                     score += whiterate * white_step_rates[(idx / 8)];
                 }
             }
             if(piece == mBPW){
-                cPiece *cpiece = new cPiece(&(match->board), idx);
-                if(cpiece->is_running_pawn()){
+                cPiece cpiece(&(match->board), idx);
+                if(cpiece.is_running_pawn()){
                     score += blackrate;
                     score += blackrate * black_step_rates[(idx / 8)];
                 }
