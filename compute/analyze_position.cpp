@@ -9,14 +9,14 @@
     using namespace boost::multiprecision::literals;
 
 
-    int score_traps_and_touches(cMatch *match){
+    int score_traps_and_touches(cMatch &match){
         int score = 0;
         for(int idx = 0; idx < 64; ++idx){
-            int piece = match->board.getfield(idx);
+            int piece = match.board.getfield(idx);
             if(piece == mBLK){
                 continue;
             }
-            cPiece cpiece(&(match->board), idx);
+            cPiece cpiece(&(match.board), idx);
             score += cpiece.score_touches();
             if(cpiece.is_trapped()){
                 score += SCORES[cpiece.piece] / 3;
@@ -26,15 +26,15 @@
     }
 
 
-    /*int score_controled_horizontal_files(cMatch *match){
+    /*int score_controled_horizontal_files(cMatch &match){
         int score = 0;
         const uint256_t row7_row8_0 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
         const uint256_t row7_row8_1 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
         const uint256_t row7_row8_2 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
         const uint256_t row7_row8_3 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
-        uint256_t wrooks = match->board.fields;
+        uint256_t wrooks = match.board.fields;
         cBoard::mask_pieces(wrooks, mWRK);
-        uint256_t wqueens = match->board.fields;
+        uint256_t wqueens = match.board.fields;
         cBoard::mask_pieces(wqueens, mWQU);
         if(wrooks & row7_row8 || wqueens & row7_row8){
             score += ATTACKED_SCORES[mBKN];
@@ -43,7 +43,7 @@
         const uint256_t row1_row2 = 0xFFFFFFFFFFFFFFFF000000000000000000000000000000000000000000000000_cppui;
         uint256_t brooks = match.board.fields;
         cBoard::mask_pieces(brooks, mBRK);
-        uint256_t bqueens = match->board.fields;
+        uint256_t bqueens = match.board.fields;
         cBoard::mask_pieces(bqueens, mBQU);
         if(brooks & row1_row2 || bqueens & row1_row2){
             score += ATTACKED_SCORES[mWKN];
@@ -52,17 +52,17 @@
     }
 
 
-    int score_controled_vertical_files(match){
+    int score_controled_vertical_files(cMatch &match){
         int score = 0;
         const uint256_t wpwcolumn = 0x0000000010000000100000001000000010000000100000001000000000000000_cppui;
         const uint256_t wrkcolumn = 0x4000000040000000400000004000000040000000400000004000000040000000_cppui;
         const uint256_t wqucolumn = 0x5000000050000000500000005000000050000000500000005000000050000000_cppui;
-        uint256_t wpawns = match->board.fields;
+        uint256_t wpawns = match.board.fields;
         cBoard::mask_pieces(wpawns, mWPW);
         if(wpawns & wpwcolumn == 0x0){
-            uint256_t wrooks = match->board.fields;
+            uint256_t wrooks = match.board.fields;
             cBoard::mask_pieces(wrooks, mWRK);
-            uint256_t wqueens = match->board.fields;
+            uint256_t wqueens = match.board.fields;
             cBoard::mask_pieces(wqueens, mWQU);
             if(wrooks & wrkcolumn || wqueens & wqucolumn){
                 score += ATTACKED_SCORES[mBKN];
@@ -71,12 +71,12 @@
         const uint256_t bpwcolumn = 0x0000000090000000900000009000000090000000900000009000000000000000_cppui;
         const uint256_t brkcolumn = 0xC0000000C0000000C0000000C0000000C0000000C0000000C0000000C0000000_cppui;
         const uint256_t bqucolumn = 0xD0000000D0000000D0000000D0000000D0000000D0000000D0000000D0000000_cppui;
-        uint256_t bpawns = match->board.fields;
+        uint256_t bpawns = match.board.fields;
         cBoard::mask_pieces(bpawns, mBPW);
         if(bpawns & bpwcolumn == 0x0){
-            uint256_t brooks = match->board.fields;
+            uint256_t brooks = match.board.fields;
             cBoard::mask_pieces(brooks, mBRK);
-            uint256_t bqueens = match->board.fields;
+            uint256_t bqueens = match.board.fields;
             cBoard::mask_pieces(bqueens, mBQU);
             if(brooks & brkcolumn || bqueens & bqucolumn){
                 score += ATTACKED_SCORES[mWKN];
@@ -86,13 +86,13 @@
     }*/
 
 
-    int score_kings_safety(cMatch *match){
+    int score_kings_safety(cMatch &match){
         int value = 0;
-        cPiece cwpiece(&(match->board), match->board.wKg);
+        cPiece cwpiece(&(match.board), match.board.wKg);
         if(cwpiece.is_safe_king() == false){
             value += ATTACKED_SCORES[mWQU] * 5;
         }
-        cPiece cbpiece(&(match->board), match->board.bKg);
+        cPiece cbpiece(&(match.board), match.board.bKg);
         if(cbpiece.is_safe_king() == false){
             value += ATTACKED_SCORES[mBQU] * 5;
         }
@@ -100,12 +100,12 @@
     }
 
 
-    int score_penalty_for_lost_castlings(cMatch *match){
+    int score_penalty_for_lost_castlings(cMatch &match){
         int score = 0;
         bool wcastling = false;
         bool bcastling = false;
         int idx = 0;
-        for(list<cMove>::iterator it = match->minutes.begin(); it != match->minutes.end(); ++it){
+        for(list<cMove>::iterator it = match.minutes.begin(); it != match.minutes.end(); ++it){
             idx += 1;
             int piece = it->getprevfield(it->src);
             if(piece == mWKG || piece == mBKG){
@@ -119,19 +119,19 @@
                 }
             }
         }
-        if(wcastling == false && (match->board.wKg_first_move_on != -1 ||
-           (match->board.wRkA_first_move_on != -1 || match->board.wRkH_first_move_on != -1))){
+        if(wcastling == false && (match.board.wKg_first_move_on != -1 ||
+           (match.board.wRkA_first_move_on != -1 || match.board.wRkH_first_move_on != -1))){
             score += ATTACKED_SCORES[mWRK] * 2;
         }
-        if(bcastling == false && (match->board.bKg_first_move_on != -1 ||
-           (match->board.bRkA_first_move_on != -1 || match->board.bRkH_first_move_on  != -1))){
+        if(bcastling == false && (match.board.bKg_first_move_on != -1 ||
+           (match.board.bRkA_first_move_on != -1 || match.board.bRkH_first_move_on  != -1))){
             score += ATTACKED_SCORES[mBRK] * 2;
         }
         return score;
     }
 
 
-/* def score_penalty_for_multiple_moves(match):
+/* def score_penalty_for_multiple_moves(cMatch &match):
     value = 0
     white_moves = []
     black_moves = []
@@ -166,7 +166,7 @@
     return value */
 
 
-    int score_penalty_for_knight_bishop_on_baseline(cMatch *match){
+    int score_penalty_for_knight_bishop_on_baseline(cMatch &match){
         int score = 0;
         int idx;
         int knight;
@@ -174,19 +174,19 @@
         int rate;
         for(int i = 0; i < 2; ++i){
             if(i == 0){
-                idx = match->board.RANKS["1"] * 8;
+                idx = match.board.RANKS["1"] * 8;
                 knight = mWKN;
                 bishop = mWBP;
                 rate = ATTACKED_SCORES[mWRK];
             }
             else{
-                idx = match->board.RANKS["8"] * 8;
+                idx = match.board.RANKS["8"] * 8;
                 knight = mBKN;
                 bishop = mBBP;
                 rate = ATTACKED_SCORES[mBRK];
             }
             for(int j = 0; j < 8; ++j){
-                int piece = match->board.getfield(idx + j);
+                int piece = match.board.getfield(idx + j);
                 if(piece == knight || piece == bishop){
                     score += rate;
                 }
@@ -196,7 +196,7 @@
     }
 
 
-/* def score_weak_pawns(match):
+/* def score_weak_pawns(cMatch &match):
     value = 0
     for idx in range(64):
         piece = match.board.getfield(idx)
@@ -211,21 +211,21 @@
     return value */
 
 
-    int score_penalty_for_weak_fianchetto(cMatch *match){
+    int score_penalty_for_weak_fianchetto(cMatch &match){
         int score = 0;
-        int piece = match->board.getfield(cBoard::COLS["B"] + cBoard::RANKS["2"] * 8);
+        int piece = match.board.getfield(cBoard::COLS["B"] + cBoard::RANKS["2"] * 8);
         if(piece == mBLK){
             score += ATTACKED_SCORES[mWRK];
         }
-        piece = match->board.getfield(cBoard::COLS["G"] + cBoard::RANKS["2"] * 8);
+        piece = match.board.getfield(cBoard::COLS["G"] + cBoard::RANKS["2"] * 8);
         if(piece == mBLK){
             score += ATTACKED_SCORES[mWRK];
         }
-        piece = match->board.getfield(cBoard::COLS["B"] + cBoard::RANKS["7"] * 8);
+        piece = match.board.getfield(cBoard::COLS["B"] + cBoard::RANKS["7"] * 8);
         if(piece == mBLK){
             score += ATTACKED_SCORES[mBRK];
         }
-        piece = match->board.getfield(cBoard::COLS["G"] + cBoard::RANKS["7"] * 8);
+        piece = match.board.getfield(cBoard::COLS["G"] + cBoard::RANKS["7"] * 8);
         if(piece == mBLK){
             score += ATTACKED_SCORES[mBRK];
         }
@@ -233,7 +233,7 @@
     }
 
 
-    int score_opening(cMatch *match){
+    int score_opening(cMatch &match){
         int score = 0;
         // score += score_penalty_for_multiple_moves(match);
         score += score_penalty_for_knight_bishop_on_baseline(match);
@@ -244,7 +244,7 @@
     }
 
 
-    int score_middlegame(cMatch *match){
+    int score_middlegame(cMatch &match){
         int score = 0;
         score += score_penalty_for_knight_bishop_on_baseline(match);
         // score += score_weak_pawns(match)
@@ -252,23 +252,23 @@
     }
 
 
-    int score_endgame(cMatch *match){
+    int score_endgame(cMatch &match){
         int score = 0;
         int whiterate = ATTACKED_SCORES[mBPW];
         int white_step_rates[8] = { 0, 0, 1, 2, 3, 4, 5, 0};
         int blackrate = ATTACKED_SCORES[mWPW];
         int black_step_rates[8] = {0, 5, 4, 3, 2, 1, 0, 0} ;
         for(int idx = 0; idx < 64; ++idx){
-            int piece = match->board.getfield(idx);
+            int piece = match.board.getfield(idx);
             if(piece == mWPW){
-                cPiece cpiece(&(match->board), idx);
+                cPiece cpiece(&(match.board), idx);
                 if(cpiece.is_running_pawn()){
                     score += whiterate;
                     score += whiterate * white_step_rates[(idx / 8)];
                 }
             }
             if(piece == mBPW){
-                cPiece cpiece(&(match->board), idx);
+                cPiece cpiece(&(match.board), idx);
                 if(cpiece.is_running_pawn()){
                     score += blackrate;
                     score += blackrate * black_step_rates[(idx / 8)];
@@ -279,16 +279,16 @@
     }
 
 
-    int score_position(cMatch *match, int movecnt){
+    int score_position(cMatch &match, int movecnt){
         int score;
-        int status = match->eval_status();
+        int status = match.eval_status();
         if(movecnt == 0 && status != cMatch::STATUS["active"]){
             cout << "eval_status" << endl;
             if(status == cMatch::STATUS["winner_black"]){
-                return SCORES[mWKG] + match->movecnt();
+                return SCORES[mWKG] + match.movecnt();
             }
             if(status == cMatch::STATUS["winner_white"]){
-                return SCORES[mBKG] - match->movecnt();
+                return SCORES[mBKG] - match.movecnt();
             }
             else{ // draw
                 return SCORES[mBLK];
@@ -300,10 +300,10 @@
             //score += score_kings_safety(match);
             //score += score_controled_horizontal_files(match);
             //score += score_controled_vertical_files(match);
-            /*if(match->is_opening()){
+            /*if(match.is_opening()){
                 score += score_opening(match);
             }*/
-            /*if(match->is_endgame()){
+            /*if(match.is_endgame()){
                 score += score_endgame(match);
             }
             else{
@@ -314,31 +314,31 @@
     }
 
 
-    bool is_stormy(cMatch *match){
-        int color = match->next_color();
+    bool is_stormy(cMatch &match){
+        int color = match.next_color();
         // is pawn on last row before promotion
         for(int x = 0; x < 8; ++x){
-            int piece = match->board.getfield((x + 6 * 8));
+            int piece = match.board.getfield((x + 6 * 8));
             if(piece == mWPW){
                 return true;
             }
         }
         for(int x = 0; x < 8; ++x){
-            int piece = match->board.getfield((x + 1 * 8));
+            int piece = match.board.getfield((x + 1 * 8));
             if(piece == mBPW){
                 return true;
             }
         }
         // attacks
         for(int idx = 0; idx < 64; ++idx){
-            int piece = match->board.getfield(idx);
+            int piece = match.board.getfield(idx);
             if(piece == mBLK){
                 continue;
             }
             int piece_color = PIECES_COLORS[piece];
 
             list<cTouch> *friends, *enmies;
-            collect_touches_for_both_colors(&(match->board), idx, piece_color, friends, enmies);
+            collect_touches_for_both_colors(&(match.board), idx, piece_color, friends, enmies);
 
             /* if(piece == mWKG or piece == mBKG):
                 if(len(enmytouches) > 0):
@@ -349,7 +349,7 @@
             // if(len(enmytouches) > len(frdlytouches)):
             //    return True"""
 
-            if(match->board.eval_pin_dir(idx) != DIRS["undef"]){
+            if(match.board.eval_pin_dir(idx) != DIRS["undef"]){
                  // ||                match->board.eval_soft_pin_dir != DIRS["undef"]){
                 return true;
             }
