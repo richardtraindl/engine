@@ -88,12 +88,12 @@
 
     int score_kings_safety(cMatch *match){
         int value = 0;
-        cPiece *cpiece = new cPiece(&(match->board), match->board.wKg);
-        if(cpiece->is_safe_king() == false){
+        cPiece cwpiece(&(match->board), match->board.wKg);
+        if(cwpiece.is_safe_king() == false){
             value += ATTACKED_SCORES[mWQU] * 5;
         }
-        cPiece cpiece(&(match->board), match->board.bKg);
-        if(cpiece.is_safe_king() == false){
+        cPiece cbpiece(&(match->board), match->board.bKg);
+        if(cbpiece.is_safe_king() == false){
             value += ATTACKED_SCORES[mBQU] * 5;
         }
         return value;
