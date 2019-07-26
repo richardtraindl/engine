@@ -48,7 +48,7 @@
 
             int search(int src, int step, int maxcnt);
 
-            bool search_bi_dirs(int *first, int *second, int src, int step, int maxcnt);
+            bool search_bi_dirs(int &first, int &second, int src, int step, int maxcnt);
 
             static bool is_nth(int src, int dst);
             static bool is_sth(int src, int dst);
