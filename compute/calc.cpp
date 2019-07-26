@@ -259,7 +259,7 @@
         }
 
         if(priomoves.size() == 0 || maxcnt == 0){
-            return score_position(&match, priomoves.size());
+            return score_position(match, priomoves.size());
             // rcandidates.clear();
         }
 
