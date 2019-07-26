@@ -349,7 +349,7 @@
             // if(len(enmytouches) > len(frdlytouches)):
             //    return True"""
 
-            if(match.board.eval_pin_dir(idx) != DIRS["undef"] || match.board.eval_soft_pin_dir(idx) != DIRS["undef"]){
+            if(match.board.eval_pin_dir(idx) != DIRS["undef"]){
                 return true;
             }
 
