@@ -67,7 +67,7 @@
             }
             else{
                 cPiece cpiece(&(match.board), idx);
-                cpiece.generate_moves(&(match.minutes), &moves);
+                cpiece.generate_moves(match.minutes, moves);
             }
         }
     }
@@ -82,7 +82,7 @@
             }
             else{
                 cPiece cpiece(&(match.board), idx);
-                cpiece.generate_priomoves(&(match.minutes), candidate, dbggmove, search_for_mate, &priomoves);
+                cpiece.generate_priomoves(match.minutes, candidate, dbggmove, search_for_mate, priomoves);
             }
         }
     }
