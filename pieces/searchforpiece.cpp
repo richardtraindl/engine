@@ -52,16 +52,16 @@
                 int piece = board->getfield(dst);
                 for(const int target : TARGETS){
                     if(piece == target){
-                        // cpiece = match.obj_for_piece(piece, dst);
-                        // if(cpiece.is_move_stuck(src)){
-                        //     break;
-                        // }
+                        cPiece cpiece(board, dst);
+                        if(cpiece.is_move_stuck(src)){
+                             break;
+                        }
                         if(PIECES_COLORS[piece] == friendlycolor){
-                            cTouch touch; //  = cTouch(piece, dst);
+                            cTouch touch(piece, dst);
                             frdlytouches->push_back(touch);
                         }
                         else{
-                            cTouch touch; // = cTouch(piece, dst);
+                            cTouch touch(piece, dst);
                             enmytouches->push_back(touch);
                         }
                     }
@@ -78,10 +78,10 @@
                 if(PIECES_COLORS[piece] != color){
                     continue;
                 }
-                // cpiece = match.obj_for_piece(piece, dst);
-                //if(cpiece.is_move_stuck(src)){
-                //    continue;
-                //}
+                cPiece cpiece(board, dst);
+                if(cpiece.is_move_stuck(src)){
+                    continue;
+                }
                 for(const int target : TARGETS){
                     if(piece == target){
                         touches->push_back(cTouch(piece, dst));
