@@ -455,7 +455,7 @@
         }
     }
 
-    bool cBoard::is_move_available(list<cMove> *minutes){
+    bool cBoard::is_move_available(list<cMove> &minutes){
         int color;
         if(minutes->size() % 2 == 0){
             color = COLORS["white"];
