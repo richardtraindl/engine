@@ -197,7 +197,7 @@
         return undo_move_from_ext(this, move, movecnt, score);
     }
 
-    void cPiece::find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported){
+    void cPiece::find_attacks_and_supports(list<cTouch> &attacked, list<cTouch> &supported){
         int opp_color = REVERSED_COLORS[color];
         for(const int step : get_steps()){
             int dst2 = board->search(pos, step, get_maxcnt());
@@ -208,7 +208,7 @@
                 int piece = board->getfield(dst2);
                 if(PIECES_COLORS[piece] == opp_color){
                     cTouch *ctouch = new cTouch(piece, dst2);
-                    attacked->push_back(*ctouch);
+                    attacked.push_back(*ctouch);
                     //###
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(board, opp_color, ctouch);
@@ -219,7 +219,7 @@
                         continue;
                     }
                     cTouch *ctouch = new cTouch(piece, dst2);
-                    supported->push_back(*ctouch);
+                    supported.push_back(*ctouch);
                     //###
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(board, color, ctouch);
