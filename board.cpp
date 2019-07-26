@@ -164,28 +164,28 @@
         return mBLK;
     }
 
-    bool cBoard::search_bi_dirs(int *first, int *second, int src, int step, int maxcnt){
+    bool cBoard::search_bi_dirs(int &first, int &second, int src, int step, int maxcnt){
         int cnt = 0;
-        *first = 65;
+        first = -1;
         int bisteps[2] = {step, (step * -1)};
         for(const int bistep : bisteps){
             int dst = src + bistep;
             while(is_inbounds(src, dst, bistep) && cnt < maxcnt){
                 int piece = getfield(dst);
                 if(piece != mBLK){
-                    if(*first == 65){
-                        *first = dst;
+                    if(first == -1){
+                        first = dst;
                         break;
                     }
                     else{
-                        *second = dst;
+                        second = dst;
                         return true;
                     }
                 }
                 cnt += 1;
                 dst += bistep;
             }
-            if(*first == 65){
+            if(first == -1){
                 break;
             }
         }
