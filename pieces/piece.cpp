@@ -197,7 +197,7 @@
         return undo_move_from_ext(this, move, movecnt, score);
     }
 
-    void cPiece::find_attacks_and_supports(list<cTouch> &attacked, list<cTouch> &supported){
+    /*void cPiece::find_attacks_and_supports(list<cTouch> &attacked, list<cTouch> &supported){
         int opp_color = REVERSED_COLORS[color];
         for(const int step : get_steps()){
             int dst2 = board->search(pos, step, get_maxcnt());
@@ -227,7 +227,7 @@
                 }
             }
         }
-    }
+    }*/
 
 
     int cPiece::score_touches(){
