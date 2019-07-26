@@ -310,7 +310,7 @@
                 else{
                     step = cPiece::step_for_dir(mWBP, dir_ary[i]);
                 }
-                if(search_bi_dirs(&first, &second, src, step, 6)){
+                if(search_bi_dirs(first, second, src, step, 6)){
                     fstpiece = getfield(first);
                     sndpiece = getfield(second);
                     if(PIECES_COLORS[fstpiece] != PIECES_COLORS[sndpiece]){
@@ -368,7 +368,7 @@
                 else{
                     step = cPiece::step_for_dir(mWBP, dir_ary[i]);
                 }
-                if(search_bi_dirs(&first, &second, src, step, 6)){
+                if(search_bi_dirs(first, second, src, step, 6)){
                     fstpiece = getfield(first);
                     sndpiece = getfield(second);
                     if(PIECES_COLORS[fstpiece] != PIECES_COLORS[sndpiece]){
