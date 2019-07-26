@@ -39,10 +39,10 @@
 
     int weight_for_discl_attacked(cTouch *discl_attacked, int weight);
 
-    def weight_for_supporting(cMatch *match, int piece, cMove *move, cTouch *supported, int weight);
+    int weight_for_supporting(cMatch *match, int piece, cMove *move, cTouch *supported, int weight);
 
     int weight_for_attacking_king(cMatch *match, cMove *move, int weight);
 
-    def weight_for_attacking(cMatch *match, cMove *move, cTouch *attacked, int weight);
+    int weight_for_attacking(cMatch *match, cMove *move, cTouch *attacked, int weight);
 
 #endif
