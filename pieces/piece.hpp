@@ -50,12 +50,12 @@
 
             int score_touches();
 
-            void generate_moves(list<cMove> *minutes, list<cMove> *moves);
+            void generate_moves(list<cMove> &minutes, list<cMove> &moves);
 
-            void generate_priomoves(list<cMove> *minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> *priomoves);
-            
+            void generate_priomoves(list<cMove> &minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves);
+
             bool is_running_pawn();
-            
+
             bool is_safe_king();
 
     };
