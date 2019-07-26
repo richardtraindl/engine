@@ -195,7 +195,7 @@
     }
 
     int cMatch::eval_status(){
-        if(board.is_move_available(&minutes)){
+        if(board.is_move_available(minutes)){
             return STATUS["active"];
         }
         else{
