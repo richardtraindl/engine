@@ -4,13 +4,14 @@
     #include "../pieces/searchforpiece.hpp"
     #include "../pieces/pieceshelper.hpp"
 
-    int lowest_piece(list<cTouch> *touches){
+
+    int lowest_piece(list<cTouch> &touches){
         if(touches.size() == 0){
 	    return mBLK;
         }
         else{
 	    int lowest = mWKG;
-	    for(list<cTouch>::iterator it = touches->begin(); it != touches->end(); ++it){
+	    for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
 	        if(PIECES_RANK[it->piece] < PIECES_RANKS[lowest]){
 		    lowest = it->piece;
 	        }
@@ -26,15 +27,15 @@
     }
 
 
-    void find_touches_on_dstfield_after_move(cMatch *match, int piece, cMove *move, list<cTouch> *friends, list<cTouch> *enmies){
-        match->do_move(move->src, move->dst, move->prompiece);
-        collect_touches_for_both_colors(match->board, move->dst, PIECES_COLORS[piece], friends, enmies);
-    	match->undo_move();
+    void find_touches_on_dstfield_after_move(cMatch &match, int piece, cMove &move, list<cTouch> &friends, list<cTouch> &enmies){
+        match.do_move(move.src, move.dst, move.prompiece);
+        collect_touches_for_both_colors(&match.board, move.dst, PIECES_COLORS[piece], &friends, &enmies);
+    	match.undo_move();
     }
 
 
-    bool is_supporter_lower_attacker(cMatch *match, int piece, CMove *move, list<cTouch> *supported){
-        for(list<cTouch>::iterator it = supported->attacker_beyond.begin(); it != supported->attacker_beyond.end(); ++it){
+    bool is_supporter_lower_attacker(cMatch &match, int piece, cMove &move, list<cTouch> &supported){
+        for(list<cTouch>::iterator it = supported.attacker_beyond.begin(); it != supported.attacker_beyond.end(); ++it){
             if(PIECES_RANKS[piece] >= PIECES_RANKS[it->piece]){
                 return false;
             }
@@ -43,16 +44,16 @@
     }
 
 
-    bool check_mates_deep_search(cMatch *match, cMove *move){
-        cMatch *newmatch = *match;
-        newmatch->do_move(move->src, move->dst, move->prompiece);
-        return calc_checks(newmatch, 3, 1);
+    bool check_mates_deep_search(cMatch &match, cMove &move){
+        cMatch *newmatch = match;
+        newmatch->do_move(move.src, move.dst, move.prompiece);
+        return calc_checks(*newmatch, 3, 1);
     }
 
 
-    bool calc_checks(cMatch *match, int maxcnt, int count){
+    bool calc_checks(cMatch &match, int maxcnt, int count){
         list<cMove> moves;
-	generate_moves(match, &moves);
+	generate_moves(match, moves);
 	if(moves.size() == 0 && count % 2 == 1){
             return true;
 	}
@@ -72,18 +73,18 @@
     }
 
 
-    bool is_soft_pinned_move(cMatch *match, cMove *move){
-	int pindir = match->board.eval_soft_pin_dir(move->src);
-        cPiece cpiece(&(match->board), move->src);
-        int mvdir = cpiece.dir_for_move(move->src, move->dst);
+    bool is_soft_pinned_move(cMatch &match, cMove &move){
+	int pindir = match.board.eval_soft_pin_dir(move.src);
+        cPiece cpiece(&(match.board), move.src);
+        int mvdir = cpiece.dir_for_move(move.src, move.dst);
         return (pindir != DIRS["undef"] && pindir != mvdir && pindir != REVERSE_DIRS[mvdir]);
     }
 
 
-    bool is_supply(cMatch *match, int piece, cMove *move){
+    bool is_supply(cMatch &match, int piece, cMove &move){
         list<cTouch> touches;
-	cSearchforRook::_collect_touches_for_color(&(match->board), move->src, PIECES_COLORS[piece], &touches);
-        cSearchforBishop::_collect_touches_for_color(&(match->board), move->src, PIECES_COLORS[piece], &touches);
+	cSearchforRook::_collect_touches_for_color(&(match.board), move.src, PIECES_COLORS[piece], &touches);
+        cSearchforBishop::_collect_touches_for_color(&(match.board), move.src, PIECES_COLORS[piece], &touches);
         for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
             if(PIECES_BARE[it->piece] == PIECES_BARE[mWQU){
                 return true;
@@ -98,19 +99,18 @@
     }
 
 
-    bool is_touched_field_within_move(cMatch *match, int piece, cMove *move, int touched_field){
-        cPiece cpiece(&(match->board), move->src);
-        int mvdir1 = cpiece.dir_for_move(move->src, move->dst);
-        int mvdir2 = cpiece.dir_for_move(move->dst, touched_field);
+    bool is_touched_field_within_move(cMatch &match, int piece, cMove &move, int touched_field){
+        cPiece cpiece(&(match.board), move.src);
+        int mvdir1 = cpiece.dir_for_move(move.src, move.dst);
+        int mvdir2 = cpiece.dir_for_move(move.dst, touched_field);
         return (mvdir1 != DIRS["undef"] && (mvdir1 == mvdir2 || REVERSE_DIRS[mvdir1] == mvdir2));
     }
 
 
-    int weight_for_standard(cMatch *match, int piece, cMove *move){
+    int weight_for_standard(cMatch &match, int piece, cMove &move){
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
         find_touches_on_dstfield_after_move(match, piece, move, &friends_on_dstfield, &enmies_on_dstfield);
         int lowest_enemy_on_dstfield = lowest_piece(enmies_on_dstfield);
-        //###
         if(is_soft_pinned_move(match, move)){
             return cTactic::WEIGHTS["bad-deal"];
         }
@@ -125,11 +125,10 @@
     }
 
 
-    int weight_for_capture(cMatch *match, int piece, cMove *move, int weight){
+    int weight_for_capture(cMatch &match, int piece, cMove &move, int weight){
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
-        int dstpiece = match->board.getfield(move->dst);
+        int dstpiece = match->board.getfield(move.dst);
 	find_touches_on_dstfield_after_move(match, piece, move, &friends_on_dstfield, &enmies_on_dstfield);
-        //###
         if(PIECES_RANK[piece] < PIECES_RANK[dstpiece]){
             return cTactic::WEIGHTS["stormy"];
         }
@@ -137,7 +136,7 @@
             return cTactic.WEIGHTS["tormy"];
         }
         if(is_soft_pinned_move(match, move) == false && 
-	   match->board.eval_soft_pin_dir(move->dst) != DIRS["undef"] && is_supply(match, piece, move)){
+	   match.board.eval_soft_pin_dir(move.dst) != DIRS["undef"] && is_supply(match, piece, move)){
             return cTactic::WEIGHTS["stormy"];
 	}
         if(is_soft_pinned_move(match, piece, move) == false and PIECES_RANK[piece] == PIECES_RANK[dstpiece]){
@@ -152,16 +151,15 @@
     }
 
 
-    int weight_for_flee(cMatch *match, int piece, cMove *move, int weight){
+    int weight_for_flee(cMatch &match, int piece, cMove &move, int weight){
         list <cTouch> friends_on_srcfield, enmies_on_srcfield;
-	collect_touches_for_both_colors(&(match->board), move->src, PIECES_COLORS[piece], &friends_on_srcfield, &enmies_on_srcfield);
+	collect_touches_for_both_colors(&(match.board), move.src, PIECES_COLORS[piece], &friends_on_srcfield, &enmies_on_srcfield);
         int lowest_enemy_on_srcfield = lowest_piece(enmies_on_srcfield);
-        //###
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
             if(lowest_enemy_on_srcfield != mBLK && PIECES_RANK[piece] > PIECES_RANK[lowest_enemy_on_srcfield]){
                 return cTactic::WEIGHTS["stormy"];
 	    }
-            if(friends_on_srcfield-size() == 0 and enmies_on_srcfield.size() > 0){
+            if(friends_on_srcfield.size() == 0 and enmies_on_srcfield.size() > 0){
                 return cTactic::WEIGHTS["stormy"];
 	    }
 	}
@@ -169,10 +167,9 @@
     }
 
 
-    int weight_for_running_pawn(cMatch *match, int piece, cMove *move, int weight){
+    int weight_for_running_pawn(cMatch &match, int piece, cMove &move, int weight){
         list <cTouch> friends_on_dstfield, enmies_on_dstfield;
         find_touches_on_dstfield_after_move(match, piece, move, friends_on_dstfield, enmies_on_dstfield);
-    ###
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) && 
            friends_on_dstfield.size() >= enmies_on_dstfield.size()){
             return cTactic::WEIGHTS["good-deal"];
@@ -181,31 +178,31 @@
     }
 
 
-    int weight_for_discl_supported(cTouch *discl_supported, int weight){
+    int weight_for_discl_supported(cTouch &discl_supported, int weight){
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) &&
-           discl_supported->attacker_beyond.size() > discl_supported->supporter_beyond.size()){
+           discl_supported.attacker_beyond.size() > discl_supported.supporter_beyond.size()){
             return cTactic::WEIGHTS["stormy"];
 	}
     	return weight;
     }
 
 
-    int weight_for_discl_attacked(cTouch *discl_attacked, int weight){
+    int weight_for_discl_attacked(cTouch &discl_attacked, int weight){
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) && 
-           discl_attacked->supporter_beyond.size() <= discl_attacked->attacker_beyond.size()){
+           discl_attacked.supporter_beyond.size() <= discl_attacked.attacker_beyond.size()){
             return cTactic.WEIGHTS["stormy"];
 	}
         return weight;
     }
 
 
-    def weight_for_supporting(cMatch *match, int piece, cMove *move, cTouch *supported, int weight){
-        if(is_touched_field_within_move(match, piece, move, supported->pos)){
+    int weight_for_supporting(cMatch &match, int piece, cMove &move, cTouch &supported, int weight){
+        if(is_touched_field_within_move(match, piece, move, supported.pos)){
             return weight;
         }
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
-            if(supported->attacker_beyond.size() > 0 && supported->attacker_beyond.size() > supported->supporter_beyond.size() && 
-               (is_supporter_lower_attacker(match, piece, move, supported) || match->board.eval_soft_pin_dir(supported.field) == DIRS["undef"])){
+            if(supported.attacker_beyond.size() > 0 && supported.attacker_beyond.size() > supported.supporter_beyond.size() && 
+               (is_supporter_lower_attacker(match, piece, move, supported) || match.board.eval_soft_pin_dir(supported.field) == DIRS["undef"])){
                 return cTactic::WEIGHTS["stormy"];
 	    }
         }
@@ -213,7 +210,7 @@
     }
 
 
-    int weight_for_attacking_king(cMatch *match, cMove *move, int weight){
+    int weight_for_attacking_king(cMatch &match, cMove &move, int weight){
         if(check_mates_deep_search(match, move)){
             return cTactic::WEIGHTS["stormy"];
 	}
@@ -221,19 +218,18 @@
     }
 
 
-    def weight_for_attacking(cMatch *match, cMove *move, cTouch *attacked, int weight){
-        list <cTouch> friends_on_dstfield, enmies_on_dstfield;
+    int weight_for_attacking(cMatch &match, cMove &move, cTouch &attacked, int weight){
+        list<cTouch> friends_on_dstfield, enmies_on_dstfield;
         find_touches_on_dstfield_after_move(match, piece, move, friends_on_dstfield, enmies_on_dstfield);
-        //###
-        if(is_touched_field_within_move(match, piece, move, attacked->pos)){
+        if(is_touched_field_within_move(match, piece, move, attacked.pos)){
             return weight;
 	}
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
-            if(PIECES_RANK[piece] < PIECES_RANK[attacked->piece] || attacked->supporter_beyond.size() == 0 || 
-               (are_fairy_equal(piece, attacked->piece) && eval_soft_pin_dir(attacked->pos) != DIRS["undef"])){ 
+            if(PIECES_RANK[piece] < PIECES_RANK[attacked.piece] || attacked.supporter_beyond.size() == 0 || 
+               (are_fairy_equal(piece, attacked.piece) && eval_soft_pin_dir(attacked.pos) != DIRS["undef"])){ 
                 return cTactic::WEIGHTS["stormy"];
 	    }
-            if(PIECES_RANK[piece] < PIECES_RANK[attacked->piece] && PIECES_RANK[piece] == PIECES_RANK[mWPW] &&
+            if(PIECES_RANK[piece] < PIECES_RANK[attacked.piece] && PIECES_RANK[piece] == PIECES_RANK[mWPW] &&
                 (friends_on_dstfield.size() > 0 || (enmies_on_dstfield.size() == 0)){ 
                 return cTactic::WEIGHTS["better-deal"];
             }
