@@ -46,7 +46,7 @@
 
             bool undo_move(cMove *move, int movecnt, int *score);
 
-            void find_attacks_and_supports(list<cTouch> *attacked, list<cTouch> *supported);
+            void find_attacks_and_supports(list<cTouch> &attacked, list<cTouch> &supported);
 
             int score_touches();
 
