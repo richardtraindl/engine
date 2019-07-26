@@ -67,7 +67,7 @@
 
             bool is_move_valid(int src, int dst, int prompiece, list<cMove> *minutes);
 
-            bool is_move_available(list<cMove> *minutes);
+            bool is_move_available(list<cMove> &minutes);
 
             void prnt();
     };
