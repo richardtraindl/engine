@@ -89,7 +89,6 @@ def is_supported_running_pawn(match, supported){
     }
 
     bool captures(cMatch &match, int piece, cMove &move){
-        int color = PIECES_COLORS[piece];
         int dstpiece = match.board.getfield(move.dst);
         if(dstpiece != mBLK){
             return true;

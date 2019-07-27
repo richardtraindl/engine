@@ -5,6 +5,7 @@
     #include "./helper.hpp"
     #include "./values.hpp"
     #include "./compute/calc.hpp"
+    #include "./ui/play.hpp"
 
     using namespace std;
 
@@ -26,22 +27,34 @@
         
         cout << "before do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
         
-        cMove *move;
+        /*cMove *move;
         move = match.do_move(8, 24, mBLK);
         cout << "1st do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
-
+        
         move = match.do_move(49, 33, mBLK);
         cout << "2nd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
         cout << "move " << hex << move->format() << "\n";
 
-        //move = match.do_move(24, 33, mBLK);
-        //cout << "3rd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
-        //cout << "move " << hex << move->format() << "\n";
+        move = match.do_move(24, 33, mBLK);
+        cout << "3rd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        cout << "move " << hex << move->format() << "\n"; 
 
-        //match.undo_move();
-        //cout << "undo_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        move = match.do_move(48, 40, mBLK);
+        cout << "4nd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        cout << "move " << hex << move->format() << "\n";
 
+        match.undo_move();
+        cout << "undo_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        */
+
+        /*move = match.do_move(57, 40, mBLK);
+        cout << "5nd do_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        cout << "move " << hex << move->format() << "\n";
+
+        match.undo_move();
+        cout << "undo_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
+        */
         cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, match.minutes) << "\n";
 
         cout << "is_move_valid() " << match.board.is_move_valid(0, 9, mBLK, match.minutes) << "\n";
@@ -73,10 +86,13 @@
             cout << it->format() << " prio: " << dec << it->prio << endl;;
         }*/
 
-        match.board.prnt();
+        /*match.board.prnt();
+        cout << dec << match.score << endl;
         list<cPrioMove> candidates;
         int score = calc_move(match, NULL, candidates);
-        cout << dec << score << endl;
+        cout << "score: " << dec << score << " match.score: " << match.score << endl; */
+        
+        play(1);
 
         return 0;
     }

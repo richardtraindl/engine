@@ -1,43 +1,39 @@
 CC = g++
 
-all: ./pieces/touch.o ./pieces/searchforpiece.o  \
+all: ./ui/play.o \
+	 ./pieces/touch.o ./pieces/searchforpiece.o \
 	 ./pieces/piece_ext1.o ./pieces/piece_ext2.o ./pieces/piece.o \
 	 ./compute/analyze_helper.o ./compute/analyze_tactics.o \
 	 ./compute/analyze_move.o ./compute/analyze_position.o ./compute/calc.o \
-	 helper.o values.o move.o board.o match.o engine.o \
+	 ./helper.o ./values.o ./move.o ./board.o ./match.o ./engine.o
 
 	$(CC) -Wall --std=c++17 \
+		./ui/play.o \
 		./pieces/touch.o ./pieces/searchforpiece.o \
 		./pieces/piece_ext1.o ./pieces/piece_ext2.o ./pieces/piece.o \
 		./compute/analyze_helper.o ./compute/analyze_tactics.o \
 		./compute/analyze_move.o ./compute/analyze_position.o ./compute/calc.o \
-		helper.o values.o move.o board.o match.o engine.o -o engine
+		./helper.o ./values.o ./move.o ./board.o ./match.o ./engine.o -o ./engine
 
-engine.o: engine.cpp
-	$(CC) -Wall --std=c++17 -c engine.cpp
+engine.o: ./engine.cpp
+	$(CC) -Wall --std=c++17 -c ./engine.cpp -o ./engine.o
 
-match.o: match.cpp match.hpp board.hpp helper.hpp values.hpp
-	$(CC) -Wall --std=c++17 -c match.cpp
+match.o: ./match.cpp match.hpp
+	$(CC) -Wall --std=c++17 -c ./match.cpp -o ./match.o
 
-board.o: board.cpp board.hpp helper.hpp values.hpp
-	$(CC) -Wall --std=c++17 -c board.cpp
+board.o: ./board.cpp ./board.hpp
+	$(CC) -Wall --std=c++17 -c ./board.cpp -o ./board.o
 
-move.o: move.cpp move.hpp helper.hpp values.hpp
-	$(CC) -Wall --std=c++17 -c move.cpp
+move.o: ./move.cpp ./move.hpp
+	$(CC) -Wall --std=c++17 -c ./move.cpp -o ./move.o
 
-values.o: values.cpp values.hpp
-	$(CC) -Wall --std=c++17 -c values.cpp
+values.o: ./values.cpp ./values.hpp
+	$(CC) -Wall --std=c++17 -c ./values.cpp -o ./values.o
 
-helper.o: helper.cpp helper.hpp helper.hpp values.hpp
-	$(CC) -Wall --std=c++17 -c helper.cpp
-
-make: 
-	make ./pieces/Makefile
-
-make: 
-	make ./compute/Makefile
+helper.o: helper.cpp helper.hpp helper.hpp
+	$(CC) -Wall --std=c++17 -c helper.cpp -o ./helper.o
 
 clean:
 	rm -f *.o rm -f ./pieces/*.o
 	rm -f *.o rm -f ./compute/*.o
-
+	rm -f *.o rm -f ./ui/*.o

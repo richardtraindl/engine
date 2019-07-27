@@ -177,18 +177,18 @@
             bool flag;
             if(PIECES_COLORS[piece] == COLORS["white"]){
                 cPiece piece(&board, move.dst);
-                flag = piece.undo_move(&move, movecnt(), &score);
+                flag = piece.undo_move(move, movecnt(), score);
             }
             else{
                 cPiece piece(&board, move.dst);
-                flag = piece.undo_move(&move, movecnt(), &score);
+                flag = piece.undo_move(move, movecnt(), score);
             }
             minutes.pop_back();
             return flag;
         }
         else{
             cPiece cpiece(&board, move.dst);
-            bool flag = cpiece.undo_move(&move, movecnt(), &score);
+            bool flag = cpiece.undo_move(move, movecnt(), score);
             minutes.pop_back();
             return flag;
         }
@@ -211,4 +211,11 @@
             }
         }
         return STATUS["draw"];
+    }
+
+
+    void cMatch::prnt_minutes(){
+        for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
+            cout << it->format() << endl;
+        }
     }

@@ -194,7 +194,7 @@
         return do_move_from_ext(this, dst, prompiece, movecnt, score);
     }
 
-    bool cPiece::undo_move(cMove *move, int movecnt, int *score){
+    bool cPiece::undo_move(cMove &move, int movecnt, int &score){
         return undo_move_from_ext(this, move, movecnt, score);
     }
 

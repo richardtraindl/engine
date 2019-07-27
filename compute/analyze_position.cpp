@@ -315,7 +315,6 @@
 
 
     bool is_stormy(cMatch &match){
-        int color = match.next_color();
         // is pawn on last row before promotion
         for(int x = 0; x < 8; ++x){
             int piece = match.board.getfield((x + 6 * 8));
@@ -337,8 +336,8 @@
             }
             int piece_color = PIECES_COLORS[piece];
 
-            list<cTouch> *friends, *enmies;
-            collect_touches_for_both_colors(&(match.board), idx, piece_color, friends, enmies);
+            list<cTouch> friends, enmies;
+            collect_touches_for_both_colors(&(match.board), idx, piece_color, &friends, &enmies);
 
             /* if(piece == mWKG or piece == mBKG):
                 if(len(enmytouches) > 0):
@@ -353,7 +352,7 @@
                 return true;
             }
 
-            for(list<cTouch>::iterator it = enmies->begin(); it != enmies->end(); ++it){
+            for(list<cTouch>::iterator it = enmies.begin(); it != enmies.end(); ++it){
                 if(PIECES_RANKS[it->piece] < PIECES_RANKS[piece]){
                     return true;
                 }

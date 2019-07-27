@@ -45,7 +45,7 @@
 
             cMove *do_move(int dst, int prompiece, int movecnt, int &score);
 
-            bool undo_move(cMove *move, int movecnt, int *score);
+            bool undo_move(cMove &move, int movecnt, int &score);
 
             //void find_attacks_and_supports(list<cTouch> &attacked, list<cTouch> &supported);
 

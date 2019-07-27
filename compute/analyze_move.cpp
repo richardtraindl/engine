@@ -19,7 +19,7 @@
         //from_castl_rk_attacked = []
         //crook = None
         int piece = match.board.getfield(priomove.src);
-        int dstpiece = match.board.getfield(priomove.dst);
+        //int dstpiece = match.board.getfield(priomove.dst);
         /*
         list<cTouch>from_dstfield_supported, from_dstfield_attacked;
         find_touches_after_move(match, move, from_dstfield_supported, from_dstfield_attacked);

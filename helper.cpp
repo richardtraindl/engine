@@ -4,9 +4,10 @@
 
     using namespace std;
 
+
     int coord_to_index(string coord){
-        int x = stoi(coord.substr(0, 1), nullptr, 10);
-        int y = stoi(coord.substr(1, 1), nullptr, 10);
+        int x = int(coord[0]);
+        int y = int(coord[1]);
         if(x > (int)'H'){
             x -= (int)'a';
         }

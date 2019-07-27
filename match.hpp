@@ -48,6 +48,8 @@
             bool undo_move();
 
             int eval_status();
+            
+            void prnt_minutes();
     };
 
 #endif
