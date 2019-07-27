@@ -11,7 +11,7 @@
             add_mvcnt = 2;
             dpth_max = 10;
             dpth_stage1 = 2;
-            dpth_stage2 = 6;
+            dpth_stage2 = 5;
             mvcnt_stage1 = 32; // 6;
             mvcnt_stage2 = 12; //6;
         }
@@ -67,7 +67,7 @@
             }
             else{
                 cPiece cpiece(&(match.board), idx);
-                cpiece.generate_moves(match.minutes, moves);
+                cpiece.generate_moves(match, moves);
             }
         }
     }
@@ -82,7 +82,7 @@
             }
             else{
                 cPiece cpiece(&(match.board), idx);
-                cpiece.generate_priomoves(match.minutes, candidate, dbggmove, search_for_mate, priomoves);
+                cpiece.generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);
             }
         }
     }

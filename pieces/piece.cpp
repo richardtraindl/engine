@@ -3,6 +3,7 @@
     #include "./piece_ext1.hpp"
     #include "./piece_ext2.hpp"
     #include "./searchforpiece.hpp"
+    #include "../compute/analyze_move.hpp"
     #include "../values.hpp"
     #include "../helper.hpp"
 
@@ -178,18 +179,18 @@
     }
 
     bool cPiece::is_trapped(){
-        return is_trapped_from_valid(this);
+        return is_trapped_from_ext(this);
     }
 
     bool cPiece::is_move_stuck(int dst){
-        return is_move_stuck_from_valid(this, dst);
+        return is_move_stuck_from_ext(this, dst);
     }
 
-    bool cPiece::is_move_valid(int dst, int prompiece, list<cMove> *minutes){
-        return is_move_valid_from_valid(this, dst, prompiece, minutes);
+    bool cPiece::is_move_valid(int dst, int prompiece, list<cMove> &minutes){
+        return is_move_valid_from_ext(this, dst, prompiece, minutes);
     }
 
-    cMove *cPiece::do_move(int dst, int prompiece, int movecnt, int *score){
+    cMove *cPiece::do_move(int dst, int prompiece, int movecnt, int &score){
         return do_move_from_ext(this, dst, prompiece, movecnt, score);
     }
 
@@ -249,7 +250,7 @@
         return score;
     }
 
-    void cPiece::generate_moves(list<cMove> &minutes, list<cMove> &moves){
+    void cPiece::generate_moves(cMatch &match, list<cMove> &moves){
         cMove *move;
         for(auto &step : get_mv_steps()){
             if(step == 0){ 
@@ -260,7 +261,7 @@
             while(board->is_inbounds(pos, dst, step) && count < get_maxcnt()){
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
-                    if(board->is_move_valid(pos, dst, prompiece, minutes)){
+                    if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
                         move = new cMove(board->fields, pos, dst, prompiece);
                         moves.push_back(*move);
                     }
@@ -273,7 +274,7 @@
         }
     }
 
-    void cPiece::generate_priomoves(list<cMove> &minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves){
+    void cPiece::generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves){
         cPrioMove *priomove;
         list<cPrioMove> excludes;        
         for(auto &step : get_mv_steps()){
@@ -287,8 +288,9 @@
                 }
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
-                    if(board->is_move_valid(pos, dst, prompiece, minutes)){
+                    if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
                         priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
+                        add_tactics(*priomove, match, candidate, dbggmove, search_for_mate, excludes);
                         //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                         //if(len(excluded) > 0):
                             //excludes.extend(excluded)

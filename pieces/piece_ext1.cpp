@@ -2,12 +2,12 @@
     #include "./piece_ext1.hpp"
     #include "../values.hpp"
 
-    cMove *do_move_from_ext(cPiece *cpiece, int dst, int prompiece, int movecnt, int *score){
+    cMove *do_move_from_ext(cPiece *cpiece, int dst, int prompiece, int movecnt, int &score){
         int dstpiece = cpiece->board->getfield(dst);
         cMove *move = new cMove(cpiece->board->fields, cpiece->pos, dst, prompiece);
         cpiece->board->setfield(move->src, mBLK);
         cpiece->board->setfield(move->dst, cpiece->piece);
-        *score += SCORES[dstpiece];
+        score += SCORES[dstpiece];
         
         if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
            cpiece->piece == mWKN || cpiece->piece == mBKN ||
@@ -18,7 +18,7 @@
         if(cpiece->piece == mWPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                *score -= SCORES[prompiece] - SCORES[cpiece->piece];
+                score -= SCORES[prompiece] - SCORES[cpiece->piece];
             }
             if(dstpiece == mBLK && cpiece->pos % 8 != dst % 8){
                 int enpass;
@@ -30,7 +30,7 @@
                 }
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
-                *score += SCORES[captpiece];
+                score += SCORES[captpiece];
             }
             return move;
         }
@@ -38,7 +38,7 @@
         if(cpiece->piece == mBPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                *score -= SCORES[prompiece] - SCORES[cpiece->piece];
+                score -= SCORES[prompiece] - SCORES[cpiece->piece];
             }
             if(dstpiece == mBLK && cpiece->pos % 8 != dst % 8){
                 int enpass;
@@ -50,7 +50,7 @@
                 }
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
-                *score += SCORES[captpiece];
+                score += SCORES[captpiece];
             }
             return move;
         }

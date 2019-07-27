@@ -4,6 +4,7 @@
 
     #include <list> 
     #include <array> 
+    #include "../match.hpp"
     #include "../board.hpp"
     #include "../move.hpp"
     #include "./touch.hpp"
@@ -38,11 +39,11 @@
 
             bool is_move_stuck(int dst);
 
-            bool is_move_valid(int dst, int prompiece, list<cMove> *minutes);
+            bool is_move_valid(int dst, int prompiece, list<cMove> &minutes);
             
             bool is_ep_move_ok(int dst, list<cMove> *minutes);
 
-            cMove *do_move(int dst, int prompiece, int movecnt, int *score);
+            cMove *do_move(int dst, int prompiece, int movecnt, int &score);
 
             bool undo_move(cMove *move, int movecnt, int *score);
 
@@ -50,9 +51,9 @@
 
             int score_touches();
 
-            void generate_moves(list<cMove> &minutes, list<cMove> &moves);
+            void generate_moves(cMatch &match, list<cMove> &moves);
 
-            void generate_priomoves(list<cMove> &minutes, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves);
+            void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves);
 
             bool is_running_pawn();
 

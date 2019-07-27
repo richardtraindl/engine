@@ -63,9 +63,9 @@
 
             int eval_soft_pin_dir(int src);
 
-            bool is_king_after_move_attacked(int src, int dst, list<cMove> *minutes);
+            bool is_king_after_move_attacked(int src, int dst, list<cMove> &minutes);
 
-            bool is_move_valid(int src, int dst, int prompiece, list<cMove> *minutes);
+            bool is_move_valid(int src, int dst, int prompiece, list<cMove> &minutes);
 
             bool is_move_available(list<cMove> &minutes);
 

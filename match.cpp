@@ -159,7 +159,7 @@
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
         cPiece cpiece(&board, src);
-        cMove *move = cpiece.do_move(dst, prompiece, movecnt() + 1, &score);
+        cMove *move = cpiece.do_move(dst, prompiece, movecnt() + 1, score);
         minutes.push_back(*move);
         return move;
     }

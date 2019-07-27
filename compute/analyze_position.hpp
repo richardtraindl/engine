@@ -1,5 +1,5 @@
-#ifndef ANALYZEPOSITION_HPP
-    #define ANALYZEPOSITION_HPP
+#ifndef ANALYZE_POSITION_HPP
+    #define ANALYZE_POSITION_HPP
 
     #include "../match.hpp"
 

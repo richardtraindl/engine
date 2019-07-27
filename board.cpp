@@ -391,7 +391,7 @@
         return DIRS["undef"];
     }
 
-    bool cBoard::is_king_after_move_attacked(int src, int dst, list<cMove> *minutes){
+    bool cBoard::is_king_after_move_attacked(int src, int dst, list<cMove> &minutes){
         int srcpiece = getfield(src);
         int dstpiece;
         int pawnenmy = mBLK;
@@ -428,17 +428,17 @@
         return flag;
     }
 
-    bool cBoard::is_move_valid(int src, int dst, int prompiece, list<cMove> *minutes){
+    bool cBoard::is_move_valid(int src, int dst, int prompiece, list<cMove> &minutes){
         int piece = getfield(src);
         int direction = cPiece::dir_for_move(piece, src, dst);
         int step = cPiece::step_for_dir(piece, direction);
         if(is_inbounds(src, dst, step) == false){
             return false; // RETURN_CODES["out-of-bounds"]
         }
-        if(minutes->size() % 2 == 0 && PIECES_COLORS[piece] != COLORS["white"]){
+        if(minutes.size() % 2 == 0 && PIECES_COLORS[piece] != COLORS["white"]){
             return false; // RETURN_CODES["wrong-color"]
         }
-        if(minutes->size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
+        if(minutes.size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
             return false; // RETURN_CODES["wrong-color"]
         }
         //if(piece != mWKG && piece != mBKG){
@@ -457,7 +457,7 @@
 
     bool cBoard::is_move_available(list<cMove> &minutes){
         int color;
-        if(minutes->size() % 2 == 0){
+        if(minutes.size() % 2 == 0){
             color = COLORS["white"];
         }
         else{

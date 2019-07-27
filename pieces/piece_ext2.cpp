@@ -3,7 +3,7 @@
     #include "./searchforpiece.hpp"
     #include "../values.hpp"
 
-    bool is_move_valid_from_valid(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes){
+    bool is_move_valid_from_ext(cPiece *cpiece, int dst, int prompiece, list<cMove> &minutes){
         bool flag = false;
         for(auto &step : cpiece->get_mv_steps()){
             if(cpiece->pos + step == dst && cBoard::is_inbounds(cpiece->pos, dst, step)){
@@ -32,7 +32,7 @@
     }
 
     // White Pawn
-    bool is_move_valid_for_whitepawn(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes){
+    bool is_move_valid_for_whitepawn(cPiece *cpiece, int dst, int prompiece, list<cMove> &minutes){
         // check double step from second renk
         if(dst - cpiece->pos == 16 && cpiece->pos > 15){ return false; }
 
@@ -81,13 +81,13 @@
         return true;
     }
 
-    bool is_ep_move_ok_for_whitepawn(cPiece *piece, int dst, list<cMove> *minutes){
+    bool is_ep_move_ok_for_whitepawn(cPiece *piece, int dst, list<cMove> &minutes){
         cMove lastmove;
-        if(minutes->empty()){ 
+        if(minutes.empty()){ 
             return false; 
         }
         else{
-            lastmove = minutes->back();
+            lastmove = minutes.back();
         }
 
         int dstpiece = piece->board->getfield(dst);
@@ -106,7 +106,7 @@
 
 
     // Black Pawn
-    bool is_move_valid_for_blackpawn(cPiece *cpiece, int dst, int prompiece, list<cMove> *minutes){
+    bool is_move_valid_for_blackpawn(cPiece *cpiece, int dst, int prompiece, list<cMove> &minutes){
         // check double step from seventh renk
         if(cpiece->pos - dst == 16 && cpiece->pos < 48){ return false; }
 
@@ -159,13 +159,13 @@
         return true;
     }
 
-    bool is_ep_move_ok_for_blackpawn(cPiece *piece, int dst, list<cMove> *minutes){
+    bool is_ep_move_ok_for_blackpawn(cPiece *piece, int dst, list<cMove> &minutes){
         cMove lastmove;
-        if(minutes->empty()){
+        if(minutes.empty()){
             return false;
         }
         else{
-            lastmove = minutes->back();
+            lastmove = minutes.back();
         }
         int dstpiece = piece->board->getfield(dst);
         int enemy = piece->board->getfield(lastmove.dst);
@@ -329,7 +329,7 @@
     // Rook, Bishop, Queen end
 
 
-    bool is_trapped_from_valid(cPiece *cpiece){
+    bool is_trapped_from_ext(cPiece *cpiece){
         if(cpiece->piece == mWPW || cpiece->piece == mBPW || 
            cpiece->piece == mWKN || cpiece->piece == mBKN ||
            cpiece->piece == mWKG || cpiece->piece == mBKG){
@@ -370,7 +370,7 @@
     }
 
 
-    bool is_move_stuck_from_valid(cPiece *cpiece, int dst){
+    bool is_move_stuck_from_ext(cPiece *cpiece, int dst){
         if(cpiece->piece == mWKG || cpiece->piece == mBKG){
             return false; //king cannot stuck
         }

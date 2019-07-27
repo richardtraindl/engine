@@ -42,11 +42,11 @@
         //match.undo_move();
         //cout << "undo_move " << dec << match.score << " \n" << hex << match.board.fields << "\n";
 
-        cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, &match.minutes) << "\n";
+        cout << "is_king_after_move_attacked() " << match.board.is_king_after_move_attacked(11, 12, match.minutes) << "\n";
 
-        cout << "is_move_valid() " << match.board.is_move_valid(0, 9, mBLK, &match.minutes) << "\n";
+        cout << "is_move_valid() " << match.board.is_move_valid(0, 9, mBLK, match.minutes) << "\n";
 
-        cout << "is_move_available() " << match.board.is_move_available(&match.minutes) << "\n";
+        cout << "is_move_available() " << match.board.is_move_available(match.minutes) << "\n";
         
         cout << "eval_status() " << match.eval_status() << "\n";
 
