@@ -333,7 +333,6 @@
         bool maximizing = match.next_color() == COLORS["white"];
         int alpha = SCORES[PIECES["wKg"]] * 10;
         int beta = SCORES[PIECES["bKg"]] * 10;
-
         score = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, candidate, rcandidates);
 
         cout << "result: " << score << " match: " << match.created_at << " ";

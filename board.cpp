@@ -43,10 +43,16 @@
 
 
     int cBoard::getfield(int idx){
+        if(idx < 0 || idx > 63){
+            cout << "getfield: " << idx;
+        }
         return (int)((fields >> ((63 - idx) * 4)) & 0xF);
     }
 
     void cBoard::setfield(int idx, int value){
+        if(idx < 0 || idx > 63){
+            cout << "setfield: " << idx;
+        }
         uint256_t _value = value;
         uint256_t tmpfields = SINGLE >> (idx * 4);
         tmpfields = tmpfields ^ FULL;

@@ -22,11 +22,11 @@
 
     //bool is_supported_running_pawn(cMatch &match, cTouch &supported);
 
-    bool castles(cMatch &match, int piece, cMove &move);
+    bool castles(cMatch &match, int piece, cPrioMove &priomove);
 
-    bool promotes(cMove &move);
+    bool promotes(cPrioMove &priomove);
 
-    bool captures(cMatch &match, int piece, cMove &move);
+    bool captures(cMatch &match, int piece, cPrioMove &priomove);
 
     //bool forks(int piece, list<cTouch> &from_dstfield_attacked);
 

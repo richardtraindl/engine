@@ -39,6 +39,7 @@
         if(candidate.src == move.src and candidate.dst == move.dst and candidate.prompiece == move.prompiece):
             priomove.tactics.append(cTactic(cTactic.DOMAINS["prev-candidate"], cTactic.WEIGHTS["good-deal"]))
     */
+
     if(defends_check(match)){
         priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["defends-check"], weight, 0)));
     }
@@ -47,18 +48,20 @@
         priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["castles"], weight, 0)));
         //crook, from_castl_rk_supported, from_castl_rk_attacked = find_rook_touches_after_castling(match, move)
     }
+
     /*
     if(is_tactical_draw(match, move)):
         priomove.tactics.append(cTactic(cTactic.DOMAINS["is-tactical-draw"], cTactic.WEIGHTS["good-deal"]))
-    */    
+    */
+
     if(promotes(priomove)){
         priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["promotes"], weight, 0)));
     }
 
-    if(captures(match, piece, priomove)){
-        int capture_weight = weight_for_capture(match, piece, priomove, weight);
-        priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, 0)));
-    }
+    //if(captures(match, piece, priomove)){
+    //    int capture_weight = weight_for_capture(match, piece, priomove, weight);
+    //    priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, 0)));
+    //}
 
     /*
     if(does_unpin(match, piece, move)):

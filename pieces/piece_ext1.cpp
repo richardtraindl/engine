@@ -20,14 +20,14 @@
                 cpiece->board->setfield(dst, prompiece);
                 score += SCORES[prompiece] - SCORES[cpiece->piece];
             }
-            if(dstpiece == mBLK && cpiece->pos % 8 != dst % 8){
-                int enpass;
-                if(cpiece->pos % 8 < dst % 8){
-                    enpass = cpiece->pos + 1;
-                }
-                else{
-                    enpass = cpiece->pos - 1;
-                }
+            if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
+                int enpass = cpiece->pos + 1;
+                int captpiece = cpiece->board->getfield(enpass);
+                cpiece->board->setfield(enpass, mBLK);
+                score += SCORES[captpiece];
+            }
+            if(dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
+                int enpass = cpiece->pos - 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];
@@ -40,14 +40,14 @@
                 cpiece->board->setfield(dst, prompiece);
                 score += SCORES[prompiece] - SCORES[cpiece->piece];
             }
-            if(dstpiece == mBLK && cpiece->pos % 8 != dst % 8){
-                int enpass;
-                if(cpiece->pos % 8 < dst % 8){
-                    enpass = cpiece->pos + 1;
-                }
-                else{
-                    enpass = cpiece->pos - 1;
-                }
+            if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
+                int enpass = cpiece->pos + 1;
+                int captpiece = cpiece->board->getfield(enpass);
+                cpiece->board->setfield(enpass, mBLK);
+                score += SCORES[captpiece];
+            }
+            if(dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
+                int enpass = cpiece->pos - 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];

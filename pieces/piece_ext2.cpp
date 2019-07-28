@@ -200,6 +200,10 @@
         if(is_short_castling_ok(cpiece, dst)){ return true; }
 
         if(is_long_castling_ok(cpiece, dst)){ return true; }
+        
+        if(abs(cpiece->pos - dst) == 2){
+            return false;
+        }
 
         int captured = cpiece->board->getfield(dst);
         cpiece->board->setfield(cpiece->pos, mBLK);
@@ -217,7 +221,7 @@
 
     bool is_short_castling_ok(cPiece *cpiece, int dst){
         uint256_t shorttest, shortmask;
-        if(cpiece->pos - dst != -2){ return false; }
+        if(cpiece->pos % 8 != 4 || cpiece->pos - dst != -2){ return false; }
 
         if(cpiece->color == COLORS["white"]){
             if(cpiece->board->wKg_first_move_on != -1 || cpiece->board->wRkH_first_move_on != -1){
@@ -253,7 +257,7 @@
 
     bool is_long_castling_ok(cPiece *cpiece, int dst){
         uint256_t longtest, longmask;
-        if(cpiece->pos - dst != 2){ return false; }
+        if(cpiece->pos % 8 != 4 || cpiece->pos - dst != 2){ return false; }
 
         if(cpiece->color == COLORS["white"]){
             if(cpiece->board->wKg_first_move_on != -1 || cpiece->board->wRkA_first_move_on != -1){

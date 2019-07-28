@@ -69,9 +69,9 @@ def is_supported_running_pawn(match, supported){
     return false;
 */
 
-    bool castles(cMatch &match, int piece, cMove &move){
+    bool castles(cMatch &match, int piece, cPrioMove &priomove){
         if(piece == mWKG || piece == mBKG){
-            if(abs(move.src - move.dst) == 2){
+            if(abs(priomove.src - priomove.dst) == 2){
                 return true;
             }
         }
@@ -79,8 +79,8 @@ def is_supported_running_pawn(match, supported){
     }
 
 
-    bool promotes(cMove &move){
-        if(move.prompiece != mBLK){
+    bool promotes(cPrioMove &priomove){
+        if(priomove.prompiece != mBLK){
             return true;
         }
         else{
@@ -88,12 +88,12 @@ def is_supported_running_pawn(match, supported){
         }
     }
 
-    bool captures(cMatch &match, int piece, cMove &move){
-        int dstpiece = match.board.getfield(move.dst);
+    bool captures(cMatch &match, int piece, cPrioMove &priomove){
+        int dstpiece = match.board.getfield(priomove.dst);
         if(dstpiece != mBLK){
             return true;
         }
-        if((piece == mWPW || piece == mBPW) && (move.src % 8) != (move.dst %8)){
+        if((piece == mWPW || piece == mBPW) && (priomove.src % 8) != (priomove.dst %8)){
             return true;
         }
         else{
