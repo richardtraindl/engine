@@ -1,5 +1,7 @@
 CC = g++
 
+all: ./touch.o ./searchforpiece.o ./piece_ext2.o ./piece_ext1.o ./piece.o
+
 piece.o: ./piece.cpp ./piece.hpp
 	$(CC) -Wall --std=c++17 -c ./piece.cpp -o ./piece.o
 

@@ -164,34 +164,32 @@
         return move;
     }
 
-    bool cMatch::undo_move(){
+    void cMatch::undo_move(){
         cMove move;
         if(minutes.size() > 0){
             move = minutes.back();
         }
         else{
-            return false;
+            return;
         }
         int piece = board.getfield(move.dst);
         if(move.prompiece != mBLK){
-            bool flag;
             if(PIECES_COLORS[piece] == COLORS["white"]){
                 cPiece piece(&board, move.dst);
-                flag = piece.undo_move(move, movecnt(), score);
+                piece.undo_move(move, movecnt(), score);
             }
             else{
                 cPiece piece(&board, move.dst);
-                flag = piece.undo_move(move, movecnt(), score);
+                piece.undo_move(move, movecnt(), score);
             }
             minutes.pop_back();
-            return flag;
         }
         else{
             cPiece cpiece(&board, move.dst);
-            bool flag = cpiece.undo_move(move, movecnt(), score);
+            cpiece.undo_move(move, movecnt(), score);
             minutes.pop_back();
-            return flag;
         }
+        // delete move;
     }
 
     int cMatch::eval_status(){

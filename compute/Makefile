@@ -1,5 +1,7 @@
 CC = g++
 
+all: ./analyze_helper.o ./analyze_tactics.o ./analyze_move.o ./analyze_position.o ./calc.o
+
 calc.o: ./calc.cpp ./calc.hpp
 	$(CC) -Wall --std=c++17 -c ./calc.cpp -o ./calc.o
 

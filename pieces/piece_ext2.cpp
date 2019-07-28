@@ -4,17 +4,7 @@
     #include "../values.hpp"
 
     bool is_move_valid_from_ext(cPiece *cpiece, int dst, int prompiece, list<cMove> &minutes){
-        bool flag = false;
-        for(auto &step : cpiece->get_mv_steps()){
-            if(cpiece->pos + step == dst && cBoard::is_inbounds(cpiece->pos, dst, step)){
-                flag = true;
-                break;
-            }
-        }
-        if(flag == false){
-            return false;
-        }
-         if(cpiece->piece == mWPW){
+        if(cpiece->piece == mWPW){
             return is_move_valid_for_whitepawn(cpiece, dst, prompiece, minutes);
         }
         if(cpiece->piece == mBPW){
@@ -33,6 +23,16 @@
 
     // White Pawn
     bool is_move_valid_for_whitepawn(cPiece *cpiece, int dst, int prompiece, list<cMove> &minutes){
+        // check move step
+        bool flag = false;
+        for(auto &step : cpiece->get_mv_steps()){
+            if(cpiece->pos + step == dst && cBoard::is_inbounds(cpiece->pos, dst, step)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag == false){ return false; }
+
         // check double step from second renk
         if(dst - cpiece->pos == 16 && cpiece->pos > 15){ return false; }
 
@@ -41,6 +41,7 @@
 
         int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
         int dstpiece = cpiece->board->getfield(dst);
+
         // check pins
         if(pin_dir != DIRS["undef"]){
             if(move_dir == DIRS["nth"]){
@@ -59,6 +60,7 @@
                 }
             }
         }
+
         // check fields
         if(move_dir == DIRS["nth"]){ 
             if(dstpiece != mBLK){ return false; }
@@ -72,6 +74,7 @@
                 return is_ep_move_ok_for_whitepawn(cpiece, dst, minutes);
             }
         }
+
         // check promotion
         if((dst / 8) == 7 && prompiece != mWQU && prompiece != mWRK && 
            prompiece != mWBP && prompiece != mWKN){ return false; }
@@ -107,6 +110,16 @@
 
     // Black Pawn
     bool is_move_valid_for_blackpawn(cPiece *cpiece, int dst, int prompiece, list<cMove> &minutes){
+        // check move step
+        bool flag = false;
+        for(auto &step : cpiece->get_mv_steps()){
+            if(cpiece->pos + step == dst && cBoard::is_inbounds(cpiece->pos, dst, step)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag == false){ return false; }
+
         // check double step from seventh renk
         if(cpiece->pos - dst == 16 && cpiece->pos < 48){ return false; }
 
@@ -115,6 +128,7 @@
 
         int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
         int dstpiece = cpiece->board->getfield(dst);
+
         // check pins
         if(pin_dir != DIRS["undef"]){
             if(move_dir == DIRS["sth"]){
@@ -133,6 +147,7 @@
                 }
             }
         }
+
         // check fields
         if(move_dir == DIRS["sth"]){
             if(dstpiece != mBLK){
@@ -150,6 +165,7 @@
                 return is_ep_move_ok_for_blackpawn(cpiece, dst, minutes);
             }
         }
+
         // check promotion
         if((dst / 8) == 0 && prompiece != mBQU && prompiece != mBRK && 
            prompiece != mBBP && prompiece != mBKN){ return false; }
@@ -184,6 +200,16 @@
     
     // Knight
     bool is_move_valid_for_knight(cPiece *cpiece, int dst, int prompiece){
+        // check move step
+        bool flag = false;
+        for(auto &step : cpiece->get_mv_steps()){
+            if(cpiece->pos + step == dst && cBoard::is_inbounds(cpiece->pos, dst, step)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag == false){ return false; }
+
         int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
         if(pin_dir != DIRS["undef"]){ return false; }
 
@@ -197,13 +223,21 @@
 
     // King
     bool is_move_valid_for_king(cPiece *cpiece, int dst, int prompiece){
+        // check move step
+        bool flag = false;
+        for(auto &step : cpiece->get_mv_steps()){
+            if(cpiece->pos + step == dst && cBoard::is_inbounds(cpiece->pos, dst, step)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag == false){ return false; }
+
         if(is_short_castling_ok(cpiece, dst)){ return true; }
 
         if(is_long_castling_ok(cpiece, dst)){ return true; }
         
-        if(abs(cpiece->pos - dst) == 2){
-            return false;
-        }
+        if(abs(cpiece->pos - dst) == 2){ return false; }
 
         int captured = cpiece->board->getfield(dst);
         cpiece->board->setfield(cpiece->pos, mBLK);
@@ -296,22 +330,23 @@
     // Rook, Bishop, Queen
     bool is_move_valid_for_long_distance_piece(cPiece *cpiece, int dst, int prompiece){
         int dir = cPiece::dir_for_move(cpiece->piece, cpiece->pos, dst);
-        if(dir == DIRS["undef"]){
-            return false;
-        }
-        int step = cPiece::step_for_dir(cpiece->piece, dir);
-        if(step == 0){
-            int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
-            for(auto &piecedir : cpiece->get_dirs_ary()){
-                if(piecedir == DIRS["undef"]){ break; }
-
-                if(dir == piecedir){
-                    if(pin_dir != piecedir && pin_dir != REVERSE_DIRS[piecedir] && pin_dir != DIRS["undef"]){
-                        return false;
-                    }
+        if(dir == DIRS["undef"]){ return false; }
+        
+        // check pins
+        int pin_dir = cpiece->board->eval_pin_dir(cpiece->pos);
+        for(auto &piecedir : cpiece->get_dirs_ary()){
+            if(piecedir == DIRS["undef"]){ break; }
+            if(dir == piecedir){
+                if(pin_dir != piecedir && 
+                   pin_dir != REVERSE_DIRS[piecedir] && 
+                   pin_dir != DIRS["undef"]){
+                    return false;
                 }
             }
         }
+
+        int step = cPiece::step_for_dir(cpiece->piece, dir);
+        if(step == 0){ return false; }
         int newpos = cpiece->pos + step;
         while(cpiece->board->is_inbounds(cpiece->pos, newpos, 0)){
             int newpiece = cpiece->board->getfield(newpos);

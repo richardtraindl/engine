@@ -12,8 +12,8 @@
             dpth_max = 10;
             dpth_stage1 = 2;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 32; // 6;
-            mvcnt_stage2 = 12; //6;
+            mvcnt_stage1 = 24;
+            mvcnt_stage2 = 8;
         }
         else{
             add_mvcnt = 2;
@@ -231,6 +231,14 @@
         }
     }
 
+    void clean_priomoves(list<cPrioMove> &priomoves){
+        cPrioMove *priomove;
+        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
+            priomove = &(*it);
+            delete priomove;
+        }
+    }
+
 
     int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
@@ -259,6 +267,7 @@
         }
 
         if(priomoves.size() == 0 || maxcnt == 0){
+            //clean_priomoves(priomoves);
             return score_position(match, priomoves.size());
             // rcandidates.clear();
         }
@@ -266,9 +275,9 @@
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             count += 1;
             newcandidates.clear();
-            
+
             if(depth == 1){
-                cout << "CURRENT SEARCH: " << dec << newscore << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;;
+                cout << "CURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
             }
 
             match.do_move(it->src, it->dst, it->prompiece);
@@ -312,10 +321,7 @@
                 break;
             }
         }
-        /*for(list<cPrioMove>::iterator it = candidates.begin(); it != candidates.end(); ++it){
-            cPrioMove *pmv = new cPrioMove(it->prevfields, it->src, it->dst, it->prompiece, it->prio);
-            result_candidates.push_back(*pmv);
-        }*/
+        //clean_priomoves(priomoves);
         return score;
     }
 

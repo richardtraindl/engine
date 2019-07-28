@@ -1,11 +1,11 @@
 CC = g++
 
-all: ./ui/play.o \
-	 ./pieces/touch.o ./pieces/searchforpiece.o \
-	 ./pieces/piece_ext1.o ./pieces/piece_ext2.o ./pieces/piece.o \
+all: ./values.o ./helper.o ./move.o ./board.o ./match.o ./engine.o \
 	 ./compute/analyze_helper.o ./compute/analyze_tactics.o \
 	 ./compute/analyze_move.o ./compute/analyze_position.o ./compute/calc.o \
-	 ./helper.o ./values.o ./move.o ./board.o ./match.o ./engine.o
+	 ./pieces/touch.o ./pieces/searchforpiece.o ./pieces/piece_ext2.o \
+	 ./pieces/piece_ext1.o ./pieces/piece.o \
+	 ./ui/play.o
 
 	$(CC) -Wall --std=c++17 \
 		./ui/play.o \

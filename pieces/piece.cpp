@@ -194,8 +194,8 @@
         return do_move_from_ext(this, dst, prompiece, movecnt, score);
     }
 
-    bool cPiece::undo_move(cMove &move, int movecnt, int &score){
-        return undo_move_from_ext(this, move, movecnt, score);
+    void cPiece::undo_move(cMove &move, int movecnt, int &score){
+        undo_move_from_ext(this, move, movecnt, score);
     }
 
     /*void cPiece::find_attacks_and_supports(list<cTouch> &attacked, list<cTouch> &supported){
@@ -253,9 +253,7 @@
     void cPiece::generate_moves(cMatch &match, list<cMove> &moves){
         cMove *move;
         for(auto &step : get_mv_steps()){
-            if(step == 0){ 
-                break; 
-            }
+            if(step == 0){ break; }
             int count = 0;
             int dst = pos + step;
             while(board->is_inbounds(pos, dst, step) && count < get_maxcnt()){
@@ -276,16 +274,14 @@
 
     void cPiece::generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves){
         cPrioMove *priomove;
-        list<cPrioMove> excludes;        
+        list<cPrioMove> excludes;
         for(auto &step : get_mv_steps()){
             if(step == 0){ break; }
             int count = 0;
             int dst = pos + step;
             while(board->is_inbounds(pos, dst, step) && count < get_maxcnt()){
                 int dstpiece = board->getfield(dst);
-                if(PIECES_COLORS[dstpiece] == color){
-                    break;
-                }
+                if(PIECES_COLORS[dstpiece] == color){ break; }
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, match.minutes)){

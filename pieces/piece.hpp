@@ -41,11 +41,9 @@
 
             bool is_move_valid(int dst, int prompiece, list<cMove> &minutes);
             
-            bool is_ep_move_ok(int dst, list<cMove> *minutes);
-
             cMove *do_move(int dst, int prompiece, int movecnt, int &score);
 
-            bool undo_move(cMove &move, int movecnt, int &score);
+            void undo_move(cMove &move, int movecnt, int &score);
 
             //void find_attacks_and_supports(list<cTouch> &attacked, list<cTouch> &supported);
 
