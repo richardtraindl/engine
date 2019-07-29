@@ -279,7 +279,7 @@
         cpiece->board->setfield(cpiece->pos, mBLK);
         for(int i = 0; i < 3; ++i){
             int dst2 = cpiece->pos + i;
-            bool isattacked = is_field_touched(cpiece->board, dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
+            bool isattacked = is_field_touched(&(cpiece->board), dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
             if(isattacked){
                 cpiece->board->setfield(cpiece->pos, cpiece->piece);
                 return false;
@@ -315,7 +315,7 @@
         cpiece->board->setfield(cpiece->pos, mBLK);
         for(int i = 0; i < 3; ++i){
             int dst2 = cpiece->pos - i;
-            bool isattacked = is_field_touched(cpiece->board, dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
+            bool isattacked = is_field_touched(&(cpiece->board), dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
             if(isattacked){
                 cpiece->board->setfield(cpiece->pos, cpiece->piece);
                 return false;
@@ -375,7 +375,7 @@
             return false; // these piece cannot be trapped
         }
         else{
-            if(is_field_touched(cpiece->board, cpiece->pos, REVERSED_COLORS[cpiece->color], EVAL_MODES["only-pins-to-king"])){
+            if(is_field_touched(&(cpiece->board), cpiece->pos, REVERSED_COLORS[cpiece->color], EVAL_MODES["only-pins-to-king"])){
                 return false;
             }
             for(int step : cpiece->get_steps()){
