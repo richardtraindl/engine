@@ -153,11 +153,14 @@
 
         if(blocks(match, piece, move)):
             priomove.tactics.append(cTactic(cTactic.DOMAINS["blocks"], weight))
+        */
 
-        if(running_pawn(match, piece, move)):
-            running_weight = weight_for_running_pawn(match, piece, move, weight)
-            priomove.tactics.append(cTactic(cTactic.DOMAINS["is-running-pawn"], running_weight))
+        if(running_pawn(match, move)){
+            int running_weight = weight_for_running_pawn(match, piece, move, weight);
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["is-running-pawn"], running_weight, 0)));
+        }
 
+        /*
         if(controles_file(match, move)):
             priomove.tactics.append(cTactic(cTactic.DOMAINS["controles-file"], weight))
 
