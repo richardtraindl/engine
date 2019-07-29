@@ -15,13 +15,13 @@
 
     void find_touches_on_dstfield_after_move(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &friends, list<cTouch> &enmies);
 
-    /*bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
+    //bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
 
-    bool check_mates_deep_search(cMatch &match, cPrioMove &priomove);
+    //bool check_mates_deep_search(cMatch &match, cPrioMove &priomove);
 
-    bool calc_checks(cMatch &match, int maxcnt, int count);
-    */
-    bool is_soft_pinned_move(cMatch &match, int piece, cPrioMove &priomove);
+    //bool calc_checks(cMatch &match, int maxcnt, int count);
+
+    // bool is_soft_pinned_move(cMatch &match, int piece, cPrioMove &priomove);
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove);
 
@@ -31,11 +31,11 @@
 
     int weight_for_capture(cMatch &match, int piece, cPrioMove &priomove, int weight);
 
-    /*
-    int weight_for_flee(cMatch &match, int piece, cPrioMove &priomove, int weight);
+    //int weight_for_flee(cMatch &match, int piece, cPrioMove &priomove, int weight);
 
     int weight_for_running_pawn(cMatch &match, int piece, cPrioMove &priomove, int weight);
 
+    /*
     int weight_for_discl_supported(cTouch &discl_supported, int weight);
 
     int weight_for_discl_attacked(cTouch &discl_attacked, int weight);
