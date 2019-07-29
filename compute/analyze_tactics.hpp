@@ -20,7 +20,7 @@
 
     //int[] search_lines_of_pin(cMatch &match, int color, int pos, int excl_dir);
 
-    //bool is_supported_running_pawn(cMatch &match, cTouch &supported);
+    bool is_supported_running_pawn(cMatch &match, cTouch &supported);
 
     bool castles(cMatch &match, int piece, cPrioMove &priomove);
 
@@ -48,7 +48,7 @@
 
     //bool blocks(cMatch &match, int piece, cMove &move);
 
-    bool running_pawn(cMatch &match, int piece, cMove &move);
+    bool running_pawn(cMatch &match, cMove &move);
 
     //bool defends_invasion(cMatch &match, cMove &move);
 
