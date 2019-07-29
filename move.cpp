@@ -248,9 +248,7 @@
             else{
                 str_end = "\n";
             }
-            out << it->domain << " * " << it->weight;
-            // reverse_lookup(WEIGHTS, it->weight)
-            // reverse_lookup(DOMAINS, it->domain) + weight_str  + str_end
+            out << reverse_lookup(cTactic::DOMAINS, it->domain) << " * " << reverse_lookup(cTactic::WEIGHTS, it->weight);
             str_tactics +=  out.str() + str_end;
             i += 1;
         }
