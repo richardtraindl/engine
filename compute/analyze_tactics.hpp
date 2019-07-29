@@ -34,9 +34,9 @@
  
     //bool threatens_fork(cMatch &match, int piece, cMove &move);
 
-    //bool flees(cMatch &match, int piece, cMove &move);
+    bool flees(cMatch &match, int piece, cMove &move);
 
-    //void find_touches_after_move(cMatch &match, cMove move, list<cTouch> &supported, list<cTouch> &attacked);
+    void find_touches_after_move(cMatch &match, cMove &move, list<cTouch> &supported, list<cTouch> &attacked);
 
     //void find_rook_touches_after_castling(cMatch &match, cMove move, ist<cTouch> &supported, list<cTouch> &attacked);
 
