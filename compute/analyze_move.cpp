@@ -79,16 +79,18 @@
             tactic = cTactic(cTactic.DOMAINS["threatens-fork"], weight)
             priomove.tactics.append(tactic)
             excludes.append(cExcluded(priomove, tactic))
+        */
 
         if(flees(match, piece, move)):
-            flee_weight = weight_for_flee(match, piece, move, weight)
-            tactic = cTactic(cTactic.DOMAINS["flees"], flee_weight, move.src)
-            priomove.tactics.append(tactic)
-            excludes.append(cExcluded(priomove, tactic))
+            flee_weight = weight_for_flee(match, piece, move, weight);
+            cTactic tactic(cTactic::DOMAINS["flees"], flee_weight, move.src);
+            priomove.tactics.push_back(tactic);
+            //excludes.push_back(cExcluded(priomove, tactic));
+        }
 
-        if(len(from_dstfield_attacked) > 0 or len(from_castl_rk_attacked) > 0):
-            for i in range(2):
-                if(i == 0):
+        if(from_dstfield_attacked.size() > 0 || from_castl_rk_attacked.size() > 0){
+            for(int i = 0; i < 2; ++i){
+                if(i == 0){
                     tmp_list_attacked = from_dstfield_attacked
                     tmp_piece = piece
                 else:
@@ -136,6 +138,7 @@
                     priomove.tactics.append(tactic)
                     excludes.append(cExcluded(priomove, tactic))
 
+        /*
         if(len(discl_attacked) > 0):
             for dattd in discl_attacked:
                 discl_attacking_weight = weight_for_discl_attacked(dattd, weight)
