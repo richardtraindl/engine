@@ -31,7 +31,7 @@
     
     void find_touches_on_dstfield_after_move(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &friends, list<cTouch> &enmies){
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        collect_touches_for_both_colors(&match.board, priomove.dst, PIECES_COLORS[piece], &friends, &enmies);
+        collect_touches_for_both_colors(match.board, priomove.dst, PIECES_COLORS[piece], friends, enmies);
         match.undo_move();
     }
 
@@ -84,8 +84,8 @@
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove){
         list<cTouch> touches;
-        cSearchforRook::_collect_touches_for_color(&(match.board), priomove.src, PIECES_COLORS[piece], &touches);
-        cSearchforBishop::_collect_touches_for_color(&(match.board), priomove.src, PIECES_COLORS[piece], &touches);
+        cSearchforRook::_collect_touches_for_color(match.board, priomove.src, PIECES_COLORS[piece], touches);
+        cSearchforBishop::_collect_touches_for_color(match.board, priomove.src, PIECES_COLORS[piece], touches);
         for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
             if(PIECES_BARES[it->piece] == PIECES_BARES[mWQU]){
                 return true;
