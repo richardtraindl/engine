@@ -356,18 +356,21 @@ def blocks(match, piece, move){
     else:
         return false;
 
+*/
 
-def running_pawn(match, piece, move){
-    if(piece == PIECES['wPw']){
-        cpawn = cWhitePawn(match, move.src)
-        return cpawn.is_running()
-    elif(piece == PIECES['bPw']){
-        cpawn = cBlackPawn(match, move.src)
-        return cpawn.is_running()
-    else:
+    bool running_pawn(cMatch &match, int piece, cMove &move){
+        if(piece == PIECES["wPw"]){
+            cPiece cpiece = cWhitePawn(&(match.board), move.src);
+            return cpiece.is_running_pawn();
+        }
+        if(piece == PIECES["bPw"]){
+            cPiece cpiece = cBlackPawn(&(match.board), move.src);
+            return cpiece.is_running_pawn();
+        }
         return false;
+    }
 
-
+/*
 def defends_invasion(match, move){
     """piece = match.board.getfield(move.src)
     color = match.color_of_piece(piece)
@@ -385,17 +388,19 @@ def defends_invasion(match, move){
 
 def controles_file(match, move){
     return false;
+*/
 
+    bool is_tactical_draw(cMatch &match, cMove &move){
+        if(match.is_fifty_moves_rule()){
+            return true;
+        }
+        match.do_move(move.src, move.dst, move.prompiece);
+        is_move_repetition = match.is_move_repetition();
+        match.undo_move();
+        return is_move_repetition;
+    }
 
-def is_tactical_draw(match, move){
-    if(match.is_fifty_moves_rule()){
-        return true;
-    match.do_move(move.src, move.dst, move.prompiece)
-    is_move_repetition = match.is_move_repetition()
-    match.undo_move()
-    return is_move_repetition
-
-
+/*
 def is_progress(match, move){
     return false;
 
