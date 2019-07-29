@@ -169,6 +169,7 @@
 	return weight;
     }
 
+    */
 
     int weight_for_running_pawn(cMatch &match, int piece, cPrioMove &priomove, int weight){
         list <cTouch> friends_on_dstfield, enmies_on_dstfield;
@@ -180,7 +181,7 @@
         return weight;
     }
 
-
+/*
     int weight_for_discl_supported(cTouch &discl_supported, int weight){
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) &&
            discl_supported.attacker_beyond.size() > discl_supported.supporter_beyond.size()){
