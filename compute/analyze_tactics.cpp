@@ -215,41 +215,47 @@ def threatens_fork(match, piece, move){
         match.undo_move();
     }
 
-/*
-def find_rook_touches_after_castling(match, move){
-    supported = []
-    attacked = []
-    ###
-    match.do_move(move.src, move.dst, move.prompiece)
-    if((move.src % 8) + 2 == (move.dst % 8)){
-        crook = cRook(match, move.dst - 1)
-    else:
-        crook = cRook(match, move.dst + 1)
-    crook.find_attacks_and_supports(attacked, supported)
-    match.undo_move()
-    ###
-    return crook, supported, attacked
 
+    void find_rook_touches_after_castling(cMatch &match, cMove &move, cPiece int &rook, list<cTouch> &attacked, list<cTouch> &supported){
+        match.do_move(move.src, move.dst, move.prompiece);
+        if((move.src % 8) + 2 == move.dst % 8){
+            rook = match.board.getfield(move.dst - 1);
+            cPiece cpiece(match.board, move.dst - 1);
+            cpiece.find_attacks_and_supports(attacked, supported);
+        }
+        else{
+            rook = match.board.getfield(move.dst + 1);
+            cPiece cpiece(match.board, move.dst + 1);
+            crook.find_attacks_and_supports(attacked, supported);
+        }
+        match.undo_move()
+    }
 
-def does_unpin(match, piece, move){
-    color = match.color_of_piece(piece)
-    pinlines_before = search_lines_of_pin(match, color, move.src, move.dst)
-    ###
-    match.do_move(move.src, move.dst, move.prompiece)
-    pinlines_after = search_lines_of_pin(match, color, move.dst, None)
-    match.undo_move()
-    ###
-    if(len(pinlines_after) < len(pinlines_before)){
-        return true;
-    for pbefore in pinlines_before:
-        identical = false;
-        for pafter in pinlines_after:
-            if(pbefore[0].field == pafter[0].field){
-                identical = true;
-        if(identical == false;){
+    /*
+    bool does_unpin(cMatch &match, int piece, cMove &move){
+        color = match.color_of_piece(piece);
+        //pinlines_before = search_lines_of_pin(match, color, move.src, move.dst)
+        match.do_move(move.src, move.dst, move.prompiece);
+        //pinlines_after = search_lines_of_pin(match, color, move.dst, None)
+        match.undo_move()
+        if(pinlines_after.size() < pinlines_before.size()){
             return true;
-    return false;
-*/
+        }
+        for(auto &pbefore : pinlines_before){
+            bool identical = false;
+            for(auto &pafter : pinlines_after){
+                if(pbefore.field == pafter.field){
+                    identical = true;
+                }
+            }
+            if(identical == false){
+                return true;
+            }
+        }
+        return false;
+    }
+    */
+
 
     bool defends_check(cMatch &match){
         if(match.next_color() == COLORS["white"]){
