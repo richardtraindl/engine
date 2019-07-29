@@ -48,13 +48,13 @@
 
     //bool blocks(cMatch &match, int piece, cMove &move);
 
-    //bool running_pawn(cMatch &match, int piece, cMove &move);
+    bool running_pawn(cMatch &match, int piece, cMove &move);
 
     //bool defends_invasion(cMatch &match, cMove &move);
 
     //bool controles_file(cMatch &match, cMove &move):
 
-    //bool is_tactical_draw(cMatch &match, cMove &move);
+    bool is_tactical_draw(cMatch &match, cMove &move);
 
     //bool is_progress(cMatch &match, cMove &move);
 
