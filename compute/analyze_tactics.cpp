@@ -59,7 +59,7 @@ def search_lines_of_pin(match, color, field, excl){
         if(match.is_endgame() == false){
             return false;
         }
-        cPiece cpiece = cPiece(&(match.board), supported.pos);
+        cPiece cpiece(&(match.board), supported.pos);
         return cpiece.is_running_pawn();
     }
 
@@ -177,10 +177,10 @@ def threatens_fork(match, piece, move){
         if(piece == mWKG || piece == mBKG){
             return false;
         }
-        collect_touches_for_both_colors(&(match.board),  move.src, PIECES_COLORS[piece], &frdlytouches_old, &enmytouches_old);
+        collect_touches_for_both_colors(match.board, move.src, PIECES_COLORS[piece], frdlytouches_old, enmytouches_old);
 
         match.do_move(move.src, move.dst, move.prompiece)
-        collect_touches_for_both_colors(&(match.board), move.dst, PIECES_COLORS[piece], &frdlytouches_new, &enmytouches_new);
+        collect_touches_for_both_colors(match.board, move.dst, PIECES_COLORS[piece], frdlytouches_new, enmytouches_new);
         match.undo_move()
 
         if(enmytouches_old.size() > 0 && frdlytouches_old.size() < frdlytouches_new.size()){
@@ -210,7 +210,7 @@ def threatens_fork(match, piece, move){
 
     void find_touches_after_move(cMatch &match, cMove &move, list<cTouch> &supported, list<cTouch> &attacked){
         match.do_move(move.src, move.dst, move.prompiece)
-        cPiece cpiece = cPiece(&(match.board), (move.dst);
+        cPiece cpiece(&(match.board), (move.dst);
         cpiece.find_attacks_and_supports(supported, attacked);
         match.undo_move();
     }
@@ -253,10 +253,10 @@ def does_unpin(match, piece, move){
 
     bool defends_check(cMatch &match){
         if(match.next_color() == COLORS["white"]){
-            return is_field_touched(&match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
+            return is_field_touched(match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
         }
         else{
-            return is_field_touched(&match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"]);
+            return is_field_touched(match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"]);
         }
     }
 
@@ -359,7 +359,7 @@ def blocks(match, piece, move){
 */
 
     bool running_pawn(cMatch &match, cMove &move){
-        cPiece cpiece = cPiece(&(match.board), move.src);
+        cPiece cpiece(&(match.board), move.src);
         return cpiece.is_running_pawn();
     }
 
