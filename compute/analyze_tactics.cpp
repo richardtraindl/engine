@@ -166,51 +166,54 @@ def threatens_fork(match, piece, move){
             newmatch.board.setfield(mv.dst, newdstpiece)
     ###
     return is_fork_threat
+*/
+
+    bool flees(cMatch &match, int piece, cMove &move){
+        int lower_enmy_cnt_old = 0
+        int lower_enmy_cnt_new = 0
+        int piece = match.board.getfield(move.src);
+        if(piece == mWKG || piece == mBKG){
+            return false;
+        }
+        frdlytouches_old, enmytouches_old = list_all_field_touches(match, move.src, PIECES_COLORS[piece])
+        //###
+        match.do_move(move.src, move.dst, move.prompiece)
+        frdlytouches_new, enmytouches_new = list_all_field_touches(match, move.dst, PIECES_COLORS[piece])
+        match.undo_move()
+        //###
+        if(enmytouches_old.size() > 0 && frdlytouches_old.size() < frdlytouches_new.size()){
+            return true;
+        }
+        if(enmytouches_old.size() > enmytouches_new.size()){
+            return true;
+        }
+        for(auto &enmy : enmytouches_old){
+            if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
+                lower_enmy_cnt_old += 1;
+            }
+        }
+        for(auto &enmy : enmytouches_new){
+            if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
+                lower_enmy_cnt_new += 1;
+            }
+        }
+        if(lower_enmy_cnt_old > lower_enmy_cnt_new){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
 
-def flees(match, piece, move){
-    lower_enmy_cnt_old = 0
-    lower_enmy_cnt_new = 0
-    piece = match.board.getfield(move.src)
-    color = match.color_of_piece(piece)
-    if(piece == PIECES['wKg'] or piece == PIECES['bKg']){
-        return false;
-    frdlytouches_old, enmytouches_old = list_all_field_touches(match, move.src, color)
-    ###
-    match.do_move(move.src, move.dst, move.prompiece)
-    frdlytouches_new, enmytouches_new = list_all_field_touches(match, move.dst, color)
-    match.undo_move()
-    ###
-    if(len(enmytouches_old) > 0 and 
-       (len(frdlytouches_old) < len(frdlytouches_new))){
-        return true;
-    if(len(enmytouches_old) > len(enmytouches_new)){
-        return true;
-    for enmy in enmytouches_old:
-        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
-            lower_enmy_cnt_old += 1
-    for enmy in enmytouches_new:
-        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
-            lower_enmy_cnt_new += 1
-    if(lower_enmy_cnt_old > lower_enmy_cnt_new){
-        return true;
-    else:
-        return false;
+    void find_touches_after_move(cMatch &match, cMove &move, list<cTouch> &supported, list<cTouch> &attacked){
+        match.do_move(move.src, move.dst, move.prompiece)
+        cPiece cpiece = cPiece(&(match.board), (move.dst);
+        cpiece.find_attacks_and_supports(attacked, supported);
+        match.undo_move();
+    }
 
-
-def find_touches_after_move(match, move){
-    supported = []
-    attacked = []
-    ###
-    match.do_move(move.src, move.dst, move.prompiece)
-    piece = match.board.getfield(move.dst)
-    cpiece = match.obj_for_piece(piece, move.dst)
-    cpiece.find_attacks_and_supports(attacked, supported)
-    match.undo_move()
-    ###
-    return supported, attacked
-
-
+/*
 def find_rook_touches_after_castling(match, move){
     supported = []
     attacked = []
