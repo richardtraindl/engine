@@ -16,7 +16,7 @@
 
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &excludes){
         int rook;
-        list<cTouch> from_rk_attacked, list<cTouch> from_rk_supported;        
+        list<cTouch> from_rk_attacked, from_rk_supported;        
         int piece = match.board.getfield(priomove.src);
         //int dstpiece = match.board.getfield(priomove.dst);
         /*
@@ -36,7 +36,7 @@
 
         if(candidate != NULL){
             if(candidate->src == priomove.src && candidate->dst == priomove.dst && candidate->prompiece == priomove.prompiece){
-                priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["prev-candidate"], cTactic::WEIGHTS["good-deal"]), 0)));
+                priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["prev-candidate"], cTactic::WEIGHTS["good-deal"], 0)));
             }
         }
 
@@ -46,7 +46,7 @@
 
         if(castles(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["castles"], weight, 0)));
-            //crook, from_castl_rk_supported, from_castl_rk_attacked = find_rook_touches_after_castling(match, move)
+            find_rook_touches_after_castling(match, priomove, rook, from_rk_supported, from_rk_attacked);
         }
 
         /*
@@ -58,10 +58,10 @@
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["promotes"], weight, 0)));
         }
 
-        //if(captures(match, piece, priomove)){
-        //    int capture_weight = weight_for_capture(match, piece, priomove, weight);
-        //    priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, 0)));
-        //}
+        if(captures(match, piece, priomove)){
+            int capture_weight = weight_for_capture(match, piece, priomove, weight);
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, 0)));
+        }
 
         /*
         if(does_unpin(match, piece, move)):
@@ -81,13 +81,14 @@
             excludes.append(cExcluded(priomove, tactic))
         */
 
-        if(flees(match, piece, move)):
-            flee_weight = weight_for_flee(match, piece, move, weight);
-            cTactic tactic(cTactic::DOMAINS["flees"], flee_weight, move.src);
+        if(flees(match, piece, priomove)){
+            int flee_weight = weight_for_flee(match, piece, priomove, weight);
+            cTactic tactic(cTactic::DOMAINS["flees"], flee_weight, priomove.src);
             priomove.tactics.push_back(tactic);
             //excludes.push_back(cExcluded(priomove, tactic));
         }
 
+        /*
         if(from_dstfield_attacked.size() > 0 || from_castl_rk_attacked.size() > 0){
             for(int i = 0; i < 2; ++i){
                 if(i == 0){
@@ -137,6 +138,7 @@
                     tactic = cTactic(supporting_tactic, supporting_weight, supported.field)
                     priomove.tactics.append(tactic)
                     excludes.append(cExcluded(priomove, tactic))
+        */
 
         /*
         if(len(discl_attacked) > 0):
@@ -157,8 +159,8 @@
             priomove.tactics.append(cTactic(cTactic.DOMAINS["blocks"], weight))
         */
 
-        if(running_pawn(match, move)){
-            int running_weight = weight_for_running_pawn(match, piece, move, weight);
+        if(running_pawn(match, priomove)){
+            int running_weight = weight_for_running_pawn(match, piece, priomove, weight);
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["is-running-pawn"], running_weight, 0)));
         }
 

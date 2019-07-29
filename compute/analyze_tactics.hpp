@@ -4,6 +4,7 @@
     #include <list>
     #include "../match.hpp"
     #include "../move.hpp"
+    #include "../pieces/touch.hpp"
 
     using namespace std;
 
@@ -34,11 +35,11 @@
  
     //bool threatens_fork(cMatch &match, int piece, cMove &move);
 
-    bool flees(cMatch &match, int piece, cMove &move);
+    bool flees(cMatch &match, int piece, cPrioMove &priomove);
 
-    void find_touches_after_move(cMatch &match, cMove &move, list<cTouch> &supported, list<cTouch> &attacked);
+    void find_touches_after_move(cMatch &match, cPrioMove &priomove, list<cTouch> &supported, list<cTouch> &attacked);
 
-    void find_rook_touches_after_castling(cMatch &match, cMove move, int &rook, list<cTouch> &supported, list<cTouch> &attacked);
+    void find_rook_touches_after_castling(cMatch &match, cPrioMove &priomove, int &rook, list<cTouch> &supported, list<cTouch> &attacked);
 
     //bool does_unpin(cMatch &match, int piece, cMove &move);
 
@@ -48,13 +49,13 @@
 
     //bool blocks(cMatch &match, int piece, cMove &move);
 
-    bool running_pawn(cMatch &match, cMove &move);
+    bool running_pawn(cMatch &match, cPrioMove &priomove);
 
     //bool defends_invasion(cMatch &match, cMove &move);
 
     //bool controles_file(cMatch &match, cMove &move):
 
-    bool is_tactical_draw(cMatch &match, cMove &move);
+    bool is_tactical_draw(cMatch &match, cPrioMove &priomove);
 
     //bool is_progress(cMatch &match, cMove &move);
 

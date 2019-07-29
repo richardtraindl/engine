@@ -21,7 +21,7 @@
                             return true;
                         }
                         if(mode == EVAL_MODES["only-pins-to-king"]){
-                            cPiece cpiece(board, dst);
+                            cPiece cpiece(&board, dst);
                             if(cpiece.is_move_stuck(src)){
                                 break;
                             }
@@ -30,7 +30,7 @@
                             }
                         }
                         else{ // mode == EVAL_MODES["all-pins"]
-                            cPiece cpiece(board, dst);
+                            cPiece cpiece(&board, dst);
                             if(cpiece.is_move_stuck(src) || board.eval_soft_pin_dir(src) != DIRS["undef"]){
                                 break;
                             }
@@ -52,7 +52,7 @@
                 int piece = board.getfield(dst);
                 for(const int target : TARGETS){
                     if(piece == target){
-                        cPiece cpiece(board, dst);
+                        cPiece cpiece(&board, dst);
                         if(cpiece.is_move_stuck(src)){
                              break;
                         }
@@ -78,7 +78,7 @@
                 if(PIECES_COLORS[piece] != color){
                     continue;
                 }
-                cPiece cpiece(board, dst);
+                cPiece cpiece(&board, dst);
                 if(cpiece.is_move_stuck(src)){
                     continue;
                 }
@@ -136,7 +136,7 @@
 
     bool is_field_touched(cBoard &board, int src, int color, int mode){
         if(cSearchforRook::_is_field_touched(board, src, color, mode)){
-          return true;
+            return true;
         }
         if(cSearchforBishop::_is_field_touched(board, src, color, mode)){
             return true;

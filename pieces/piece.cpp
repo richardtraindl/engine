@@ -201,7 +201,7 @@
     void cPiece::find_attacks_and_supports(list<cTouch> &supported, list<cTouch> &attacked){
         for(const int step : get_steps()){
             int dst2 = board->search(pos, step, get_maxcnt());
-            if(dst2 != mBLK){
+            if(dst2 != -1){
                 if(is_move_stuck(dst2)){
                     continue;
                 }
@@ -213,14 +213,14 @@
                     cTouch *ctouch = new cTouch(piece, dst2);
                     supported.push_back(*ctouch);
                     board->setfield(dst2, mBLK);
-                    add_field_touches_beyond(board, color, ctouch);
+                    add_field_touches_beyond(*board, color, *ctouch);
                     board->setfield(dst2, piece);
                 }
                 if(PIECES_COLORS[piece] == REVERSED_COLORS[color]){
                     cTouch *ctouch = new cTouch(piece, dst2);
                     attacked.push_back(*ctouch);
                     board->setfield(dst2, mBLK);
-                    add_field_touches_beyond(board, REVERSED_COLORS[color], ctouch);
+                    add_field_touches_beyond(*board, REVERSED_COLORS[color], *ctouch);
                     board->setfield(dst2, piece);
                 }
             }
@@ -234,7 +234,7 @@
         }
         int score = 0;
         list<cTouch>friends, enmies;
-        collect_touches_for_both_colors(&(*board), pos, color, friends, enmies);
+        collect_touches_for_both_colors(*board, pos, color, friends, enmies);
         if(board->eval_pin_dir(pos) != DIRS["undef"]){
             score += ATTACKED_SCORES[piece];
         }
@@ -320,7 +320,7 @@
             for(int idx = -1; idx < 2; ++idx){
                 int src = pos + idx;
                 int dst = board->search(src, step, 5);
-                while(dst != mBLK){
+                while(dst != -1){
                     int newpiece = board->getfield(dst);
                     if(newpiece == opp_pawn){
                         return false;
@@ -336,7 +336,7 @@
             for(int idx = -1; idx < 2; ++idx){
                 int src = pos + idx;
                 int dst = board->search(src, step, 5);
-                while(dst != mBLK){
+                while(dst != -1){
                     int newpiece = board->getfield(dst);
                     if(newpiece == opp_pawn){
                         return false;

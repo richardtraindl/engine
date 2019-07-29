@@ -1,5 +1,6 @@
 
     #include "./analyze_tactics.hpp"
+    #include "../pieces/piece.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"
 
@@ -40,8 +41,8 @@ def search_lines_of_pin(match, color, field, excl){
 
         if(match.color_of_piece(dirtouches[0].piece) == color and 
            match.color_of_piece(dirtouches[1].piece) == oppcolor and
-           PIECES_RANK[piece] > PIECES_RANK[dirtouches[0].piece] and 
-           PIECES_RANK[piece] > PIECES_RANK[dirtouches[1].piece]){
+           PIECES_RANKS[piece] > PIECES_RANKS[dirtouches[0].piece] and 
+           PIECES_RANKS[piece] > PIECES_RANKS[dirtouches[1].piece]){
 
             if(dirtouches[1].piece == PIECES['wQu'] or dirtouches[1].piece == PIECES['bQu']){
                 pinlines.append([dirtouches[0], dirtouches[1]])
@@ -103,7 +104,7 @@ def forks(piece, from_dstfield_attacked){
     count = 0
     for attacked in from_dstfield_attacked:
         if(len(attacked.supporter_beyond) == 0 or
-           PIECES_RANK[attacked.piece] >= PIECES_RANK[piece]){
+           PIECES_RANKS[attacked.piece] >= PIECES_RANKS[piece]){
             count += 1
     return count >= 2
 
@@ -168,20 +169,19 @@ def threatens_fork(match, piece, move){
     return is_fork_threat
 */
 
-    bool flees(cMatch &match, int piece, cMove &move){
+    bool flees(cMatch &match, int piece, cPrioMove &priomove){
         list<cTouch> frdlytouches_new, enmytouches_new;
         list<cTouch> frdlytouches_old, enmytouches_old;
-        int lower_enmy_cnt_old = 0
-        int lower_enmy_cnt_new = 0
-        int piece = match.board.getfield(move.src);
+        int lower_enmy_cnt_old = 0;
+        int lower_enmy_cnt_new = 0;
         if(piece == mWKG || piece == mBKG){
             return false;
         }
-        collect_touches_for_both_colors(match.board, move.src, PIECES_COLORS[piece], frdlytouches_old, enmytouches_old);
+        collect_touches_for_both_colors(match.board, priomove.src, PIECES_COLORS[piece], frdlytouches_old, enmytouches_old);
 
-        match.do_move(move.src, move.dst, move.prompiece)
-        collect_touches_for_both_colors(match.board, move.dst, PIECES_COLORS[piece], frdlytouches_new, enmytouches_new);
-        match.undo_move()
+        match.do_move(priomove.src, priomove.dst, priomove.prompiece);
+        collect_touches_for_both_colors(match.board, priomove.dst, PIECES_COLORS[piece], frdlytouches_new, enmytouches_new);
+        match.undo_move();
 
         if(enmytouches_old.size() > 0 && frdlytouches_old.size() < frdlytouches_new.size()){
             return true;
@@ -190,12 +190,12 @@ def threatens_fork(match, piece, move){
             return true;
         }
         for(auto &enmy : enmytouches_old){
-            if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
+            if(PIECES_RANKS[enmy.piece] < PIECES_RANKS[piece]){
                 lower_enmy_cnt_old += 1;
             }
         }
         for(auto &enmy : enmytouches_new){
-            if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]){
+            if(PIECES_RANKS[enmy.piece] < PIECES_RANKS[piece]){
                 lower_enmy_cnt_new += 1;
             }
         }
@@ -208,27 +208,27 @@ def threatens_fork(match, piece, move){
     }
 
 
-    void find_touches_after_move(cMatch &match, cMove &move, list<cTouch> &supported, list<cTouch> &attacked){
-        match.do_move(move.src, move.dst, move.prompiece)
-        cPiece cpiece(&(match.board), (move.dst);
+    void find_touches_after_move(cMatch &match, cPrioMove &priomove, list<cTouch> &supported, list<cTouch> &attacked){
+        match.do_move(priomove.src, priomove.dst, priomove.prompiece);
+        cPiece cpiece(&(match.board), priomove.dst);
         cpiece.find_attacks_and_supports(supported, attacked);
         match.undo_move();
     }
 
 
-    void find_rook_touches_after_castling(cMatch &match, cMove &move, cPiece int &rook, list<cTouch> &attacked, list<cTouch> &supported){
-        match.do_move(move.src, move.dst, move.prompiece);
-        if((move.src % 8) + 2 == move.dst % 8){
-            rook = match.board.getfield(move.dst - 1);
-            cPiece cpiece(match.board, move.dst - 1);
+    void find_rook_touches_after_castling(cMatch &match, cPrioMove &priomove, int &rook, list<cTouch> &attacked, list<cTouch> &supported){
+        match.do_move(priomove.src, priomove.dst, priomove.prompiece);
+        if((priomove.src % 8) + 2 == priomove.dst % 8){
+            rook = match.board.getfield(priomove.dst - 1);
+            cPiece cpiece(&(match.board), priomove.dst - 1);
             cpiece.find_attacks_and_supports(attacked, supported);
         }
         else{
-            rook = match.board.getfield(move.dst + 1);
-            cPiece cpiece(match.board, move.dst + 1);
-            crook.find_attacks_and_supports(attacked, supported);
+            rook = match.board.getfield(priomove.dst + 1);
+            cPiece cpiece(&(match.board), priomove.dst + 1);
+            cpiece.find_attacks_and_supports(attacked, supported);
         }
-        match.undo_move()
+        match.undo_move();
     }
 
     /*
@@ -364,8 +364,8 @@ def blocks(match, piece, move){
 
 */
 
-    bool running_pawn(cMatch &match, cMove &move){
-        cPiece cpiece(&(match.board), move.src);
+    bool running_pawn(cMatch &match, cPrioMove &priomove){
+        cPiece cpiece(&(match.board), priomove.src);
         return cpiece.is_running_pawn();
     }
 
@@ -389,12 +389,12 @@ def controles_file(match, move){
     return false;
 */
 
-    bool is_tactical_draw(cMatch &match, cMove &move){
+    bool is_tactical_draw(cMatch &match, cMove &priomove){
         if(match.is_fifty_moves_rule()){
             return true;
         }
-        match.do_move(move.src, move.dst, move.prompiece);
-        is_move_repetition = match.is_move_repetition();
+        match.do_move(priomove.src, priomove.dst, priomove.prompiece);
+        bool is_move_repetition = match.is_move_repetition();
         match.undo_move();
         return is_move_repetition;
     }

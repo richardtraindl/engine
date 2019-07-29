@@ -167,7 +167,7 @@
             cnt += 1;
             dst += step;
         }
-        return mBLK;
+        return -1;
     }
 
     bool cBoard::search_bi_dirs(int &first, int &second, int src, int step, int maxcnt){
@@ -421,10 +421,10 @@
         dstpiece = getfield(dst);
         setfield(dst, srcpiece);
         if(PIECES_COLORS[srcpiece] == COLORS["white"]){
-            flag = is_field_touched(this, wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
+            flag = is_field_touched(*this, wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
         }
         else{
-            flag = is_field_touched(this, bKg, COLORS["white"], EVAL_MODES["ignore-pins"]);
+            flag = is_field_touched(*this, bKg, COLORS["white"], EVAL_MODES["ignore-pins"]);
         }
         setfield(dst, dstpiece);
         setfield(src, srcpiece);

@@ -242,7 +242,7 @@
         int captured = cpiece->board->getfield(dst);
         cpiece->board->setfield(cpiece->pos, mBLK);
         cpiece->board->setfield(dst, cpiece->piece);
-        bool isattacked = is_field_touched(&(cpiece->board), dst, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
+        bool isattacked = is_field_touched(*(cpiece->board), dst, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
         cpiece->board->setfield(cpiece->pos, cpiece->piece);
         cpiece->board->setfield(dst, captured);
         if(isattacked){ return false; }
@@ -279,7 +279,7 @@
         cpiece->board->setfield(cpiece->pos, mBLK);
         for(int i = 0; i < 3; ++i){
             int dst2 = cpiece->pos + i;
-            bool isattacked = is_field_touched(&(cpiece->board), dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
+            bool isattacked = is_field_touched(*(cpiece->board), dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
             if(isattacked){
                 cpiece->board->setfield(cpiece->pos, cpiece->piece);
                 return false;
@@ -315,7 +315,7 @@
         cpiece->board->setfield(cpiece->pos, mBLK);
         for(int i = 0; i < 3; ++i){
             int dst2 = cpiece->pos - i;
-            bool isattacked = is_field_touched(&(cpiece->board), dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
+            bool isattacked = is_field_touched(*(cpiece->board), dst2, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
             if(isattacked){
                 cpiece->board->setfield(cpiece->pos, cpiece->piece);
                 return false;
@@ -375,7 +375,7 @@
             return false; // these piece cannot be trapped
         }
         else{
-            if(is_field_touched(&(cpiece->board), cpiece->pos, REVERSED_COLORS[cpiece->color], EVAL_MODES["only-pins-to-king"])){
+            if(is_field_touched(*(cpiece->board), cpiece->pos, REVERSED_COLORS[cpiece->color], EVAL_MODES["only-pins-to-king"])){
                 return false;
             }
             for(int step : cpiece->get_steps()){
@@ -390,7 +390,7 @@
                             return false;
                         }
                         list<cTouch> frdlytouches, enmytouches;
-                        collect_touches_for_both_colors(&(cpiece->board), pos1, cpiece->color, frdlytouches, enmytouches);
+                        collect_touches_for_both_colors(*(cpiece->board), pos1, cpiece->color, frdlytouches, enmytouches);
                         bool enmy_is_lower = false;
                         for(const cTouch enmy : enmytouches){
                             if(PIECES_RANKS[enmy.piece] < PIECES_RANKS[cpiece->piece]){
