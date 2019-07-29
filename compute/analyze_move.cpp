@@ -15,9 +15,8 @@
 
 
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &excludes){
-        //from_castl_rk_supported = []
-        //from_castl_rk_attacked = []
-        //crook = None
+         int rook;
+         list<cTouch> from_rk_attacked, list<cTouch> from_rk_supported;        
         int piece = match.board.getfield(priomove.src);
         //int dstpiece = match.board.getfield(priomove.dst);
         /*
