@@ -198,12 +198,12 @@
         }
         else{
             if(next_color() == COLORS["white"]){
-                if(is_field_touched(&board, board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
+                if(is_field_touched(board, board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
                     return STATUS["winner_black"];
                 }
             }
             else{
-                if(is_field_touched(&board, board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
+                if(is_field_touched(board, board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
                     return STATUS["winner_white"];
                 }
             }
