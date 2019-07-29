@@ -337,7 +337,7 @@
             int piece_color = PIECES_COLORS[piece];
 
             list<cTouch> friends, enmies;
-            collect_touches_for_both_colors(&(match.board), idx, piece_color, &friends, &enmies);
+            collect_touches_for_both_colors(match.board, idx, piece_color, friends, enmies);
 
             /* if(piece == mWKG or piece == mBKG):
                 if(len(enmytouches) > 0):
