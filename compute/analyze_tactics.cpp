@@ -53,21 +53,16 @@ def search_lines_of_pin(match, color, field, excl){
                 pinlines.append([dirtouches[0], dirtouches[1]])
 
     return pinlines
-
-
-def is_supported_running_pawn(match, supported){
-    if(match.is_endgame() == false;){
-        return false;
-    if(supported.piece == PIECES['wPw']){
-        cpawn = cWhitePawn(match, supported.field)
-        if(cpawn.is_running()){
-            return true;
-    elif(supported.piece == PIECES['bPw']){
-        cpawn = cBlackPawn(match, supported.field)
-        if(cpawn.is_running()){
-            return true;
-    return false;
 */
+
+    bool is_supported_running_pawn(cMatch &match, cTouch &supported){
+        if(match.is_endgame() == false){
+            return false;
+        }
+        cPiece cpiece = cPiece(&(match.board), supported.pos);
+        return cpiece.is_running_pawn();
+    }
+
 
     bool castles(cMatch &match, int piece, cPrioMove &priomove){
         if(piece == mWKG || piece == mBKG){
@@ -358,16 +353,9 @@ def blocks(match, piece, move){
 
 */
 
-    bool running_pawn(cMatch &match, int piece, cMove &move){
-        if(piece == PIECES["wPw"]){
-            cPiece cpiece = cPiece(&(match.board), move.src);
-            return cpiece.is_running_pawn();
-        }
-        if(piece == PIECES["bPw"]){
-            cPiece cpiece = cPiece(&(match.board), move.src);
-            return cpiece.is_running_pawn();
-        }
-        return false;
+    bool running_pawn(cMatch &match, cMove &move){
+        cPiece cpiece = cPiece(&(match.board), move.src);
+        return cpiece.is_running_pawn();
     }
 
 /*
