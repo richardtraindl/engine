@@ -7,11 +7,11 @@
     int cSearchforRook::MAXCNT = 7;
     int cSearchforRook::TARGETS[4] = {mWRK, mBRK, mWQU, mBQU};
 
-    bool cSearchforRook::_is_field_touched(cBoard *board, int src, int color, int mode){
+    bool cSearchforRook::_is_field_touched(cBoard &board, int src, int color, int mode){
         for(const int step : STEPS){
-            int dst = board->search(src, step, MAXCNT);
+            int dst = board.search(src, step, MAXCNT);
             if(dst != -1){
-                int piece = board->getfield(dst);
+                int piece = board.getfield(dst);
                 if(PIECES_COLORS[piece] != color){
                     continue;
                 }
@@ -31,7 +31,7 @@
                         }
                         else{ // mode == EVAL_MODES["all-pins"]
                             cPiece cpiece(board, dst);
-                            if(cpiece.is_move_stuck(src) || board->eval_soft_pin_dir(src) != DIRS["undef"]){
+                            if(cpiece.is_move_stuck(src) || board.eval_soft_pin_dir(src) != DIRS["undef"]){
                                 break;
                             }
                             else{
@@ -45,11 +45,11 @@
         return false;
     }
 
-    void cSearchforRook::_collect_touches_for_both_colors(cBoard *board, int src, int friendlycolor, list<cTouch> *frdlytouches, list<cTouch> *enmytouches){
+    void cSearchforRook::_collect_touches_for_both_colors(cBoard &board, int src, int friendlycolor, list<cTouch> &frdlytouches, list<cTouch> &enmytouches){
         for(const int step : STEPS){
-            int dst = board->search(src, step, MAXCNT);
+            int dst = board.search(src, step, MAXCNT);
             if(dst != -1){
-                int piece = board->getfield(dst);
+                int piece = board.getfield(dst);
                 for(const int target : TARGETS){
                     if(piece == target){
                         cPiece cpiece(board, dst);
@@ -58,11 +58,11 @@
                         }
                         if(PIECES_COLORS[piece] == friendlycolor){
                             cTouch touch(piece, dst);
-                            frdlytouches->push_back(touch);
+                            frdlytouches.push_back(touch);
                         }
                         else{
                             cTouch touch(piece, dst);
-                            enmytouches->push_back(touch);
+                            enmytouches.push_back(touch);
                         }
                     }
                 }
@@ -70,11 +70,11 @@
         }
     }
 
-    void cSearchforRook::_collect_touches_for_color(cBoard *board, int src, int color, list<cTouch> *touches){
+    void cSearchforRook::_collect_touches_for_color(cBoard &board, int src, int color, list<cTouch> &touches){
         for(const int step : STEPS){
-            int dst = board->search(src, step, MAXCNT);
+            int dst = board.search(src, step, MAXCNT);
             if(dst != -1){
-                int piece = board->getfield(dst);
+                int piece = board.getfield(dst);
                 if(PIECES_COLORS[piece] != color){
                     continue;
                 }
@@ -84,7 +84,7 @@
                 }
                 for(const int target : TARGETS){
                     if(piece == target){
-                        touches->push_back(cTouch(piece, dst));
+                        touches.push_back(cTouch(piece, dst));
                     }
                 }
             }
@@ -100,11 +100,11 @@
     int cSearchforKing::STEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
     int cSearchforKing::MAXCNT = 7;
     int cSearchforKing::TARGETS[2] = {mWKG, mBKG};
-    bool cSearchforKing::_is_field_touched(cBoard *board, int src, int color){
+    bool cSearchforKing::_is_field_touched(cBoard &board, int src, int color){
         for(const int step : STEPS){
-            int dst = board->search(src, step, MAXCNT);
+            int dst = board.search(src, step, MAXCNT);
             if(dst != -1){
-                int piece = board->getfield(dst);
+                int piece = board.getfield(dst);
                 if(PIECES_COLORS[piece] != color){
                     continue;
                 }
@@ -134,7 +134,7 @@
     int cSearchforBlackPawn::TARGETS[1] = {mBPW};
 
 
-    bool is_field_touched(cBoard *board, int src, int color, int mode){
+    bool is_field_touched(cBoard &board, int src, int color, int mode){
         if(cSearchforRook::_is_field_touched(board, src, color, mode)){
           return true;
         }
@@ -156,7 +156,7 @@
         return false;
     }
 
-    void collect_touches_for_both_colors(cBoard *board, int src, int color, list<cTouch> *friends, list<cTouch> *enmies){
+    void collect_touches_for_both_colors(cBoard &board, int src, int color, list<cTouch> &friends, list<cTouch> &enmies){
         cSearchforRook::_collect_touches_for_both_colors(board, src, color, friends, enmies);
         cSearchforBishop::_collect_touches_for_both_colors(board, src, color, friends, enmies);
         cSearchforKnight::_collect_touches_for_both_colors(board, src, color, friends, enmies);
@@ -165,7 +165,7 @@
         cSearchforBlackPawn::_collect_touches_for_both_colors(board, src, color, friends, enmies);
     }
 
-    void collect_touches_for_color(cBoard *board, int src, int color, list<cTouch> *touches){
+    void collect_touches_for_color(cBoard &board, int src, int color, list<cTouch> &touches){
         cSearchforRook::_collect_touches_for_color(board, src, color, touches);
         cSearchforBishop::_collect_touches_for_color(board, src, color, touches);
         cSearchforKnight::_collect_touches_for_color(board, src, color, touches);
@@ -174,6 +174,6 @@
         cSearchforBlackPawn::_collect_touches_for_color(board, src, color, touches);
     }
 
-    void add_field_touches_beyond(cBoard *board, int color, cTouch *ctouch){
-        collect_touches_for_both_colors(board, ctouch->pos, color, &(ctouch->supporter_beyond), &(ctouch->attacker_beyond));
+    void add_field_touches_beyond(cBoard &board, int color, cTouch &touch){
+        collect_touches_for_both_colors(board, touch.pos, color, touch.supporter_beyond, touch.attacker_beyond);
     }
