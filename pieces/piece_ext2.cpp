@@ -390,7 +390,7 @@
                             return false;
                         }
                         list<cTouch> frdlytouches, enmytouches;
-                        collect_touches_for_both_colors(cpiece->board, pos1, cpiece->color, &frdlytouches, &enmytouches);
+                        collect_touches_for_both_colors(cpiece->board, pos1, cpiece->color, frdlytouches, enmytouches);
                         bool enmy_is_lower = false;
                         for(const cTouch enmy : enmytouches){
                             if(PIECES_RANKS[enmy.piece] < PIECES_RANKS[cpiece->piece]){
