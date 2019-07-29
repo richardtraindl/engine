@@ -169,18 +169,20 @@ def threatens_fork(match, piece, move){
 */
 
     bool flees(cMatch &match, int piece, cMove &move){
+        list<cTouch> frdlytouches_new, enmytouches_new;
+        list<cTouch> frdlytouches_old, enmytouches_old;
         int lower_enmy_cnt_old = 0
         int lower_enmy_cnt_new = 0
         int piece = match.board.getfield(move.src);
         if(piece == mWKG || piece == mBKG){
             return false;
         }
-        frdlytouches_old, enmytouches_old = list_all_field_touches(match, move.src, PIECES_COLORS[piece])
-        //###
+        collect_touches_for_both_colors(&(match.board),  move.src, PIECES_COLORS[piece], &frdlytouches_old, &enmytouches_old);
+
         match.do_move(move.src, move.dst, move.prompiece)
-        frdlytouches_new, enmytouches_new = list_all_field_touches(match, move.dst, PIECES_COLORS[piece])
+        collect_touches_for_both_colors(&(match.board), move.dst, PIECES_COLORS[piece], &frdlytouches_new, &enmytouches_new);
         match.undo_move()
-        //###
+
         if(enmytouches_old.size() > 0 && frdlytouches_old.size() < frdlytouches_new.size()){
             return true;
         }
@@ -209,7 +211,7 @@ def threatens_fork(match, piece, move){
     void find_touches_after_move(cMatch &match, cMove &move, list<cTouch> &supported, list<cTouch> &attacked){
         match.do_move(move.src, move.dst, move.prompiece)
         cPiece cpiece = cPiece(&(match.board), (move.dst);
-        cpiece.find_attacks_and_supports(attacked, supported);
+        cpiece.find_attacks_and_supports(supported, attacked);
         match.undo_move();
     }
 
