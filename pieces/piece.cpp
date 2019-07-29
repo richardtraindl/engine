@@ -234,7 +234,7 @@
         }
         int score = 0;
         list<cTouch>friends, enmies;
-        collect_touches_for_both_colors(board, pos, color, &friends, &enmies);
+        collect_touches_for_both_colors(&(*board), pos, color, friends, enmies);
         if(board->eval_pin_dir(pos) != DIRS["undef"]){
             score += ATTACKED_SCORES[piece];
         }
