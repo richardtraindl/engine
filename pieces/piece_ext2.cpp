@@ -242,7 +242,7 @@
         int captured = cpiece->board->getfield(dst);
         cpiece->board->setfield(cpiece->pos, mBLK);
         cpiece->board->setfield(dst, cpiece->piece);
-        bool isattacked = is_field_touched(cpiece->board, dst, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
+        bool isattacked = is_field_touched(&(cpiece->board), dst, REVERSED_COLORS[cpiece->color], EVAL_MODES["ignore-pins"]);
         cpiece->board->setfield(cpiece->pos, cpiece->piece);
         cpiece->board->setfield(dst, captured);
         if(isattacked){ return false; }
