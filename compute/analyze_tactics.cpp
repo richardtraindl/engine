@@ -360,11 +360,11 @@ def blocks(match, piece, move){
 
     bool running_pawn(cMatch &match, int piece, cMove &move){
         if(piece == PIECES["wPw"]){
-            cPiece cpiece = cWhitePawn(&(match.board), move.src);
+            cPiece cpiece = cPiece(&(match.board), move.src);
             return cpiece.is_running_pawn();
         }
         if(piece == PIECES["bPw"]){
-            cPiece cpiece = cBlackPawn(&(match.board), move.src);
+            cPiece cpiece = cPiece(&(match.board), move.src);
             return cpiece.is_running_pawn();
         }
         return false;
