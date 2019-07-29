@@ -153,23 +153,21 @@
     }
 
 
-/*
     int weight_for_flee(cMatch &match, int piece, cPrioMove &priomove, int weight){
         list <cTouch> friends_on_srcfield, enmies_on_srcfield;
-	collect_touches_for_both_colors(&(match.board), priomove.src, PIECES_COLORS[piece], &friends_on_srcfield, &enmies_on_srcfield);
+	collect_touches_for_both_colors(match.board, priomove.src, PIECES_COLORS[piece], friends_on_srcfield, enmies_on_srcfield);
         int lowest_enemy_on_srcfield = lowest_piece(enmies_on_srcfield);
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
             if(lowest_enemy_on_srcfield != mBLK && PIECES_RANKS[piece] > PIECES_RANKS[lowest_enemy_on_srcfield]){
                 return cTactic::WEIGHTS["stormy"];
 	    }
-            if(friends_on_srcfield.size() == 0 and enmies_on_srcfield.size() > 0){
+            if(friends_on_srcfield.size() == 0 && enmies_on_srcfield.size() > 0){
                 return cTactic::WEIGHTS["stormy"];
 	    }
 	}
 	return weight;
     }
 
-    */
 
     int weight_for_running_pawn(cMatch &match, int piece, cPrioMove &priomove, int weight){
         list <cTouch> friends_on_dstfield, enmies_on_dstfield;
