@@ -179,8 +179,8 @@
         return weight;
     }
 
-/*
-    int weight_for_discl_supported(cTouch &discl_supported, int weight){
+
+    int weight_for_discl_supporting(cTouch &discl_supported, int weight){
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) &&
            discl_supported.attacker_beyond.size() > discl_supported.supporter_beyond.size()){
             return cTactic::WEIGHTS["stormy"];
@@ -189,7 +189,7 @@
     }
 
 
-    int weight_for_discl_attacked(cTouch &discl_attacked, int weight){
+    int weight_for_discl_attacking(cTouch &discl_attacked, int weight){
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) && 
            discl_attacked.supporter_beyond.size() <= discl_attacked.attacker_beyond.size()){
             return cTactic.WEIGHTS["stormy"];
@@ -204,7 +204,7 @@
         }
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
             if(supported.attacker_beyond.size() > 0 && supported.attacker_beyond.size() > supported.supporter_beyond.size() && 
-               (is_supporter_lower_attacker(match, piece, priomove, supported) || match.board.eval_soft_pin_dir(supported.field) == DIRS["undef"])){
+               (is_supporter_lower_attacker(match, piece, priomove, supported) || match.board.eval_soft_pin_dir(supported.pos) == DIRS["undef"])){
                 return cTactic::WEIGHTS["stormy"];
 	    }
         }
@@ -239,4 +239,4 @@
         return cTactic::WEIGHTS["bad-deal"];
     }
 
-*/
+
