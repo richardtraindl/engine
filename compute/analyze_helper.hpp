@@ -35,15 +35,14 @@
 
     int weight_for_running_pawn(cMatch &match, int piece, cPrioMove &priomove, int weight);
 
-    /*
-    int weight_for_discl_supported(cTouch &discl_supported, int weight);
+    int weight_for_discl_supporting(cTouch &discl_supported, int weight);
 
-    int weight_for_discl_attacked(cTouch &discl_attacked, int weight);
+    int weight_for_discl_attacking(cTouch &discl_attacked, int weight);
 
     int weight_for_supporting(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported, int weight);
 
     int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight);
 
     int weight_for_attacking(cMatch &match, cPrioMove &priomove, cTouch &attacked, int weight);
-    */
+
 #endif
