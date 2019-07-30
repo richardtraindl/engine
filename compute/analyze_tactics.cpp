@@ -231,6 +231,50 @@ def threatens_fork(match, piece, move){
         match.undo_move();
     }
 
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool search_for_mate, list<cTouch> &attacked){
+        int weight;
+        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
+            if(it->piece == mWKG || it->piece == mBKG){
+                if(search_for_mate){
+                    weight = weight_for_attacking_king(match, priomove, weight);
+                }
+                else{
+                    weight = weight;
+                }
+                cTactic *tactic = new cTactic(cTactic::DOMAINS["attacks-king"], weight, it->pos);
+                priomove.tactics.push_back(*tactic);
+                //excludes.append(cExcluded(priomove, tactic))
+            else{
+                weight = weight_for_attacking(match, piece, priomove, attacked, weight);
+                cTactic *tactic = new cTactic(cTactic::DOMAINS["attacks"], weight, it->pos);
+                priomove.tactics.psu_back(*tactic);
+                //excludes.append(cExcluded(priomove, tactic))
+            }
+        }
+    }
+
+    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported){
+        int weight, tactic;
+        for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
+            if(is_supported_running_pawn(match, *it)){
+                tactic = cTactic::DOMAINS["supports-running-pawn"];
+            }
+            else{
+                if(it->attacker_beyond.size() > 0){
+                    tactic = cTactic::DOMAINS["supports"];
+                }
+                else{
+                    continue;
+                }
+            }
+            weight = weight_for_supporting(match, piece, priomove, *it, weight);
+            cTactic *ctactic = new cTactic(tactic, weight, it->pos);
+            priomove.tactics.push_back(*ctactic);
+            //excludes.append(cExcluded(priomove, tactic))
+        }
+    }
+
+
     /*
     bool does_unpin(cMatch &match, int piece, cPrioMove &priomove){
         color = match.color_of_piece(piece);
