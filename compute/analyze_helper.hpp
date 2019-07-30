@@ -15,7 +15,7 @@
 
     void find_touches_on_dstfield_after_move(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &friends, list<cTouch> &enmies);
 
-    //bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
+    bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
 
     //bool check_mates_deep_search(cMatch &match, cPrioMove &priomove);
 
