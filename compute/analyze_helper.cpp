@@ -21,13 +21,12 @@
         }
     }
 
-/*
+
     bool are_fairy_equal(int piece1, int piece2){
-        return PIECES_RANKSS[piece1] <= PIECES_RANKSS[piece2] || 
-	        (PIECES_RANKSS[piece1] == PIECES_RANKSS[mWRK] && PIECES_RANKSS[piece2] == PIECES_RANKSS[mWKN]);
+        return PIECES_RANKS[piece1] <= PIECES_RANKS[piece2] || 
+	       (PIECES_RANKS[piece1] == PIECES_RANKS[mWRK] && PIECES_RANKS[piece2] == PIECES_RANKS[mWKN]);
     }
 
-    */
     
     void find_touches_on_dstfield_after_move(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &friends, list<cTouch> &enmies){
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
@@ -228,7 +227,7 @@
 	}
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
             if(PIECES_RANKS[piece] < PIECES_RANKS[attacked.piece] || attacked.supporter_beyond.size() == 0 || 
-               (are_fairy_equal(piece, attacked.piece) && eval_soft_pin_dir(attacked.pos) != DIRS["undef"])){ 
+               (are_fairy_equal(piece, attacked.piece) && match.board.eval_soft_pin_dir(attacked.pos) != DIRS["undef"])){ 
                 return cTactic::WEIGHTS["stormy"];
 	    }
             if(PIECES_RANKS[piece] < PIECES_RANKS[attacked.piece] && PIECES_RANKS[piece] == PIECES_RANKS[mWPW] &&
