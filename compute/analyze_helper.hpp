@@ -17,11 +17,11 @@
 
     bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
 
-    //bool check_mates_deep_search(cMatch &match, cPrioMove &priomove);
+    bool check_mates_deep_search(cMatch &match, cPrioMove &priomove);
 
-    //bool calc_checks(cMatch &match, int maxcnt, int count);
+    bool calc_checks(cMatch &match, int maxcnt, int count);
 
-    // bool is_soft_pinned_move(cMatch &match, int piece, cPrioMove &priomove);
+    bool is_soft_pinned_move(cMatch &match, int piece, cPrioMove &priomove);
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove);
 
