@@ -11,7 +11,7 @@
 
     int lowest_piece(list<cTouch> &touches);
 
-    //bool are_fairy_equal(int piece1, int piece2);
+    bool are_fairy_equal(int piece1, int piece2);
 
     void find_touches_on_dstfield_after_move(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &friends, list<cTouch> &enmies);
 
@@ -25,7 +25,7 @@
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove);
 
-    //bool is_touched_field_within_move(cMatch &match, int piece, cPrioMove &priomove, int touched_field);
+    bool is_touched_field_within_move(cMatch &match, int piece, cPrioMove &priomove, int touched_field);
 
     int weight_for_standard(cMatch &match, int piece, cPrioMove &priomove);
 
