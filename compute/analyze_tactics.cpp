@@ -5,28 +5,25 @@
     #include "../values.hpp"
 
 
-    cDirTouch::cDirTouch(int _piece, int _pos, int _dir){
-            piece = _piece;
-            pos = _pos;
-            dir = _dir;
+    void search_dir(cMatch &match, int pos, int dir, int excl_pos, list<cTouch> &touches){
+        int src = pos;
+        int step = cPiece::step_for_dir(mWQU, dir);
+        if(step == 0){
+            return;
+        }
+        do {
+           dst = match.board.search(src, step, cQueen::MAXCNT);
+           if(dst != cBoard::SNOK && dst != excl_pos){
+                int piece = match.board.getfield(dst);
+                touches.push_back(*(new cTouch(piece, dst)));
+                src = dst;
+           }
+           else{
+               break;
+           }
+        }
+        while(dst != cBoard::SNOK);
     }
-    
-/*
-def search_dir(match, field, direction, excl){
-    dirtouches = []
-    src = field
-    step = cQueen.step_for_dir(direction)
-    if(step is None){
-        return dirtouches
-    for i in range(7){
-        dst = match.board.search(src, step, cQueen.MAXCNT)
-        if(dst is not None and dst != excl){
-            piece = match.board.getfield(dst)
-            dirtouches.append(cDirTouch(piece, direction, dst))
-            src = dst
-        else:
-            break
-    return dirtouches
 
 
 def search_lines_of_pin(match, color, field, excl){
