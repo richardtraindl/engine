@@ -34,10 +34,9 @@
         match.undo_move();
     }
 
-    /*
     bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported){
         for(list<cTouch>::iterator it = supported.attacker_beyond.begin(); it != supported.attacker_beyond.end(); ++it){
-            if(PIECES_RANKSS[piece] >= PIECES_RANKSS[it->piece]){
+            if(PIECES_RANKS[piece] >= PIECES_RANKS[it->piece]){
                 return false;
             }
         }
@@ -73,7 +72,7 @@
 	return false;
     }
 
-*/
+
     bool is_soft_pinned_move(cMatch &match, int piece ,cPrioMove &priomove){
         int pindir = match.board.eval_soft_pin_dir(priomove.src);
         int mvdir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
