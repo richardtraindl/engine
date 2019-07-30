@@ -15,7 +15,7 @@
 
 
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &excludes){
-        int rook;
+        int rook = mBLK;
         list<cTouch> from_rk_attacked, from_rk_supported;        
         int piece = match.board.getfield(priomove.src);
 
@@ -85,57 +85,17 @@
             //excludes.push_back(cExcluded(priomove, tactic));
         }
 
+        fill_attacked(match, piece, priomove, search_for_mate, from_dstfield_attacked);
+        
+        if(rook != mBLK){
+            fill_attacked(match, rook, priomove, search_for_mate, from_castl_rk_attacked);
+        }
 
-        if(from_dstfield_attacked.size() > 0 || from_castl_rk_attacked.size() > 0){
-            list<cTouch> tmp_list_attacked;
-            for(int i = 0; i < 2; ++i){
-                if(i == 0){
-                    tmp_list_attacked = from_dstfield_attacked
-                    tmp_piece = piece
-                else:
-                    if(crook is None):
-                        continue
-                    else:
-                        tmp_list_attacked = from_castl_rk_attacked
-                        tmp_piece = crook.piece
-                for attacked in tmp_list_attacked:
-                    if(attacked.piece == PIECES["wKg"] or attacked.piece == PIECES["bKg"]):
-                        if(search_for_mate):
-                            attacking_weight = weight_for_attacking_king(match, move, weight)
-                        else:
-                            attacking_weight = weight
-                        tactic = cTactic(cTactic.DOMAINS["attacks-king"], attacking_weight, attacked.field)
-                        priomove.tactics.append(tactic)
-                        excludes.append(cExcluded(priomove, tactic))
-                    else:
-                        attacking_weight = weight_for_attacking(match, tmp_piece, move, attacked, weight)
-                        tactic = cTactic(cTactic.DOMAINS["attacks"], attacking_weight, attacked.field)
-                        priomove.tactics.append(tactic)
-                        excludes.append(cExcluded(priomove, tactic))
-
-        if(len(from_dstfield_supported) > 0 or len(from_castl_rk_supported) > 0):
-            for i in range(2):
-                if(i == 0):
-                    tmp_list_supported = from_dstfield_supported
-                    tmp_piece = piece
-                else:
-                    if(crook is None):
-                        continue
-                    else:
-                        tmp_list_attacked = from_castl_rk_supported
-                        tmp_piece = crook.piece
-                for supported in tmp_list_supported:
-                    if(is_supported_running_pawn(match, supported)):
-                        supporting_tactic = cTactic.DOMAINS["supports-running-pawn"]
-                    elif(len(supported.attacker_beyond) > 0):
-                        supporting_tactic = cTactic.DOMAINS["supports"]
-                    else:
-                        continue
-                    ###
-                    supporting_weight = weight_for_supporting(match, tmp_piece, move, supported, weight)
-                    tactic = cTactic(supporting_tactic, supporting_weight, supported.field)
-                    priomove.tactics.append(tactic)
-                    excludes.append(cExcluded(priomove, tactic))
+        fill_supported(match, piece, priomove, from_dstfield_supported);
+        
+        if(rook != mBLK){
+            fill_supported(match, rook, priomove, from_castl_rk_supported);
+        }
 
 
         /*
