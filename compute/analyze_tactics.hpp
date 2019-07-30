@@ -57,8 +57,8 @@
 
     bool is_tactical_draw(cMatch &match, cPrioMove &priomove);
 
-    //bool is_progress(cMatch &match, cMove &move);
+    bool is_progress(cMatch &match, cPrioMove &priomove);
 
-    //bool is_approach_of_opp_king(cMatch &match, int piece, cMove &move);
+    bool is_approach_to_opp_king(cMatch &match, int piece, cPrioMove &priomove);
 
 #endif

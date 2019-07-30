@@ -16,7 +16,7 @@
             if(piece == mBLK){
                 continue;
             }
-            cPiece cpiece(&(match.board), idx);
+            cPiece cpiece(match.board, idx);
             score += cpiece.score_touches();
             if(cpiece.is_trapped()){
                 score += SCORES[cpiece.piece] / 3;
@@ -88,11 +88,11 @@
 
     int score_kings_safety(cMatch &match){
         int value = 0;
-        cPiece cwpiece(&(match.board), match.board.wKg);
+        cPiece cwpiece(match.board, match.board.wKg);
         if(cwpiece.is_safe_king() == false){
             value += ATTACKED_SCORES[mWQU] * 5;
         }
-        cPiece cbpiece(&(match.board), match.board.bKg);
+        cPiece cbpiece(match.board, match.board.bKg);
         if(cbpiece.is_safe_king() == false){
             value += ATTACKED_SCORES[mBQU] * 5;
         }
@@ -261,14 +261,14 @@
         for(int idx = 0; idx < 64; ++idx){
             int piece = match.board.getfield(idx);
             if(piece == mWPW){
-                cPiece cpiece(&(match.board), idx);
+                cPiece cpiece(match.board, idx);
                 if(cpiece.is_running_pawn()){
                     score += whiterate;
                     score += whiterate * white_step_rates[(idx / 8)];
                 }
             }
             if(piece == mBPW){
-                cPiece cpiece(&(match.board), idx);
+                cPiece cpiece(match.board, idx);
                 if(cpiece.is_running_pawn()){
                     score += blackrate;
                     score += blackrate * black_step_rates[(idx / 8)];

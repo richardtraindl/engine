@@ -158,7 +158,7 @@
     }
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
-        cPiece cpiece(&board, src);
+        cPiece cpiece(board, src);
         cMove *move = cpiece.do_move(dst, prompiece, movecnt() + 1, score);
         minutes.push_back(*move);
         return move;
@@ -175,17 +175,17 @@
         int piece = board.getfield(move.dst);
         if(move.prompiece != mBLK){
             if(PIECES_COLORS[piece] == COLORS["white"]){
-                cPiece piece(&board, move.dst);
+                cPiece piece(board, move.dst);
                 piece.undo_move(move, movecnt(), score);
             }
             else{
-                cPiece piece(&board, move.dst);
+                cPiece piece(board, move.dst);
                 piece.undo_move(move, movecnt(), score);
             }
             minutes.pop_back();
         }
         else{
-            cPiece cpiece(&board, move.dst);
+            cPiece cpiece(board, move.dst);
             cpiece.undo_move(move, movecnt(), score);
             minutes.pop_back();
         }

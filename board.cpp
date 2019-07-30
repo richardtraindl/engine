@@ -19,6 +19,8 @@
         bRkH_first_move_on = -1;
     }
 
+    const int cBoard::SNOK = -1;
+
     map<string, int> cBoard::RANKS = {
         {"1", 0},
         {"2", 1},
@@ -167,19 +169,19 @@
             cnt += 1;
             dst += step;
         }
-        return -1;
+        return SNOK;
     }
 
     bool cBoard::search_bi_dirs(int &first, int &second, int src, int step, int maxcnt){
         int cnt = 0;
-        first = -1;
+        first = cBoard::SNOK;
         int bisteps[2] = {step, (step * -1)};
         for(const int bistep : bisteps){
             int dst = src + bistep;
             while(is_inbounds(src, dst, bistep) && cnt < maxcnt){
                 int piece = getfield(dst);
                 if(piece != mBLK){
-                    if(first == -1){
+                    if(first == cBoard::SNOK){
                         first = dst;
                         break;
                     }
@@ -191,7 +193,7 @@
                 cnt += 1;
                 dst += bistep;
             }
-            if(first == -1){
+            if(first == cBoard::SNOK){
                 break;
             }
         }
@@ -403,14 +405,14 @@
         int pawnenmy = mBLK;
         bool flag;
         if(srcpiece == mWPW){
-            cPiece cpiece(this, src);
+            cPiece cpiece(*this, src);
             if(is_ep_move_ok_for_whitepawn(&cpiece, dst, minutes)){
                 pawnenmy = getfield(dst);
                 setfield(dst, mBLK);
             }
         }
         if(srcpiece == mBPW){
-        cPiece cpiece(this, src);
+        cPiece cpiece(*this, src);
             if(is_ep_move_ok_for_blackpawn(&cpiece, dst, minutes)){
                 pawnenmy = getfield(dst);
                 setfield(dst, mBLK);
@@ -452,7 +454,7 @@
         //        return false; // RETURN_CODES["king-attacked-error"]
         //    }
         //}
-        cPiece cpiece(this, src);
+        cPiece cpiece(*this, src);
         if(cpiece.is_move_valid(dst, prompiece, minutes)){
             return true; // RETURN_CODES["ok"]
         }
@@ -472,7 +474,7 @@
         for(int idx = 0; idx < 64; ++idx){
             int piece = getfield(idx);
             if(color == PIECES_COLORS[piece]){
-                cPiece cpiece(this, idx);
+                cPiece cpiece(*this, idx);
                 for(auto &step : cpiece.get_mv_steps()){
                     if(step == 0){ break; }
                     int count = 0;

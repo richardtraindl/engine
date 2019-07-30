@@ -13,6 +13,7 @@
 
     class cBoard{
         public:
+            static const int SNOK;
             static map<string, int> RANKS;
             static map<string, int> COLS;
             const uint256_t BASE     = 0x42356324111111110000000000000000000000000000000099999999CABDEBAC_cppui;

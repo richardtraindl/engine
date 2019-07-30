@@ -12,7 +12,7 @@
             dpth_max = 10;
             dpth_stage1 = 2;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 24;
+            mvcnt_stage1 = 16;
             mvcnt_stage2 = 8;
         }
         else{
@@ -30,7 +30,7 @@
         cout << "-------------------------------------------" << endl;
         int idx = 1;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
-            cout << idx << ". ";
+            cout << dec << idx << ". ";
             cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << endl;
             cout << it->concat_fmttactics() << endl;
             idx += 1;
@@ -66,7 +66,7 @@
                 continue;
             }
             else{
-                cPiece cpiece(&(match.board), idx);
+                cPiece cpiece(match.board, idx);
                 cpiece.generate_moves(match, moves);
             }
         }
@@ -81,7 +81,7 @@
                 continue;
             }
             else{
-                cPiece cpiece(&(match.board), idx);
+                cPiece cpiece(match.board, idx);
                 cpiece.generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);
             }
         }
@@ -223,7 +223,7 @@
             if(resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true)){
                 return count_up_to_prio(priomoves, cPrioMove::PRIOS["prio0"]);
                 // return min(slimits.mvcnt_stage3, count)
-                // return min(2, count)
+                return min(2, count);
             }
             else{
                 return 0;
@@ -262,7 +262,7 @@
         priomoves.sort(sortByPrio);
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
         if(depth == 1){
-            cout << priomoves.size();
+            cout << priomoves.size() << endl;;
             prnt_priomoves(priomoves);
         }
 

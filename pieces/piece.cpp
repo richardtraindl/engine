@@ -7,9 +7,9 @@
     #include "../values.hpp"
     #include "../helper.hpp"
 
-    cPiece::cPiece(cBoard *_board, int _pos){
-        board = _board;
-        pos = _pos;
+    cPiece::cPiece(cBoard &newboard, int newpos){
+        board = &newboard;
+        pos = newpos;
         piece = board->getfield(pos);
         color = PIECES_COLORS[piece];
     }
@@ -201,7 +201,7 @@
     void cPiece::find_attacks_and_supports(list<cTouch> &supported, list<cTouch> &attacked){
         for(const int step : get_steps()){
             int dst2 = board->search(pos, step, get_maxcnt());
-            if(dst2 != -1){
+            if(dst2 != cBoard::SNOK){
                 if(is_move_stuck(dst2)){
                     continue;
                 }
@@ -320,7 +320,7 @@
             for(int idx = -1; idx < 2; ++idx){
                 int src = pos + idx;
                 int dst = board->search(src, step, 5);
-                while(dst != -1){
+                while(dst != cBoard::SNOK){
                     int newpiece = board->getfield(dst);
                     if(newpiece == opp_pawn){
                         return false;
@@ -336,7 +336,7 @@
             for(int idx = -1; idx < 2; ++idx){
                 int src = pos + idx;
                 int dst = board->search(src, step, 5);
-                while(dst != -1){
+                while(dst != cBoard::SNOK){
                     int newpiece = board->getfield(dst);
                     if(newpiece == opp_pawn){
                         return false;

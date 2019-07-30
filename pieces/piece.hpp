@@ -18,7 +18,7 @@
             int piece;
             int color;
 
-            cPiece(cBoard *board, int pos);
+            cPiece(cBoard &newboard, int newpos);
             ~cPiece();
 
             array<int, 8> get_dirs_ary(); 

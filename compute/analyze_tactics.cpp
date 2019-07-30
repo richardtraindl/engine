@@ -60,7 +60,7 @@ def search_lines_of_pin(match, color, field, excl){
         if(match.is_endgame() == false){
             return false;
         }
-        cPiece cpiece(&(match.board), supported.pos);
+        cPiece cpiece(match.board, supported.pos);
         return cpiece.is_running_pawn();
     }
 
@@ -210,7 +210,7 @@ def threatens_fork(match, piece, move){
 
     void find_touches_after_move(cMatch &match, cPrioMove &priomove, list<cTouch> &supported, list<cTouch> &attacked){
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        cPiece cpiece(&(match.board), priomove.dst);
+        cPiece cpiece(match.board, priomove.dst);
         cpiece.find_attacks_and_supports(supported, attacked);
         match.undo_move();
     }
@@ -220,23 +220,23 @@ def threatens_fork(match, piece, move){
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
         if((priomove.src % 8) + 2 == priomove.dst % 8){
             rook = match.board.getfield(priomove.dst - 1);
-            cPiece cpiece(&(match.board), priomove.dst - 1);
+            cPiece cpiece(match.board, priomove.dst - 1);
             cpiece.find_attacks_and_supports(attacked, supported);
         }
         else{
             rook = match.board.getfield(priomove.dst + 1);
-            cPiece cpiece(&(match.board), priomove.dst + 1);
+            cPiece cpiece(match.board, priomove.dst + 1);
             cpiece.find_attacks_and_supports(attacked, supported);
         }
         match.undo_move();
     }
 
     /*
-    bool does_unpin(cMatch &match, int piece, cMove &move){
+    bool does_unpin(cMatch &match, int piece, cPrioMove &priomove){
         color = match.color_of_piece(piece);
-        //pinlines_before = search_lines_of_pin(match, color, move.src, move.dst)
-        match.do_move(move.src, move.dst, move.prompiece);
-        //pinlines_after = search_lines_of_pin(match, color, move.dst, None)
+        //pinlines_before = search_lines_of_pin(match, color, priomove.src, priomove.dst)
+        match.do_move(priomove.src, priomove.dst, priomove.prompiece);
+        //pinlines_after = search_lines_of_pin(match, color, priomove.dst, None)
         match.undo_move()
         if(pinlines_after.size() < pinlines_before.size()){
             return true;
@@ -267,27 +267,27 @@ def threatens_fork(match, piece, move){
     }
 
 /*
-def find_disclosures(match, move){
+def find_disclosures(match, priomove){
     discl_supported = []
     discl_attacked = []
-    piece = match.board.getfield(move.src)
-    cpiece = match.obj_for_piece(piece, move.src)
-    mv_dir = cpiece.dir_for_move(move.src, move.dst)
+    piece = match.board.getfield(priomove.src)
+    cpiece = match.obj_for_piece(piece, priomove.src)
+    mv_dir = cpiece.dir_for_move(priomove.src, priomove.dst)
     targets = [[cRook.STEPS[0], PIECES_BARE[PIECES['wRk']]],
                [cRook.STEPS[2], PIECES_BARE[PIECES['wRk']]],
                [cBishop.STEPS[0], PIECES_BARE[PIECES['wBp']]],
                [cBishop.STEPS[2], PIECES_BARE[PIECES['wBp']]]]
     ###
-    match.do_move(move.src, move.dst, move.prompiece)
+    match.do_move(priomove.src, priomove.dst, priomove.prompiece)
     for target in targets:
-        fst_field, snd_field = match.board.search_bi_dirs(move.src, target[0], 6)
+        fst_field, snd_field = match.board.search_bi_dirs(priomove.src, target[0], 6)
         if(fst_field is None or snd_field is None){
             continue
-        if(fst_field == move.dst or snd_field  == move.dst){
+        if(fst_field == priomove.dst or snd_field  == priomove.dst){
             continue
         fst_piece = match.board.getfield(fst_field)
         cfirst = match.obj_for_piece(fst_piece, fst_field)
-        """first_dir = cfirst.dir_for_move(target[0], move.src)
+        """first_dir = cfirst.dir_for_move(target[0], priomove.src)
         if(first_dir == mv_dir or REVERSE_DIRS[first_dir] == mv_dir){
             continue"""
         snd_piece = match.board.getfield(snd_field)
@@ -308,17 +308,17 @@ def find_disclosures(match, move){
                     discl_attacked.append(cTouch(cfirst.piece, cfirst.pos))    
     match.undo_move()
     ###
-    match.board.setfield(move.src, PIECES['blk'])
+    match.board.setfield(priomove.src, PIECES['blk'])
     for item in discl_attacked:
         list_field_touches_beyond(match, item, match.color_of_piece(item.piece))
     for item in discl_supported:
         list_field_touches_beyond(match, item, match.color_of_piece(item.piece))
-    match.board.setfield(move.src, piece)
+    match.board.setfield(priomove.src, piece)
     ###
     return discl_supported, discl_attacked
 
 
-def blocks(match, piece, move){
+def blocks(match, piece, priomove){
     STEPS = [8, 1, 9, -7]
     color = match.color_of_piece(piece)
     #frdlytouches_before_count = 0
@@ -326,9 +326,9 @@ def blocks(match, piece, move){
     #frdlytouches_after_count = 0
     enmytouches_after_count = 0
     for step in STEPS:
-        dst1, dst2 = match.board.search_bi_dirs(move.dst, step)
+        dst1, dst2 = match.board.search_bi_dirs(priomove.dst, step)
         if(dst1 is not None){
-            if(dst1 == move.src or dst2 == move.src){
+            if(dst1 == priomove.src or dst2 == priomove.src){
                 continue
             piece1 = match.board.getfield(dst1)
             piece2 = match.board.getfield(dst2)
@@ -340,11 +340,11 @@ def blocks(match, piece, move){
                 frdlytouches, enmytouches = list_all_field_touches(match, dst2, color)
             enmytouches_before_count += len(enmytouches)
     ###
-    match.do_move(move.src, move.dst, move.prompiece)
+    match.do_move(priomove.src, priomove.dst, priomove.prompiece)
     for step in STEPS:
-        dst1, dst2 = match.board.search_bi_dirs(move.dst, step)
+        dst1, dst2 = match.board.search_bi_dirs(priomove.dst, step)
         if(dst1 is not None){
-            if(dst1 == move.src or dst2 == move.src){
+            if(dst1 == priomove.src or dst2 == priomove.src){
                 continue
             piece1 = match.board.getfield(dst1)
             piece2 = match.board.getfield(dst2)
@@ -365,7 +365,7 @@ def blocks(match, piece, move){
 */
 
     bool running_pawn(cMatch &match, cPrioMove &priomove){
-        cPiece cpiece(&(match.board), priomove.src);
+        cPiece cpiece(match.board, priomove.src);
         return cpiece.is_running_pawn();
     }
 
@@ -389,7 +389,7 @@ def controles_file(match, move){
     return false;
 */
 
-    bool is_tactical_draw(cMatch &match, cMove &priomove){
+    bool is_tactical_draw(cMatch &match, cPrioMove &priomove){
         if(match.is_fifty_moves_rule()){
             return true;
         }
@@ -399,24 +399,28 @@ def controles_file(match, move){
         return is_move_repetition;
     }
 
-/*
-def is_progress(match, move){
-    return false;
+
+    bool is_progress(cMatch &match, cPrioMove &priomove){
+        return false;
+    }
 
 
-def is_approach_of_opp_king(match, piece, move){
-    if(cMatch.color_of_piece(piece) == COLORS['white']){
-        oppkg = match.board.bKg
-    else:
-        oppkg = match.board.wKg
-    kgx = oppkg % 8
-    kgy = oppkg // 8
-    x1 = move.src % 8
-    y1 = move.src // 8
-    x2 = move.dst % 8
-    y2 = move.dst // 8
-    diff1 = abs(kgx - x1) + abs(kgy - y1)
-    diff2 = abs(kgx - x2) + abs(kgy - y2)
-    return diff2 < diff1
+    bool is_approach_to_opp_king(cMatch &match, int piece, cPrioMove &priomove){
+        int oppkg;
+        if(PIECES_COLORS[piece] == COLORS["white"]){
+            oppkg = match.board.bKg;
+        }
+        else{
+            oppkg = match.board.wKg;
+        }
+        int kgx = oppkg % 8;
+        int kgy = oppkg / 8;
+        int x1 = priomove.src % 8;
+        int y1 = priomove.src / 8;
+        int x2 = priomove.dst % 8;
+        int y2 = priomove.dst / 8;
+        int diff1 = abs(kgx - x1) + abs(kgy - y1);
+        int diff2 = abs(kgx - x2) + abs(kgy - y2);
+        return diff2 < diff1;
+    }
 
-*/

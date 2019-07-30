@@ -10,7 +10,7 @@
     bool cSearchforRook::_is_field_touched(cBoard &board, int src, int color, int mode){
         for(const int step : STEPS){
             int dst = board.search(src, step, MAXCNT);
-            if(dst != -1){
+            if(dst != cBoard::SNOK){
                 int piece = board.getfield(dst);
                 if(PIECES_COLORS[piece] != color){
                     continue;
@@ -21,7 +21,7 @@
                             return true;
                         }
                         if(mode == EVAL_MODES["only-pins-to-king"]){
-                            cPiece cpiece(&board, dst);
+                            cPiece cpiece(board, dst);
                             if(cpiece.is_move_stuck(src)){
                                 break;
                             }
@@ -30,7 +30,7 @@
                             }
                         }
                         else{ // mode == EVAL_MODES["all-pins"]
-                            cPiece cpiece(&board, dst);
+                            cPiece cpiece(board, dst);
                             if(cpiece.is_move_stuck(src) || board.eval_soft_pin_dir(src) != DIRS["undef"]){
                                 break;
                             }
@@ -48,11 +48,11 @@
     void cSearchforRook::_collect_touches_for_both_colors(cBoard &board, int src, int friendlycolor, list<cTouch> &frdlytouches, list<cTouch> &enmytouches){
         for(const int step : STEPS){
             int dst = board.search(src, step, MAXCNT);
-            if(dst != -1){
+            if(dst != cBoard::SNOK){
                 int piece = board.getfield(dst);
                 for(const int target : TARGETS){
                     if(piece == target){
-                        cPiece cpiece(&board, dst);
+                        cPiece cpiece(board, dst);
                         if(cpiece.is_move_stuck(src)){
                              break;
                         }
@@ -73,12 +73,12 @@
     void cSearchforRook::_collect_touches_for_color(cBoard &board, int src, int color, list<cTouch> &touches){
         for(const int step : STEPS){
             int dst = board.search(src, step, MAXCNT);
-            if(dst != -1){
+            if(dst != cBoard::SNOK){
                 int piece = board.getfield(dst);
                 if(PIECES_COLORS[piece] != color){
                     continue;
                 }
-                cPiece cpiece(&board, dst);
+                cPiece cpiece(board, dst);
                 if(cpiece.is_move_stuck(src)){
                     continue;
                 }
@@ -103,7 +103,7 @@
     bool cSearchforKing::_is_field_touched(cBoard &board, int src, int color){
         for(const int step : STEPS){
             int dst = board.search(src, step, MAXCNT);
-            if(dst != -1){
+            if(dst != cBoard::SNOK){
                 int piece = board.getfield(dst);
                 if(PIECES_COLORS[piece] != color){
                     continue;
