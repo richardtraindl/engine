@@ -216,7 +216,7 @@ def threatens_fork(match, piece, move){
     }
 
 
-    void find_rook_touches_after_castling(cMatch &match, cPrioMove &priomove, int &rook, list<cTouch> &attacked, list<cTouch> &supported){
+    void find_rook_touches_after_castling(cMatch &match, cPrioMove &priomove, int &rook, list<cTouch> &supported, list<cTouch> &attacked){
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
         if((priomove.src % 8) + 2 == priomove.dst % 8){
             rook = match.board.getfield(priomove.dst - 1);
