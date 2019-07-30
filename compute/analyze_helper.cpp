@@ -99,14 +99,13 @@
         return false;
     }
 
-/*
+
     bool is_touched_field_within_move(cMatch &match, int piece, cPrioMove &priomove, int touched_field){
-        cPiece cpiece(&(match.board), priomove.src);
-        int mvdir1 = cpiece.dir_for_move(priomove.src, priomove.dst);
-        int mvdir2 = cpiece.dir_for_move(priomove.dst, touched_field);
+        int mvdir1 = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
+        int mvdir2 = cPiece::dir_for_move(piece, priomove.dst, touched_field);
         return (mvdir1 != DIRS["undef"] && (mvdir1 == mvdir2 || REVERSE_DIRS[mvdir1] == mvdir2));
     }
-*/
+
 
     int weight_for_standard(cMatch &match, int piece, cPrioMove &priomove){
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
