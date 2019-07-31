@@ -1,10 +1,11 @@
 
     #include "./analyze_tactics.hpp"
+    #include "./analyze_helper.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"
 
-
+/*
     void search_dir(cMatch &match, int pos, int dir, int excl_pos, list<cTouch> &touches){
         int src = pos;
         int step = cPiece::step_for_dir(mWQU, dir);
@@ -80,6 +81,7 @@ def search_lines_of_pin(match, color, field, excl){
             return false;
         }
     }
+
 
     bool captures(cMatch &match, int piece, cPrioMove &priomove){
         int dstpiece = match.board.getfield(priomove.dst);
@@ -228,6 +230,7 @@ def threatens_fork(match, piece, move){
         match.undo_move();
     }
 
+
     void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool search_for_mate, list<cTouch> &attacked){
         int weight;
         for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
@@ -241,14 +244,16 @@ def threatens_fork(match, piece, move){
                 cTactic *tactic = new cTactic(cTactic::DOMAINS["attacks-king"], weight, it->pos);
                 priomove.tactics.push_back(*tactic);
                 //excludes.append(cExcluded(priomove, tactic))
+            }
             else{
-                weight = weight_for_attacking(match, piece, priomove, attacked, weight);
+                weight = weight_for_attacking(match, piece, priomove, *it, weight);
                 cTactic *tactic = new cTactic(cTactic::DOMAINS["attacks"], weight, it->pos);
-                priomove.tactics.psu_back(*tactic);
+                priomove.tactics.push_back(*tactic);
                 //excludes.append(cExcluded(priomove, tactic))
             }
         }
     }
+
 
     void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported){
         int weight, tactic;

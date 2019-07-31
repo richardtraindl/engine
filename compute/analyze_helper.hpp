@@ -15,11 +15,11 @@
 
     void find_touches_on_dstfield_after_move(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &friends, list<cTouch> &enmies);
 
-    bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
+    bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported);
 
     bool check_mates_deep_search(cMatch &match, cPrioMove &priomove);
 
-    bool calc_checks(cMatch &match, int maxcnt, int count);
+    bool _calc_checks(cMatch &match, int maxcnt, int count);
 
     bool is_soft_pinned_move(cMatch &match, int piece, cPrioMove &priomove);
 
@@ -43,6 +43,6 @@
 
     int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight);
 
-    int weight_for_attacking(cMatch &match, cPrioMove &priomove, cTouch &attacked, int weight);
+    int weight_for_attacking(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, int weight);
 
 #endif

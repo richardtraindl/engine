@@ -1,6 +1,7 @@
 
     #include <list>
     #include "./analyze_helper.hpp"
+    #include "./calc.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"
@@ -24,7 +25,7 @@
 
     bool are_fairy_equal(int piece1, int piece2){
         return PIECES_RANKS[piece1] <= PIECES_RANKS[piece2] || 
-	       (PIECES_RANKS[piece1] == PIECES_RANKS[mWRK] && PIECES_RANKS[piece2] == PIECES_RANKS[mWKN]);
+           (PIECES_RANKS[piece1] == PIECES_RANKS[mWRK] && PIECES_RANKS[piece2] == PIECES_RANKS[mWKN]);
     }
 
     
@@ -34,42 +35,43 @@
         match.undo_move();
     }
 
-    bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported){
+
+    bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported){
         for(list<cTouch>::iterator it = supported.attacker_beyond.begin(); it != supported.attacker_beyond.end(); ++it){
             if(PIECES_RANKS[piece] >= PIECES_RANKS[it->piece]){
                 return false;
             }
         }
-    	return true;
+        return true;
     }
 
 
     bool check_mates_deep_search(cMatch &match, cPrioMove &priomove){
-        cMatch *newmatch = match;
+        cMatch *newmatch = &match;
         newmatch->do_move(priomove.src, priomove.dst, priomove.prompiece);
-        return calc_checks(*newmatch, 3, 1);
+        return _calc_checks(*newmatch, 3, 1);
     }
 
 
-    bool calc_checks(cMatch &match, int maxcnt, int count){
+    bool _calc_checks(cMatch &match, int maxcnt, int count){
         list<cMove> moves;
-	generate_moves(match, moves);
-	if(moves.size() == 0 && count % 2 == 1){
-            return true;
-	}
-	if(count >= maxcnt){
-            return false;
-	}
-	for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-            match.do_move(it->src, it->dst, it->prompiece);
-            if(calc_checks(match, maxcnt, count + 1)){
+        generate_moves(match, moves);
+        if(moves.size() == 0 && count % 2 == 1){
                 return true;
-	    }
-            else{
-                match.undo_move();
-	    }
-    	}
-	return false;
+        }
+        if(count >= maxcnt){
+                return false;
+        }
+        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+                match.do_move(it->src, it->dst, it->prompiece);
+                if(_calc_checks(match, maxcnt, count + 1)){
+                    return true;
+            }
+                else{
+                    match.undo_move();
+            }
+        }
+        return false;
     }
 
 
@@ -152,17 +154,17 @@
 
     int weight_for_flee(cMatch &match, int piece, cPrioMove &priomove, int weight){
         list <cTouch> friends_on_srcfield, enmies_on_srcfield;
-	collect_touches_for_both_colors(match.board, priomove.src, PIECES_COLORS[piece], friends_on_srcfield, enmies_on_srcfield);
+        collect_touches_for_both_colors(match.board, priomove.src, PIECES_COLORS[piece], friends_on_srcfield, enmies_on_srcfield);
         int lowest_enemy_on_srcfield = lowest_piece(enmies_on_srcfield);
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
             if(lowest_enemy_on_srcfield != mBLK && PIECES_RANKS[piece] > PIECES_RANKS[lowest_enemy_on_srcfield]){
                 return cTactic::WEIGHTS["stormy"];
-	    }
+            }
             if(friends_on_srcfield.size() == 0 && enmies_on_srcfield.size() > 0){
                 return cTactic::WEIGHTS["stormy"];
-	    }
-	}
-	return weight;
+            }
+        }
+        return weight;
     }
 
 
@@ -181,16 +183,16 @@
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) &&
            discl_supported.attacker_beyond.size() > discl_supported.supporter_beyond.size()){
             return cTactic::WEIGHTS["stormy"];
-	}
-    	return weight;
+        }
+        return weight;
     }
 
 
     int weight_for_discl_attacking(cTouch &discl_attacked, int weight){
         if((weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]) && 
            discl_attacked.supporter_beyond.size() <= discl_attacked.attacker_beyond.size()){
-            return cTactic.WEIGHTS["stormy"];
-	}
+            return cTactic::WEIGHTS["stormy"];
+        }
         return weight;
     }
 
@@ -203,7 +205,7 @@
             if(supported.attacker_beyond.size() > 0 && supported.attacker_beyond.size() > supported.supporter_beyond.size() && 
                (is_supporter_lower_attacker(match, piece, priomove, supported) || match.board.eval_soft_pin_dir(supported.pos) == DIRS["undef"])){
                 return cTactic::WEIGHTS["stormy"];
-	    }
+            }
         }
         return weight;
     }
@@ -212,24 +214,24 @@
     int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight){
         if(check_mates_deep_search(match, priomove)){
             return cTactic::WEIGHTS["stormy"];
-	}
+        }
         return weight;
     }
 
 
-    int weight_for_attacking(cMatch &match, cPrioMove &priomove, cTouch &attacked, int weight){
+    int weight_for_attacking(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, int weight){
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
         find_touches_on_dstfield_after_move(match, piece, priomove, friends_on_dstfield, enmies_on_dstfield);
         if(is_touched_field_within_move(match, piece, priomove, attacked.pos)){
             return weight;
-	}
+        }
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
             if(PIECES_RANKS[piece] < PIECES_RANKS[attacked.piece] || attacked.supporter_beyond.size() == 0 || 
                (are_fairy_equal(piece, attacked.piece) && match.board.eval_soft_pin_dir(attacked.pos) != DIRS["undef"])){ 
                 return cTactic::WEIGHTS["stormy"];
-	    }
+            }
             if(PIECES_RANKS[piece] < PIECES_RANKS[attacked.piece] && PIECES_RANKS[piece] == PIECES_RANKS[mWPW] &&
-                (friends_on_dstfield.size() > 0 || (enmies_on_dstfield.size() == 0)){ 
+                (friends_on_dstfield.size() > 0 || enmies_on_dstfield.size() == 0)){ 
                 return cTactic::WEIGHTS["better-deal"];
             }
         }

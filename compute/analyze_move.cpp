@@ -16,7 +16,7 @@
 
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &excludes){
         int rook = mBLK;
-        list<cTouch> from_rk_attacked, from_rk_supported;        
+        list<cTouch> from_castl_rk_supported, from_castl_rk_attacked;
         int piece = match.board.getfield(priomove.src);
 
         //int dstpiece = match.board.getfield(priomove.dst);
@@ -24,10 +24,9 @@
         list<cTouch>from_dstfield_supported, from_dstfield_attacked;
         find_touches_after_move(match, priomove, from_dstfield_supported, from_dstfield_attacked);
 
-        /*
-        list<cTouch> discl_supported, list<cTouch> discl_attacked;
-        find_disclosures(match, move, &discl_supported, &discl_attacked);
-        */
+        //list<cTouch> discl_supported, list<cTouch> discl_attacked;
+        //find_disclosures(match, move, &discl_supported, &discl_attacked);
+
         int weight = weight_for_standard(match, piece, priomove);
 
 
@@ -43,7 +42,7 @@
 
         if(castles(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["castles"], weight, 0)));
-            find_rook_touches_after_castling(match, priomove, rook, from_rk_supported, from_rk_attacked);
+            find_rook_touches_after_castling(match, priomove, rook, from_castl_rk_supported, from_castl_rk_attacked);
         }
 
         if(is_tactical_draw(match, priomove)){
