@@ -235,21 +235,15 @@
         return false;
     }
 
-    string cPrioMove::concat_fmttactics(){
+    string cPrioMove::fmt_tactics(){
         string str_tactics = "";
         int length = tactics.size();
         stringstream out;
         int i = 1;
         string str_end;
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(i < length){
-                str_end = " | ";
-            }
-            else{
-                str_end = "\n";
-            }
-            out << reverse_lookup(cTactic::DOMAINS, it->domain) << " * " << reverse_lookup(cTactic::WEIGHTS, it->weight);
-            str_tactics +=  out.str() + str_end;
+            out << reverse_lookup(cTactic::DOMAINS, it->domain) << " * " << reverse_lookup(cTactic::WEIGHTS, it->weight) << " | " ;
+            str_tactics +=  out.str();
             i += 1;
         }
         return str_tactics;

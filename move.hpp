@@ -65,7 +65,7 @@
 
             bool is_tactic_stormy();
 
-            string concat_fmttactics();
+            string fmt_tactics();
     };
 
 #endif

@@ -32,7 +32,7 @@
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             cout << dec << idx << ". ";
             cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << endl;
-            cout << it->concat_fmttactics() << endl;
+            cout << it->fmt_tactics() << endl;
             idx += 1;
         }
         cout << "-------------------------------------------" << endl;
