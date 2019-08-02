@@ -1,58 +1,47 @@
 
     #include "./analyze_tactics.hpp"
     #include "./analyze_helper.hpp"
+    #include "../board.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"
 
-/*
-    void search_dir(cMatch &match, int pos, int dir, int excl_pos, list<cTouch> &touches){
-        int src = pos;
-        int step = cPiece::step_for_dir(mWQU, dir);
-        if(step == 0){
-            return;
+
+    void _search_all_pindirs(cMatch &match, int color, int pos, int excl_pos, list<int*> &pindirs){
+        int dirs[8] = {8, -8, 1, -1, 9, -9, 7, -7};
+        int piece = match.board.getfield(pos);
+        for(int i = 0; i < 8; ++i){
+            int first, second, first_piece, second_piece;
+            if(match.board.search_for_two_pieces_within_dir(first, second, pos, dirs[i], 7)){
+                first_piece = match.board.getfield(first);
+                second_piece = match.board.getfield(second);
+                if(PIECES_COLORS[first_piece] == color && 
+                   PIECES_COLORS[second_piece] == REVERSED_COLORS[color] && 
+                   PIECES_RANKS[piece] > PIECES_RANKS[first_piece] &&  
+                   PIECES_RANKS[piece] > PIECES_RANKS[second_piece]){
+                    if(second_piece == mWQU || second_piece == mBQU){
+                        int *int_ary = new int[2];
+                        *int_ary = first;
+                        *(int_ary + 1) = second;
+                        pindirs.push_back(int_ary);
+                    }
+                    if(i < 4 && (second_piece == mWRK || second_piece == mBRK)){ 
+                        int *int_ary = new int[2];
+                        *int_ary = first;
+                        *(int_ary + 1) = second;
+                        pindirs.push_back(int_ary);
+                    }
+                    if(i >= 4 && (second_piece == mWBP || second_piece == mBBP)){
+                          int *int_ary = new int[2];
+                        *int_ary = first;
+                        *(int_ary + 1) = second;
+                        pindirs.push_back(int_ary);
+                    }
+                }
+            }
         }
-        do {
-           dst = match.board.search(src, step, cQueen::MAXCNT);
-           if(dst != cBoard::SNOK && dst != excl_pos){
-                int piece = match.board.getfield(dst);
-                touches.push_back(*(new cTouch(piece, dst)));
-                src = dst;
-           }
-           else{
-               break;
-           }
-        }
-        while(dst != cBoard::SNOK);
     }
 
-
-def search_lines_of_pin(match, color, field, excl){
-    pinlines = []
-    piece = match.board.getfield(field)
-    oppcolor = REVERSED_COLORS[color]
- 
-    for i in range(len(cQueen.DIRS_ARY)){
-        dirtouches = search_dir(match, field, cQueen.DIRS_ARY[i], excl)
-        if(len(dirtouches) < 2){
-            continue
-
-        if(match.color_of_piece(dirtouches[0].piece) == color and 
-           match.color_of_piece(dirtouches[1].piece) == oppcolor and
-           PIECES_RANKS[piece] > PIECES_RANKS[dirtouches[0].piece] and 
-           PIECES_RANKS[piece] > PIECES_RANKS[dirtouches[1].piece]){
-
-            if(dirtouches[1].piece == PIECES['wQu'] or dirtouches[1].piece == PIECES['bQu']){
-                pinlines.append([dirtouches[0], dirtouches[1]])
-
-            elif(i < 4 and (dirtouches[1].piece == PIECES['wRk'] or dirtouches[1].piece == PIECES['bRk'])){ 
-                pinlines.append([dirtouches[0], dirtouches[1]])
-
-            elif(i >= 4 and (dirtouches[1].piece == PIECES['wBp'] or dirtouches[1].piece == PIECES['bBp'])){
-                pinlines.append([dirtouches[0], dirtouches[1]])
-
-    return pinlines
-*/
 
     bool is_supported_running_pawn(cMatch &match, cTouch &supported){
         if(match.is_endgame() == false){
@@ -277,20 +266,19 @@ def threatens_fork(match, piece, move){
     }
 
 
-    /*
     bool does_unpin(cMatch &match, int piece, cPrioMove &priomove){
-        color = match.color_of_piece(piece);
-        //pinlines_before = search_lines_of_pin(match, color, priomove.src, priomove.dst)
+        list<int*> pindirs_before, pindirs_after;
+        _search_all_pindirs(match, PIECES_COLORS[piece], priomove.src, priomove.dst, pindirs_before);
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        //pinlines_after = search_lines_of_pin(match, color, priomove.dst, None)
-        match.undo_move()
-        if(pinlines_after.size() < pinlines_before.size()){
+        _search_all_pindirs(match, PIECES_COLORS[piece], priomove.src, priomove.dst, pindirs_after);
+        match.undo_move();
+        if(pindirs_after.size() < pindirs_before.size()){
             return true;
         }
-        for(auto &pbefore : pinlines_before){
+        for(auto &pbefore : pindirs_before){
             bool identical = false;
-            for(auto &pafter : pinlines_after){
-                if(pbefore.field == pafter.field){
+            for(auto &pafter : pindirs_after){
+                if(pbefore[0] == pafter[0]){
                     identical = true;
                 }
             }
@@ -300,7 +288,6 @@ def threatens_fork(match, piece, move){
         }
         return false;
     }
-    */
 
 
     bool defends_check(cMatch &match){

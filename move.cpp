@@ -237,7 +237,6 @@
 
     string cPrioMove::fmt_tactics(){
         string str_tactics = "";
-        int length = tactics.size();
         stringstream out;
         int i = 1;
         string str_end;

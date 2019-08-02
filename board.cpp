@@ -172,16 +172,38 @@
         return SNOK;
     }
 
+    bool cBoard::search_for_two_pieces_within_dir(int &first, int &second, int src, int step, int maxcnt){
+        int cnt = 0;
+        first = SNOK;
+        int dst = src + step;
+        while(is_inbounds(src, dst, step) && cnt < maxcnt){
+            int piece = getfield(dst);
+            if(piece != mBLK){
+                if(first == SNOK){
+                    first = dst;
+                    continue;
+                }
+                else{
+                    second = dst;
+                    return true;
+                }
+            }
+            cnt += 1;
+            dst += step;
+        }
+        return false;
+    }
+
     bool cBoard::search_bi_dirs(int &first, int &second, int src, int step, int maxcnt){
         int cnt = 0;
-        first = cBoard::SNOK;
+        first = SNOK;
         int bisteps[2] = {step, (step * -1)};
         for(const int bistep : bisteps){
             int dst = src + bistep;
             while(is_inbounds(src, dst, bistep) && cnt < maxcnt){
                 int piece = getfield(dst);
                 if(piece != mBLK){
-                    if(first == cBoard::SNOK){
+                    if(first == SNOK){
                         first = dst;
                         break;
                     }
@@ -193,7 +215,7 @@
                 cnt += 1;
                 dst += bistep;
             }
-            if(first == cBoard::SNOK){
+            if(first == SNOK){
                 break;
             }
         }

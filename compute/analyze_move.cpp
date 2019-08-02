@@ -58,10 +58,12 @@
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, 0)));
         }
 
-        /*
-        if(does_unpin(match, piece, move)):
-            priomove.tactics.append(cTactic(cTactic.DOMAINS["unpins"], weight))
 
+        if(does_unpin(match, piece, priomove)){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["unpins"], weight, 0)));
+        }
+
+        /*
         if(forks(piece, from_dstfield_attacked)):
             priomove.tactics.append(cTactic(cTactic.DOMAINS["forks"], weight))
 
@@ -138,9 +140,9 @@
             priomove.prio = 1
             excludes.clear()
             return excludes
-
-        priomove.evaluate_priority()
-
-        return excludes
         */
+
+        priomove.evaluate_priority();
+
+        //return excludes
     }

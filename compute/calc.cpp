@@ -279,7 +279,9 @@
             if(depth == 1){
                 cout << "CURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
             }
-
+            if(depth > 5){
+                cout << "c";
+            }
             match.do_move(it->src, it->dst, it->prompiece);
             if(maximizing){
                 newscore = alphabeta(match, depth + 1, slimits, score, beta, false, &(*it), NULL, newcandidates);

@@ -49,6 +49,8 @@
 
             int search(int src, int step, int maxcnt);
 
+            bool search_for_two_pieces_within_dir(int &first, int &second, int src, int step, int maxcnt);
+
             bool search_bi_dirs(int &first, int &second, int src, int step, int maxcnt);
 
             static bool is_nth(int src, int dst);

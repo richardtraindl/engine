@@ -5,9 +5,11 @@ all: ./values.o ./helper.o ./move.o ./board.o ./match.o ./engine.o \
 	 ./compute/analyze_move.o ./compute/analyze_position.o ./compute/calc.o \
 	 ./pieces/touch.o ./pieces/searchforpiece.o ./pieces/piece_ext2.o \
 	 ./pieces/piece_ext1.o ./pieces/piece.o \
-	 ./ui/play.o
+	 ./ui/play.o \
+	 ./bricks/brick.o
 
 	$(CC) -Wall --std=c++17 \
+		./bricks/brick.o \
 		./ui/play.o \
 		./pieces/touch.o ./pieces/searchforpiece.o \
 		./pieces/piece_ext1.o ./pieces/piece_ext2.o ./pieces/piece.o \

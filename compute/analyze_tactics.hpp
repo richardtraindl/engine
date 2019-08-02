@@ -17,9 +17,7 @@
             cDirTouch(int piece, int pos, int dir);
     };
 
-    //list<cDirTouches> *search_dir(match, int pos, int dir, int excl_dir);
-
-    //int[] search_lines_of_pin(cMatch &match, int color, int pos, int excl_dir);
+    void _search_all_pindirs(cMatch &match, int color, int pos, int excl_pos, list<int*> &pindirs);
 
     bool is_supported_running_pawn(cMatch &match, cTouch &supported);
 
@@ -45,7 +43,7 @@
 
     void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
 
-    //bool does_unpin(cMatch &match, int piece, cMove &move);
+    bool does_unpin(cMatch &match, int piece, cPrioMove &priomove);
 
     bool defends_check(cMatch &match);
 
