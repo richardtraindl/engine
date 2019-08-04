@@ -31,7 +31,7 @@
 
     bool defends_fork(cMatch &match, int piece, int dstpiece, cPrioMove &priomove);
  
-    //bool threatens_fork(cMatch &match, int piece, cMove &move);
+    bool threatens_fork(cMatch &match, int piece, cPrioMove &priomove);
 
     bool flees(cMatch &match, int piece, cPrioMove &priomove);
 

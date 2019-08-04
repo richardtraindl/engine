@@ -149,7 +149,7 @@
 
     void cPrioMove::evaluate_priority(){
         int count = 0;
-        int prio = PRIOS["prio3"];
+        prio = PRIOS["prio3"];
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
             int newprio = it->DOMAINS_TO_PRIOS[it->domain] + it->WEIGHTS_TO_ADJUST[it->weight];
             prio = min(prio, newprio);

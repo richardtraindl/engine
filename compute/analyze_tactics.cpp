@@ -137,40 +137,40 @@
     }
 
 
-/*def threatens_fork(match, piece, move){
-    attacked = []
-    supported = []
-    is_fork_threat = false;
-    ###
-    newmatch = copy.deepcopy(match)
-    newmatch.do_move(move.src, move.dst, move.prompiece)
-    cpiece = newmatch.obj_for_piece(piece, move.dst)
-    first_move_dir = cpiece.dir_for_move(move.src, move.dst)
-    if(cpiece is not None){
-        moves = cpiece.generate_moves(false;, None, false;, None)
-        for mv in moves:
-            cnewpiece = newmatch.obj_for_piece(piece, mv.dst)
-            second_move_dir = cnewpiece.dir_for_move(mv.src, mv.dst)
-            if(first_move_dir == second_move_dir or 
-               REVERSE_DIRS[first_move_dir] == second_move_dir){
-                continue
-            newdstpiece = newmatch.board.getfield(mv.dst)
-            newmatch.board.setfield(mv.src, PIECES['blk'])
-            newmatch.board.setfield(mv.dst, piece)
-            if(cnewpiece is not None){
-                attacked.clear()
-                supported.clear()
-                cnewpiece.find_attacks_and_supports(attacked, supported)
-                if(forks(piece, attacked)){
-                    is_fork_threat = true;
-                    newmatch.board.setfield(mv.src, piece)
-                    newmatch.board.setfield(mv.dst, newdstpiece)
-                    break
-            newmatch.board.setfield(mv.src, piece)
-            newmatch.board.setfield(mv.dst, newdstpiece)
-    ###
-    return is_fork_threat
-*/
+    bool threatens_fork(cMatch &match, int piece, cPrioMove &priomove){
+        list<cTouch> supported, attacked;
+        list<cMove> moves;
+        bool is_fork_threat = false;
+
+        cMatch newmatch = match;
+        newmatch.do_move(priomove.src, priomove.dst, priomove.prompiece);
+        int first_move_dir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
+        cPiece cpiece(newmatch.board, priomove.dst);
+        cpiece.generate_moves(match, moves);
+        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+            cPiece cnewpiece(newmatch.board, it->dst);
+            int second_move_dir = cPiece::dir_for_move(piece, it->src, it->dst);
+            if(first_move_dir == second_move_dir || REVERSE_DIRS[first_move_dir] == second_move_dir){
+                continue;
+            }
+            int newdstpiece = newmatch.board.getfield(it->dst);
+            newmatch.board.setfield(it->src, mBLK);
+            newmatch.board.setfield(it->dst, piece);
+            supported.clear();
+            attacked.clear();
+            cnewpiece.find_attacks_and_supports(supported, attacked);
+            if(forks(piece, attacked)){
+                is_fork_threat = true;
+                newmatch.board.setfield(it->src, piece);
+                newmatch.board.setfield(it->dst, newdstpiece);
+                break;
+            }
+            newmatch.board.setfield(it->src, piece);
+            newmatch.board.setfield(it->dst, newdstpiece);
+        }
+        return is_fork_threat;
+    }
+
 
     bool flees(cMatch &match, int piece, cPrioMove &priomove){
         list<cTouch> frdlytouches_new, enmytouches_new;

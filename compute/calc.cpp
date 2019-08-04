@@ -262,7 +262,7 @@
         priomoves.sort(sortByPrio);
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
         if(depth == 1){
-            cout << priomoves.size() << endl;;
+            cout << "priomoves count: " << priomoves.size() << endl;
             prnt_priomoves(priomoves);
         }
 
@@ -278,9 +278,6 @@
 
             if(depth == 1){
                 cout << "CURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
-            }
-            if(depth > 5){
-                cout << "c";
             }
             match.do_move(it->src, it->dst, it->prompiece);
             if(maximizing){

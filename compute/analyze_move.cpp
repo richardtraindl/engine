@@ -74,12 +74,11 @@
             //excludes.append(cExcluded(priomove, tactic))
         }
 
-        /*
-        if(threatens_fork(match, piece, move)):
-            tactic = cTactic(cTactic.DOMAINS["threatens-fork"], weight)
-            priomove.tactics.append(tactic)
-            excludes.append(cExcluded(priomove, tactic))
-        */
+
+        if(threatens_fork(match, piece, priomove)){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["threatens-fork"], weight, 0)));
+            //excludes.append(cExcluded(priomove, tactic))
+        }
 
 
         if(flees(match, piece, priomove)){

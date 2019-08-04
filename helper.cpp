@@ -2,8 +2,6 @@
     #include <sstream>
     #include "./helper.hpp"
 
-    using namespace std;
-
 
     int coord_to_index(string coord){
         int x = int(coord[0]);
@@ -26,7 +24,7 @@
     };
 
 
-    string reverse_lookup(const map<string, int>& dict, int value){
+    string reverse_lookup(const map<string, int> &dict, int value){
         for(auto &x: dict){
             if(x.second == value){
                 return x.first;
