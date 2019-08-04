@@ -178,6 +178,16 @@
         }
     }
 
+    bool cPiece::is_queen_or_rook(int piece){
+        return PIECES_BARES[piece] == PIECES_BARES[mWQU] ||
+               PIECES_BARES[piece] == PIECES_BARES[mWRK];
+    }
+
+    bool cPiece::is_queen_or_bishop(int piece){
+        return PIECES_BARES[piece] == PIECES_BARES[mWQU] ||
+               PIECES_BARES[piece] == PIECES_BARES[mWBP];
+    }
+
     bool cPiece::is_trapped(){
         return is_trapped_from_ext(this);
     }

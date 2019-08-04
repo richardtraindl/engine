@@ -27,9 +27,9 @@
 
     bool captures(cMatch &match, int piece, cPrioMove &priomove);
 
-    //bool forks(int piece, list<cTouch> &from_dstfield_attacked);
+    bool forks(int piece, list<cTouch> &from_dstfield_attacked);
 
-    //bool defends_fork(cMatch &match, int piece, cMove &move, int dstpiece);
+    bool defends_fork(cMatch &match, int piece, int dstpiece, cPrioMove &priomove);
  
     //bool threatens_fork(cMatch &match, int piece, cMove &move);
 
@@ -47,15 +47,15 @@
 
     bool defends_check(cMatch &match);
 
-    //void find_disclosures(cMatch &match, cMove &move, list<cTouch> &discl_supported, list<cTouch> &discl_attacked);
+    void find_disclosures(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &discl_supported, list<cTouch> &discl_attacked);
 
-    //bool blocks(cMatch &match, int piece, cMove &move);
+    bool blocks(cMatch &match, int piece, cPrioMove &priomove);
 
     bool running_pawn(cMatch &match, cPrioMove &priomove);
 
-    //bool defends_invasion(cMatch &match, cMove &move);
+    //bool defends_invasion(cMatch &match, cPrioMove &priomove);
 
-    //bool controles_file(cMatch &match, cMove &move):
+    //bool controles_file(cMatch &match, cPrioMove &priomove);
 
     bool is_tactical_draw(cMatch &match, cPrioMove &priomove);
 

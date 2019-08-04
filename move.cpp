@@ -24,7 +24,7 @@
     string cMove::format(){
         int piece = getprevfield(src);
         if(piece == mWKG || piece == mBKG){
-            if((int)(src % 8) - (int)((int)(dst % 8) == -2)){
+            if(src % 8 - dst % 8 == -2){
                 return string("0-0");
             }
             if(src % 8 - dst % 8 == 2){

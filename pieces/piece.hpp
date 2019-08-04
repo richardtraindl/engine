@@ -35,6 +35,10 @@
 
             static int step_for_dir(int piece, int dir);
 
+            static bool is_queen_or_rook(int piece);
+
+            static bool is_queen_or_bishop(int piece);
+
             bool is_trapped();
 
             bool is_move_stuck(int dst);

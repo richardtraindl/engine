@@ -3,6 +3,7 @@
     #include "./analyze_helper.hpp"
     #include "../board.hpp"
     #include "../pieces/piece.hpp"
+    #include "../pieces/piece_ext2.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"
 
@@ -85,44 +86,58 @@
         }
     }
 
-/*
-def forks(piece, from_dstfield_attacked){
-    if(len(from_dstfield_attacked) < 2){
-        return false;
-    count = 0
-    for attacked in from_dstfield_attacked:
-        if(len(attacked.supporter_beyond) == 0 or
-           PIECES_RANKS[attacked.piece] >= PIECES_RANKS[piece]){
-            count += 1
-    return count >= 2
 
-
-def defends_fork(match, piece, move, dstpiece){
-    attacked = []
-    supported = []
-    if(dstpiece == PIECES['blk']){
-        if(piece == PIECES['wPw'] or piece == PIECES['bPw']){
-            cpawn = match.obj_for_piece(piece, move.src)
-            if(cpawn.is_ep_move_ok(move.dst)){
-                forking = move.src
-                forking_piece = match.board.getfield(forking)
-            else:
-                return false;
-        else:
+    bool forks(int piece, list<cTouch> &from_dstfield_attacked){
+        if(from_dstfield_attacked.size() < 2){
             return false;
-    else:
-        forking = move.dst
-        forking_piece = dstpiece
+        }
+        int count = 0;
+        for(list<cTouch>::iterator it = from_dstfield_attacked.begin(); it != from_dstfield_attacked.end(); ++it){
+            if(it->supporter_beyond.size() == 0 || PIECES_RANKS[it->piece] >= PIECES_RANKS[piece]){
+                count += 1;
+            }
+        }
+        return count >= 2;
+    }
 
-    cforking_piece = match.obj_for_piece(forking_piece, forking)
-    if(cforking_piece is not None){
-        cforking_piece.find_attacks_and_supports(attacked, supported)
-        return forks(forking_piece, attacked)
-    else:
-        return false;
+
+    bool defends_fork(cMatch &match, int piece, int dstpiece, cPrioMove &priomove){
+        list<cTouch> supported, attacked;
+        int forking, forking_piece;
+        if(dstpiece == mBLK){
+            if(piece == mWPW){
+                cPiece cpiece(match.board, priomove.src);
+                if(is_ep_move_ok_for_whitepawn(&cpiece, priomove.dst, match.minutes)){
+                    forking = priomove.dst - 8;
+                    forking_piece = match.board.getfield(forking);
+                }
+                else{
+                    return false;
+                }
+            }
+            if(piece == mBPW){
+                cPiece cpiece(match.board, priomove.src);
+                if(is_ep_move_ok_for_blackpawn(&cpiece, priomove.dst, match.minutes)){
+                    forking = priomove.dst + 8;
+                    forking_piece = match.board.getfield(forking);
+                }
+                else{
+                    return false;
+                }
+            }
+            return false;
+        }
+        else{
+            forking = priomove.dst;
+            forking_piece = dstpiece;
+        }
+        cPiece cforking_piece(match.board, forking);
+        cforking_piece.find_attacks_and_supports(supported, attacked);
+        return forks(forking_piece, attacked);
+    }
 
 
-def threatens_fork(match, piece, move){
+/*def threatens_fork(match, piece, move){
     attacked = []
     supported = []
     is_fork_threat = false;
@@ -299,128 +314,118 @@ def threatens_fork(match, piece, move){
         }
     }
 
-/*
-def find_disclosures(match, priomove){
-    discl_supported = []
-    discl_attacked = []
-    piece = match.board.getfield(priomove.src)
-    cpiece = match.obj_for_piece(piece, priomove.src)
-    mv_dir = cpiece.dir_for_move(priomove.src, priomove.dst)
-    targets = [[cRook.STEPS[0], PIECES_BARE[PIECES['wRk']]],
-               [cRook.STEPS[2], PIECES_BARE[PIECES['wRk']]],
-               [cBishop.STEPS[0], PIECES_BARE[PIECES['wBp']]],
-               [cBishop.STEPS[2], PIECES_BARE[PIECES['wBp']]]]
-    ###
-    match.do_move(priomove.src, priomove.dst, priomove.prompiece)
-    for target in targets:
-        fst_field, snd_field = match.board.search_bi_dirs(priomove.src, target[0], 6)
-        if(fst_field is None or snd_field is None){
-            continue
-        if(fst_field == priomove.dst or snd_field  == priomove.dst){
-            continue
-        fst_piece = match.board.getfield(fst_field)
-        cfirst = match.obj_for_piece(fst_piece, fst_field)
-        """first_dir = cfirst.dir_for_move(target[0], priomove.src)
-        if(first_dir == mv_dir or REVERSE_DIRS[first_dir] == mv_dir){
-            continue"""
-        snd_piece = match.board.getfield(snd_field)
-        csecond = match.obj_for_piece(snd_piece, snd_field)
-        if(PIECES_BARE[cfirst.piece] == target[1] or
-           PIECES_BARE[cfirst.piece] == PIECES_BARE[PIECES['wQu']]){
-            if(cpiece.color == cfirst.color){
-                if(cfirst.color == csecond.color){
-                    discl_supported.append(cTouch(csecond.piece, csecond.pos))
-                else:
-                    discl_attacked.append(cTouch(csecond.piece, csecond.pos))
-        if(PIECES_BARE[csecond.piece] == target[1] or
-           PIECES_BARE[csecond.piece] == PIECES_BARE[PIECES['wQu']]){
-            if(cpiece.color == csecond.color){
-                if(csecond.color == cfirst.color){
-                    discl_supported.append(cTouch(cfirst.piece, cfirst.pos))
-                else:
-                    discl_attacked.append(cTouch(cfirst.piece, cfirst.pos))    
-    match.undo_move()
-    ###
-    match.board.setfield(priomove.src, PIECES['blk'])
-    for item in discl_attacked:
-        list_field_touches_beyond(match, item, match.color_of_piece(item.piece))
-    for item in discl_supported:
-        list_field_touches_beyond(match, item, match.color_of_piece(item.piece))
-    match.board.setfield(priomove.src, piece)
-    ###
-    return discl_supported, discl_attacked
+
+    void find_disclosures(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &discl_supported, list<cTouch> &discl_attacked){
+        int mvdir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
+        int STEPS[4] = {8, 1, 9, 7};
+        match.do_move(priomove.src, priomove.dst, priomove.prompiece);
+        for(auto &step : STEPS){
+            int first, second;
+            if(match.board.search_bi_dirs(first, second, priomove.src, step, 7)){
+                if(first == priomove.dst || second  == priomove.dst){
+                    continue;
+                }
+                int piece1 = match.board.getfield(first);
+                int piece2 = match.board.getfield(second);
+                if(PIECES_COLORS[piece1] == PIECES_COLORS[piece2] &&
+                   PIECES_COLORS[piece1] != PIECES_COLORS[piece]){
+                    continue;
+                }
+                if(PIECES_COLORS[piece1] == PIECES_COLORS[piece] &&
+                   (((step == 8 || step == 1) && cPiece::is_queen_or_rook(piece1)) ||
+                    ((step == 9 || step == 7) && cPiece::is_queen_or_bishop(piece1)))){
+                    if(PIECES_COLORS[piece2] == PIECES_COLORS[piece]){
+                        discl_supported.push_back(*(new cTouch(piece2, second)));
+                    }
+                    else{
+                        discl_attacked.push_back(*(new cTouch(piece2, second)));
+                    }
+                }
+
+                if(PIECES_COLORS[piece2] == PIECES_COLORS[piece] &&
+                   (((step == 8 || step == 1) && cPiece::is_queen_or_rook(piece2)) ||
+                    ((step == 9 || step == 7) && cPiece::is_queen_or_bishop(piece2)))){
+                    if(PIECES_COLORS[piece1] == PIECES_COLORS[piece]){
+                        discl_supported.push_back(*(new cTouch(piece1, first)));
+                    }
+                    else{
+                        discl_attacked.push_back(*(new cTouch(piece1, first)));
+                    }
+                }
+            }
+        }
+        match.undo_move();
+    }
 
 
-def blocks(match, piece, priomove){
-    STEPS = [8, 1, 9, -7]
-    color = match.color_of_piece(piece)
-    #frdlytouches_before_count = 0
-    enmytouches_before_count = 0
-    #frdlytouches_after_count = 0
-    enmytouches_after_count = 0
-    for step in STEPS:
-        dst1, dst2 = match.board.search_bi_dirs(priomove.dst, step)
-        if(dst1 is not None){
-            if(dst1 == priomove.src or dst2 == priomove.src){
-                continue
-            piece1 = match.board.getfield(dst1)
-            piece2 = match.board.getfield(dst2)
-            if(match.color_of_piece(piece1) == match.color_of_piece(piece2)){
-                continue
-            if(match.color_of_piece(piece1) == color){
-                frdlytouches, enmytouches = list_all_field_touches(match, dst1, color)
-            else:
-                frdlytouches, enmytouches = list_all_field_touches(match, dst2, color)
-            enmytouches_before_count += len(enmytouches)
-    ###
-    match.do_move(priomove.src, priomove.dst, priomove.prompiece)
-    for step in STEPS:
-        dst1, dst2 = match.board.search_bi_dirs(priomove.dst, step)
-        if(dst1 is not None){
-            if(dst1 == priomove.src or dst2 == priomove.src){
-                continue
-            piece1 = match.board.getfield(dst1)
-            piece2 = match.board.getfield(dst2)
-            if(match.color_of_piece(piece1) == match.color_of_piece(piece2)){
-                continue
-            if(match.color_of_piece(piece1) == color){
-                frdlytouches, enmytouches = list_all_field_touches(match, dst1, color)
-            else:
-                frdlytouches, enmytouches = list_all_field_touches(match, dst2, color)
-            enmytouches_after_count += len(enmytouches)
-    match.undo_move()
-    ###
-    if(enmytouches_after_count < enmytouches_before_count){
-           return true;
-    else:
-        return false;
+    bool blocks(cMatch &match, int piece, cPrioMove &priomove){
+        int STEPS[4] = {8, 1, 9, -7};
+        list<cTouch> touches_before, touches_after;
+        int oppcolor = REVERSED_COLORS[PIECES_COLORS[piece]];
+        for(int i = 0; i < 2; ++i){
+            if(i == 1){
+                match.do_move(priomove.src, priomove.dst, priomove.prompiece);
+            }
+            for(auto &step : STEPS){
+                int dst1, dst2;
+                if(match.board.search_bi_dirs(dst1, dst2, priomove.dst, step, 7)){
+                    if(dst1 == priomove.src || dst2 == priomove.src){
+                        continue;
+                    }
+                    int piece1 = match.board.getfield(dst1);
+                    int piece2 = match.board.getfield(dst2);
+                    if(PIECES_COLORS[piece1] == PIECES_COLORS[piece2]){
+                        continue;
+                    }
+                    if(PIECES_COLORS[piece1] == PIECES_COLORS[piece]){
+                        if(i == 0){
+                            collect_touches_for_color(match.board, dst1, oppcolor, touches_before);
+                        }
+                        else{
+                            collect_touches_for_color(match.board, dst1, oppcolor, touches_after);
+                        }
+                    }
+                    else{
+                        if(i == 0){
+                            collect_touches_for_color(match.board, dst2, oppcolor, touches_before);
+                        }
+                        else{
+                            collect_touches_for_color(match.board, dst2, oppcolor, touches_after);
+                        }
+                    }
+                }
+            }
+            if(i == 1){
+                match.undo_move();
+            }
+        }
+        if(touches_after.size() < touches_before.size()){
+               return true;
+        }
+        else{
+            return false;
+        }
+    }
 
-*/
 
     bool running_pawn(cMatch &match, cPrioMove &priomove){
         cPiece cpiece(match.board, priomove.src);
         return cpiece.is_running_pawn();
     }
 
-/*
-def defends_invasion(match, move){
-    """piece = match.board.getfield(move.src)
-    color = match.color_of_piece(piece)
-    board =  [[0] * 8 for i in range(8)]
 
-    for y in range(8){
-        for x in range(8){
-            piece = match.board.readfield(x, y)
-            if(match.color_of_piece(piece) == COLORS['white']){
-                board[y][x] += 1
-            elif(match.color_of_piece(piece) == COLORS['black']){
-                board[y][x] -= 1"""
-    return false;
+    /*
+    bool defends_invasion(cMatch &match, cPrioMove &priomove){
+        return false;
+    }
+    */
 
+    /*
+    bool controles_file(cMatch &match, cPrioMove &priomove){
+        return false;
+    }
+    */
 
-def controles_file(match, move){
-    return false;
-*/
 
     bool is_tactical_draw(cMatch &match, cPrioMove &priomove){
         if(match.is_fifty_moves_rule()){
