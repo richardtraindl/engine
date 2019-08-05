@@ -17,7 +17,7 @@
 
     bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported);
 
-    bool check_mates_deep_search(cMatch &match, cPrioMove &priomove);
+    bool is_check_mate_deep_search(cMatch &match, cPrioMove &priomove);
 
     bool _calc_checks(cMatch &match, int maxcnt, int count);
 
