@@ -46,7 +46,7 @@
     }
 
 
-    bool check_mates_deep_search(cMatch &match, cPrioMove &priomove){
+    bool is_check_mate_deep_search(cMatch &match, cPrioMove &priomove){
         cMatch *newmatch = &match;
         newmatch->do_move(priomove.src, priomove.dst, priomove.prompiece);
         return _calc_checks(*newmatch, 3, 1);
