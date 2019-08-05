@@ -101,9 +101,9 @@
     }
 
 
-    bool is_touched_field_within_move(cMatch &match, int piece, cPrioMove &priomove, int touched_field){
-        int mvdir1 = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
-        int mvdir2 = cPiece::dir_for_move(piece, priomove.dst, touched_field);
+    bool are_move_dirs_equal(int piece1, int src1, int dst1, int piece2, int src2, int dst2){
+        int mvdir1 = cPiece::dir_for_move(piece1, src1, dst1);
+        int mvdir2 = cPiece::dir_for_move(piece2, src2, dst2);
         return (mvdir1 != DIRS["undef"] && (mvdir1 == mvdir2 || REVERSE_DIRS[mvdir1] == mvdir2));
     }
 
