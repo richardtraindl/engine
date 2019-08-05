@@ -73,11 +73,17 @@
     }
 
 
-    bool captures(cMatch &match, int piece, cPrioMove &priomove){
+    bool captures(cMatch &match, cPrioMove &priomove){
         int dstpiece = match.board.getfield(priomove.dst);
         if(dstpiece != mBLK){
             return true;
         }
+        else{
+            return false;
+        }
+    }
+
+    bool captures_enpassant(cMatch &match, int piece, cPrioMove &priomove){
         if((piece == mWPW || piece == mBPW) && (priomove.src % 8) != (priomove.dst %8)){
             return true;
         }
