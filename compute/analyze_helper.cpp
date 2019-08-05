@@ -212,7 +212,7 @@
 
 
     int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight){
-        if(check_mates_deep_search(match, priomove)){
+        if(is_check_mate_deep_search(match, priomove)){
             return cTactic::WEIGHTS["stormy"];
         }
         return weight;
