@@ -126,15 +126,14 @@
     }
 
 
-    int weight_for_capture(cMatch &match, int piece, cPrioMove &priomove, int weight){
+    int weight_for_capture(cMatch &match, int piece,  int dstpiece, cPrioMove &priomove, int weight){
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
-        int dstpiece = match.board.getfield(priomove.dst);
         find_touches_on_dstfield_after_move(match, piece, priomove, friends_on_dstfield, enmies_on_dstfield);
         if(PIECES_RANKS[piece] < PIECES_RANKS[dstpiece]){
             return cTactic::WEIGHTS["stormy"];
         }
         if(is_move_out_of_soft_pin(match, piece, priomove) == false && enmies_on_dstfield.size() == 0){
-            return cTactic::WEIGHTS["tormy"];
+            return cTactic::WEIGHTS["stormy"];
         }
         if(is_move_out_of_soft_pin(match, piece, priomove) == false && 
            match.board.eval_soft_pin_dir(priomove.dst) != DIRS["undef"] && is_supply(match, piece, priomove)){
