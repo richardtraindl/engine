@@ -39,9 +39,9 @@
 
     void find_rook_touches_after_castling(cMatch &match, cPrioMove &priomove, int &rook, list<cTouch> &supported, list<cTouch> &attacked);
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool search_for_mate, list<cTouch> &attacked);
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool search_for_mate, list<cTouch> &attacked, int weight);
 
-    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported);
+    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported, int weight);
 
     bool does_unpin(cMatch &match, int piece, cPrioMove &priomove);
 

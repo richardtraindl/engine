@@ -212,10 +212,27 @@
 
 
     void find_touches_after_move(cMatch &match, cPrioMove &priomove, list<cTouch> &supported, list<cTouch> &attacked){
+        list<cTouch> supported_before, attacked_before;
+        cPiece cpiece1(match.board, priomove.dst);
+        cpiece1.find_attacks_and_supports(supported_before, attacked_before);
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        cPiece cpiece(match.board, priomove.dst);
-        cpiece.find_attacks_and_supports(supported, attacked);
+        cPiece cpiece2(match.board, priomove.dst);
+        cpiece2.find_attacks_and_supports(supported, attacked);
         match.undo_move();
+        for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
+            for(list<cTouch>::iterator it2 = supported_before.begin(); it2 != supported_before.end(); ++it2){
+                if(it->pos == it2->pos){
+                    it = supported.erase(it);
+                }
+            }
+        }
+        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
+            for(list<cTouch>::iterator it2 = attacked_before.begin(); it2 != attacked_before.end(); ++it2){
+                if(it->pos == it2->pos){
+                    it = attacked.erase(it);
+                }
+            }
+        }
     }
 
 
@@ -235,48 +252,52 @@
     }
 
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool search_for_mate, list<cTouch> &attacked){
-        int weight;
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool search_for_mate, list<cTouch> &attacked, int weight){
+        int weight_for_king = cTactic::WEIGHTS["bad-deal"] + 100;
+        int weight_for_piece = cTactic::WEIGHTS["bad-deal"] + 100;
         for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
             if(it->piece == mWKG || it->piece == mBKG){
                 if(search_for_mate){
-                    weight = weight_for_attacking_king(match, priomove, weight);
+                    weight_for_king = min(weight_for_king, weight_for_attacking_king(match, priomove, weight));
                 }
                 else{
-                    weight = weight;
+                    weight_for_king = min(weight_for_king, weight);
                 }
-                cTactic *tactic = new cTactic(cTactic::DOMAINS["attacks-king"], weight, it->pos);
-                priomove.tactics.push_back(*tactic);
-                //excludes.append(cExcluded(priomove, tactic))
             }
             else{
-                weight = weight_for_attacking(match, piece, priomove, *it, weight);
-                cTactic *tactic = new cTactic(cTactic::DOMAINS["attacks"], weight, it->pos);
-                priomove.tactics.push_back(*tactic);
-                //excludes.append(cExcluded(priomove, tactic))
+                weight_for_piece = min(weight_for_piece, weight_for_attacking(match, piece, priomove, *it, weight));
             }
+        }
+        if(weight_for_king < cTactic::WEIGHTS["bad-deal"] + 100){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks-king"], weight_for_king, PIECES_RANKS[piece])));
+        }
+        if(weight_for_piece < cTactic::WEIGHTS["bad-deal"] + 100){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_piece, PIECES_RANKS[piece])));
         }
     }
 
 
-    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported){
-        int weight, tactic;
+    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported, int weight){
+        int weight_for_running_pawn = cTactic::WEIGHTS["bad-deal"] + 100;
+        int weight_for_piece = cTactic::WEIGHTS["bad-deal"] + 100;
         for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
             if(is_supported_running_pawn(match, *it)){
-                tactic = cTactic::DOMAINS["supports-running-pawn"];
+                weight_for_running_pawn = min(weight_for_running_pawn, weight_for_supporting(match, piece, priomove, *it, weight));
             }
             else{
                 if(it->attacker_beyond.size() > 0){
-                    tactic = cTactic::DOMAINS["supports"];
+                    weight_for_piece = min(weight_for_piece, weight_for_supporting(match, piece, priomove, *it, weight));
                 }
                 else{
                     continue;
                 }
             }
-            weight = weight_for_supporting(match, piece, priomove, *it, weight);
-            cTactic *ctactic = new cTactic(tactic, weight, it->pos);
-            priomove.tactics.push_back(*ctactic);
-            //excludes.append(cExcluded(priomove, tactic))
+        }
+        if(weight_for_running_pawn < cTactic::WEIGHTS["bad-deal"] + 100){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports-running-pawn"], weight_for_running_pawn, PIECES_RANKS[piece])));
+        }
+        if(weight_for_piece < cTactic::WEIGHTS["bad-deal"] + 100){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports"], weight_for_piece, PIECES_RANKS[piece])));
         }
     }
 

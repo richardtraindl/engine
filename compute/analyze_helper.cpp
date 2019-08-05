@@ -118,7 +118,7 @@
         if(enmies_on_dstfield.size() == 0){
             return cTactic::WEIGHTS["good-deal"];
         }
-        if((lowest_enemy_on_dstfield == mBLK || PIECES_RANKS[piece] <= PIECES_RANKS[lowest_enemy_on_dstfield]) && 
+        if(PIECES_RANKS[piece] <= PIECES_RANKS[lowest_enemy_on_dstfield] && 
            friends_on_dstfield.size() >= enmies_on_dstfield.size()){
             return cTactic::WEIGHTS["good-deal"];
         }
@@ -227,7 +227,7 @@
         }
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
             if(PIECES_RANKS[piece] < PIECES_RANKS[attacked.piece] || attacked.supporter_beyond.size() == 0 || 
-               (are_fairy_equal(piece, attacked.piece) && match.board.eval_soft_pin_dir(attacked.pos) != DIRS["undef"])){ 
+               (are_fairy_equal(piece, attacked.piece) && match.board.eval_soft_pin_dir(attacked.pos) != DIRS["undef"])){  
                 return cTactic::WEIGHTS["stormy"];
             }
             if(PIECES_RANKS[piece] < PIECES_RANKS[attacked.piece] && PIECES_RANKS[piece] == PIECES_RANKS[mWPW] &&

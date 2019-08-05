@@ -89,12 +89,12 @@
         };
 
         map<string, int> cTactic::WEIGHTS = {
-            {"stormy", 1},
-            {"better-deal", 2},
-            {"good-deal", 3},
-            {"downgraded", 4},
-            {"upgraded", 5},
-            {"bad-deal", 6}
+            {"stormy",                  1},
+            {"better-deal",             2},
+            {"good-deal",               3},
+            {"downgraded",              4},
+            {"upgraded",                5},
+            {"bad-deal",                6}
         };
 
         map<int, int> cTactic::DOMAINS_TO_PRIOS = {
@@ -122,25 +122,24 @@
             {DOMAINS["opposition"],             213},
             {DOMAINS["approach-opp-king"],      214},
             // ### level 3 ###
-            {DOMAINS["undefined"],           500}
+            {DOMAINS["undefined"],              500}
         };
 
         map<int, int> cTactic::WEIGHTS_TO_ADJUST = {
-            {WEIGHTS["stormy"],      -70},
-            {WEIGHTS["better-deal"], -10},
-            {WEIGHTS["good-deal"],     0},
-            {WEIGHTS["upgraded"],      0},
-            {WEIGHTS["undefined"],     0},
-            {WEIGHTS["downgraded"],   60},
-            {WEIGHTS["bad-deal"],    130}
+            {WEIGHTS["stormy"],                 -70},
+            {WEIGHTS["better-deal"],            -10},
+            {WEIGHTS["good-deal"],                0},
+            {WEIGHTS["upgraded"],                 0},
+            {WEIGHTS["undefined"],                0},
+            {WEIGHTS["downgraded"],              60},
+            {WEIGHTS["bad-deal"],               130}
         };
 
-
         map<string, int> cPrioMove::PRIOS = {
-            {"prio0", 100},
-            {"prio1", 200},
-            {"prio2", 250},
-            {"prio3", 300} 
+            {"prio0",                           100},
+            {"prio1",                           200},
+            {"prio2",                           250},
+            {"prio3",                           300} 
         };
 
     cPrioMove::cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int _prio) :  cMove(prevfields, src, dst, prompiece){
@@ -151,7 +150,7 @@
         int count = 0;
         prio = PRIOS["prio3"];
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            int newprio = it->DOMAINS_TO_PRIOS[it->domain] + it->WEIGHTS_TO_ADJUST[it->weight];
+            int newprio = it->DOMAINS_TO_PRIOS[it->domain] + it->WEIGHTS_TO_ADJUST[it->weight] + it->addition;
             prio = min(prio, newprio);
             if(it->weight <= cTactic::WEIGHTS["downgraded"]){
                 count += 2;

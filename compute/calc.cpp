@@ -12,8 +12,8 @@
             dpth_max = 10;
             dpth_stage1 = 2;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 16;
-            mvcnt_stage2 = 8;
+            mvcnt_stage1 = 12;
+            mvcnt_stage2 = 6;
         }
         else{
             add_mvcnt = 2;
@@ -30,7 +30,7 @@
         cout << "-------------------------------------------" << endl;
         int idx = 1;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
-            cout << dec << idx << ". ";
+            cout << "\n" << dec << idx << ". ";
             cout << it->format() << " prio: " << it->prio << " is_tactic_stormy: " << it->is_tactic_stormy() << endl;
             cout << it->fmt_tactics() << endl;
             idx += 1;
