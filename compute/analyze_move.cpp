@@ -44,11 +44,15 @@
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["promotes"], weight, PIECES_RANKS[piece])));
         }
 
-        if(captures(match, piece, priomove)){
-            int capture_weight = weight_for_capture(match, piece, priomove, weight);
+        
+        if(captures(match, priomove)){
+            int capture_weight = weight_for_capture(match, piece, dstpiece, priomove, weight);
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, PIECES_RANKS[piece])));
         }
-
+        if(captures_enpassant(match, piece, priomove)){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece])));
+        }
+            
         if(does_unpin(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["unpins"], weight, PIECES_RANKS[piece])));
         }
