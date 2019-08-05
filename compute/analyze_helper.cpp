@@ -198,7 +198,7 @@
 
 
     int weight_for_supporting(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported, int weight){
-        if(is_touched_field_within_move(match, piece, priomove, supported.pos)){
+        if(are_move_dirs_equal(piece, priomove.src, priomove.dst, piece, priomove.dst, supported.pos)){
             return weight;
         }
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
@@ -222,7 +222,7 @@
     int weight_for_attacking(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, int weight){
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
         find_touches_on_dstfield_after_move(match, piece, priomove, friends_on_dstfield, enmies_on_dstfield);
-        if(is_touched_field_within_move(match, piece, priomove, attacked.pos)){
+        if(are_move_dirs_equal(piece, priomove.src, priomove.dst, piece, priomove.dst, attacked.pos)){
             return weight;
         }
         if(weight == cTactic::WEIGHTS["good-deal"] || weight == cTactic::WEIGHTS["better-deal"]){
