@@ -25,7 +25,7 @@
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove);
 
-    bool is_touched_field_within_move(cMatch &match, int piece, cPrioMove &priomove, int touched_field);
+    bool are_move_dirs_equal(int piece1, int src1, int dst1, int piece2, int src2, int dst2);
 
     int weight_for_standard(cMatch &match, int piece, cPrioMove &priomove);
 
