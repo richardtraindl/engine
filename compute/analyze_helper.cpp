@@ -75,7 +75,7 @@
     }
 
 
-    bool is_soft_pinned_move(cMatch &match, int piece ,cPrioMove &priomove){
+    bool is_move_out_of_soft_pin(cMatch &match, int piece ,cPrioMove &priomove){
         int pindir = match.board.eval_soft_pin_dir(priomove.src);
         int mvdir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
         return (pindir != DIRS["undef"] && pindir != mvdir && pindir != REVERSE_DIRS[mvdir]);
@@ -112,7 +112,7 @@
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
         find_touches_on_dstfield_after_move(match, piece, priomove, friends_on_dstfield, enmies_on_dstfield);
         int lowest_enemy_on_dstfield = lowest_piece(enmies_on_dstfield);
-        if(is_soft_pinned_move(match, piece, priomove)){
+        if(is_move_out_of_soft_pin(match, piece, priomove)){
             return cTactic::WEIGHTS["bad-deal"];
         }
         if(enmies_on_dstfield.size() == 0){
@@ -133,14 +133,14 @@
         if(PIECES_RANKS[piece] < PIECES_RANKS[dstpiece]){
             return cTactic::WEIGHTS["stormy"];
         }
-        if(is_soft_pinned_move(match, piece, priomove) == false && enmies_on_dstfield.size() == 0){
+        if(is_move_out_of_soft_pin(match, piece, priomove) == false && enmies_on_dstfield.size() == 0){
             return cTactic::WEIGHTS["tormy"];
         }
-        if(is_soft_pinned_move(match, piece, priomove) == false && 
+        if(is_move_out_of_soft_pin(match, piece, priomove) == false && 
            match.board.eval_soft_pin_dir(priomove.dst) != DIRS["undef"] && is_supply(match, piece, priomove)){
             return cTactic::WEIGHTS["stormy"];
         }
-        if(is_soft_pinned_move(match, piece, priomove) == false && PIECES_RANKS[piece] == PIECES_RANKS[dstpiece]){
+        if(is_move_out_of_soft_pin(match, piece, priomove) == false && PIECES_RANKS[piece] == PIECES_RANKS[dstpiece]){
             if(friends_on_dstfield.size() > enmies_on_dstfield.size()){
                 return cTactic::WEIGHTS["better-deal"];
             }
