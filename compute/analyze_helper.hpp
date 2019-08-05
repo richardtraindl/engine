@@ -21,7 +21,7 @@
 
     bool _calc_checks(cMatch &match, int maxcnt, int count);
 
-    bool is_soft_pinned_move(cMatch &match, int piece, cPrioMove &priomove);
+    bool is_move_out_of_soft_pin(cMatch &match, int piece, cPrioMove &priomove);
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove);
 
