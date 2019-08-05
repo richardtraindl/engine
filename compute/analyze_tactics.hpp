@@ -27,6 +27,10 @@
 
     bool captures(cMatch &match, int piece, cPrioMove &priomove);
 
+    bool captures(cMatch &match, cPrioMove &priomove);
+
+    bool captures_enpassant(cMatch &match, int piece, cPrioMove &priomove);
+
     bool forks(int piece, list<cTouch> &from_dstfield_attacked);
 
     bool defends_fork(cMatch &match, int piece, int dstpiece, cPrioMove &priomove);
