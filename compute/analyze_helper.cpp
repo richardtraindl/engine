@@ -57,18 +57,18 @@
         list<cMove> moves;
         generate_moves(match, moves);
         if(moves.size() == 0 && count % 2 == 1){
-                return true;
+            return true;
         }
         if(count >= maxcnt){
-                return false;
+            return false;
         }
         for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-                match.do_move(it->src, it->dst, it->prompiece);
-                if(_calc_checks(match, maxcnt, count + 1)){
-                    return true;
+            match.do_move(it->src, it->dst, it->prompiece);
+            if(_calc_checks(match, maxcnt, count + 1)){
+                return true;
             }
-                else{
-                    match.undo_move();
+            else{
+                match.undo_move();
             }
         }
         return false;
