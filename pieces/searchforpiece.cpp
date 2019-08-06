@@ -57,12 +57,10 @@
                              break;
                         }
                         if(PIECES_COLORS[piece] == friendlycolor){
-                            cTouch touch(piece, dst);
-                            frdlytouches.push_back(touch);
+                            frdlytouches.push_back(*(new cTouch(piece, dst)));
                         }
                         else{
-                            cTouch touch(piece, dst);
-                            enmytouches.push_back(touch);
+                            enmytouches.push_back(*(new cTouch(piece, dst)));
                         }
                     }
                 }
@@ -84,7 +82,7 @@
                 }
                 for(const int target : TARGETS){
                     if(piece == target){
-                        touches.push_back(cTouch(piece, dst));
+                        touches.push_back(*(new cTouch(piece, dst)));
                     }
                 }
             }
