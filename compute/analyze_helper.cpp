@@ -96,8 +96,7 @@
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove){
         list<cTouch> touches;
-        cSearchforRook::_collect_touches_for_color(match.board, priomove.src, PIECES_COLORS[piece], touches);
-        cSearchforBishop::_collect_touches_for_color(match.board, priomove.src, PIECES_COLORS[piece], touches);
+        collect_long_distance_touches_for_color(match.board, priomove.src, PIECES_COLORS[piece], touches);
         for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
             if(PIECES_BARES[it->piece] == PIECES_BARES[mWQU]){
                 return true;

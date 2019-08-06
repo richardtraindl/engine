@@ -215,29 +215,23 @@
                 if(is_move_stuck(dst2)){
                     continue;
                 }
-                int piece = board->getfield(dst2);
-                if(PIECES_COLORS[piece] == color){
-                    if(piece == mWKG || piece == mBKG){
+                int piece2 = board->getfield(dst2);
+                if(PIECES_COLORS[piece2] == color){
+                    if(piece2 == mWKG || piece2 == mBKG){
                         continue;
                     }
-                    cTouch *ctouch = new cTouch(piece, dst2);
+                    cTouch *ctouch = new cTouch(piece2, dst2);
                     supported.push_back(*ctouch);
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(*board, color, *ctouch);
-                    board->setfield(dst2, piece);
-                    if(pos == coord_to_index("d3")){
-                        cout << "supporter_beyond1 " << ctouch->supporter_beyond.size() << endl;
-                    }
+                    board->setfield(dst2, piece2);
                 }
-                if(PIECES_COLORS[piece] == REVERSED_COLORS[color]){
-                    cTouch *ctouch = new cTouch(piece, dst2);
+                if(PIECES_COLORS[piece2] == REVERSED_COLORS[color]){
+                    cTouch *ctouch = new cTouch(piece2, dst2);
                     attacked.push_back(*ctouch);
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(*board, REVERSED_COLORS[color], *ctouch);
-                    board->setfield(dst2, piece);
-                    if(pos == coord_to_index("d3")){
-                        cout << "attacker_beyond1 " << ctouch->attacker_beyond.size() << endl;
-                    }
+                    board->setfield(dst2, piece2);
                 }
             }
         }

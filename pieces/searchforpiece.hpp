@@ -8,19 +8,8 @@
 
     using namespace std;
 
-    class cSearchforRook{
-        public:
-            static int STEPS[4];
-            static int MAXCNT;
-            static int TARGETS[4];
 
-            static bool _is_field_touched(cBoard &board, int src, int color, int mode);
-            static void _collect_touches_for_both_colors(cBoard &board, int src, int friendlycolor, list<cTouch> &frdlytouches, list<cTouch> &enmytouches);
-            static void _collect_touches_for_color(cBoard &board, int src, int color, list<cTouch> &touches);
-    };
-
-
-    class cSearchforBishop : public cSearchforRook{
+    class cSearchforPiece{
         public:
             static int STEPS[4];
             static int MAXCNT;
@@ -28,17 +17,31 @@
     };
 
 
-    class cSearchforKing : public cSearchforRook{
+    class cSearchforRook : public cSearchforPiece{
+        public:
+            static int STEPS[4];
+            static int MAXCNT;
+            static int TARGETS[4];
+    };
+
+
+    class cSearchforBishop : public cSearchforPiece{
+        public:
+            static int STEPS[4];
+            static int MAXCNT;
+            static int TARGETS[4];
+    };
+
+
+    class cSearchforKing : public cSearchforPiece{
         public:
             static int STEPS[8];
             static int MAXCNT;
             static int TARGETS[2];
-
-            static bool _is_field_touched(cBoard &board, int src, int color);
     };
 
 
-    class cSearchforKnight : public cSearchforRook{
+    class cSearchforKnight : public cSearchforPiece{
         public:
             static int STEPS[8];
             static int MAXCNT;
@@ -46,7 +49,7 @@
     };
 
 
-    class cSearchforWhitePawn : public cSearchforRook{
+    class cSearchforWhitePawn : public cSearchforPiece{
         public:
             static int STEPS[2];
             static int MAXCNT;
@@ -54,17 +57,27 @@
     };
 
 
-    class cSearchforBlackPawn : public cSearchforRook{
+    class cSearchforBlackPawn : public cSearchforPiece{
         public:
             static int STEPS[2];
             static int MAXCNT;
             static int TARGETS[1];
     };
 
+
+    bool _is_field_touched(cBoard &board, int src, int color, int mode);
+    
+    bool _is_field_touched_by_king(cBoard &board, int src, int color);
 
     bool is_field_touched(cBoard &board, int src, int color, int mode);
 
+    void _collect_touches_for_both_colors(cBoard &board, int src, int friendlycolor, list<cTouch> &frdlytouches, list<cTouch> &enmytouches);
+
     void collect_touches_for_both_colors(cBoard &board, int src, int color, list<cTouch> &friends, list<cTouch> &enmies);
+
+    void _collect_touches_for_color(cBoard &board, int src, int color, list<cTouch> &touches);
+
+    void collect_long_distance_touches_for_color(cBoard &board, int src, int color, list<cTouch> &touches);
 
     void collect_touches_for_color(cBoard &board, int src, int color, list<cTouch> &touches);
 
