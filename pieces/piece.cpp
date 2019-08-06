@@ -208,7 +208,7 @@
         undo_move_from_ext(this, move, movecnt, score);
     }
 
-    void cPiece::find_attacks_and_supports(list<cTouch> &supported, list<cTouch> &attacked){
+    void cPiece::find_supports_and_attacks(list<cTouch> &supported, list<cTouch> &attacked){
         for(const int step : get_steps()){
             int dst2 = board->search(pos, step, get_maxcnt());
             if(dst2 != cBoard::SNOK){
@@ -225,6 +225,9 @@
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(*board, color, *ctouch);
                     board->setfield(dst2, piece);
+                    if(pos == coord_to_index("d3")){
+                        cout << "supporter_beyond1 " << ctouch->supporter_beyond.size() << endl;
+                    }
                 }
                 if(PIECES_COLORS[piece] == REVERSED_COLORS[color]){
                     cTouch *ctouch = new cTouch(piece, dst2);
@@ -232,6 +235,9 @@
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(*board, REVERSED_COLORS[color], *ctouch);
                     board->setfield(dst2, piece);
+                    if(pos == coord_to_index("d3")){
+                        cout << "attacker_beyond1 " << ctouch->attacker_beyond.size() << endl;
+                    }
                 }
             }
         }

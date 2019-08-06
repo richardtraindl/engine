@@ -85,7 +85,7 @@
             {"is-progress",           190},
             {"opposition",            200},
             {"approach-opp-king",     210},
-            {"undefined",             220}
+            {"undef",                 220}
         };
 
         map<string, int> cTactic::WEIGHTS = {
@@ -94,7 +94,8 @@
             {"good-deal",               3},
             {"downgraded",              4},
             {"upgraded",                5},
-            {"bad-deal",                6}
+            {"bad-deal",                6},
+            {"undef",                   7}
         };
 
         map<int, int> cTactic::DOMAINS_TO_PRIOS = {
@@ -122,7 +123,7 @@
             {DOMAINS["opposition"],             213},
             {DOMAINS["approach-opp-king"],      214},
             // ### level 3 ###
-            {DOMAINS["undefined"],              500}
+            {DOMAINS["undef"],                  500}
         };
 
         map<int, int> cTactic::WEIGHTS_TO_ADJUST = {
@@ -240,8 +241,7 @@
         int i = 1;
         string str_end;
         for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            out << reverse_lookup(cTactic::DOMAINS, it->domain) << " * " << reverse_lookup(cTactic::WEIGHTS, it->weight) << " | " ;
-            str_tactics +=  out.str();
+            str_tactics += reverse_lookup(cTactic::DOMAINS, it->domain) + " * " + reverse_lookup(cTactic::WEIGHTS, it->weight) + " | " ;
             i += 1;
         }
         return str_tactics;

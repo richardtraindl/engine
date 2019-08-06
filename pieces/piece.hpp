@@ -49,7 +49,7 @@
 
             void undo_move(cMove &move, int movecnt, int &score);
 
-            void find_attacks_and_supports(list<cTouch> &supported, list<cTouch> &attacked);
+            void find_supports_and_attacks(list<cTouch> &supported, list<cTouch> &attacked);
 
             int score_touches();
 

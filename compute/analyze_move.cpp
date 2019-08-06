@@ -3,6 +3,7 @@
     #include "./analyze_helper.hpp"
     #include "./analyze_tactics.hpp"
     #include "../values.hpp"
+    #include "../helper.hpp"
 
 
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &excludes){
@@ -86,21 +87,21 @@
         }
 
         if(discl_attacked.size() > 0){
-            int weight_for_attacking_piece = cTactic::WEIGHTS["bad-deal"] + 100;
+            int weight_for_attacking_piece = cTactic::WEIGHTS["undef"];
             for(list<cTouch>::iterator it = discl_attacked.begin(); it != discl_attacked.end(); ++it){
                 weight_for_attacking_piece = min(weight_for_attacking_piece, weight_for_discl_attacking(*it, weight));
             }
-            if(weight_for_attacking_piece < cTactic::WEIGHTS["bad-deal"] + 100){
+            if(weight_for_attacking_piece < cTactic::WEIGHTS["undef"]){
                 priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_attacking_piece, PIECES_RANKS[piece])));
             }
         }
 
         if(discl_supported.size() > 0){
-            int weight_for_supporting_piece = cTactic::WEIGHTS["bad-deal"] + 100;
+            int weight_for_supporting_piece = cTactic::WEIGHTS["undef"];
             for(list<cTouch>::iterator it = discl_supported.begin(); it != discl_supported.end(); ++it){
                 weight_for_supporting_piece = min(weight_for_supporting_piece, weight_for_discl_supporting(*it, weight));
             }
-            if(weight_for_supporting_piece < cTactic::WEIGHTS["bad-deal"] + 100){
+            if(weight_for_supporting_piece < cTactic::WEIGHTS["undef"]){
                 priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports"], weight_for_supporting_piece, PIECES_RANKS[piece])));
             }
         }

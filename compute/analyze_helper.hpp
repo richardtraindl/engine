@@ -13,6 +13,8 @@
 
     bool are_fairy_equal(int piece1, int piece2);
 
+    bool is_dst_field_ok(int piece, list<cTouch> friends_on_dstfield, list<cTouch>enmies_on_dstfield);
+
     void find_touches_on_dstfield_after_move(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &friends, list<cTouch> &enmies);
 
     bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported);
