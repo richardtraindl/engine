@@ -2,6 +2,7 @@
     #include "./searchforpiece.hpp"
     #include "./piece.hpp"
     #include "../values.hpp"
+    #include "../helper.hpp"
 
 
     int cSearchforRook::STEPS[4] = {8, -8, 1, -1};
@@ -15,7 +16,7 @@
 
 
     int cSearchforKing::STEPS[8] = {8, 9, 1, -7, -8, -9, -1, 7};
-    int cSearchforKing::MAXCNT = 7;
+    int cSearchforKing::MAXCNT = 1;
     int cSearchforKing::TARGETS[2] = {mWKG, mBKG};    
 
 

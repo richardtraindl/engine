@@ -6,7 +6,6 @@
     #include "../pieces/piece_ext2.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"
-    #include "../helper.hpp"
 
 
     void _search_all_pindirs(cMatch &match, int color, int pos, int excl_pos, list<int*> &pindirs){
@@ -139,7 +138,7 @@
             forking_piece = dstpiece;
         }
         cPiece cforking_piece(match.board, forking);
-        cforking_piece.find_supports_and_attacks(supported, attacked);
+        cforking_piece.find_supported_and_attacked(supported, attacked);
         return forks(forking_piece, attacked);
     }
 
@@ -165,7 +164,7 @@
             newmatch.board.setfield(it->dst, piece);
             supported.clear();
             attacked.clear();
-            cnewpiece.find_supports_and_attacks(supported, attacked);
+            cnewpiece.find_supported_and_attacked(supported, attacked);
             if(forks(piece, attacked)){
                 is_fork_threat = true;
                 newmatch.board.setfield(it->src, piece);
@@ -220,17 +219,23 @@
     void find_touches_after_move(cMatch &match, cPrioMove &priomove, list<cTouch> &supported, list<cTouch> &attacked){
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
         cPiece cpiece(match.board, priomove.dst);
-        cpiece.find_supports_and_attacks(supported, attacked);
+        cpiece.find_supported_and_attacked(supported, attacked);
+        for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
+            collect_touches_for_both_colors(match.board, it->pos, PIECES_COLORS[it->piece], it->supporter_beyond, it->attacker_beyond);
+        }
+        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
+            collect_touches_for_both_colors(match.board, it->pos, PIECES_COLORS[it->piece], it->supporter_beyond, it->attacker_beyond);
+        }
         match.undo_move();
     }
 
     void find_touches_after_move_old(cMatch &match, cPrioMove &priomove, list<cTouch> &supported, list<cTouch> &attacked){
         list<cTouch> supported_before, attacked_before;
         cPiece cpiece1(match.board, priomove.dst);
-        cpiece1.find_supports_and_attacks(supported_before, attacked_before);
+        cpiece1.find_supported_and_attacked(supported_before, attacked_before);
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
         cPiece cpiece2(match.board, priomove.dst);
-        cpiece2.find_supports_and_attacks(supported, attacked);
+        cpiece2.find_supported_and_attacked(supported, attacked);
         match.undo_move();
         for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
             for(list<cTouch>::iterator it2 = supported_before.begin(); it2 != supported_before.end(); ++it2){
@@ -254,12 +259,12 @@
         if((priomove.src % 8) + 2 == priomove.dst % 8){
             rook = match.board.getfield(priomove.dst - 1);
             cPiece cpiece(match.board, priomove.dst - 1);
-            cpiece.find_supports_and_attacks(supported, attacked);
+            cpiece.find_supported_and_attacked(supported, attacked);
         }
         else{
             rook = match.board.getfield(priomove.dst + 1);
             cPiece cpiece(match.board, priomove.dst + 1);
-            cpiece.find_supports_and_attacks(supported, attacked);
+            cpiece.find_supported_and_attacked(supported, attacked);
         }
         match.undo_move();
     }
@@ -299,9 +304,6 @@
             }
             else{
                 if(it->attacker_beyond.size() > 0){
-                    if(priomove.src == coord_to_index("c4") && priomove.dst == coord_to_index("d3")){
-                        cout << "attacker_beyond "<< endl;
-                    }
                     weight_for_piece = min(weight_for_piece, weight_for_supporting(match, piece, priomove, *it, weight));
                 }
                 else{

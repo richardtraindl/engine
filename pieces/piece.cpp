@@ -5,7 +5,6 @@
     #include "./searchforpiece.hpp"
     #include "../compute/analyze_move.hpp"
     #include "../values.hpp"
-    #include "../helper.hpp"
 
     cPiece::cPiece(cBoard &newboard, int newpos){
         board = &newboard;
@@ -208,7 +207,7 @@
         undo_move_from_ext(this, move, movecnt, score);
     }
 
-    void cPiece::find_supports_and_attacks(list<cTouch> &supported, list<cTouch> &attacked){
+    void cPiece::find_supported_and_attacked(list<cTouch> &supported, list<cTouch> &attacked){
         for(const int step : get_steps()){
             int dst2 = board->search(pos, step, get_maxcnt());
             if(dst2 != cBoard::SNOK){

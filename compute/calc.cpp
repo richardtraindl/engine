@@ -279,6 +279,7 @@
             if(depth == 1){
                 cout << "CURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
             }
+            int tmpscore = match.score;
             match.do_move(it->src, it->dst, it->prompiece);
             if(maximizing){
                 newscore = alphabeta(match, depth + 1, slimits, score, beta, false, &(*it), NULL, newcandidates);
@@ -287,6 +288,9 @@
                 newscore = alphabeta(match, depth + 1, slimits, alpha, score, true, &(*it), NULL, newcandidates);
             }
             match.undo_move();
+            if(tmpscore != match.score){
+                cout << "after " << dec << depth << " " << it->src << " " << it->dst << " " << it->prompiece << endl;
+            }
 
             if(maximizing){
                 if(newscore > score){

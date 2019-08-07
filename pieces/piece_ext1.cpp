@@ -18,7 +18,8 @@
         if(cpiece->piece == mWPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                score += SCORES[prompiece] - SCORES[cpiece->piece];
+                score += (SCORES[prompiece] - SCORES[mWPW]) * -1;
+                cout << dec << "ws " << ((SCORES[prompiece] - SCORES[mWPW]) * -1) << endl;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
@@ -38,7 +39,8 @@
         if(cpiece->piece == mBPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                score += SCORES[prompiece] - SCORES[cpiece->piece];
+                score += (SCORES[prompiece] - SCORES[mBPW]) * -1;
+                cout << dec << "bsc " << ((SCORES[prompiece] - SCORES[mBPW]) * -1) << endl;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
@@ -122,7 +124,8 @@
 
         if(cpiece->piece == mWPW){
             if(move.prompiece != mBLK){
-                score -= SCORES[move.prompiece] - SCORES[mWPW];
+                score += SCORES[move.prompiece] - SCORES[mWPW];
+                cout << dec << score << endl;
             }
             if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 score -= SCORES[mBPW];
@@ -132,7 +135,8 @@
 
         if(cpiece->piece == mBPW){
             if(move.prompiece != mBLK){
-                score -= SCORES[move.prompiece] - SCORES[mBPW];
+                score += SCORES[move.prompiece] - SCORES[mBPW];
+                cout << dec << score << endl;
             }
             if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 score -= SCORES[mWPW];

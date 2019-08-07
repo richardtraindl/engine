@@ -283,7 +283,6 @@
         int score;
         int status = match.eval_status();
         if(movecnt == 0 && status != cMatch::STATUS["active"]){
-            cout << "eval_status" << endl;
             if(status == cMatch::STATUS["winner_black"]){
                 return SCORES[mWKG] + match.movecnt();
             }

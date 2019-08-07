@@ -11,8 +11,8 @@
         public:
             int piece;
             int pos;
-            list<cTouch> attacker_beyond;
             list<cTouch> supporter_beyond;
+            list<cTouch> attacker_beyond;
             
             cTouch(int piece, int pos);
             cTouch();
