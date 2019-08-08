@@ -289,7 +289,13 @@
             }
             match.undo_move();
             if(tmpscore != match.score){
-                cout << "after " << dec << depth << " " << it->src << " " << it->dst << " " << it->prompiece << endl;
+                int tmppiece = match.board.getfield(it->src);
+                cout << "after " << dec << tmpscore << " " << match.score << " " << tmppiece << " " << it->src << " " << it->dst << " " << it->prompiece << endl;
+                if(last_pmove != NULL){
+                    cout << "last_pmove " << dec << last_pmove->src << " " << last_pmove->dst << " " << last_pmove->prompiece << endl;
+                }
+
+                match.board.prnt();
             }
 
             if(maximizing){

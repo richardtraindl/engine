@@ -471,11 +471,11 @@
         if(minutes.size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
             return false; // RETURN_CODES["wrong-color"]
         }
-        //if(piece != mWKG && piece != mBKG){
-        //    if(is_king_after_move_attacked(src, dst, minutes)){
-        //        return false; // RETURN_CODES["king-attacked-error"]
-        //    }
-        //}
+        if(piece != mWKG && piece != mBKG){
+            if(is_king_after_move_attacked(src, dst, minutes)){
+                return false; // RETURN_CODES["king-attacked-error"]
+            }
+        }
         cPiece cpiece(*this, src);
         if(cpiece.is_move_valid(dst, prompiece, minutes)){
             return true; // RETURN_CODES["ok"]

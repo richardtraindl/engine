@@ -170,25 +170,12 @@
             move = minutes.back();
         }
         else{
+            cout << "return " << endl;
             return;
         }
-        int piece = board.getfield(move.dst);
-        if(move.prompiece != mBLK){
-            if(PIECES_COLORS[piece] == COLORS["white"]){
-                cPiece piece(board, move.dst);
-                piece.undo_move(move, movecnt(), score);
-            }
-            else{
-                cPiece piece(board, move.dst);
-                piece.undo_move(move, movecnt(), score);
-            }
-            minutes.pop_back();
-        }
-        else{
-            cPiece cpiece(board, move.dst);
-            cpiece.undo_move(move, movecnt(), score);
-            minutes.pop_back();
-        }
+        cPiece cpiece(board, move.dst);
+        cpiece.undo_move(move, movecnt(), score);
+        minutes.pop_back();
         // delete move;
     }
 

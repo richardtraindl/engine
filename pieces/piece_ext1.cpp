@@ -18,8 +18,8 @@
         if(cpiece->piece == mWPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                score += (SCORES[prompiece] - SCORES[mWPW]) * -1;
-                cout << dec << "ws " << ((SCORES[prompiece] - SCORES[mWPW]) * -1) << endl;
+                score -= SCORES[prompiece] - SCORES[mWPW];
+                //cout << "do wsc " << dec << score << endl;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
@@ -39,8 +39,8 @@
         if(cpiece->piece == mBPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                score += (SCORES[prompiece] - SCORES[mBPW]) * -1;
-                cout << dec << "bsc " << ((SCORES[prompiece] - SCORES[mBPW]) * -1) << endl;
+                score -= SCORES[prompiece] - SCORES[mBPW];
+                //cout << "do bsc " << dec << score << endl;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
@@ -91,9 +91,10 @@
                 cpiece->board->wRkA_first_move_on = movecnt;
             }
             if(srcx == cBoard::COLS["H"] && srcy == cBoard::RANKS["1"] && 
-                 cpiece->board->wRkH_first_move_on == -1){
+                cpiece->board->wRkH_first_move_on == -1){
                 cpiece->board->wRkH_first_move_on = movecnt;
             }
+            return move;
         }
         if(cpiece->piece == mBRK){
             int srcx = cpiece->pos % 8;
@@ -106,6 +107,7 @@
                  cpiece->board->bRkH_first_move_on == -1){
                 cpiece->board->bRkH_first_move_on = movecnt;
             }
+            return move;
         }
         return move;
     }
@@ -113,9 +115,12 @@
 
     bool undo_move_from_ext(cPiece *cpiece, cMove &move, int movecnt, int &score){
         cpiece->board->fields = move.prevfields;
+        //int piece = cpiece->board->getfield(move.src);
         int dstpiece = cpiece->board->getfield(move.dst);
         score -= SCORES[dstpiece];
 
+        //cout << "undo - undo " << dec << cpiece->piece << endl;
+        
         if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
            cpiece->piece == mWKN || cpiece->piece == mBKN ||
            cpiece->piece == mWQU || cpiece->piece == mBQU){
@@ -125,7 +130,7 @@
         if(cpiece->piece == mWPW){
             if(move.prompiece != mBLK){
                 score += SCORES[move.prompiece] - SCORES[mWPW];
-                cout << dec << score << endl;
+                //cout << "undo wsc" << dec << score << endl;
             }
             if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 score -= SCORES[mBPW];
@@ -136,7 +141,7 @@
         if(cpiece->piece == mBPW){
             if(move.prompiece != mBLK){
                 score += SCORES[move.prompiece] - SCORES[mBPW];
-                cout << dec << score << endl;
+                //cout << "undo bsc" << dec << score << endl;
             }
             if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 score -= SCORES[mWPW];
@@ -151,6 +156,7 @@
             if(cpiece->board->wRkH_first_move_on != -1 && cpiece->board->wRkH_first_move_on == movecnt){
                 cpiece->board->wRkH_first_move_on = -1;
             }
+            return true;
         }
 
         if(cpiece->piece == mBRK){
@@ -160,6 +166,7 @@
             if(cpiece->board->bRkH_first_move_on != -1 && cpiece->board->bRkH_first_move_on == movecnt){
                 cpiece->board->bRkH_first_move_on = -1;
             }
+            return true;
         }
 
         if(cpiece->piece == mWKG){
@@ -167,6 +174,7 @@
                 cpiece->board->wKg_first_move_on = -1;
             }
             cpiece->board->wKg = move.src;
+            return true;
         }
         
         if(cpiece->piece == mBKG){
@@ -174,6 +182,7 @@
                 cpiece->board->bKg_first_move_on = -1;
             }
             cpiece->board->bKg = move.src;
+            return true;
         }
         return true;
     }

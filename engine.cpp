@@ -91,7 +91,7 @@
         int score = calc_move(match, NULL, candidates);
         cout << "score: " << dec << score << " match.score: " << match.score << endl; */
 
-        play(2);
+        play(1);
 
         return 0;
     }
