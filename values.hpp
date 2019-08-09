@@ -74,6 +74,8 @@
 
     extern map<int, int> SCORES;
 
+    extern map<int, int> REVERSED_SCORES;
+
     extern map<int, int> SUPPORTED_SCORES;
 
     extern map<int, int> ATTACKED_SCORES;

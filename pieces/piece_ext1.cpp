@@ -18,20 +18,22 @@
         if(cpiece->piece == mWPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                score -= SCORES[prompiece] - SCORES[mWPW];
-                //cout << "do wsc " << dec << score << endl;
+                score += REVERSED_SCORES[prompiece] - REVERSED_SCORES[mWPW];
+                return move;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];
+                return move;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
                 int enpass = cpiece->pos - 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];
+                return move;
             }
             return move;
         }
@@ -39,20 +41,22 @@
         if(cpiece->piece == mBPW){
             if(prompiece != mBLK){
                 cpiece->board->setfield(dst, prompiece);
-                score -= SCORES[prompiece] - SCORES[mBPW];
-                //cout << "do bsc " << dec << score << endl;
+                score += REVERSED_SCORES[prompiece] - REVERSED_SCORES[mBPW];
+                return move;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];
+                return move;
             }
             if(dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
                 int enpass = cpiece->pos - 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];
+                return move;
             }
             return move;
         }
@@ -115,41 +119,42 @@
 
     bool undo_move_from_ext(cPiece *cpiece, cMove &move, int movecnt, int &score){
         cpiece->board->fields = move.prevfields;
-        //int piece = cpiece->board->getfield(move.src);
+        int piece = cpiece->board->getfield(move.src);
         int dstpiece = cpiece->board->getfield(move.dst);
         score -= SCORES[dstpiece];
 
-        //cout << "undo - undo " << dec << cpiece->piece << endl;
-        
-        if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
-           cpiece->piece == mWKN || cpiece->piece == mBKN ||
-           cpiece->piece == mWQU || cpiece->piece == mBQU){
+        if(piece == mWBP || piece == mBBP || 
+           piece == mWKN || piece == mBKN ||
+           piece == mWQU || piece == mBQU){
             return true;
         }
 
-        if(cpiece->piece == mWPW){
+        if(piece == mWPW){
             if(move.prompiece != mBLK){
                 score += SCORES[move.prompiece] - SCORES[mWPW];
-                //cout << "undo wsc" << dec << score << endl;
+                return true;
+
             }
             if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 score -= SCORES[mBPW];
+                return true;
             }
             return true;
         }
 
-        if(cpiece->piece == mBPW){
+        if(piece == mBPW){
             if(move.prompiece != mBLK){
                 score += SCORES[move.prompiece] - SCORES[mBPW];
-                //cout << "undo bsc" << dec << score << endl;
+                return true;
             }
             if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 score -= SCORES[mWPW];
+                return true;
             }
             return true;
         }
 
-        if(cpiece->piece == mWRK){
+        if(piece == mWRK){
             if(cpiece->board->wRkA_first_move_on != -1 && cpiece->board->wRkA_first_move_on == movecnt){
                 cpiece->board->wRkA_first_move_on = -1;
             }
@@ -159,7 +164,7 @@
             return true;
         }
 
-        if(cpiece->piece == mBRK){
+        if(piece == mBRK){
             if(cpiece->board->bRkA_first_move_on != -1 && cpiece->board->bRkA_first_move_on == movecnt){
                 cpiece->board->bRkA_first_move_on = -1;
             }
@@ -169,7 +174,7 @@
             return true;
         }
 
-        if(cpiece->piece == mWKG){
+        if(piece == mWKG){
             if(cpiece->board->wKg_first_move_on != -1 && cpiece->board->wKg_first_move_on == movecnt){
                 cpiece->board->wKg_first_move_on = -1;
             }
@@ -177,7 +182,7 @@
             return true;
         }
         
-        if(cpiece->piece == mBKG){
+        if(piece == mBKG){
             if(cpiece->board->bKg_first_move_on != -1 && cpiece->board->bKg_first_move_on == movecnt){
                 cpiece->board->bKg_first_move_on = -1;
             }

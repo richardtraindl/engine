@@ -204,6 +204,22 @@
         {PIECES["bKg"], 20000}
     };
 
+    map<int, int> REVERSED_SCORES = {
+        {PIECES["blk"], 0},
+        {PIECES["wPw"], 100},
+        {PIECES["wKn"], 340},
+        {PIECES["wBp"], 340},
+        {PIECES["wRk"], 450},
+        {PIECES["wQu"], 900},
+        {PIECES["wKg"], 20000},
+        {PIECES["bPw"], -100},
+        {PIECES["bKn"], -340},
+        {PIECES["bBp"], -340},
+        {PIECES["bRk"], -450},
+        {PIECES["bQu"], -900},
+        {PIECES["bKg"], -20000}
+    };
+
     map<int, int> SUPPORTED_SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], 6},

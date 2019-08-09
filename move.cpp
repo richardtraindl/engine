@@ -1,5 +1,4 @@
 
-    #include <sstream>
     #include "./move.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
@@ -35,7 +34,6 @@
         int dstpiece = getprevfield(dst);
         string hyphen = "";
         string trailing = "";
-        stringstream out;
         if(dstpiece == mBLK){
             hyphen = "-";
         }
@@ -44,8 +42,7 @@
         }
         if(piece == mWPW || piece == mBPW){
             if(prompiece != mBLK){
-                out << prompiece;
-                trailing = ", " + out.str();
+                trailing = ", " + reverse_lookup(PIECES, prompiece);
             }
             else{
                 if(dstpiece == mBLK && src % 8 != dst % 8){
