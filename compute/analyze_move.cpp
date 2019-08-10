@@ -47,7 +47,7 @@
 
         
         if(captures(match, priomove)){
-            int capture_weight = weight_for_capture(match, piece, dstpiece, priomove, weight);
+            int capture_weight = weight_for_capture(match, piece, dstpiece, priomove);
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, PIECES_RANKS[piece])));
         }
         if(captures_enpassant(match, piece, priomove)){

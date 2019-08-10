@@ -89,10 +89,11 @@
             {"stormy",                  1},
             {"better-deal",             2},
             {"good-deal",               3},
-            {"downgraded",              4},
-            {"upgraded",                5},
-            {"bad-deal",                6},
-            {"undef",                   7}
+            {"vague-deal",              4},
+            {"downgraded",              5},
+            {"upgraded",                6},
+            {"bad-deal",                7},
+            {"undef",                   8}
         };
 
         map<int, int> cTactic::DOMAINS_TO_PRIOS = {
@@ -127,6 +128,7 @@
             {WEIGHTS["stormy"],                 -70},
             {WEIGHTS["better-deal"],            -10},
             {WEIGHTS["good-deal"],                0},
+            {WEIGHTS["vague-deal"],               0},
             {WEIGHTS["upgraded"],                 0},
             {WEIGHTS["undefined"],                0},
             {WEIGHTS["downgraded"],              60},

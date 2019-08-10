@@ -31,7 +31,7 @@
 
     int weight_for_standard(cMatch &match, int piece, cPrioMove &priomove);
 
-    int weight_for_capture(cMatch &match, int piece, int dstpiece, cPrioMove &priomove, int weight);
+    int weight_for_capture(cMatch &match, int piece, int dstpiece, cPrioMove &priomove);
 
     int weight_for_flee(cMatch &match, int piece, cPrioMove &priomove, int weight);
 

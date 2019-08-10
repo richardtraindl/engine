@@ -24,6 +24,16 @@
             const uint256_t BITS1100 = 0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC_cppui;
             const uint256_t BITS0111 = 0x7777777777777777777777777777777777777777777777777777777777777777_cppui;
             const uint256_t BITS0011 = 0x3333333333333333333333333333333333333333333333333333333333333333_cppui;
+            const string WHITE_TEXT  = "\033[37m";
+            const string BLACK_TEXT  = "\033[30m";
+            const string WHITE_BACK  = "\033[47m";
+            const string BROWN_BACK  = "\033[43m";
+            const string BLUE_BACK   = "\033[44m";
+            const string GREEN_BACK  = "\033[42m";
+            const string BOLD_ON     = "\033[1m";
+            const string BOLD_OFF    = "\033[2m";
+            const string MAGIC       = "\033[3m";
+            const string RESET_ALL   = "\033[0m";
 
             uint256_t fields;
             int wKg;

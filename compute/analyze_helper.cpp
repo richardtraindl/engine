@@ -132,7 +132,7 @@
     }
 
 
-    int weight_for_capture(cMatch &match, int piece,  int dstpiece, cPrioMove &priomove, int weight){
+    int weight_for_capture(cMatch &match, int piece,  int dstpiece, cPrioMove &priomove){
         list<cTouch> friends_on_dstfield, enmies_on_dstfield;
         find_touches_on_dstfield_after_move(match, piece, priomove, friends_on_dstfield, enmies_on_dstfield);
         if(PIECES_RANKS[piece] < PIECES_RANKS[dstpiece]){
@@ -153,7 +153,7 @@
                 return cTactic::WEIGHTS["good-deal"];
             }
         }
-        return weight;
+        return cTactic::WEIGHTS["vague-deal"];
     }
 
 

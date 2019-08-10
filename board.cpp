@@ -520,20 +520,36 @@
     }
 
     void cBoard::prnt(){
+        string textcolor, backcolor, strpiece;
         for(int y = 7; y >=0; --y){
-            cout << "  –––– –––– –––– –––– –––– –––– –––– ––––" << endl;
-            cout << " | ";
             for(int x = 0; x < 8; ++x){
-                cout << hex << PIECES_STR[getfield(y * 8 + x)] << " | ";
+                int piece = getfield(y * 8 + x);
+                if(piece == mBLK){
+                    strpiece = "   ";
+                }
+                else{
+                    strpiece = reverse_lookup(PIECES, piece);
+                }
+                if(PIECES_COLORS[piece] == COLORS["white"]){
+                    textcolor = WHITE_TEXT + BOLD_ON;
+                }
+                else{
+                    textcolor = BLACK_TEXT + BOLD_ON;
+                }
+                if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
+                    backcolor = GREEN_BACK;
+                }
+                else{
+                    backcolor = WHITE_BACK;
+                }
+                // "\e#3" \e#4"
+                cout << backcolor + textcolor + strpiece + RESET_ALL; 
             }
             cout << endl;
         }
-        cout << "  –––– –––– –––– –––– –––– –––– –––– ––––" << endl;
     }
 
-
 /*
-
     def set_to_base(self){
         self.fields = self.BASE
         self.wKg = self.COLS["E"] + self.RANKS["1"] * 8
