@@ -24,11 +24,15 @@
             const uint256_t BITS1100 = 0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC_cppui;
             const uint256_t BITS0111 = 0x7777777777777777777777777777777777777777777777777777777777777777_cppui;
             const uint256_t BITS0011 = 0x3333333333333333333333333333333333333333333333333333333333333333_cppui;
-            const string WHITE_TEXT  = "\033[37m";
+            const string WHITE_TEXT  = "\033[97m";
+            const string WHITE_BACK  = "\033[107m";
+            const string YELLOW_TEXT  = "\033[93m";
+            const string YELLOW_BACK  = "\033[103m";
             const string BLACK_TEXT  = "\033[30m";
-            const string WHITE_BACK  = "\033[47m";
-            const string BROWN_BACK  = "\033[43m";
-            const string BLUE_BACK   = "\033[44m";
+            
+            const string BLUE_BACK   = "\033[104m";
+            const string CYAN_BACK   = "\033[106m";            
+            const string MAGENTA_BACK = "\033[44m";
             const string GREEN_BACK  = "\033[42m";
             const string BOLD_ON     = "\033[1m";
             const string BOLD_OFF    = "\033[2m";

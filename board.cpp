@@ -537,10 +537,10 @@
                     textcolor = BLACK_TEXT + BOLD_ON;
                 }
                 if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
-                    backcolor = GREEN_BACK;
+                    backcolor = BLUE_BACK;
                 }
                 else{
-                    backcolor = WHITE_BACK;
+                    backcolor = GREEN_BACK;
                 }
                 // "\e#3" \e#4"
                 cout << backcolor + textcolor + strpiece + RESET_ALL; 

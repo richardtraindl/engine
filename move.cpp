@@ -98,48 +98,48 @@
 
         map<int, int> cTactic::DOMAINS_TO_PRIOS = {
             // ### level 1 ###
-            {DOMAINS["promotes"],               90},
-            {DOMAINS["captures"],               91},
-            {DOMAINS["is-running-pawn"],        92},
-            {DOMAINS["is-tactical-draw"],       93},
-            {DOMAINS["defends-check"] ,         94},
-            {DOMAINS["prev-candidate"] ,        95},
+            {DOMAINS["promotes"],               100},
+            {DOMAINS["captures"],               101},
+            {DOMAINS["is-running-pawn"],        102},
+            {DOMAINS["is-tactical-draw"],       103},
+            {DOMAINS["defends-check"] ,         104},
+            {DOMAINS["prev-candidate"] ,        105},
             // ### level 2 ###
-            {DOMAINS["castles"],                200},
-            {DOMAINS["attacks-king"],           201},
-            {DOMAINS["forks"],                  202}, 
-            {DOMAINS["threatens-fork"],         203},
-            {DOMAINS["defends-fork"],           204}, 
-            {DOMAINS["unpins"],                 205}, 
-            {DOMAINS["supports-running-pawn"],  206}, 
-            {DOMAINS["flees"],                  207}, 
-            {DOMAINS["blocks"],                 208},
-            {DOMAINS["controles-file"],         209}, 
-            {DOMAINS["is-progress"],            210},
-            {DOMAINS["supports"],               211},
-            {DOMAINS["attacks"],                212},
-            {DOMAINS["opposition"],             213},
-            {DOMAINS["approach-opp-king"],      214},
+            {DOMAINS["castles"],                120},
+            {DOMAINS["attacks-king"],           121},
+            {DOMAINS["forks"],                  122}, 
+            {DOMAINS["threatens-fork"],         123},
+            {DOMAINS["defends-fork"],           124}, 
+            {DOMAINS["unpins"],                 125}, 
+            {DOMAINS["supports-running-pawn"],  126}, 
+            {DOMAINS["flees"],                  127}, 
+            {DOMAINS["blocks"],                 128},
+            {DOMAINS["controles-file"],         129}, 
+            {DOMAINS["is-progress"],            130},
+            {DOMAINS["supports"],               131},
+            {DOMAINS["attacks"],                132},
+            {DOMAINS["opposition"],             133},
+            {DOMAINS["approach-opp-king"],      134},
             // ### level 3 ###
-            {DOMAINS["undef"],                  500}
+            {DOMAINS["undef"],                  150}
         };
 
         map<int, int> cTactic::WEIGHTS_TO_ADJUST = {
-            {WEIGHTS["stormy"],                 -70},
-            {WEIGHTS["better-deal"],            -10},
+            {WEIGHTS["stormy"],                 -40},
+            {WEIGHTS["better-deal"],            -30},
             {WEIGHTS["good-deal"],                0},
-            {WEIGHTS["vague-deal"],               0},
+            {WEIGHTS["vague-deal"],              10},
             {WEIGHTS["upgraded"],                 0},
-            {WEIGHTS["undefined"],                0},
-            {WEIGHTS["downgraded"],              60},
-            {WEIGHTS["bad-deal"],               130}
+            {WEIGHTS["undef"],                    0},
+            {WEIGHTS["downgraded"],              40},
+            {WEIGHTS["bad-deal"],                50}
         };
 
         map<string, int> cPrioMove::PRIOS = {
-            {"prio0",                           100},
-            {"prio1",                           200},
-            {"prio2",                           250},
-            {"prio3",                           300} 
+            {"prio0",                            50},
+            {"prio1",                           100},
+            {"prio2",                           150},
+            {"prio3",                           200} 
         };
 
     cPrioMove::cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int _prio) :  cMove(prevfields, src, dst, prompiece){
@@ -191,7 +191,7 @@
                 return it->weight;
             }
         }
-        return cTactic::WEIGHTS["undefined"];
+        return cTactic::WEIGHTS["undef"];
     }
 
     bool cPrioMove::has_domain(int domain){
