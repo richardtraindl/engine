@@ -3,6 +3,7 @@
     #include "./calc.hpp"
     #include "../pieces/piece.hpp"
     #include "./analyze_position.hpp"
+    #include "../helper.hpp"
     #include "../values.hpp"
 
 
@@ -255,7 +256,7 @@
             score = beta; 
         }
 
-        cMove *dbggmove = NULL; //new cMove(0x0, 3, 51, PIECES["blk"]);
+        cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("e1"), coord_to_index("c1"), mBLK);
         bool search_for_mate = match.is_endgame();
         list<cPrioMove> priomoves;
         generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);

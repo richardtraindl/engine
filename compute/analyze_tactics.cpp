@@ -311,10 +311,10 @@
                 }
             }
         }
-        if(weight_for_running_pawn < cTactic::WEIGHTS["undef"]){
+        if(weight_for_running_pawn != cTactic::WEIGHTS["undef"]){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports-running-pawn"], weight_for_running_pawn, PIECES_RANKS[piece])));
         }
-        if(weight_for_piece < cTactic::WEIGHTS["undef"]){
+        if(weight_for_piece != cTactic::WEIGHTS["undef"]){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports"], weight_for_piece, PIECES_RANKS[piece])));
         }
     }
