@@ -61,11 +61,26 @@
     bool is_check_mate_deep_search(cMatch &match, cPrioMove &priomove){
         cMatch newmatch = match;
         newmatch.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        return _calc_checks(newmatch, 3, 1);
+        return _calc_checks(newmatch, 3, 1, true);
     }
 
 
-    bool _calc_checks(cMatch &match, int maxcnt, int count){
+    bool _calc_checks(cMatch &match, int maxcnt, int count, bool opponent_to_move){
+        list<cMove> moves;
+        generate_moves(match, moves);
+        if(moves.size() == 0 || count >= maxcnt){
+            return opponent_to_move && (moves.size() == 0);
+        }
+        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+            match.do_move(it->src, it->dst, it->prompiece);
+            bool flag = _calc_checks(match, maxcnt, count + 1, !opponent_to_move);
+            match.undo_move();
+            if(flag){ return true; }
+        }
+        return false;
+    }
+
+    bool _calc_checks_old(cMatch &match, int maxcnt, int count){
         list<cMove> moves;
         generate_moves(match, moves);
         if(moves.size() == 0 && count % 2 == 1){
