@@ -27,7 +27,8 @@
 
             cMatch();
 
-            cMatch(const cMatch &obj);
+            cMatch(const cMatch &match);
+            // copy constructor
 
             void update_attributes();
 

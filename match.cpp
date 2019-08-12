@@ -15,7 +15,11 @@
         score = 0;
         level = LEVELS["blitz"];
     } 
-    cMatch::cMatch(const cMatch &obj){
+    cMatch::cMatch(const cMatch &match){
+        status = match.status;
+        score = match.score;
+        level = match.level;
+        cBoard board = match.board;
     } // copy constructor
 
     map<string, int> cMatch::STATUS = {

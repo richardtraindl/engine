@@ -32,10 +32,10 @@
         match.do_move(coord_to_index("c3"), coord_to_index("b5"), mBLK);
         match.do_move(coord_to_index("c6"), coord_to_index("b5"), mBLK);
         match.do_move(coord_to_index("c4"), coord_to_index("b5"), mBLK);
-        //match.do_move(coord_to_index("b8"), coord_to_index("d7"), mBLK);
-        //match.do_move(coord_to_index("e1"), coord_to_index("c1"), mBLK);
-        //match.do_move(coord_to_index("e8"), coord_to_index("c8"), mBLK);
-        
+        match.do_move(coord_to_index("b8"), coord_to_index("d7"), mBLK);
+        match.do_move(coord_to_index("e1"), coord_to_index("c1"), mBLK);
+        match.do_move(coord_to_index("e8"), coord_to_index("c8"), mBLK);
+
         //[c3xb5]  [c6xb5]  [c4-d5]  [f6xd5]  [g5xe7]  [d5xe7]  [b3xb5]
         // match.do_move(coord_to_index("b8"), coord_to_index("d7"), mBLK);
         /*

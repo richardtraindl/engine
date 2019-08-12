@@ -51,6 +51,9 @@
 
             cBoard();
 
+            cBoard(const cBoard &board);
+            // copy constructor
+
             int getfield(int idx);
 
             void setfield(int idx, int value);

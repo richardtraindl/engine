@@ -19,6 +19,18 @@
         bRkH_first_move_on = -1;
     }
 
+    cBoard::cBoard(const cBoard &board){
+        fields = board.fields;
+        wKg = board.wKg;
+        bKg = board.bKg;
+        wKg_first_move_on = board.wKg_first_move_on;
+        bKg_first_move_on = board.bKg_first_move_on;
+        wRkA_first_move_on = board.wRkA_first_move_on;
+        wRkH_first_move_on = board.wRkH_first_move_on;
+        bRkA_first_move_on = board.bRkA_first_move_on;
+        bRkH_first_move_on = board.bRkH_first_move_on;
+    } // copy constructor
+
     const int cBoard::SNOK = -1;
 
     map<string, int> cBoard::RANKS = {
