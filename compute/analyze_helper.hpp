@@ -21,7 +21,7 @@
 
     bool is_check_mate_deep_search(cMatch &match, cPrioMove &priomove);
 
-    bool _calc_checks(cMatch &match, int maxcnt, int count);
+    bool _calc_checks(cMatch &match, int maxcnt, int count, bool opponent_to_move);
 
     bool is_move_out_of_soft_pin(cMatch &match, int piece, cPrioMove &priomove);
 
