@@ -1,6 +1,7 @@
  
     #include <boost/multiprecision/cpp_int.hpp>
     #include "./analyze_position.hpp"
+    #include "./analyze_helper.hpp"
     #include "../compute/calc.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/searchforpiece.hpp"
@@ -90,12 +91,22 @@
     int score_kings_safety(cMatch &match){
         int value = 0;
         cPiece cwpiece(match.board, match.board.wKg);
-        if(cwpiece.is_safe_king() == false){
-            value += ATTACKED_SCORES[mWQU] * 5;
+        if(cwpiece.is_king_safe() == false){
+            if(search_for_checkmate(match, COLORS["white"])){
+                value += SCORES[mWKG];
+            }
+            else{
+                value += ATTACKED_SCORES[mWQU] * 5;
+            }
         }
         cPiece cbpiece(match.board, match.board.bKg);
-        if(cbpiece.is_safe_king() == false){
-            value += ATTACKED_SCORES[mBQU] * 5;
+        if(cbpiece.is_king_safe() == false){
+            if(search_for_checkmate(match, COLORS["black"])){
+                value += SCORES[mWKG];
+            }
+            else{
+                value += ATTACKED_SCORES[mBQU] * 5;
+            }
         }
         return value;
     }
@@ -297,7 +308,7 @@
         else{
             score = match.score;
             //score += score_traps_and_touches(match);
-            //score += score_kings_safety(match);
+            score += score_kings_safety(match);
             //score += score_controled_horizontal_files(match);
             //score += score_controled_vertical_files(match);
             /*if(match.is_opening()){

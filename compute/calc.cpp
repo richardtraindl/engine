@@ -3,7 +3,6 @@
     #include "./calc.hpp"
     #include "../pieces/piece.hpp"
     #include "./analyze_position.hpp"
-    #include "./analyze_helper.hpp"
     #include "../helper.hpp"
     #include "../values.hpp"
 
@@ -257,7 +256,7 @@
             score = beta; 
         }
 
-        cMove *dbggmove = new cMove(0x0, coord_to_index("e1"), coord_to_index("c1"), mBLK);
+        cMove *dbggmove = new cMove(0x0, coord_to_index("g5"), coord_to_index("f6"), mBLK);
         list<cPrioMove> priomoves;
         generate_priomoves(match, candidate, dbggmove, priomoves);
         priomoves.sort(sortByPrio);
@@ -267,23 +266,7 @@
             prnt_priomoves(priomoves);
         }
 
-        if(maxcnt == 0){
-            cPiece cwhite_piece(match.board, match.board.wKg);
-            if(cwhite_piece.is_king_safe() == false){
-                if(search_for_checkmate(match, COLORS["white"])){
-                    return SCORES[mWKG];
-                }
-            }
-            cPiece cblack_piece(match.board, match.board.bKg);
-            if(cblack_piece.is_king_safe() == false){
-                if(search_for_checkmate(match, COLORS["black"])){ 
-                    return SCORES[mBKG];
-                }
-            }
-            return score_position(match, priomoves.size());
-        }
-
-        if(priomoves.size() == 0){
+        if(priomoves.size() == 0 || maxcnt == 0){
             return score_position(match, priomoves.size());
         }
 

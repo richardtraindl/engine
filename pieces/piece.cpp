@@ -361,7 +361,7 @@
     }
 
 
-    bool cPiece::is_safe_king(){
+    bool cPiece::is_king_safe(){
         int count = 0;
         for(auto &step : get_mv_steps()){
             if(step == 0){ break; }

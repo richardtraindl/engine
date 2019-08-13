@@ -59,7 +59,7 @@
 
             bool is_running_pawn();
 
-            bool is_safe_king();
+            bool is_king_safe();
 
     };
 
