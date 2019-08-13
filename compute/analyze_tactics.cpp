@@ -270,17 +270,12 @@
     }
 
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool search_for_mate, list<cTouch> &attacked, int weight){
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight){
         int weight_for_king = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
             if(it->piece == mWKG || it->piece == mBKG){
-                if(search_for_mate){
-                    weight_for_king = min(weight_for_king, weight_for_attacking_king(match, priomove, weight));
-                }
-                else{
-                    weight_for_king = min(weight_for_king, weight);
-                }
+                weight_for_king = min(weight_for_king, weight);
             }
             else{
                 weight_for_piece = min(weight_for_piece, weight_for_attacking(match, piece, priomove, *it, weight));

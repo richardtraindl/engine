@@ -1,6 +1,7 @@
  
     #include <boost/multiprecision/cpp_int.hpp>
     #include "./analyze_position.hpp"
+    #include "../compute/calc.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"

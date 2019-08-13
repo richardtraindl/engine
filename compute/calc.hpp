@@ -31,7 +31,7 @@
 
     void generate_moves(cMatch &match, list<cMove> &moves);
     
-    void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves);
+    void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &priomoves);
 
     void append_newmove(cPrioMove &move, list<cPrioMove> &newcandidates, list<cPrioMove> &rcandidates);
 

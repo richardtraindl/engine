@@ -3,6 +3,7 @@
     #include "./calc.hpp"
     #include "../pieces/piece.hpp"
     #include "./analyze_position.hpp"
+    #include "./analyze_helper.hpp"
     #include "../helper.hpp"
     #include "../values.hpp"
 
@@ -74,7 +75,7 @@
     }
 
 
-    void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves){
+    void generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &priomoves){
         int color = match.next_color();
         for(int idx = 0; idx < 64; ++idx){
             int piece = match.board.getfield(idx);
@@ -83,7 +84,7 @@
             }
             else{
                 cPiece cpiece(match.board, idx);
-                cpiece.generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);
+                cpiece.generate_priomoves(match, candidate, dbggmove, priomoves);
             }
         }
     }
@@ -257,9 +258,8 @@
         }
 
         cMove *dbggmove = new cMove(0x0, coord_to_index("e1"), coord_to_index("c1"), mBLK);
-        bool search_for_mate = true; // match.is_endgame();
         list<cPrioMove> priomoves;
-        generate_priomoves(match, candidate, dbggmove, search_for_mate, priomoves);
+        generate_priomoves(match, candidate, dbggmove, priomoves);
         priomoves.sort(sortByPrio);
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
         if(depth == 1){
@@ -267,10 +267,23 @@
             prnt_priomoves(priomoves);
         }
 
-        if(priomoves.size() == 0 || maxcnt == 0){
-            //clean_priomoves(priomoves);
+        if(maxcnt == 0){
+            bool ismate = search_for_checkmate(match, match.next_color());
+            if(ismate){
+                if(match.next_color() == COLORS["white"]){
+                    return SCORES[mWKG];
+                }
+                else{
+                    return SCORES[mBKG];
+                }
+            }
+            else{
+                return score_position(match, priomoves.size());
+            }
+        }
+
+        if(priomoves.size() == 0){
             return score_position(match, priomoves.size());
-            // rcandidates.clear();
         }
 
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){

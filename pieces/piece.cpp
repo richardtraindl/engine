@@ -1,4 +1,5 @@
 
+    #include <ctime>
     #include "./piece.hpp"
     #include "./piece_ext1.hpp"
     #include "./piece_ext2.hpp"
@@ -279,7 +280,7 @@
         }
     }
 
-    void cPiece::generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &priomoves){
+    void cPiece::generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &priomoves){
         cPrioMove *priomove;
         list<cPrioMove> excludes;
         for(auto &step : get_mv_steps()){
@@ -293,7 +294,7 @@
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
                         priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
-                        add_tactics(*priomove, match, candidate, dbggmove, search_for_mate, excludes);
+                        add_tactics(*priomove, match, candidate, dbggmove, excludes);
                         //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
                         //if(len(excluded) > 0):
                             //excludes.extend(excluded)
@@ -359,52 +360,33 @@
         return false;
     }
 
-            
+
     bool cPiece::is_safe_king(){
-        if(piece != mWKG && piece != mBKG){
+        int count = 0;
+        for(auto &step : get_mv_steps()){
+            if(step == 0){ break; }
+            int dst = pos + step;
+            if(board->is_inbounds(pos, dst, step)){
+                list<cTouch> friends, enemies;
+                collect_touches_for_both_colors(*board, dst, color, friends, enemies);
+                if(friends.size() < enemies.size()){
+                    return false;
+                }
+                if(enemies.size() > 0){
+                    count += 1;
+                }
+            }
+        }
+
+        if(count > 2){
+            return false;
+        }
+        list<cTouch> friends, enemies;
+        collect_touches_for_both_colors(*board, pos, color, friends, enemies);
+        if(enemies.size() >= 2){
             return false;
         }
         else{
             return true;
-                    /* 
-                def is_safe(self){
-                    count = 0
-                    for step in self.STEPS:
-                        dst = self.pos + step
-                        if(board->is_inbounds(self.pos, dst, step)){
-                            friends, enemies = list_all_field_touches(self.match, dst, self.color)
-                            if(len(friends) < len(enemies)){
-                                return false;
-                            if(len(enemies) > 0){
-                                count += 1
-                    if(count > 2){
-                        return false;
-                    friends.clear()
-                    enemies.clear()
-                    friends, enemies = list_all_field_touches(self.match, self.pos, self.color)
-                    if(len(enemies) == 0){
-                        return True
-                    if(len(enemies) >= 2){
-                        return false;
-                    else{
-                        enemy = enemies[0]
-                        friends_beyond, enemies_beyond = list_all_field_touches(self.match, enemy.field, self.color)
-                        if(len(friends_beyond) >= len(enemies_beyond)){
-                            return True
-                        cenemy = self.match.obj_for_piece(enemy.piece, enemy.field)
-                        direction = cenemy.dir_for_move(self.pos, enemy.field)
-                        if(direction == DIRS["undef"]){
-                            return True
-                        else{
-                            step = cenemy.step_for_dir(direction)
-                        dst = self.pos + step
-                        while(board->is_inbounds(self.pos, dst, step)){
-                            blocking_friends, blocking_enemies = list_all_field_touches(self.match, dst, self.color)
-                            if(len(blocking_friends) > 0){
-                                return True
-                            dst += step
-                    return false;
-            */
         }
     }
-

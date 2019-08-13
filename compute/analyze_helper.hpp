@@ -19,15 +19,15 @@
 
     bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported);
 
-    bool is_check_mate_deep_search(cMatch &match, cPrioMove &priomove);
-
-    bool _calc_checks(cMatch &match, int maxcnt, int count, bool opponent_to_move);
-
     bool is_move_out_of_soft_pin(cMatch &match, int piece, cPrioMove &priomove);
 
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove);
 
     bool are_move_dirs_equal(int piece1, int src1, int dst1, int piece2, int src2, int dst2);
+
+    bool search_for_checkmate(cMatch &match, int color);
+
+    bool _search_for_checkmate(cMatch &match, int count, int maxcnt, int color);
 
     int weight_for_standard(cMatch &match, int piece, cPrioMove &priomove);
 
@@ -43,7 +43,7 @@
 
     int weight_for_supporting(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported, int weight);
 
-    int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight);
+    //int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight);
 
     int weight_for_attacking(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, int weight);
 

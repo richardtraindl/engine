@@ -6,7 +6,7 @@
     #include "../helper.hpp"
 
 
-    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, bool search_for_mate, list<cPrioMove> &excludes){
+    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &excludes){
         int rook = mBLK;
         list<cTouch> from_castl_rk_supported, from_castl_rk_attacked;
 
@@ -87,10 +87,10 @@
 
 
         if(from_dstfield_attacked.size() > 0){
-            fill_attacked(match, piece, priomove, search_for_mate, from_dstfield_attacked, weight);
+            fill_attacked(match, piece, priomove, from_dstfield_attacked, weight);
         }
         if(rook != mBLK){
-            fill_attacked(match, rook, priomove, search_for_mate, from_castl_rk_attacked, weight);
+            fill_attacked(match, rook, priomove, from_castl_rk_attacked, weight);
         }
 
 

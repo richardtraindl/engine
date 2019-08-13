@@ -58,50 +58,6 @@
     }
 
 
-    bool is_check_mate_deep_search(cMatch &match, cPrioMove &priomove){
-        cMatch newmatch = match;
-        newmatch.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        return _calc_checks(newmatch, 3, 1, true);
-    }
-
-
-    bool _calc_checks(cMatch &match, int maxcnt, int count, bool opponent_to_move){
-        list<cMove> moves;
-        generate_moves(match, moves);
-        if(moves.size() == 0 || count >= maxcnt){
-            return opponent_to_move && (moves.size() == 0);
-        }
-        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-            match.do_move(it->src, it->dst, it->prompiece);
-            bool flag = _calc_checks(match, maxcnt, count + 1, !opponent_to_move);
-            match.undo_move();
-            if(flag){ return true; }
-        }
-        return false;
-    }
-
-    bool _calc_checks_old(cMatch &match, int maxcnt, int count){
-        list<cMove> moves;
-        generate_moves(match, moves);
-        if(moves.size() == 0 && count % 2 == 1){
-            return true;
-        }
-        if(count >= maxcnt){
-            return false;
-        }
-        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-            match.do_move(it->src, it->dst, it->prompiece);
-            if(_calc_checks(match, maxcnt, count + 1)){
-                return true;
-            }
-            else{
-                match.undo_move();
-            }
-        }
-        return false;
-    }
-
-
     bool is_move_out_of_soft_pin(cMatch &match, int piece ,cPrioMove &priomove){
         int pindir = match.board.eval_soft_pin_dir(priomove.src);
         int mvdir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
@@ -131,6 +87,42 @@
         int mvdir1 = cPiece::dir_for_move(piece1, src1, dst1);
         int mvdir2 = cPiece::dir_for_move(piece2, src2, dst2);
         return (mvdir1 != DIRS["undef"] && (mvdir1 == mvdir2 || REVERSE_DIRS[mvdir1] == mvdir2));
+    }
+
+
+    bool search_for_checkmate(cMatch &match, int color){
+        int maxcnt;
+        if(match.next_color() == color){
+            maxcnt = 3;
+        }
+        else{
+            maxcnt = 4;
+        }
+        return _search_for_checkmate(match, 1, maxcnt, color);
+    }
+
+    bool _search_for_checkmate(cMatch &match, int count, int maxcnt, int color){
+        cout << ".";
+        list<cMove> moves;
+        generate_moves(match, moves);
+        if(moves.size() == 0){
+            if(match.next_color() == color){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        if(count >= maxcnt){
+            return false;
+        }
+        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+            match.do_move(it->src, it->dst, it->prompiece);
+            bool ismate = _search_for_checkmate(match, count + 1, maxcnt, color);
+            match.undo_move();
+            if(ismate){ return true; }
+        }
+        return false;
     }
 
 
@@ -231,12 +223,12 @@
     }
 
 
-    int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight){
+    /*int weight_for_attacking_king(cMatch &match, cPrioMove &priomove, int weight){
         if(is_check_mate_deep_search(match, priomove)){
             return cTactic::WEIGHTS["stormy"];
         }
         return weight;
-    }
+    }*/
 
 
     int weight_for_attacking(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, int weight){
