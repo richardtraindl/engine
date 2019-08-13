@@ -268,18 +268,19 @@
         }
 
         if(maxcnt == 0){
-            bool ismate = search_for_checkmate(match, match.next_color());
-            if(ismate){
-                if(match.next_color() == COLORS["white"]){
+            cPiece cwhite_piece(match.board, match.board.wKg);
+            if(cwhite_piece.is_king_safe() == false){
+                if(search_for_checkmate(match, COLORS["white"])){
                     return SCORES[mWKG];
                 }
-                else{
+            }
+            cPiece cblack_piece(match.board, match.board.bKg);
+            if(cblack_piece.is_king_safe() == false){
+                if(search_for_checkmate(match, COLORS["black"])){ 
                     return SCORES[mBKG];
                 }
             }
-            else{
-                return score_position(match, priomoves.size());
-            }
+            return score_position(match, priomoves.size());
         }
 
         if(priomoves.size() == 0){
