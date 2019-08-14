@@ -140,6 +140,12 @@
 
         if(blocks(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["blocks"], weight, PIECES_RANKS[piece])));
+             if(find_excluded(excludes, priomove.src, cBoard::SNOK, cTactic::DOMAINS["blocks"])){
+                priomove.downgrade(cTactic::DOMAINS["blocks"]);
+            }
+            else{
+                excludes.push_back(*(new cExclude(priomove.src, cBoard::SNOK, cTactic::DOMAINS["blocks"])));
+            }
         }
 
 
