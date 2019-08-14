@@ -270,45 +270,6 @@
     }
 
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight list<cExclude> excludes){
-        int weight_for_king = cTactic::WEIGHTS["undef"];
-        int weight_for_piece = cTactic::WEIGHTS["undef"];
-        int touch_pos_for_king, touch_pos_for_piece;
-        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
-            if(it->piece == mWKG || it->piece == mBKG){
-                if(weight < weight_for_king){
-                    weight_for_king = weight;
-                    touch_pos_for_king = it->pos;
-                }
-            }
-            else{
-                if(weight < weight_for_piece){
-                    weight_for_piece = weight;
-                    touch_pos_for_piece = it->pos;
-                }
-            }
-        }
-        if(weight_for_king < cTactic::WEIGHTS["undef"]){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks-king"], weight_for_king, PIECES_RANKS[piece])));
-            if(find_excluded(excludes, priomove.src, touch_pos_for_king, cTactic::DOMAINS["attacks-king"])){
-                priomove.downgrade(cTactic::DOMAINS["attacks-king"]);
-            }
-            else{
-                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_king, cTactic::DOMAINS["attacks-king"])));
-            }
-        }
-        if(weight_for_piece < cTactic::WEIGHTS["undef"]){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_piece, PIECES_RANKS[piece])));
-            if(find_excluded(excludes, priomove.src, touch_pos_for_piece, cTactic::DOMAINS["attacks"])){
-                priomove.downgrade(cTactic::DOMAINS["attacks"]);
-            }
-            else{
-                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_piece, cTactic::DOMAINS["attacks"])));
-            }
-        }
-    }
-
-
     void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported, int weight, list<cExclude> excludes){
         int weight_for_running_pawn = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
@@ -349,6 +310,45 @@
             }
             else{
                 excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_piece, cTactic::DOMAINS["supports"])));
+            }
+        }
+    }
+
+
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight list<cExclude> excludes){
+        int weight_for_king = cTactic::WEIGHTS["undef"];
+        int weight_for_piece = cTactic::WEIGHTS["undef"];
+        int touch_pos_for_king, touch_pos_for_piece;
+        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
+            if(it->piece == mWKG || it->piece == mBKG){
+                if(weight < weight_for_king){
+                    weight_for_king = weight;
+                    touch_pos_for_king = it->pos;
+                }
+            }
+            else{
+                if(weight < weight_for_piece){
+                    weight_for_piece = weight;
+                    touch_pos_for_piece = it->pos;
+                }
+            }
+        }
+        if(weight_for_king < cTactic::WEIGHTS["undef"]){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks-king"], weight_for_king, PIECES_RANKS[piece])));
+            if(find_excluded(excludes, priomove.src, touch_pos_for_king, cTactic::DOMAINS["attacks-king"])){
+                priomove.downgrade(cTactic::DOMAINS["attacks-king"]);
+            }
+            else{
+                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_king, cTactic::DOMAINS["attacks-king"])));
+            }
+        }
+        if(weight_for_piece < cTactic::WEIGHTS["undef"]){
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_piece, PIECES_RANKS[piece])));
+            if(find_excluded(excludes, priomove.src, touch_pos_for_piece, cTactic::DOMAINS["attacks"])){
+                priomove.downgrade(cTactic::DOMAINS["attacks"]);
+            }
+            else{
+                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_piece, cTactic::DOMAINS["attacks"])));
             }
         }
     }
