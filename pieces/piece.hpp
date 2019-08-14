@@ -11,6 +11,16 @@
 
     using namespace std;
 
+    class cExclude{
+        public:
+            int pos;
+            int touch_pos;
+            int tactic_domain;
+    };
+
+    bool find_excluded(list<cExclude> excludes, int pos, int touch_pos, int tactic_domain);
+
+
     class cPiece{
         public:
             cBoard *board;
