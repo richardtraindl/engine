@@ -100,19 +100,19 @@
         }
 
 
-        if(from_dstfield_attacked.size() > 0){
-            fill_attacked(match, piece, priomove, from_dstfield_attacked, weight);
-        }
-        if(rook != mBLK){
-            fill_attacked(match, rook, priomove, from_castl_rk_attacked, weight);
-        }
-
-
         if(from_dstfield_supported.size() > 0){
-            fill_supported(match, piece, priomove, from_dstfield_supported, weight);
+            fill_supported(match, piece, priomove, from_dstfield_supported, weight, excludes);
         }
         if(rook != mBLK){
-            fill_supported(match, rook, priomove, from_castl_rk_supported, weight);
+            fill_supported(match, rook, priomove, from_castl_rk_supported, weight, excludes);
+        }
+
+
+        if(from_dstfield_attacked.size() > 0){
+            fill_attacked(match, piece, priomove, from_dstfield_attacked, weight, excludes);
+        }
+        if(rook != mBLK){
+            fill_attacked(match, rook, priomove, from_castl_rk_attacked, weight, excludes);
         }
 
 
