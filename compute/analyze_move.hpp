@@ -7,7 +7,6 @@
 
     using namespace std;
 
-
-    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &excludes);
+    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, list<cExclude> &excludes);
 
 #endif
