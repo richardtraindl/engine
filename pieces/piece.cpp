@@ -7,14 +7,6 @@
     #include "../compute/analyze_move.hpp"
     #include "../values.hpp"
 
-
-    cExclude::cExclude(int newpos, int newtouch_pos, int newtactic_domain){
-        pos = newpos;
-        touch_pos = newtouch_pos;
-        tactic_domain = newtactic_domain;
-    }
-
-
     cPiece::cPiece(cBoard &newboard, int newpos){
         board = &newboard;
         pos = newpos;
@@ -290,7 +282,7 @@
 
     void cPiece::generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &priomoves){
         cPrioMove *priomove;
-        list<cExclude> excludes
+        list<cExclude> excludes;
         for(auto &step : get_mv_steps()){
             if(step == 0){ break; }
             int count = 0;

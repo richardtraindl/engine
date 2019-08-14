@@ -291,7 +291,7 @@
     }
 
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight list<cExclude> excludes){
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight, list<cExclude> excludes){
         int weight_for_king = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         int touch_pos_for_king, touch_pos_for_piece;

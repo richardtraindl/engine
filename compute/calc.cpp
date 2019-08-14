@@ -10,10 +10,10 @@
     cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
             add_mvcnt = 2;
-            dpth_max = 10;
+            dpth_max = 12;
             dpth_stage1 = 2;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 12;
+            mvcnt_stage1 = 10;
             mvcnt_stage2 = 6;
         }
         else{
@@ -256,7 +256,7 @@
             score = beta; 
         }
 
-        cMove *dbggmove = new cMove(0x0, coord_to_index("g5"), coord_to_index("f6"), mBLK);
+        cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("g5"), coord_to_index("f6"), mBLK);
         list<cPrioMove> priomoves;
         generate_priomoves(match, candidate, dbggmove, priomoves);
         priomoves.sort(sortByPrio);

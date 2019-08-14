@@ -116,7 +116,6 @@
         generate_moves(match, moves);
         if(moves.size() == 0){
             if(match.next_color() == color){
-                cout << "!";
                 return true;
             }
             else{
@@ -131,6 +130,16 @@
             bool ismate = _search_for_checkmate(match, count + 1, maxcnt, color);
             match.undo_move();
             if(ismate){ return true; }
+        }
+        return false;
+    }
+
+
+    bool find_excluded(list<cExclude> excludes, int pos, int touch_pos, int tactic_domain){
+        for(list<cExclude>::iterator it = excludes.begin(); it != excludes.end(); ++it){
+            if(it->pos == pos && it->touch_pos == touch_pos && it->tactic_domain == tactic_domain){
+                return true;
+            }
         }
         return false;
     }

@@ -11,16 +11,6 @@
 
     using namespace std;
 
-    class cExclude{
-        public:
-            int pos;
-            int touch_pos;
-            int tactic_domain;
-         
-            cExclude(int newpos, int newtouch_pos, int newtactic_domain){
-    };
-
-
     class cPiece{
         public:
             cBoard *board;

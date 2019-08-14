@@ -6,15 +6,6 @@
     #include "../helper.hpp"
 
 
-    bool find_excluded(list<cExclude> excludes, int pos, int touch_pos, int tactic_domain){
-        for(list<cExclude>::iterator it = excludes.begin(); it != excludes.end(); ++it){
-            if(it->pos == pos && it->touch_pos == touch_pos && it->tactic_domain == tactic_domain){
-                return true;
-        }
-        return false;
-    }
-
-
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, list<cExclude> &excludes){
         int rook = mBLK;
         list<cTouch> from_castl_rk_supported, from_castl_rk_attacked;

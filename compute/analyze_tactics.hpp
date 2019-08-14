@@ -8,7 +8,6 @@
 
     using namespace std;
 
-
     class cDirTouch{
         public:
             int piece;

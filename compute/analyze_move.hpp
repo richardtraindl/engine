@@ -10,6 +10,4 @@
 
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, list<cExclude> &excludes);
 
-    bool find_excluded(list<cExclude> excludes, int pos, int touch_pos, int tactic_domain);
-
 #endif
