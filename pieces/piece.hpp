@@ -16,6 +16,8 @@
             int pos;
             int touch_pos;
             int tactic_domain;
+         
+            cExclude(int newpos, int newtouch_pos, int newtactic_domain){
     };
 
     bool find_excluded(list<cExclude> excludes, int pos, int touch_pos, int tactic_domain);
