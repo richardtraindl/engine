@@ -298,7 +298,7 @@
 
     void cPiece::generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &priomoves){
         cPrioMove *priomove;
-        list<cPrioMove> excludes;
+        list<cExclude> excludes
         for(auto &step : get_mv_steps()){
             if(step == 0){ break; }
             int count = 0;
@@ -311,9 +311,6 @@
                     if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
                         priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
                         add_tactics(*priomove, match, candidate, dbggmove, excludes);
-                        //excluded = add_tactics(priomove, self.match, candidate, dbggmove, search_for_mate)
-                        //if(len(excluded) > 0):
-                            //excludes.extend(excluded)
                         priomoves.push_back(*priomove);
                     }
                     if(prompiece == mBLK){ break; }
@@ -321,23 +318,6 @@
                 dst += step;
             }
         }
-        /*
-        if(excludes.size() > 0){
-            includes = []
-            sorted(excludes, key=lambda x: x.tactic.weight)
-            for excl in excludes:
-                if(includes is None):
-                    includes.append(excl)
-                else:
-                    for incl in includes:
-                        if(incl.tactic.domain == excl.tactic.domain and 
-                           incl.tactic.addition is not None and
-                           incl.tactic.addition == excl.tactic.addition):
-                            excl.priomove.downgrade(excl.tactic)
-                            excl.priomove.evaluate_priority()
-                        else:
-                            includes.append(excl)
-        */
     }
 
     bool cPiece::is_running_pawn(){
