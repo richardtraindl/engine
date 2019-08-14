@@ -7,6 +7,22 @@
     #include "../compute/analyze_move.hpp"
     #include "../values.hpp"
 
+
+    cExclude::cExclude(int newpos, int newtouch_pos, int newtactic_domain){
+        pos = newpos;
+        touch_pos = newtouch_pos;
+        tactic_domain = newtactic_domain;
+    }
+
+    bool find_excluded(list<cExclude> excludes, int pos, int touch_pos, int tactic_domain){
+        for(list<cExclude>::iterator it = excludes.begin(); it != excludes.end(); ++it){
+            if(it->pos == pos && it->touch_pos == touch_pos && it->tactic_domain == tactic_domain){
+                return true;
+        }
+        return false;
+    }
+
+
     cPiece::cPiece(cBoard &newboard, int newpos){
         board = &newboard;
         pos = newpos;
