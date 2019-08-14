@@ -229,30 +229,6 @@
         match.undo_move();
     }
 
-    void find_touches_after_move_old(cMatch &match, cPrioMove &priomove, list<cTouch> &supported, list<cTouch> &attacked){
-        list<cTouch> supported_before, attacked_before;
-        cPiece cpiece1(match.board, priomove.dst);
-        cpiece1.find_supported_and_attacked(supported_before, attacked_before);
-        match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        cPiece cpiece2(match.board, priomove.dst);
-        cpiece2.find_supported_and_attacked(supported, attacked);
-        match.undo_move();
-        for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
-            for(list<cTouch>::iterator it2 = supported_before.begin(); it2 != supported_before.end(); ++it2){
-                if(it->pos == it2->pos){
-                    it = supported.erase(it);
-                }
-            }
-        }
-        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
-            for(list<cTouch>::iterator it2 = attacked_before.begin(); it2 != attacked_before.end(); ++it2){
-                if(it->pos == it2->pos){
-                    it = attacked.erase(it);
-                }
-            }
-        }
-    }
-
 
     void find_rook_touches_after_castling(cMatch &match, cPrioMove &priomove, int &rook, list<cTouch> &supported, list<cTouch> &attacked){
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
