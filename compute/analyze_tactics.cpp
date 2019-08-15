@@ -220,12 +220,6 @@
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
         cPiece cpiece(match.board, priomove.dst);
         cpiece.find_supported_and_attacked(supported, attacked);
-        /*for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
-            collect_touches_for_both_colors(match.board, it->pos, PIECES_COLORS[it->piece], it->supporter_beyond, it->attacker_beyond);
-        }
-        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
-            collect_touches_for_both_colors(match.board, it->pos, PIECES_COLORS[it->piece], it->supporter_beyond, it->attacker_beyond);
-        }*/
         match.undo_move();
     }
 
