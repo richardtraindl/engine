@@ -220,12 +220,12 @@
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
         cPiece cpiece(match.board, priomove.dst);
         cpiece.find_supported_and_attacked(supported, attacked);
-        for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
+        /*for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
             collect_touches_for_both_colors(match.board, it->pos, PIECES_COLORS[it->piece], it->supporter_beyond, it->attacker_beyond);
         }
         for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
             collect_touches_for_both_colors(match.board, it->pos, PIECES_COLORS[it->piece], it->supporter_beyond, it->attacker_beyond);
-        }
+        }*/
         match.undo_move();
     }
 
@@ -246,22 +246,22 @@
     }
 
 
-    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported, int weight, list<cExclude> excludes){
+    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported, int weight, list<cExclude> &excludes){
         int weight_for_running_pawn = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         int touch_pos_for_running_pawn, touch_pos_for_piece;
         for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
-            int _weight_for_supporting = weight_for_supporting(match, piece, priomove, *it, weight);
+            int new_weight_for_supporting = weight_for_supporting(match, piece, priomove, *it, weight);
             if(is_supported_running_pawn(match, *it)){
-                 if(_weight_for_supporting < weight_for_running_pawn){
-                    weight_for_running_pawn = _weight_for_supporting;
+                 if(new_weight_for_supporting < weight_for_running_pawn){
+                    weight_for_running_pawn = new_weight_for_supporting;
                     touch_pos_for_running_pawn = it->pos;
                 }
             }
             else{
                 if(it->attacker_beyond.size() > 0){
-                    if(_weight_for_supporting < weight_for_piece){
-                        weight_for_piece = _weight_for_supporting;
+                    if(new_weight_for_supporting < weight_for_piece){
+                        weight_for_piece = new_weight_for_supporting;
                         touch_pos_for_piece = it->pos;
                     }
                 }
@@ -291,7 +291,7 @@
     }
 
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight, list<cExclude> excludes){
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight, list<cExclude> &excludes){
         int weight_for_king = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         int touch_pos_for_king, touch_pos_for_piece;
@@ -303,8 +303,9 @@
                 }
             }
             else{
-                if(weight < weight_for_piece){
-                    weight_for_piece = weight;
+                int new_weight_for_attacking = weight_for_attacking(match, piece, priomove, *it, weight);
+                if(new_weight_for_attacking < weight_for_piece){
+                    weight_for_piece = new_weight_for_attacking;
                     touch_pos_for_piece = it->pos;
                 }
             }

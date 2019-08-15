@@ -209,8 +209,9 @@
     }
 
     void cPiece::find_supported_and_attacked(list<cTouch> &supported, list<cTouch> &attacked){
-        for(auto &step : get_steps()){   
-            if(step == mBLK){ return; }         
+
+        for(auto &step : get_steps()){
+            if(step == mBLK){ return; }
             int dst2 = board->search(pos, step, get_maxcnt());
             if(dst2 != cBoard::SNOK){
                 if(is_move_stuck(dst2)){

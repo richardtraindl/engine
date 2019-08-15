@@ -107,28 +107,6 @@
         }
 
 
-        if(discl_attacked.size() > 0){
-            int weight_for_discl_attacking_piece = cTactic::WEIGHTS["undef"];
-            int touchpos_for_piece;
-            for(list<cTouch>::iterator it = discl_attacked.begin(); it != discl_attacked.end(); ++it){
-                int new_weight_for_discl_attacking_piece = weight_for_discl_attacking(*it, weight);
-                if(new_weight_for_discl_attacking_piece < weight_for_discl_attacking_piece){
-                    weight_for_discl_attacking_piece = new_weight_for_discl_attacking_piece;
-                    touchpos_for_piece = it->pos;
-                }
-            }
-            if(weight_for_discl_attacking_piece < cTactic::WEIGHTS["undef"]){
-                priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_discl_attacking_piece, PIECES_RANKS[piece])));
-                if(find_excluded(excludes, priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])){
-                    priomove.downgrade(cTactic::DOMAINS["attacks"]);
-                }
-                else{
-                    excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])));
-                }
-            }
-        }
-
-
         if(discl_supported.size() > 0){
             int weight_for_discl_supporting_piece = cTactic::WEIGHTS["undef"];
             int touchpos_for_piece;
@@ -146,6 +124,28 @@
                 }
                 else{
                     excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["supports"])));
+                }
+            }
+        }
+
+
+        if(discl_attacked.size() > 0){
+            int weight_for_discl_attacking_piece = cTactic::WEIGHTS["undef"];
+            int touchpos_for_piece;
+            for(list<cTouch>::iterator it = discl_attacked.begin(); it != discl_attacked.end(); ++it){
+                int new_weight_for_discl_attacking_piece = weight_for_discl_attacking(*it, weight);
+                if(new_weight_for_discl_attacking_piece < weight_for_discl_attacking_piece){
+                    weight_for_discl_attacking_piece = new_weight_for_discl_attacking_piece;
+                    touchpos_for_piece = it->pos;
+                }
+            }
+            if(weight_for_discl_attacking_piece < cTactic::WEIGHTS["undef"]){
+                priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_discl_attacking_piece, PIECES_RANKS[piece])));
+                if(find_excluded(excludes, priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])){
+                    priomove.downgrade(cTactic::DOMAINS["attacks"]);
+                }
+                else{
+                    excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])));
                 }
             }
         }

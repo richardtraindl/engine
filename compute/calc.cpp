@@ -186,9 +186,9 @@
         if(depth <= slimits.dpth_stage1 && priomoves.front().has_domain(cTactic::DOMAINS["defends-check"])){
             return priomoves.size();
         }
-        int stormycnt = count_up_within_stormy(priomoves);
         if(depth <= slimits.dpth_stage1){
             resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false);
+            int stormycnt = count_up_within_stormy(priomoves);
             count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
             if(count == 0){
                 count = slimits.mvcnt_stage1;
@@ -200,6 +200,7 @@
         }
         if(depth <= slimits.dpth_stage2){
             resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false);
+            int stormycnt = count_up_within_stormy(priomoves);
             count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
             if(count == 0){
                 count = slimits.mvcnt_stage2;
@@ -255,8 +256,7 @@
         else{ 
             score = beta; 
         }
-
-        cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("g5"), coord_to_index("f6"), mBLK);
+        cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("d1"), coord_to_index("d7"), mBLK);
         list<cPrioMove> priomoves;
         generate_priomoves(match, candidate, dbggmove, priomoves);
         priomoves.sort(sortByPrio);
@@ -277,8 +277,7 @@
             if(depth == 1){
                 cout << "CURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
             }
-            uint256_t tmpfields = match.board.fields;
-            int tmpscore = match.score;
+
             match.do_move(it->src, it->dst, it->prompiece);
             if(maximizing){
                 newscore = alphabeta(match, depth + 1, slimits, score, beta, false, &(*it), NULL, newcandidates);
@@ -287,14 +286,6 @@
                 newscore = alphabeta(match, depth + 1, slimits, alpha, score, true, &(*it), NULL, newcandidates);
             }
             match.undo_move();
-            //if(tmpfields != match.board.fields){
-            if(tmpscore != match.score){
-                int tmppiece = match.board.getfield(it->src);
-                cout << "after " << dec << tmpscore << " " << match.score << " " << tmppiece << " " << it->src << " " << it->dst << " " << it->prompiece << endl;
-                if(last_pmove != NULL){
-                    cout << "last_pmove " << dec << last_pmove->src << " " << last_pmove->dst << " " << last_pmove->prompiece << endl;
-                }
-            }
 
             if(maximizing){
                 if(newscore > score){

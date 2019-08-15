@@ -29,7 +29,7 @@
 
     bool _search_for_checkmate(cMatch &match, int count, int maxcnt, int color);
 
-    bool find_excluded(list<cExclude> excludes, int pos, int touch_pos, int tactic_domain);
+    bool find_excluded(list<cExclude> &excludes, int pos, int touch_pos, int tactic_domain);
 
     int weight_for_standard(cMatch &match, int piece, cPrioMove &priomove);
 
