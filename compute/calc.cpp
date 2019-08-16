@@ -244,7 +244,6 @@
 
     int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
-        //list<cPrioMove> candidates;
         int newscore;
         int score;
         int count = 0;
@@ -288,12 +287,12 @@
             match.undo_move();
 
             if(maximizing){
-                if(newscore > score){
-                    score = newscore;
-                    if(score >= beta){
-                        break; // beta cut-off
-                    }
-                    else{
+                if(newscore >= beta){
+                    break; // beta cut-off
+                }
+                else{
+                    if(newscore > score){
+                        score = newscore;
                         append_newmove((*it), newcandidates, rcandidates);
                         if(depth == 1){
                             cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
@@ -302,12 +301,12 @@
                 }
             }
             else{
-                if(newscore < score){
-                    score = newscore;
-                    if(score <= alpha){
-                        break; // alpha cut-off
-                    }
-                    else{
+                if(newscore <= alpha){
+                    break; // alpha cut-off
+                }
+                else{
+                    if(newscore < score){
+                        score = newscore;
                         append_newmove((*it), newcandidates, rcandidates);
                         if(depth == 1){
                             cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
@@ -319,7 +318,6 @@
                 break;
             }
         }
-        //clean_priomoves(priomoves);
         return score;
     }
 
