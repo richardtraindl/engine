@@ -293,10 +293,10 @@
                     score = newscore;
                     update = true;
                 }
-                alpha = max(alpha, score);
-                if(alpha >= beta){
-                    break; # beta cut-off
+                if(score >= beta){
+                    break; //beta cut-off
                 }
+                alpha = max(alpha, score);
                 if(update){
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
@@ -310,10 +310,10 @@
                     score = newscore;
                     update = true;
                 }
-                beta = min(beta, score);
-                if(alpha >= beta){
+                if(score <= alpha){
                     break; // alpha cut-off
                 }
+                beta = min(beta, score);
                 if(update){
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
