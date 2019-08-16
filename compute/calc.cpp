@@ -247,13 +247,14 @@
         int newscore;
         int score;
         int count = 0;
+        bool update;
         //time_t starttime = time(0);
 
         if(maximizing){ 
-            score = alpha; 
+            score = SCORES[mWKG] * 10;
         }
         else{ 
-            score = beta; 
+            score = SCORES[mBKG] * 10;
         }
         cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("d1"), coord_to_index("d7"), mBLK);
         list<cPrioMove> priomoves;
@@ -287,30 +288,36 @@
             match.undo_move();
 
             if(maximizing){
-                if(newscore >= beta){
-                    break; // beta cut-off
+                update = false;
+                if(newscore > score){
+                    score = newscore;
+                    update = true;
                 }
-                else{
-                    if(newscore > score){
-                        score = newscore;
-                        append_newmove((*it), newcandidates, rcandidates);
-                        if(depth == 1){
-                            cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
-                        }
+                alpha = max(alpha, score);
+                if(alpha >= beta){
+                    break; # beta cut-off
+                }
+                if(update){
+                    append_newmove((*it), newcandidates, rcandidates);
+                    if(depth == 1){
+                        cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
                     }
                 }
             }
             else{
-                if(newscore <= alpha){
+                update = false;
+                if(newscore < score){
+                    score = newscore;
+                    update = true;
+                }
+                beta = min(beta, score);
+                if(alpha >= beta){
                     break; // alpha cut-off
                 }
-                else{
-                    if(newscore < score){
-                        score = newscore;
-                        append_newmove((*it), newcandidates, rcandidates);
-                        if(depth == 1){
-                            cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
-                        }
+                if(update){
+                    append_newmove((*it), newcandidates, rcandidates);
+                    if(depth == 1){
+                        cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
                     }
                 }
             }
