@@ -10,19 +10,27 @@
     cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
             add_mvcnt = 2;
+            dpth_max = 10;
+            dpth_stage1 = 2;
+            dpth_stage2 = 5;
+            mvcnt_stage1 = 12;
+            mvcnt_stage2 = 6;
+        }
+        if(level == cMatch::LEVELS["low"]){
+            add_mvcnt = 2;
             dpth_max = 12;
             dpth_stage1 = 2;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 10;
+            mvcnt_stage1 = 8;
             mvcnt_stage2 = 6;
         }
         else{
             add_mvcnt = 2;
-            dpth_max = 10;
+            dpth_max = 12;
             dpth_stage1 = 3;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 8;
-            mvcnt_stage2 = 8;
+            mvcnt_stage1 = 10;
+            mvcnt_stage2 = 6;
         }
     }
 
@@ -245,17 +253,8 @@
     int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
         int newscore;
-        int score;
         int count = 0;
-        bool update;
-        //time_t starttime = time(0);
 
-        if(maximizing){ 
-            score = SCORES[mWKG] * 10;
-        }
-        else{ 
-            score = SCORES[mBKG] * 10;
-        }
         cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("d1"), coord_to_index("d7"), mBLK);
         list<cPrioMove> priomoves;
         generate_priomoves(match, candidate, dbggmove, priomoves);
@@ -277,55 +276,48 @@
             if(depth == 1){
                 cout << "CURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
             }
+            if(depth > slimits.mvcnt_stage2){
+                cout << ".";
+            }
 
             match.do_move(it->src, it->dst, it->prompiece);
-            if(maximizing){
-                newscore = alphabeta(match, depth + 1, slimits, score, beta, false, &(*it), NULL, newcandidates);
-            }
-            else{
-                newscore = alphabeta(match, depth + 1, slimits, alpha, score, true, &(*it), NULL, newcandidates);
-            }
+            newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, &(*it), NULL, newcandidates);
             match.undo_move();
 
             if(maximizing){
-                update = false;
-                if(newscore > score){
-                    score = newscore;
-                    update = true;
-                }
-                if(score >= beta){
-                    break; //beta cut-off
-                }
-                alpha = max(alpha, score);
-                if(update){
+                if(newscore > alpha){
+                    alpha = newscore;
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
+                        cout << "CANDIDATE:      " << dec << alpha << concat_fmtmoves(rcandidates) << endl;
                     }
+                }
+                if(beta <= alpha){
+                    break;
                 }
             }
             else{
-                update = false;
-                if(newscore < score){
-                    score = newscore;
-                    update = true;
-                }
-                if(score <= alpha){
-                    break; // alpha cut-off
-                }
-                beta = min(beta, score);
-                if(update){
+                if(newscore < beta){
+                    beta = newscore;
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "CANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
+                        cout << "CANDIDATE:      " << dec << beta << concat_fmtmoves(rcandidates) << endl;
                     }
+                }
+                if(beta <= alpha){
+                    break;
                 }
             }
             if(count >= maxcnt){
                 break;
             }
         }
-        return score;
+        if(maximizing){
+            return alpha;
+        }
+        else{
+            return beta;
+        }
     }
 
 
@@ -340,8 +332,8 @@
         //else:
         cSearchLimits slimits(cMatch::LEVELS["blitz"]);
         bool maximizing = match.next_color() == COLORS["white"];
-        int alpha = SCORES[PIECES["wKg"]] * 10;
-        int beta = SCORES[PIECES["bKg"]] * 10;
+        int alpha = SCORES[mWKG] * 10;
+        int beta = SCORES[mBKG] * 10;
         score = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, candidate, rcandidates);
 
         cout << "result: " << score << " match: " << match.created_at << " ";

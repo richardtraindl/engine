@@ -34,7 +34,7 @@
         match.do_move(coord_to_index("c4"), coord_to_index("b5"), mBLK);
         match.do_move(coord_to_index("b8"), coord_to_index("d7"), mBLK);
         match.do_move(coord_to_index("e1"), coord_to_index("c1"), mBLK);
-        match.do_move(coord_to_index("a8"), coord_to_index("d8"), mBLK);
+        //match.do_move(coord_to_index("a8"), coord_to_index("d8"), mBLK);
         //match.do_move(coord_to_index("d1"), coord_to_index("d7"), mBLK);
         //match.do_move(coord_to_index("d8"), coord_to_index("d7"), mBLK);
         //match.do_move(coord_to_index("h1"), coord_to_index("d1"), mBLK);
@@ -53,7 +53,7 @@
         */
 
         cPrioMove *candidate = NULL;
-        play(match, candidate, true);
+        play(match, candidate, false);
 
         return 0;
     }
