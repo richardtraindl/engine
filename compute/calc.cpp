@@ -21,8 +21,8 @@
             dpth_max = 12;
             dpth_stage1 = 2;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 8;
-            mvcnt_stage2 = 6;
+            mvcnt_stage1 = 12;
+            mvcnt_stage2 = 8;
         }
         else{
             add_mvcnt = 2;
@@ -252,8 +252,15 @@
 
     int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
-        int newscore;
+        int score, newscore;
         int count = 0;
+
+        if(maximizing){
+            score = alpha;
+        }
+        else{
+            score = beta;
+        }
 
         cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("d1"), coord_to_index("d7"), mBLK);
         list<cPrioMove> priomoves;
@@ -274,50 +281,50 @@
             newcandidates.clear();
 
             if(depth == 1){
-                cout << "CURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
+                cout << "\nCURRENT SEARCH: " << " [" + it->format() + "] " << concat_fmtmoves(newcandidates) << endl;
             }
             if(depth > slimits.mvcnt_stage2){
                 cout << ".";
             }
 
             match.do_move(it->src, it->dst, it->prompiece);
-            newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, &(*it), NULL, newcandidates);
+            if(maximizing){
+                newscore = alphabeta(match, depth + 1, slimits, score, beta, !maximizing, &(*it), NULL, newcandidates);
+            }
+            else{
+                newscore = alphabeta(match, depth + 1, slimits, alpha, score, !maximizing, &(*it), NULL, newcandidates);
+            }
             match.undo_move();
 
             if(maximizing){
-                if(newscore > alpha){
-                    alpha = newscore;
+                if(newscore > score){
+                    score = newscore;
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "CANDIDATE:      " << dec << alpha << concat_fmtmoves(rcandidates) << endl;
+                        cout << "\nCANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
                     }
-                }
-                if(beta <= alpha){
-                    break;
+                    if(score >= beta){
+                        break;
+                    }
                 }
             }
             else{
-                if(newscore < beta){
-                    beta = newscore;
+                 if(newscore < score){
+                    score = newscore;
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "CANDIDATE:      " << dec << beta << concat_fmtmoves(rcandidates) << endl;
+                        cout << "\nCANDIDATE:      " << dec << beta << concat_fmtmoves(rcandidates) << endl;
                     }
-                }
-                if(beta <= alpha){
-                    break;
+                    if(score <= alpha){
+                        break;
+                    }
                 }
             }
             if(count >= maxcnt){
                 break;
             }
         }
-        if(maximizing){
-            return alpha;
-        }
-        else{
-            return beta;
-        }
+        return score;
     }
 
 
