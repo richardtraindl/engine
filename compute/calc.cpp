@@ -10,19 +10,19 @@
     cSearchLimits::cSearchLimits(int level){
         if(level == cMatch::LEVELS["blitz"]){
             add_mvcnt = 2;
-            dpth_max = 10;
-            dpth_stage1 = 2;
+            dpth_stage1 = 3;
             dpth_stage2 = 5;
-            mvcnt_stage1 = 12;
+            dpth_max = 10;
+            mvcnt_stage1 = 8;
             mvcnt_stage2 = 6;
         }
         if(level == cMatch::LEVELS["low"]){
             add_mvcnt = 2;
-            dpth_max = 12;
-            dpth_stage1 = 2;
-            dpth_stage2 = 5;
-            mvcnt_stage1 = 12;
-            mvcnt_stage2 = 8;
+            dpth_stage1 = 3;
+            dpth_stage2 = 7;
+            dpth_max = 13;
+            mvcnt_stage1 = 10;
+            mvcnt_stage2 = 6;
         }
         else{
             add_mvcnt = 2;
@@ -210,12 +210,12 @@
             resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false);
             int stormycnt = count_up_within_stormy(priomoves);
             count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
-            if(count == 0){
+            /*if(count == 0){
                 count = slimits.mvcnt_stage2;
             }
             else{
                 count = min(count, slimits.mvcnt_stage2);
-            }
+            }*/
             return max(stormycnt, count);
             //if(depth <= slimits.dpth_stage3):
             //    resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio0"], last_pmove, false);
@@ -233,7 +233,7 @@
             if(resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true)){
                 return count_up_to_prio(priomoves, cPrioMove::PRIOS["prio0"]);
                 // return min(slimits.mvcnt_stage3, count)
-                return min(2, count);
+                //return min(2, count);
             }
             else{
                 return 0;
@@ -252,14 +252,15 @@
 
     int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
-        int score, newscore;
+        int newscore;
+        int bestscore;
         int count = 0;
-
+        
         if(maximizing){
-            score = alpha;
+            bestscore = SCORES[mWKG] * 10;;
         }
         else{
-            score = beta;
+            bestscore = SCORES[mBKG] * 10;;
         }
 
         cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("d1"), coord_to_index("d7"), mBLK);
@@ -274,6 +275,9 @@
 
         if(priomoves.size() == 0 || maxcnt == 0){
             return score_position(match, priomoves.size());
+            //if(match.board.fields == 0x60000011100D1105000000000010000300900000000900900004090000EB0C_cppui){
+                //match.prnt_minutes();
+            //}
         }
 
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
@@ -288,34 +292,31 @@
             }
 
             match.do_move(it->src, it->dst, it->prompiece);
-            if(maximizing){
-                newscore = alphabeta(match, depth + 1, slimits, score, beta, !maximizing, &(*it), NULL, newcandidates);
-            }
-            else{
-                newscore = alphabeta(match, depth + 1, slimits, alpha, score, !maximizing, &(*it), NULL, newcandidates);
-            }
+            newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, &(*it), NULL, newcandidates);
             match.undo_move();
 
             if(maximizing){
-                if(newscore > score){
-                    score = newscore;
+                if(newscore > bestscore){
+                    bestscore = newscore;
+                    alpha = max(bestscore, alpha);
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "\nCANDIDATE:      " << dec << score << concat_fmtmoves(rcandidates) << endl;
+                        cout << "\nCANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
                     }
-                    if(score >= beta){
+                    if(alpha >= beta){
                         break;
                     }
                 }
             }
             else{
-                 if(newscore < score){
-                    score = newscore;
+                if(newscore < bestscore){
+                    bestscore = newscore;
+                    beta = min(bestscore, beta);
                     append_newmove((*it), newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "\nCANDIDATE:      " << dec << beta << concat_fmtmoves(rcandidates) << endl;
+                        cout << "\nCANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
                     }
-                    if(score <= alpha){
+                    if(beta <= alpha){
                         break;
                     }
                 }
@@ -324,7 +325,7 @@
                 break;
             }
         }
-        return score;
+        return bestscore;
     }
 
 

@@ -560,6 +560,19 @@
             cout << endl;
         }
     }
+   
+    bool cBoard::debug_compare(cBoard &board2){
+        return fields == board2.fields &&
+               wKg == board2.wKg &&
+               bKg == board2.bKg &&
+               wKg_first_move_on == board2.wKg_first_move_on &&
+               bKg_first_move_on == board2.bKg_first_move_on &&
+               wRkA_first_move_on == board2.wRkA_first_move_on &&
+               wRkH_first_move_on == board2.wRkH_first_move_on &&
+               bRkA_first_move_on == board2.bRkA_first_move_on &&
+               bRkH_first_move_on == board2.bRkH_first_move_on;
+    }
+
 
 /*
     def set_to_base(self){

@@ -90,6 +90,8 @@
             bool is_move_available(list<cMove> &minutes);
 
             void prnt();
+
+            bool debug_compare(cBoard &board2);
     };
 
 #endif
