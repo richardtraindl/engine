@@ -92,23 +92,21 @@
         int value = 0;
         cPiece cwpiece(match.board, match.board.wKg);
         if(cwpiece.is_king_safe() == false){
-            cout << " unsafe white king ";
-            if(search_for_checkmate(match, COLORS["white"])){
-                value += SCORES[mWKG];
-            }
-            else{
+            //if(search_for_checkmate(match, COLORS["white"])){
+            //    value += SCORES[mWKG];
+            //}
+            //else{
                 value += ATTACKED_SCORES[mWQU] * 5;
-            }
+            //}
         }
         cPiece cbpiece(match.board, match.board.bKg);
         if(cbpiece.is_king_safe() == false){
-            cout << " unsafe black king ";
-            if(search_for_checkmate(match, COLORS["black"])){
-                value += SCORES[mWKG];
-            }
-            else{
+            //if(search_for_checkmate(match, COLORS["black"])){
+            //    value += SCORES[mWKG];
+            //}
+            //else{
                 value += ATTACKED_SCORES[mBQU] * 5;
-            }
+            //}
         }
         return value;
     }
@@ -310,7 +308,7 @@
         else{
             score = match.score;
             score += score_traps_and_touches(match);
-            //score += score_kings_safety(match);
+            score += score_kings_safety(match);
             //score += score_controled_horizontal_files(match);
             //score += score_controled_vertical_files(match);
             /*if(match.is_opening()){

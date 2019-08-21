@@ -103,24 +103,21 @@
 
     bool _search_for_checkmate(cMatch &match, int count, int maxcnt, int color){
         list<cMove> moves;
-        if(match.next_color() == color && color == COLORS["white"]){
-            if(is_field_touched(match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"]) == false){
-                return false;
-            }
-        }
-        if(match.next_color() == color && color == COLORS["black"]){
-            if(is_field_touched(match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"]) == false){
-                return false;
-            }
-        }
         generate_moves(match, moves);
         if(moves.size() == 0){
             if(match.next_color() == color){
-                return true;
+                if(color == COLORS["white"]){
+                    if(is_field_touched(match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
+                        return true;
+                    }
+                }
+                else{
+                    if(is_field_touched(match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
+                        return true;
+                    }
+                }
             }
-            else{
-                return false;
-            }
+            return false;
         }
         if(count >= maxcnt){
             return false;

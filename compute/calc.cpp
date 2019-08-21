@@ -154,14 +154,14 @@
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
             if(only_exchange == false && it->is_tactic_stormy()){
                 count_of_stormy += 1;
-                it->prio = min(it->prio, (new_prio + it->prio % 10) - 13);
+                it->prio = min(it->prio, (new_prio + it->prio % 10) - 10);
                 continue;
             }
             if(it->has_domain(cTactic::DOMAINS["captures"])){
                 int weight = it->fetch_weight(cTactic::DOMAINS["captures"]);
                 if(weight > cTactic::WEIGHTS["bad-deal"]){
                     count_of_good_captures += 1;
-                    it->prio = min(it->prio, (new_prio + it->prio % 10) - 12);
+                    it->prio = min(it->prio, (new_prio + it->prio % 10) - 20);
                 }
                 if(last_pmove_capture_bad_deal){
                     bad_captures.push_back(*it);
@@ -187,10 +187,10 @@
 
 
     int select_movecnt(cMatch &match, list<cPrioMove> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove){
+        int count;
         if(priomoves.size() == 0 || depth > slimits.dpth_max){
             return 0;
         }
-        int count;
         if(depth <= slimits.dpth_stage1 && priomoves.front().has_domain(cTactic::DOMAINS["defends-check"])){
             return priomoves.size();
         }
