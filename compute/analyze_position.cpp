@@ -90,23 +90,29 @@
 
     int score_kings_safety(cMatch &match){
         int value = 0;
-        cPiece cwpiece(match.board, match.board.wKg);
-        if(cwpiece.is_king_safe() == false){
-            //if(search_for_checkmate(match, COLORS["white"])){
-            //    value += SCORES[mWKG];
-            //}
-            //else{
-                value += ATTACKED_SCORES[mWQU] * 5;
-            //}
+        int color = COLORS["undef"];
+
+        cPiece cwhite_piece(match.board, match.board.wKg);
+        bool white_king_is_safe = cwhite_piece.is_king_safe();
+
+        cPiece cblack_piece(match.board, match.board.bKg);
+        bool black_king_is_safe = cblack_piece.is_king_safe();
+
+        /*if(white_king_is_safe == false || black_king_is_safe == false){
+            int color = search_for_checkmate(match);
         }
-        cPiece cbpiece(match.board, match.board.bKg);
-        if(cbpiece.is_king_safe() == false){
-            //if(search_for_checkmate(match, COLORS["black"])){
-            //    value += SCORES[mWKG];
-            //}
-            //else{
-                value += ATTACKED_SCORES[mBQU] * 5;
-            //}
+        if(color == COLORS["white"]){
+            return SCORES[mWKG];
+        }
+        if(color == COLORS["black"]){
+            return SCORES[mBKG];
+        }*/
+        
+        if(white_king_is_safe == false){
+            value += ATTACKED_SCORES[mWQU] * 5;
+        }
+        if(black_king_is_safe == false){
+            value += ATTACKED_SCORES[mBQU] * 5;
         }
         return value;
     }

@@ -33,7 +33,7 @@
         }
         if(flag == false){ return false; }
 
-        // check double step from second renk
+        // check double step from second rank
         if(dst - cpiece->pos == 16 && cpiece->pos > 15){ return false; }
 
         int move_dir = cPiece::dir_for_move(mWPW, cpiece->pos, dst);
@@ -120,7 +120,7 @@
         }
         if(flag == false){ return false; }
 
-        // check double step from seventh renk
+        // check double step from seventh rank
         if(cpiece->pos - dst == 16 && cpiece->pos < 48){ return false; }
 
         int move_dir = cPiece::dir_for_move(mBPW, cpiece->pos, dst);

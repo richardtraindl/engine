@@ -37,9 +37,7 @@
 
     int count_up_to_prio(list<cPrioMove> &priomoves, int priolimit);
 
-    int count_up_within_stormy(list<cPrioMove> &priomoves);
-
-    bool resort_exchange_or_stormy_moves(list<cPrioMove> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange);
+    bool resort_exchange_moves(list<cPrioMove> &priomoves, int new_prio, cPrioMove *last_pmove, bool with_stormy);
 
     int select_movecnt(cMatch &match, list<cPrioMove> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove);
 

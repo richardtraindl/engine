@@ -25,9 +25,9 @@
 
     bool are_move_dirs_equal(int piece1, int src1, int dst1, int piece2, int src2, int dst2);
 
-    bool search_for_checkmate(cMatch &match, int color);
+    int search_for_checkmate(cMatch &match);
 
-    bool _search_for_checkmate(cMatch &match, int count, int maxcnt, int color);
+    int _search_for_checkmate(cMatch &match, int count, int maxcnt);
 
     bool find_excluded(list<cExclude> &excludes, int pos, int touch_pos, int tactic_domain);
 

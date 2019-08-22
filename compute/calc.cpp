@@ -120,69 +120,58 @@
     }
 
 
-    int count_up_within_stormy(list<cPrioMove> &priomoves){
-        int count = 0;
-        for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
-            if(it->is_tactic_stormy()){
-                count += 1;
-            }
-        }
-        return count;
-    }
-
-
     bool sortByPrio(cPrioMove &A, cPrioMove &B){
         return (A.prio < B.prio);
     }
 
 
-    bool resort_exchange_or_stormy_moves(list<cPrioMove> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange){
-        if(only_exchange && last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["captures"]) == false){
+    bool resort_exchange_moves(list<cPrioMove> &priomoves, int new_prio, cPrioMove *last_pmove, bool with_stormy){
+        if(with_stormy == false && 
+           (last_pmove == NULL || (last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["captures"]) == false))){
             return false;
         }
-        bool last_pmove_capture_bad_deal;
-        if(last_pmove != NULL && last_pmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["bad-deal"])){
-            last_pmove_capture_bad_deal = true;
-        }
-        else{
-            last_pmove_capture_bad_deal = false;
-        }
-        int count_of_stormy = 0;
-        int count_of_good_captures = 0;
+        list<cPrioMove> goodes;
         cPrioMove *first_silent = NULL;
-        list<cPrioMove> bad_captures;
+        cPrioMove *first_bad_capture = NULL;
         for(list<cPrioMove>::iterator it = priomoves.begin(); it != priomoves.end(); ++it){
-            if(only_exchange == false && it->is_tactic_stormy()){
-                count_of_stormy += 1;
-                it->prio = min(it->prio, (new_prio + it->prio % 10) - 10);
+            if(with_stormy == true && it->is_tactic_stormy()){
+                goodes.push_back(*it);
                 continue;
             }
             if(it->has_domain(cTactic::DOMAINS["captures"])){
-                int weight = it->fetch_weight(cTactic::DOMAINS["captures"]);
-                if(weight > cTactic::WEIGHTS["bad-deal"]){
-                    count_of_good_captures += 1;
-                    it->prio = min(it->prio, (new_prio + it->prio % 10) - 20);
+                if(it->fetch_weight(cTactic::DOMAINS["captures"]) == cTactic::WEIGHTS["bad-deal"]){
+                    if(first_bad_capture == NULL){
+                        first_bad_capture = &(*it);
+                    }
                 }
-                if(last_pmove_capture_bad_deal){
-                    bad_captures.push_back(*it);
-                    // count_of_bad_captures += 1
-                    // priomove.prio = min(priomove.prio, new_prio)
+                else{
+                    goodes.push_back(*it);
                 }
             }
-            if(first_silent == NULL){
-                first_silent = &(*it);
+            else{
+                if(first_silent == NULL){
+                    first_silent = &(*it);
+                }
             }
         }
-        if(bad_captures.size() > 0 && count_of_good_captures == 0 && count_of_stormy == 0){
-            if(first_silent != NULL){
-                first_silent->prio = min(first_silent->prio, (new_prio + first_silent->prio % 10) - 10);
+        if(goodes.size() > 0){
+            for(list<cPrioMove>::iterator it = goodes.begin(); it != goodes.end(); ++it){
+                it->prio = min(it->prio, (new_prio + it->prio % 10) - 20);
             }
-            for(list<cPrioMove>::iterator it = bad_captures.begin(); it != bad_captures.end(); ++it){
-                it->prio = min(it->prio, new_prio + it->prio % 10);
+            priomoves.sort(sortByPrio);
+            return true;
+        }
+        if(last_pmove != NULL && last_pmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["bad-deal"])){
+            if(first_bad_capture != NULL){
+                first_bad_capture->prio = min(first_bad_capture->prio, (new_prio + first_bad_capture->prio % 10) - 20);
+                if(first_silent != NULL){
+                    first_silent->prio = min(first_silent->prio, (new_prio + first_silent->prio % 10) - 10);
+                }
+                priomoves.sort(sortByPrio);
+                return true;
             }
         }
-        priomoves.sort(sortByPrio);
-        return true;
+        return false;
     }
 
 
@@ -195,8 +184,8 @@
             return priomoves.size();
         }
         if(depth <= slimits.dpth_stage1){
-            resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false);
-            int stormycnt = count_up_within_stormy(priomoves);
+            resort_exchange_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, true);
+            //int stormycnt = count_up_within_stormy(priomoves);
             count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
             if(count == 0){
                 count = slimits.mvcnt_stage1;
@@ -204,42 +193,24 @@
             else{
                 count = min(count, slimits.mvcnt_stage1);
             }
-            return max(stormycnt, count);
+            return count; //max(stormycnt, count);
         }
         if(depth <= slimits.dpth_stage2){
-            resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false);
-            int stormycnt = count_up_within_stormy(priomoves);
+            resort_exchange_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, true);
+            //int stormycnt = count_up_within_stormy(priomoves);
             count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
-            /*if(count == 0){
-                count = slimits.mvcnt_stage2;
-            }
-            else{
-                count = min(count, slimits.mvcnt_stage2);
-            }*/
-            return max(stormycnt, count);
-            //if(depth <= slimits.dpth_stage3):
-            //    resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIOS["prio0"], last_pmove, false);
-            //    count = count_up_to_prio(priomoves, cPrioMove.PRIOS["prio0"]);
-            //    if(count == 0){
-            //        count = slimits.mvcnt_stage3;
-            //    }
-            //    else{
-            //        count = min(count, slimits.mvcnt_stage3);
-            //    }
-            //    return max(stormycnt, count) ;
-            //}
+            return count; //max(stormycnt, count);
         }
         else{
-            if(resort_exchange_or_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true)){
+            if(resort_exchange_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, false)){
                 return count_up_to_prio(priomoves, cPrioMove::PRIOS["prio0"]);
-                // return min(slimits.mvcnt_stage3, count)
-                //return min(2, count);
             }
             else{
                 return 0;
             }
         }
     }
+
 
     void clean_priomoves(list<cPrioMove> &priomoves){
         cPrioMove *priomove;

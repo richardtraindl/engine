@@ -90,45 +90,39 @@
     }
 
 
-    bool search_for_checkmate(cMatch &match, int color){
-        int maxcnt;
-        if(match.next_color() == color){
-            maxcnt = 3;
-        }
-        else{
-            maxcnt = 4;
-        }
-        return _search_for_checkmate(match, 1, maxcnt, color);
+    int search_for_checkmate(cMatch &match){
+        cout << "s" << endl;
+        return _search_for_checkmate(match, 1, 4);
     }
 
-    bool _search_for_checkmate(cMatch &match, int count, int maxcnt, int color){
+    int _search_for_checkmate(cMatch &match, int count, int maxcnt){
         list<cMove> moves;
         generate_moves(match, moves);
         if(moves.size() == 0){
-            if(match.next_color() == color){
-                if(color == COLORS["white"]){
-                    if(is_field_touched(match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
-                        return true;
-                    }
-                }
-                else{
-                    if(is_field_touched(match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
-                        return true;
-                    }
+            if(match.next_color() == COLORS["white"]){
+                if(is_field_touched(match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
+                    return COLORS["white"];
                 }
             }
-            return false;
+            else{
+                if(is_field_touched(match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
+                    return COLORS["black"];
+                }
+            }
+            return COLORS["undef"];
         }
         if(count >= maxcnt){
-            return false;
+            return COLORS["undef"];
         }
         for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
             match.do_move(it->src, it->dst, it->prompiece);
-            bool ismate = _search_for_checkmate(match, count + 1, maxcnt, color);
+            int color = _search_for_checkmate(match, count + 1, maxcnt);
             match.undo_move();
-            if(ismate){ return true; }
+            if(color != COLORS["undef"]){ 
+                return color; 
+            }
         }
-        return false;
+        return COLORS["undef"];
     }
 
 

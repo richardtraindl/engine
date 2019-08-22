@@ -348,12 +348,12 @@
             if(step == 0){ break; }
             int dst = pos + step;
             if(board->is_inbounds(pos, dst, step)){
-                list<cTouch> friends, enemies;
-                collect_touches_for_both_colors(*board, dst, color, friends, enemies);
-                if(friends.size() < enemies.size()){
+                list<cTouch> friends1, enemies1;
+                collect_touches_for_both_colors(*board, dst, color, friends1, enemies1);
+                if(friends1.size() < enemies1.size()){
                     return false;
                 }
-                if(enemies.size() > 0){
+                if(enemies1.size() > 0){
                     count += 1;
                 }
             }
@@ -362,9 +362,9 @@
         if(count > 2){
             return false;
         }
-        list<cTouch> friends, enemies;
-        collect_touches_for_both_colors(*board, pos, color, friends, enemies);
-        if(enemies.size() >= 2){
+        list<cTouch> friends2, enemies2;
+        collect_touches_for_both_colors(*board, pos, color, friends2, enemies2);
+        if(enemies2.size() > 1){
             return false;
         }
         else{
