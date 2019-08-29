@@ -360,7 +360,6 @@
 
             match.do_move(priomove->src, priomove->dst, priomove->prompiece);
             alphabeta_for_thread(match, depth + 1, threadcnt, 0, slimits, alpha, beta, !maximizing, priomove, newcandidates, newscore);
-            //newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, NULL, newcandidates);
             match.undo_move();
 
             if(maximizing){
@@ -412,7 +411,7 @@
         int scores[threadcnt];
         for(int idx = 0; idx < threadcnt; ++idx){
             candidates.push_back(*(new list<cPrioMove>));
-            threads[idx] = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, idx, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates.back()), ref(*scores));
+            threads[idx] = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, idx, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates.back()), ref(*(scores + idx)));
         }
         for(int idx = 0; idx < threadcnt; ++idx){
             threads[idx].join();
@@ -425,12 +424,10 @@
             rscore = SCORES[mBKG] * 10;
         }
         for(int idx = 0; idx < threadcnt; ++idx){
-            cout << "candidates: " << candidates[idx].size() << endl;
-            if((maximizing && scores[idx] > rscore) || (!maximizing && scores[idx] < rscore)){
-                rscore = scores[idx];
-                if(candidates[idx].size() > 0){
-                    cout << "candidates: ";
-                    cout << concat_fmtmoves(candidates[idx]) << endl;
+            cout << "rscore " << rscore << " scores " << scores[idx] << " candidates: " << candidates[idx].size() << " rcandidates: " << &candidates[idx] << endl;
+            if(candidates[idx].size() > 0){
+                if((maximizing && scores[idx] > rscore) || (!maximizing && scores[idx] < rscore)){
+                    rscore = scores[idx];
                     rcandidates.clear();
                     rcandidates.assign(candidates[idx].begin(), candidates[idx].end());
                 }
