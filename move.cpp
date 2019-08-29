@@ -15,7 +15,7 @@
     int cMove::getprevfield(int idx){
         if(idx < 0 || idx > 63){
             cout << "getprevfield: " << dec << idx << endl;
-            return 0;
+            return -1;
         }
         return (int)((prevfields >> ((63 - idx) * 4)) & 0xF);
     }

@@ -6,7 +6,7 @@
     #include "../helper.hpp"
 
 
-    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *candidate, cMove *dbggmove, list<cExclude> &excludes){
+    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *dbggmove, list<cExclude> &excludes){
         int rook = mBLK;
         list<cTouch> from_castl_rk_supported, from_castl_rk_attacked;
 
@@ -20,13 +20,6 @@
         find_disclosures(match, piece, priomove, discl_supported, discl_attacked);
 
         int weight = weight_for_standard(match, piece, priomove);
-
-
-        if(candidate != NULL){
-            if(candidate->src == priomove.src && candidate->dst == priomove.dst && candidate->prompiece == priomove.prompiece){
-                priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["prev-candidate"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece])));
-            }
-        }
 
 
         if(defends_check(match)){
@@ -49,7 +42,7 @@
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["promotes"], weight, PIECES_RANKS[piece])));
         }
 
-        
+
         if(captures(match, priomove)){
             int capture_weight = weight_for_capture(match, piece, dstpiece, priomove);
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, PIECES_RANKS[piece])));
@@ -57,7 +50,7 @@
         if(captures_enpassant(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece])));
         }
-            
+
 
         if(does_unpin(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["unpins"], weight, PIECES_RANKS[piece])));

@@ -259,7 +259,7 @@
         return score;
     }
 
-    void cPiece::generate_moves(cMatch &match, list<cMove> &moves){
+    void cPiece::generate_moves(cMatch &match, list<cMove *> &moves){
         cMove *move;
         for(auto &step : get_mv_steps()){
             if(step == 0){ break; }
@@ -270,7 +270,7 @@
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
                         move = new cMove(board->fields, pos, dst, prompiece);
-                        moves.push_back(*move);
+                        moves.push_back(move);
                     }
                     if(prompiece == mBLK){
                         break;
@@ -281,7 +281,7 @@
         }
     }
 
-    void cPiece::generate_priomoves(cMatch &match, cMove *candidate, cMove *dbggmove, list<cPrioMove> &priomoves){
+    void cPiece::generate_priomoves(cMatch &match, cMove *dbggmove, list<cPrioMove *> &priomoves){
         cPrioMove *priomove;
         list<cExclude> excludes;
         for(auto &step : get_mv_steps()){
@@ -295,8 +295,8 @@
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
                         priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
-                        add_tactics(*priomove, match, candidate, dbggmove, excludes);
-                        priomoves.push_back(*priomove);
+                        add_tactics(*priomove, match, dbggmove, excludes);
+                        priomoves.push_back(priomove);
                     }
                     if(prompiece == mBLK){ break; }
                 }

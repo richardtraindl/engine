@@ -14,13 +14,28 @@
         status = STATUS["active"];
         score = 0;
         level = LEVELS["blitz"];
+        cBoard board;
     } 
     cMatch::cMatch(const cMatch &match){
-        status = match.status;
-        score = match.score;
-        level = match.level;
-        cBoard board = match.board;
+        created_at = time(0);
+
+        board.fields = match.board.fields;
+        board.wKg = match.board.wKg;
+        board.bKg = match.board.bKg;
+        board.wKg_first_move_on = match.board.wKg_first_move_on;
+        board.bKg_first_move_on = match.board.bKg_first_move_on;
+        board.wRkA_first_move_on = match.board.wRkA_first_move_on;
+        board.wRkH_first_move_on = match.board.wRkH_first_move_on;
+        board.bRkA_first_move_on = match.board.bRkA_first_move_on;
+        board.bRkH_first_move_on = match.board.bRkH_first_move_on;
+
+        for(cMove move : match.minutes){
+            minutes.push_back((*new cMove(move.prevfields, move.src, move.dst, move.prompiece)));
+        }
     } // copy constructor
+
+    cMatch::~cMatch(){
+    }
 
     map<string, int> cMatch::STATUS = {
         {"active", 10},
@@ -149,6 +164,7 @@
     }
 
     bool cMatch::is_move_repetition(){
+        return false;
         cMatch newmatch = *this;
         int count = 0;
         int maxcnt = min((int)newmatch.minutes.size(), 8);

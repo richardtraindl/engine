@@ -52,7 +52,6 @@
         match.do_move(coord_to_index("b2"), coord_to_index("b4"), mBLK);
         */
 
-        cPrioMove *candidate = NULL;
         bool maximizing;
         if(match.next_color() == COLORS["white"]){
             maximizing = true;
@@ -60,7 +59,7 @@
         else{
             maximizing = false;
         }
-        play(match, candidate, maximizing, cMatch::LEVELS["low"]);
+        play(match, maximizing);
 
         return 0;
     }

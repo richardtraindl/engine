@@ -8,7 +8,7 @@ all: ./values.o ./helper.o ./move.o ./board.o ./match.o ./engine.o \
 	 ./ui/play.o \
 	 ./bricks/brick.o
 
-	$(CC) -Wall --std=c++17 \
+	$(CC) -Wall --std=c++17 -lpthread \
 		./bricks/brick.o \
 		./ui/play.o \
 		./pieces/touch.o ./pieces/searchforpiece.o \

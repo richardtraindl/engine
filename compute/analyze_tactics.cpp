@@ -145,7 +145,7 @@
 
     bool threatens_fork(cMatch &match, int piece, cPrioMove &priomove){
         list<cTouch> supported, attacked;
-        list<cMove> moves;
+        list<cMove *> moves;
         bool is_fork_threat = false;
 
         cMatch newmatch = match;
@@ -153,26 +153,27 @@
         int first_move_dir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
         cPiece cpiece(newmatch.board, priomove.dst);
         cpiece.generate_moves(match, moves);
-        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-            cPiece cnewpiece(newmatch.board, it->dst);
-            int second_move_dir = cPiece::dir_for_move(piece, it->src, it->dst);
+        for(cMove *move : moves){
+        //for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+            cPiece cnewpiece(newmatch.board, move->dst);
+            int second_move_dir = cPiece::dir_for_move(piece, move->src, move->dst);
             if(first_move_dir == second_move_dir || REVERSE_DIRS[first_move_dir] == second_move_dir){
                 continue;
             }
-            int newdstpiece = newmatch.board.getfield(it->dst);
-            newmatch.board.setfield(it->src, mBLK);
-            newmatch.board.setfield(it->dst, piece);
+            int newdstpiece = newmatch.board.getfield(move->dst);
+            newmatch.board.setfield(move->src, mBLK);
+            newmatch.board.setfield(move->dst, piece);
             supported.clear();
             attacked.clear();
             cnewpiece.find_supported_and_attacked(supported, attacked);
             if(forks(piece, attacked)){
                 is_fork_threat = true;
-                newmatch.board.setfield(it->src, piece);
-                newmatch.board.setfield(it->dst, newdstpiece);
+                newmatch.board.setfield(move->src, piece);
+                newmatch.board.setfield(move->dst, newdstpiece);
                 break;
             }
-            newmatch.board.setfield(it->src, piece);
-            newmatch.board.setfield(it->dst, newdstpiece);
+            newmatch.board.setfield(move->src, piece);
+            newmatch.board.setfield(move->dst, newdstpiece);
         }
         return is_fork_threat;
     }
@@ -472,6 +473,7 @@
 
 
     bool is_tactical_draw(cMatch &match, cPrioMove &priomove){
+        return false;
         if(match.is_fifty_moves_rule()){
             return true;
         }

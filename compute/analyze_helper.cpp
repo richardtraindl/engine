@@ -96,7 +96,7 @@
     }
 
     int _search_for_checkmate(cMatch &match, int count, int maxcnt){
-        list<cMove> moves;
+        list<cMove *> moves;
         generate_moves(match, moves);
         if(moves.size() == 0){
             if(match.next_color() == COLORS["white"]){
@@ -114,8 +114,9 @@
         if(count >= maxcnt){
             return COLORS["undef"];
         }
-        for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
-            match.do_move(it->src, it->dst, it->prompiece);
+        //for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
+        for(cMove *move : moves){
+            match.do_move(move->src, move->dst, move->prompiece);
             int color = _search_for_checkmate(match, count + 1, maxcnt);
             match.undo_move();
             if(color != COLORS["undef"]){ 
