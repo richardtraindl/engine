@@ -11,14 +11,13 @@
 
     class cSearchLimits{
         public:
-            int add_mvcnt;
-            int dpth_max;
             int dpth_stage1;
             int dpth_stage2;
+            int dpth_max;
             int mvcnt_stage1;
             int mvcnt_stage2;
-            
-            cSearchLimits(int level);
+
+            cSearchLimits(cMatch &match);
     };
 
     void prnt_priomoves(list<cPrioMove *> &priomoves);

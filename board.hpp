@@ -59,6 +59,8 @@
             void setfield(int idx, int value);
 
             bool verify();
+            
+            void eval_count_of_officers(int &wofficers, int &bofficers);
 
             static bool is_inbounds_core(int src, int dst);
 

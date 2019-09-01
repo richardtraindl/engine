@@ -22,6 +22,7 @@
             int status;
             int score;
             int level;
+            bool is_endgame;
             cBoard board;
             list<cMove> minutes;
 
@@ -40,7 +41,7 @@
 
             bool is_opening();
 
-            bool is_endgame();
+            void eval_is_endgame();
 
             bool is_fifty_moves_rule();
 

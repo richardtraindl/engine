@@ -79,7 +79,9 @@
                 priomove.downgrade(cTactic::DOMAINS["flees"]);
             }
             else{
-                excludes.push_back(*(new cExclude(priomove.src, cBoard::SNOK, cTactic::DOMAINS["flees"])));
+                if(flee_weight >= cTactic::WEIGHTS["vague-deal"]){
+                    excludes.push_back(*(new cExclude(priomove.src, cBoard::SNOK, cTactic::DOMAINS["flees"])));
+                }
             }
         }
 
@@ -116,7 +118,9 @@
                     priomove.downgrade(cTactic::DOMAINS["supports"]);
                 }
                 else{
-                    excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["supports"])));
+                    if(weight_for_discl_supporting_piece >= cTactic::WEIGHTS["vague-deal"]){
+                        excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["supports"])));
+                    }
                 }
             }
         }
@@ -138,7 +142,9 @@
                     priomove.downgrade(cTactic::DOMAINS["attacks"]);
                 }
                 else{
-                    excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])));
+                    if(weight_for_discl_attacking_piece >= cTactic::WEIGHTS["vague-deal"]){
+                        excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])));
+                    }
                 }
             }
         }
@@ -151,7 +157,14 @@
 
         if(running_pawn(match, priomove)){
             int running_weight = weight_for_running_pawn(match, piece, priomove, weight);
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["is-running-pawn"], running_weight, PIECES_RANKS[piece])));
+            int addition;
+            if(PIECES_COLORS[piece] == COLORS["white"]){
+                addition = priomove.dst;
+            }
+            else{
+                addition = 8 - priomove.dst;
+            }
+            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["is-running-pawn"], running_weight, addition)));
         }
 
         /*
@@ -163,7 +176,7 @@
         */
 
 
-        if(match.is_endgame() && is_approach_to_opp_king(match, piece, priomove)){
+        if(match.is_endgame && is_approach_to_opp_king(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["approach-opp-king"], weight, PIECES_RANKS[piece])));
         }
 

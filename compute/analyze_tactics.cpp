@@ -45,7 +45,7 @@
 
 
     bool is_supported_running_pawn(cMatch &match, cTouch &supported){
-        if(match.is_endgame() == false){
+        if(match.is_endgame == false){
             return false;
         }
         cPiece cpiece(match.board, supported.pos);
@@ -490,6 +490,10 @@
 
 
     bool is_approach_to_opp_king(cMatch &match, int piece, cPrioMove &priomove){
+        if(piece != PIECES["wKg"] && piece != PIECES["bKg"]){
+            return false;
+        }
+        
         int oppkg;
         if(PIECES_COLORS[piece] == COLORS["white"]){
             oppkg = match.board.bKg;

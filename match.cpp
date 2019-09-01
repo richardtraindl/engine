@@ -14,6 +14,7 @@
         status = STATUS["active"];
         score = 0;
         level = LEVELS["blitz"];
+        is_endgame = false;
         cBoard board;
     } 
     cMatch::cMatch(const cMatch &match){
@@ -136,8 +137,8 @@
         return minutes.size() <= 20;
     }
 
-    bool cMatch::is_endgame(){
-        return minutes.size() >= 60;
+    void cMatch::eval_is_endgame(){
+        is_endgame = minutes.size() >= 60;
     }
 
     // 100 Züge davor kein Bauernzug und keine Figur geschlagen

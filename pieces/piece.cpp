@@ -241,20 +241,31 @@
 
 
     int cPiece::score_touches(){
-        if(piece == mWKG || piece == mBKG){
-            return 0; // king touches score 0
-        }
         int score = 0;
+        if(piece == mWKG || piece == mBKG){
+            return score; // king touches score 0
+        }
+
         list<cTouch>friends, enmies;
         collect_touches_for_both_colors(*board, pos, color, friends, enmies);
         if(board->eval_pin_dir(pos) != DIRS["undef"]){
             score += ATTACKED_SCORES[piece];
         }
         if(friends.size() < enmies.size()){
-            score += ATTACKED_SCORES[piece];
+            if(friends.size() == 0){
+                score += ATTACKED_SCORES[piece] * 2;
+            }
+            else{
+                score += ATTACKED_SCORES[piece];
+            }
         }
         if(friends.size() > enmies.size()){
-            score += SUPPORTED_SCORES[piece];
+            if(enmies.size() == 0){
+                score += SUPPORTED_SCORES[piece];
+            }
+            else{
+                score += SUPPORTED_SCORES[piece] * 2;
+            }
         }
         return score;
     }

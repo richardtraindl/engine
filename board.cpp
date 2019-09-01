@@ -121,6 +121,22 @@
         return true;
     }
 
+    void cBoard::eval_count_of_officers(int &wofficers, int &bofficers){
+        wofficers = 0;
+        bofficers = 0;
+        for(int idx = 0; idx < 64; ++idx){
+            int piece = getfield(idx);
+            if(piece == mWRK || piece == mWBP || piece == mWKN || piece == mWQU){
+                wofficers += 1;
+                continue;
+            }
+            if(piece == mBRK || piece == mBBP || piece == mBKN || piece == mBQU){
+                bofficers += 1;
+                continue;
+            }
+        }
+    }
+
     bool cBoard::is_inbounds_core(int src, int dst){
         if(src < 0 || src > 63 || dst < 0 || dst > 63){
             return false;

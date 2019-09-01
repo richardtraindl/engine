@@ -320,7 +320,7 @@
             /*if(match.is_opening()){
                 score += score_opening(match);
             }*/
-            /*if(match.is_endgame()){
+            /*if(match.is_endgame){
                 score += score_endgame(match);
             }
             else{
