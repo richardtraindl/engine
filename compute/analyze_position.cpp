@@ -300,12 +300,12 @@
     int score_position(cMatch &match, int movecnt){
         int score;
         int status = match.eval_status();
-        if(movecnt == 0 && status != cMatch::STATUS["active"]){
+        if(movecnt == 0 && status != cMatch::STATUS["open"]){
             if(status == cMatch::STATUS["winner-black"]){
-                return SCORES[mWKG] + match.movecnt();
+                return SCORES[mWKG] + match.minutes.size();
             }
             if(status == cMatch::STATUS["winner-white"]){
-                return SCORES[mBKG] - match.movecnt();
+                return SCORES[mBKG] - match.minutes.size();
             }
             else{ // draw
                 return SCORES[mBLK];

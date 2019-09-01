@@ -45,7 +45,7 @@
 
 
     bool is_supported_running_pawn(cMatch &match, cTouch &supported){
-        if(match.is_endgame == false){
+        if(match.is_endgame() == false){
             return false;
         }
         cPiece cpiece(match.board, supported.pos);
@@ -154,7 +154,6 @@
         cPiece cpiece(newmatch.board, priomove.dst);
         cpiece.generate_moves(match, moves);
         for(cMove *move : moves){
-        //for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
             cPiece cnewpiece(newmatch.board, move->dst);
             int second_move_dir = cPiece::dir_for_move(piece, move->src, move->dst);
             if(first_move_dir == second_move_dir || REVERSE_DIRS[first_move_dir] == second_move_dir){

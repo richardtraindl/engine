@@ -19,10 +19,8 @@
             static map<string, int> RETURN_CODES;
 
             time_t created_at;
-            int status;
             int score;
             int level;
-            bool is_endgame;
             cBoard board;
             list<cMove> minutes;
 
@@ -35,13 +33,11 @@
 
             void update_attributes();
 
-            int movecnt();
-
             int next_color();
 
             bool is_opening();
 
-            void eval_is_endgame();
+            bool is_endgame();
 
             bool is_fifty_moves_rule();
 

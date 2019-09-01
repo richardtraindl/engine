@@ -10,45 +10,48 @@
     #include "../values.hpp"
 
 
-    cSearchLimits::cSearchLimits(cMatch &match){
-        if(match.level == cMatch::LEVELS["blitz"]){
+    cSearchLimits::cSearchLimits(int level, bool is_endgame){
+        if(level == cMatch::LEVELS["blitz"]){
             dpth_stage1 = 1;
-            if(match.is_endgame){
+            if(is_endgame){
                 dpth_stage2 = 5;
-                dpth_max = 9;
+                //dpth_max = 9;
             }
             else{
                 dpth_stage2 = 3;
-                dpth_max = 7;
+                //dpth_max = 7;
             }
+            dpth_max = 7;
             mvcnt_stage1 = 8;
             mvcnt_stage2 = 6;
             return;
         }
-        if(match.level == cMatch::LEVELS["low"]){
+        if(level == cMatch::LEVELS["low"]){
             dpth_stage1 = 3;
-            if(match.is_endgame){
+            if(is_endgame){
                 dpth_stage2 = 7;
-                dpth_max = 11;
+                //dpth_max = 11;
             }
             else{
                 dpth_stage2 = 5;
-                dpth_max = 9;
+                //dpth_max = 9;
             }
+            dpth_max = 9;
             mvcnt_stage1 = 10;
             mvcnt_stage2 = 6;
             return;
         }
         //medium high
         dpth_stage1 = 3;
-        if(match.is_endgame){
+        if(is_endgame){
             dpth_stage2 = 7;
-            dpth_max = 13;
+            //dpth_max = 13;
         }
         else{
             dpth_stage2 = 5;
-            dpth_max = 11;
+            //dpth_max = 11;
         }
+        dpth_max = 11;
         mvcnt_stage1 = 12;
         mvcnt_stage2 = 6;
     }
@@ -427,8 +430,7 @@
         //    candidates.append(move)
         //    score = match.score
         //else:
-        match.eval_is_endgame();
-        cSearchLimits slimits(match);
+        cSearchLimits slimits(match.level, match.is_endgame());
         bool maximizing = match.next_color() == COLORS["white"];
         int alpha = SCORES[mWKG] * 10;
         int beta = SCORES[mBKG] * 10;
@@ -447,7 +449,7 @@
         //    candidates.append(move)
         //    score = match.score
         //else:
-        cSearchLimits slimits(match);
+        cSearchLimits slimits(match.level, match.is_endgame());
         bool maximizing = match.next_color() == COLORS["white"];
         int alpha = SCORES[mWKG] * 10;
         int beta = SCORES[mBKG] * 10;

@@ -219,13 +219,13 @@ def populate_openings():
 def retrieve_move(match):
     candidates = None
     prevfields = cBoard.BASE
-    if(match.movecnt() >= cOpenings.MAXDEPTH):
+    if(match.minutes.size() >= cOpenings.MAXDEPTH):
         print("### openings: depth not supported ###")
         return candidates
 
     openings = populate_openings()
-    stage = openings.stages[match.movecnt()]
-    if(match.movecnt() == 0):
+    stage = openings.stages[match.minutes.size()]
+    if(match.minutes.size() == 0):
         if(stage[0].fields == match.board.fields):
             candidates = stage[0].candidates
     else:

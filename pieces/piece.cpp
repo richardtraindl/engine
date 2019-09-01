@@ -49,7 +49,7 @@
             return {9, -9, 7, -7, 0, 0, 0, 0};
         }
         if(piece == mWKN || piece == mBKN){
-            return {8, -8, 1, -1, 0, 0, 0, 0};
+            return {17, 10, -6, -15, -17, -10, 6, 15};
         }
         if(piece == mWQU || piece == mBQU){
             return {8, -8, 1, -1, 9, -9, 7, -7};
@@ -209,7 +209,6 @@
     }
 
     void cPiece::find_supported_and_attacked(list<cTouch> &supported, list<cTouch> &attacked){
-
         for(auto &step : get_steps()){
             if(step == mBLK){ return; }
             int dst2 = board->search(pos, step, get_maxcnt());
@@ -228,7 +227,7 @@
                     add_field_touches_beyond(*board, color, *ctouch);
                     board->setfield(dst2, piece2);
                 }
-                if(PIECES_COLORS[piece2] == REVERSED_COLORS[color]){
+                else{ //if(PIECES_COLORS[piece2] == REVERSED_COLORS[color]){
                     cTouch *ctouch = new cTouch(piece2, dst2);
                     attacked.push_back(*ctouch);
                     board->setfield(dst2, mBLK);
@@ -251,15 +250,15 @@
         if(board->eval_pin_dir(pos) != DIRS["undef"]){
             score += ATTACKED_SCORES[piece];
         }
-        if(friends.size() < enmies.size()){
-            if(friends.size() == 0){
+        if(enmies.size() > 0){
+            if(enmies.size() > friends.size()){
                 score += ATTACKED_SCORES[piece] * 2;
             }
             else{
                 score += ATTACKED_SCORES[piece];
             }
         }
-        if(friends.size() > enmies.size()){
+        if(friends.size() > 0){
             if(enmies.size() == 0){
                 score += SUPPORTED_SCORES[piece];
             }

@@ -17,7 +17,7 @@
             int mvcnt_stage1;
             int mvcnt_stage2;
 
-            cSearchLimits(cMatch &match);
+            cSearchLimits(int level, bool is_endgame);
     };
 
     void prnt_priomoves(list<cPrioMove *> &priomoves);

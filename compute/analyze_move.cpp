@@ -15,7 +15,12 @@
 
         list<cTouch>from_dstfield_supported, from_dstfield_attacked;
         find_touches_after_move(match, priomove, from_dstfield_supported, from_dstfield_attacked);
-
+        if(priomove.src == coord_to_index("f2") && priomove.src == coord_to_index("f3")){
+            cout << "here" << endl;
+            for(cTouch supported : from_dstfield_supported){
+                cout << reverse_lookup(PIECES, supported.piece) << " " << index_to_coord(supported.pos) << " " << supported.supporter_beyond.size() << " " << supported.attacker_beyond.size() << endl;
+            }
+        }
         list<cTouch> discl_supported, discl_attacked;
         find_disclosures(match, piece, priomove, discl_supported, discl_attacked);
 
@@ -176,7 +181,7 @@
         */
 
 
-        if(match.is_endgame && is_approach_to_opp_king(match, piece, priomove)){
+        if(match.is_endgame() && is_approach_to_opp_king(match, piece, priomove)){
             priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["approach-opp-king"], weight, PIECES_RANKS[piece])));
         }
 

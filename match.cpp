@@ -11,14 +11,14 @@
 
     cMatch::cMatch(){ 
         created_at = time(0); 
-        status = STATUS["active"];
         score = 0;
         level = LEVELS["blitz"];
-        is_endgame = false;
         cBoard board;
     } 
     cMatch::cMatch(const cMatch &match){
         created_at = time(0);
+        score = match.score;
+        level = match.level;
 
         board.fields = match.board.fields;
         board.wKg = match.board.wKg;
@@ -39,7 +39,7 @@
     }
 
     map<string, int> cMatch::STATUS = {
-        {"active", 10},
+        {"open", 10},
         {"draw", 11}, 
         {"winner-white", 12}, 
         {"winner-black", 13}
@@ -77,32 +77,32 @@
         for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
             if(board.wKg_first_move_on == -1 && 
                it->src % 8 == cBoard::COLS["E"] && it->src / 8 == cBoard::RANKS["1"]){
-                board.wKg_first_move_on = movecnt();
+                board.wKg_first_move_on = minutes.size();
                 continue;
             }
             if(board.bKg_first_move_on == -1 && 
                it->src % 8 == cBoard::COLS["E"] && it->src / 8 == cBoard::RANKS["8"]){
-                board.bKg_first_move_on = movecnt();
+                board.bKg_first_move_on = minutes.size();
                 continue;
             }
             if(board.wRkA_first_move_on == -1 && 
                it->src % 8 == cBoard::COLS["A"] && it->src / 8 == cBoard::RANKS["1"]){
-                board.wRkA_first_move_on = movecnt();
+                board.wRkA_first_move_on = minutes.size();
                 continue;
             }
             if(board.wRkH_first_move_on == -1 && 
                it->src % 8 == cBoard::COLS["H"] && it->src / 8 == cBoard::RANKS["1"]){
-                board.wRkH_first_move_on = movecnt();
+                board.wRkH_first_move_on = minutes.size();
                 continue;
             }
             if(board.bRkA_first_move_on == -1 && 
                it->src % 8 == cBoard::COLS["A"] && it->src / 8 == cBoard::RANKS["8"]){
-                board.bRkA_first_move_on = movecnt();
+                board.bRkA_first_move_on = minutes.size();
                 continue;
             }
             if(board.bRkH_first_move_on == -1 && 
                it->src % 8 == cBoard::COLS["H"] && it->src / 8 == cBoard::RANKS["8"]){
-                board.bRkH_first_move_on = movecnt();
+                board.bRkH_first_move_on = minutes.size();
                 continue;
             }
         }
@@ -120,10 +120,6 @@
         }
     }
 
-    int cMatch::movecnt(){
-        return minutes.size();
-    }
-
     int cMatch::next_color(){
         if(minutes.size() % 2 == 0){
             return COLORS["white"];
@@ -137,8 +133,10 @@
         return minutes.size() <= 20;
     }
 
-    void cMatch::eval_is_endgame(){
-        is_endgame = minutes.size() >= 60;
+    bool cMatch::is_endgame(){
+        int wofficers, bofficers;
+        board.eval_count_of_officers(wofficers, bofficers);
+        return wofficers < 3 && bofficers < 3;
     }
 
     // 100 Züge davor kein Bauernzug und keine Figur geschlagen
@@ -180,7 +178,7 @@
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
         cPiece cpiece(board, src);
-        cMove *move = cpiece.do_move(dst, prompiece, movecnt() + 1, score);
+        cMove *move = cpiece.do_move(dst, prompiece, minutes.size() + 1, score);
         minutes.push_back(*move);
         return move;
     }
@@ -195,14 +193,14 @@
             return;
         }
         cPiece cpiece(board, move.dst);
-        cpiece.undo_move(move, movecnt(), score);
+        cpiece.undo_move(move, minutes.size(), score);
         minutes.pop_back();
         // delete move;
     }
 
     int cMatch::eval_status(){
         if(board.is_move_available(minutes)){
-            return STATUS["active"];
+            return STATUS["open"];
         }
         else{
             if(next_color() == COLORS["black"]){

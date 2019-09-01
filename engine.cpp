@@ -39,7 +39,13 @@
         match.do_move(coord_to_index("d8"), coord_to_index("d7"), mBLK);
         match.do_move(coord_to_index("h1"), coord_to_index("d1"), mBLK);
         match.do_move(coord_to_index("e7"), coord_to_index("e6"), mBLK);
-        
+
+        /*match.do_move(coord_to_index("h2"), coord_to_index("h4"), mBLK);
+        match.do_move(coord_to_index("e7"), coord_to_index("e5"), mBLK);
+        match.do_move(coord_to_index("h4"), coord_to_index("h5"), mBLK);
+        match.do_move(coord_to_index("e5"), coord_to_index("e4"), mBLK);
+        match.do_move(coord_to_index("h1"), coord_to_index("h4"), mBLK); */
+
         //[c3xb5]  [c6xb5]  [c4-d5]  [f6xd5]  [g5xe7]  [d5xe7]  [b3xb5]
         // match.do_move(coord_to_index("b8"), coord_to_index("d7"), mBLK);
         /*
