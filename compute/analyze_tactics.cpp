@@ -472,7 +472,6 @@
 
 
     bool is_tactical_draw(cMatch &match, cPrioMove &priomove){
-        return false;
         if(match.is_fifty_moves_rule()){
             return true;
         }

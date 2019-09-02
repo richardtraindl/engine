@@ -2,7 +2,6 @@
     #include "./searchforpiece.hpp"
     #include "./piece.hpp"
     #include "../values.hpp"
-    #include "../helper.hpp"
 
 
     int cSearchforRook::STEPS[4] = {8, -8, 1, -1};
@@ -104,9 +103,6 @@
                 for(const int target : cSearchforPiece::TARGETS){
                     if(piece == target){
                         cPiece cpiece(board, dst);
-                        if(cpiece.is_move_stuck(src)){
-                             break;
-                        }
                         if(PIECES_COLORS[piece] == friendlycolor){
                             frdlytouches.push_back(*(new cTouch(piece, dst)));
                         }

@@ -170,7 +170,7 @@
         for(int i = 0; i < maxcnt; ++i){
             newmatch.undo_move();
             if(newmatch.board.fields == board.fields){
-                count += 2;
+                count++;
             }
         }
         return count >= 2;

@@ -222,17 +222,17 @@
                         continue;
                     }
                     cTouch *ctouch = new cTouch(piece2, dst2);
-                    supported.push_back(*ctouch);
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(*board, color, *ctouch);
                     board->setfield(dst2, piece2);
+                    supported.push_back(*ctouch);
                 }
                 else{ //if(PIECES_COLORS[piece2] == REVERSED_COLORS[color]){
                     cTouch *ctouch = new cTouch(piece2, dst2);
-                    attacked.push_back(*ctouch);
                     board->setfield(dst2, mBLK);
                     add_field_touches_beyond(*board, REVERSED_COLORS[color], *ctouch);
                     board->setfield(dst2, piece2);
+                    attacked.push_back(*ctouch);
                 }
             }
         }
