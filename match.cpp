@@ -163,7 +163,6 @@
     }
 
     bool cMatch::is_move_repetition(){
-        return false;
         cMatch newmatch = *this;
         int count = 0;
         int maxcnt = min((int)newmatch.minutes.size(), 8);
