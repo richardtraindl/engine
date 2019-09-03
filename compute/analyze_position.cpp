@@ -28,27 +28,29 @@
     }
 
 
-    /*int score_controled_horizontal_files(cMatch &match){
+    int score_controled_horizontal_files(cMatch &match){
         int score = 0;
-        const uint256_t row7_row8_0 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
-        const uint256_t row7_row8_1 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
-        const uint256_t row7_row8_2 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
-        const uint256_t row7_row8_3 = 0x000000000000000000000000000000000000000000000000FFFFFFFFFFFFFFFF_cppui;
-        uint256_t wrooks = match.board.fields;
-        cBoard::mask_pieces(wrooks, mWRK);
-        uint256_t wqueens = match.board.fields;
-        cBoard::mask_pieces(wqueens, mWQU);
-        if(wrooks & row7_row8 || wqueens & row7_row8){
-            score += ATTACKED_SCORES[mBKN];
+        for(int idx = 8; idx < 16; ++idx){
+            int piece = match.board.getfield(idx);
+            if(piece == mBRK || piece == mBQU){
+                list<cTouch> friends, enmies;
+                collect_touches_for_both_colors(match.board, idx, COLORS["black"], friends, enmies);
+                if(friends.size() >= enmies.size()){
+                    score += ATTACKED_SCORES[PIECES["wRk"]];
+                    break;
+                }
+            }
         }
-
-        const uint256_t row1_row2 = 0xFFFFFFFFFFFFFFFF000000000000000000000000000000000000000000000000_cppui;
-        uint256_t brooks = match.board.fields;
-        cBoard::mask_pieces(brooks, mBRK);
-        uint256_t bqueens = match.board.fields;
-        cBoard::mask_pieces(bqueens, mBQU);
-        if(brooks & row1_row2 || bqueens & row1_row2){
-            score += ATTACKED_SCORES[mWKN];
+        for(int idx = 48; idx < 56; ++idx){
+            int piece = match.board.getfield(idx);
+            if(piece == mWRK || piece == mWQU){
+                list<cTouch> friends, enmies;
+                collect_touches_for_both_colors(match.board, idx, COLORS["white"], friends, enmies);
+                if(friends.size() >= enmies.size()){
+                    score += ATTACKED_SCORES[PIECES["bRk"]];
+                    break;
+                }
+            }
         }
         return score;
     }
@@ -56,36 +58,43 @@
 
     int score_controled_vertical_files(cMatch &match){
         int score = 0;
-        const uint256_t wpwcolumn = 0x0000000010000000100000001000000010000000100000001000000000000000_cppui;
-        const uint256_t wrkcolumn = 0x4000000040000000400000004000000040000000400000004000000040000000_cppui;
-        const uint256_t wqucolumn = 0x5000000050000000500000005000000050000000500000005000000050000000_cppui;
-        uint256_t wpawns = match.board.fields;
-        cBoard::mask_pieces(wpawns, mWPW);
-        if(wpawns & wpwcolumn == 0x0){
-            uint256_t wrooks = match.board.fields;
-            cBoard::mask_pieces(wrooks, mWRK);
-            uint256_t wqueens = match.board.fields;
-            cBoard::mask_pieces(wqueens, mWQU);
-            if(wrooks & wrkcolumn || wqueens & wqucolumn){
-                score += ATTACKED_SCORES[mBKN];
+        bool vertical_wrk_or_wqu, vertical_brk_or_bqu;
+        for(int idx = 0; idx < 8; ++idx){
+            vertical_wrk_or_wqu = false;
+            vertical_brk_or_bqu = false;
+            int dst = match.board.search(idx, 8, 7);
+            while(dst != cBoard::SNOK){
+                int piece = match.board.getfield(dst);
+                if(piece == mWPW || piece == mBPW){
+                    vertical_wrk_or_wqu = false;
+                    vertical_brk_or_bqu = false;
+                    break;
+                }
+                if(piece == mWRK || piece == mWQU){
+                    list<cTouch> friends, enmies;
+                    collect_touches_for_both_colors(match.board, dst, COLORS["white"], friends, enmies);
+                    if(friends.size() >= enmies.size()){
+                        vertical_wrk_or_wqu = true;
+                    }
+                }
+                if(piece == mBRK || piece == mBQU){
+                    list<cTouch> friends, enmies;
+                    collect_touches_for_both_colors(match.board, dst, COLORS["black"], friends, enmies);
+                    if(friends.size() >= enmies.size()){
+                        vertical_brk_or_bqu = true;
+                    }
+                }
+                dst = match.board.search(dst, 8, 6);
             }
-        }
-        const uint256_t bpwcolumn = 0x0000000090000000900000009000000090000000900000009000000000000000_cppui;
-        const uint256_t brkcolumn = 0xC0000000C0000000C0000000C0000000C0000000C0000000C0000000C0000000_cppui;
-        const uint256_t bqucolumn = 0xD0000000D0000000D0000000D0000000D0000000D0000000D0000000D0000000_cppui;
-        uint256_t bpawns = match.board.fields;
-        cBoard::mask_pieces(bpawns, mBPW);
-        if(bpawns & bpwcolumn == 0x0){
-            uint256_t brooks = match.board.fields;
-            cBoard::mask_pieces(brooks, mBRK);
-            uint256_t bqueens = match.board.fields;
-            cBoard::mask_pieces(bqueens, mBQU);
-            if(brooks & brkcolumn || bqueens & bqucolumn){
-                score += ATTACKED_SCORES[mWKN];
+            if(vertical_wrk_or_wqu){
+                score += ATTACKED_SCORES[PIECES["bRk"]];
+            }
+            if(vertical_brk_or_bqu){
+                score += ATTACKED_SCORES[PIECES["wRk"]];
             }
         }
         return score;
-    }*/
+    }
 
 
     int score_kings_safety(cMatch &match){
@@ -315,8 +324,8 @@
             score = match.score;
             score += score_traps_and_touches(match);
             score += score_kings_safety(match);
-            //score += score_controled_horizontal_files(match);
-            //score += score_controled_vertical_files(match);
+            score += score_controled_horizontal_files(match);
+            score += score_controled_vertical_files(match);
             /*if(match.is_opening()){
                 score += score_opening(match);
             }*/

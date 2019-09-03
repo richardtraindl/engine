@@ -6,7 +6,7 @@
     #include "../helper.hpp"
 
 
-    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *dbggmove, list<cExclude> &excludes){
+    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *dbggmove, list<cExclude *> &excludes){
         int rook = mBLK;
         list<cTouch> from_castl_rk_supported, from_castl_rk_attacked;
 
@@ -23,64 +23,64 @@
 
 
         if(defends_check(match)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["defends-check"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["defends-check"], weight, PIECES_RANKS[piece]));
         }
 
 
         if(castles(match, piece, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["castles"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["castles"], weight, PIECES_RANKS[piece]));
             find_rook_touches_after_castling(match, priomove, rook, from_castl_rk_supported, from_castl_rk_attacked);
         }
 
 
         if(is_tactical_draw(match, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["is-tactical-draw"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["is-tactical-draw"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece]));
         }
 
 
         if(promotes(priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["promotes"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["promotes"], weight, PIECES_RANKS[piece]));
         }
 
 
         if(captures(match, priomove)){
             int capture_weight = weight_for_capture(match, piece, dstpiece, priomove);
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], capture_weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["captures"], capture_weight, PIECES_RANKS[piece]));
         }
         if(captures_enpassant(match, piece, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece]));
         }
 
 
         if(does_unpin(match, piece, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["unpins"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["unpins"], weight, PIECES_RANKS[piece]));
         }
 
 
         if(forks(piece, from_dstfield_attacked)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["forks"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["forks"], weight, PIECES_RANKS[piece]));
         }
 
 
         if(defends_fork(match, piece, dstpiece, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["defends-fork"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["defends-fork"], weight, PIECES_RANKS[piece]));
         }
 
 
         if(threatens_fork(match, piece, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["threatens-fork"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["threatens-fork"], weight, PIECES_RANKS[piece]));
         }
 
 
         if(flees(match, piece, priomove)){
             int flee_weight = weight_for_flee(match, piece, priomove, weight);
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["flees"], flee_weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["flees"], flee_weight, PIECES_RANKS[piece]));
             if(find_excluded(excludes, priomove.src, cBoard::SNOK, cTactic::DOMAINS["flees"])){
                 priomove.downgrade(cTactic::DOMAINS["flees"]);
             }
             else{
                 if(flee_weight >= cTactic::WEIGHTS["vague-deal"]){
-                    excludes.push_back(*(new cExclude(priomove.src, cBoard::SNOK, cTactic::DOMAINS["flees"])));
+                    excludes.push_back(new cExclude(priomove.src, cBoard::SNOK, cTactic::DOMAINS["flees"]));
                 }
             }
         }
@@ -113,13 +113,13 @@
                 }
             }
             if(weight_for_discl_supporting_piece < cTactic::WEIGHTS["undef"]){
-                priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports"], weight_for_discl_supporting_piece, PIECES_RANKS[piece])));
+                priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["supports"], weight_for_discl_supporting_piece, PIECES_RANKS[piece]));
                 if(find_excluded(excludes, priomove.src, touchpos_for_piece, cTactic::DOMAINS["supports"])){
                     priomove.downgrade(cTactic::DOMAINS["supports"]);
                 }
                 else{
                     if(weight_for_discl_supporting_piece >= cTactic::WEIGHTS["vague-deal"]){
-                        excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["supports"])));
+                        excludes.push_back(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["supports"]));
                     }
                 }
             }
@@ -137,13 +137,13 @@
                 }
             }
             if(weight_for_discl_attacking_piece < cTactic::WEIGHTS["undef"]){
-                priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_discl_attacking_piece, PIECES_RANKS[piece])));
+                priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["attacks"], weight_for_discl_attacking_piece, PIECES_RANKS[piece]));
                 if(find_excluded(excludes, priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])){
                     priomove.downgrade(cTactic::DOMAINS["attacks"]);
                 }
                 else{
                     if(weight_for_discl_attacking_piece >= cTactic::WEIGHTS["vague-deal"]){
-                        excludes.push_back(*(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"])));
+                        excludes.push_back(new cExclude(priomove.src, touchpos_for_piece, cTactic::DOMAINS["attacks"]));
                     }
                 }
             }
@@ -151,7 +151,7 @@
 
 
         if(blocks(match, piece, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["blocks"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["blocks"], weight, PIECES_RANKS[piece]));
         }
 
 
@@ -164,7 +164,7 @@
             else{
                 addition = 8 - priomove.dst;
             }
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["is-running-pawn"], running_weight, addition)));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["is-running-pawn"], running_weight, addition));
         }
 
         /*
@@ -177,7 +177,7 @@
 
 
         if(match.is_endgame() && is_approach_to_opp_king(match, piece, priomove)){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["approach-opp-king"], weight, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["approach-opp-king"], weight, PIECES_RANKS[piece]));
         }
 
 

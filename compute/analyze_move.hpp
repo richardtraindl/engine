@@ -8,6 +8,6 @@
 
     using namespace std;
 
-    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *dbggmove, list<cExclude> &excludes);
+    void add_tactics(cPrioMove &priomove, cMatch &match, cMove *dbggmove, list<cExclude*> &excludes);
 
 #endif

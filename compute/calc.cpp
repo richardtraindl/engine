@@ -85,7 +85,7 @@
         int remaining = seconds % (60 * 60);
         minute = remaining / 60;
         sec = remaining % 60;
-        cout << msg << hour << minute << sec;
+        cout << msg << hour << minute << sec << endl;
     }
 
 
@@ -242,9 +242,9 @@
 
     void clean_priomoves(list<cPrioMove *> priomoves){
         for(cPrioMove *priomove : priomoves){
-            //for(cTactic tactic : priomove->tactics){
-            //    delete tactic;
-            //}
+            for(cTactic *tactic : priomove->tactics){
+                delete tactic;
+            }
             delete priomove;
         }
     }

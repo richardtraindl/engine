@@ -43,7 +43,7 @@
 
     class cPrioMove : public cMove{
         public:
-            list<cTactic> tactics;
+            list<cTactic *> tactics;
             int prio;
             static map<string, int> PRIOS;
 

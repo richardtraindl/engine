@@ -149,10 +149,11 @@
     void cPrioMove::evaluate_priority(){
         int count = 0;
         prio = PRIOS["prio3"];
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            int newprio = it->DOMAINS_TO_PRIOS[it->domain] + it->WEIGHTS_TO_ADJUST[it->weight] + it->addition;
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            int newprio = cTactic::DOMAINS_TO_PRIOS[tactic->domain] + cTactic::WEIGHTS_TO_ADJUST[tactic->weight] + tactic->addition;
             prio = min(prio, newprio);
-            if(it->weight <= cTactic::WEIGHTS["downgraded"]){
+            if(tactic->weight <= cTactic::WEIGHTS["downgraded"]){
                 count += 2;
             }
         }
@@ -160,12 +161,13 @@
     }
 
     void cPrioMove::downgrade(int domain){
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->domain == domain){
-                if(it->weight == cTactic::WEIGHTS["stormy"] ||
-                   it->weight == cTactic::WEIGHTS["better-deal"] ||
-                   it->weight == cTactic::WEIGHTS["good-deal"]){
-                    it->weight = cTactic::WEIGHTS["downgraded"];
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            if(tactic->domain == domain){
+                if(tactic->weight == cTactic::WEIGHTS["stormy"] ||
+                   tactic->weight == cTactic::WEIGHTS["better-deal"] ||
+                   tactic->weight == cTactic::WEIGHTS["good-deal"]){
+                    tactic->weight = cTactic::WEIGHTS["downgraded"];
                     return;
                 }
             }
@@ -173,12 +175,13 @@
     }
                     
     void cPrioMove::upgrade(int domain){
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->domain == domain){
-                if(it->weight != cTactic::WEIGHTS["stormy"] && 
-                   it->weight != cTactic::WEIGHTS["better-deal"] && 
-                   it->weight != cTactic::WEIGHTS["good-deal"]){
-                    it->weight = cTactic::WEIGHTS["upgraded"];
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            if(tactic->domain == domain){
+                if(tactic->weight != cTactic::WEIGHTS["stormy"] && 
+                   tactic->weight != cTactic::WEIGHTS["better-deal"] && 
+                   tactic->weight != cTactic::WEIGHTS["good-deal"]){
+                    tactic->weight = cTactic::WEIGHTS["upgraded"];
                     return;
                 }
             }
@@ -186,17 +189,19 @@
     }
 
     int cPrioMove::fetch_weight(int domain){
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->domain == domain){
-                return it->weight;
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            if(tactic->domain == domain){
+                return tactic->weight;
             }
         }
         return cTactic::WEIGHTS["undef"];
     }
 
     bool cPrioMove::has_domain(int domain){
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->domain == domain){
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            if(tactic->domain == domain){
                 return true;
             }
         }
@@ -204,8 +209,9 @@
     }
 
     bool cPrioMove::has_weight(int weight){
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->weight == weight){
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            if(tactic->weight == weight){
                 return true;
             }
         }
@@ -213,8 +219,9 @@
     }
 
     bool cPrioMove::has_tactic_ext(int domain, int weight){
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->domain == domain and it->weight == weight){
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            if(tactic->domain == domain and tactic->weight == weight){
                 return true;
             }
         }
@@ -222,12 +229,13 @@
     }
 
     bool cPrioMove::is_tactic_stormy(){
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            if(it->weight == cTactic::WEIGHTS["stormy"] || 
-               ((it->domain == cTactic::DOMAINS["promotes"] || 
-                 it->domain == cTactic::DOMAINS["captures"]) &&  
-                (it->weight == cTactic::WEIGHTS["better-deal"] || 
-                 it->weight == cTactic::WEIGHTS["good-deal"]))){
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            if(tactic->weight == cTactic::WEIGHTS["stormy"] || 
+               ((tactic->domain == cTactic::DOMAINS["promotes"] || 
+                 tactic->domain == cTactic::DOMAINS["captures"]) &&  
+                (tactic->weight == cTactic::WEIGHTS["better-deal"] || 
+                 tactic->weight == cTactic::WEIGHTS["good-deal"]))){
                 return true;
             }
         }
@@ -236,12 +244,9 @@
 
     string cPrioMove::fmt_tactics(){
         string str_tactics = "";
-        stringstream out;
-        int i = 1;
-        string str_end;
-        for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
-            str_tactics += reverse_lookup(cTactic::DOMAINS, it->domain) + " * " + reverse_lookup(cTactic::WEIGHTS, it->weight) + " | " ;
-            i += 1;
+        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
+        for(cTactic *tactic : tactics){
+            str_tactics += reverse_lookup(cTactic::DOMAINS, tactic->domain) + " * " + reverse_lookup(cTactic::WEIGHTS, tactic->weight) + " | " ;
         }
         return str_tactics;
     }

@@ -291,9 +291,9 @@
         }
     }
 
-    void cPiece::generate_priomoves(cMatch &match, cMove *dbggmove, list<cPrioMove *> &priomoves){
+    void cPiece::generate_priomoves(cMatch &match, cMove *dbggmove, list<cPrioMove*> &priomoves){
         cPrioMove *priomove;
-        list<cExclude> excludes;
+        list<cExclude*> excludes;
         for(auto &step : get_mv_steps()){
             if(step == 0){ break; }
             int count = 0;
@@ -312,6 +312,9 @@
                 }
                 dst += step;
             }
+        }
+        for(cExclude *excluded : excludes){
+            delete excluded;
         }
     }
 

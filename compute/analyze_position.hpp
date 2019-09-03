@@ -7,9 +7,9 @@
 
     int score_traps_and_touches(cMatch &match);
 
-    //int score_controled_horizontal_files(cMatch &match);
+    int score_controled_horizontal_files(cMatch &match);
 
-    //int score_controled_vertical_files(cMatch &match);
+    int score_controled_vertical_files(cMatch &match);
 
     int score_kings_safety(cMatch &match);
 

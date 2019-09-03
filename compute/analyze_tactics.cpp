@@ -240,7 +240,7 @@
     }
 
 
-    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported, int weight, list<cExclude> &excludes){
+    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &supported, int weight, list<cExclude*> &excludes){
         int weight_for_running_pawn = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         int touch_pos_for_running_pawn, touch_pos_for_piece;
@@ -265,27 +265,27 @@
             }
         }
         if(weight_for_running_pawn != cTactic::WEIGHTS["undef"]){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports-running-pawn"], weight_for_running_pawn, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["supports-running-pawn"], weight_for_running_pawn, PIECES_RANKS[piece]));
             if(find_excluded(excludes, priomove.src, touch_pos_for_running_pawn, cTactic::DOMAINS["supports-running-pawn"])){
                 priomove.downgrade(cTactic::DOMAINS["supports-running-pawn"]);
             }
             else{
-                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_running_pawn, cTactic::DOMAINS["supports-running-pawn"])));
+                excludes.push_back(new cExclude(priomove.src, touch_pos_for_running_pawn, cTactic::DOMAINS["supports-running-pawn"]));
             }
         }
         if(weight_for_piece != cTactic::WEIGHTS["undef"]){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["supports"], weight_for_piece, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["supports"], weight_for_piece, PIECES_RANKS[piece]));
             if(find_excluded(excludes, priomove.src, touch_pos_for_piece, cTactic::DOMAINS["supports"])){
                 priomove.downgrade(cTactic::DOMAINS["supports"]);
             }
             else{
-                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_piece, cTactic::DOMAINS["supports"])));
+                excludes.push_back(new cExclude(priomove.src, touch_pos_for_piece, cTactic::DOMAINS["supports"]));
             }
         }
     }
 
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight, list<cExclude> &excludes){
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, int weight, list<cExclude*> &excludes){
         int weight_for_king = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         int touch_pos_for_king, touch_pos_for_piece;
@@ -305,21 +305,21 @@
             }
         }
         if(weight_for_king < cTactic::WEIGHTS["undef"]){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks-king"], weight_for_king, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["attacks-king"], weight_for_king, PIECES_RANKS[piece]));
             if(find_excluded(excludes, priomove.src, touch_pos_for_king, cTactic::DOMAINS["attacks-king"])){
                 priomove.downgrade(cTactic::DOMAINS["attacks-king"]);
             }
             else{
-                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_king, cTactic::DOMAINS["attacks-king"])));
+                excludes.push_back(new cExclude(priomove.src, touch_pos_for_king, cTactic::DOMAINS["attacks-king"]));
             }
         }
         if(weight_for_piece < cTactic::WEIGHTS["undef"]){
-            priomove.tactics.push_back(*(new cTactic(cTactic::DOMAINS["attacks"], weight_for_piece, PIECES_RANKS[piece])));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["attacks"], weight_for_piece, PIECES_RANKS[piece]));
             if(find_excluded(excludes, priomove.src, touch_pos_for_piece, cTactic::DOMAINS["attacks"])){
                 priomove.downgrade(cTactic::DOMAINS["attacks"]);
             }
             else{
-                excludes.push_back(*(new cExclude(priomove.src, touch_pos_for_piece, cTactic::DOMAINS["attacks"])));
+                excludes.push_back(new cExclude(priomove.src, touch_pos_for_piece, cTactic::DOMAINS["attacks"]));
             }
         }
     }
@@ -476,9 +476,9 @@
             return true;
         }
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        bool is_move_repetition = match.is_move_repetition();
+        bool is_three_times_rep = match.is_three_times_rep();
         match.undo_move();
-        return is_move_repetition;
+        return is_three_times_rep;
     }
 
 

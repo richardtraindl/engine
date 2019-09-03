@@ -162,17 +162,17 @@
         return false;
     }
 
-    bool cMatch::is_move_repetition(){
+    bool cMatch::is_three_times_rep(){
         cMatch newmatch = *this;
         int count = 0;
         int maxcnt = min((int)newmatch.minutes.size(), 8);
-        for(int i = 0; i < maxcnt; ++i){
+        for(int i = 1; i < maxcnt; ++i){
             newmatch.undo_move();
             if(newmatch.board.fields == board.fields){
                 count++;
             }
         }
-        return count >= 2;
+        return count >= 3;
     }
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
