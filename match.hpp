@@ -41,7 +41,7 @@
 
             bool is_fifty_moves_rule();
 
-            bool is_three_times_rep(uint256_t fields);
+            bool is_three_times_rep();
 
             cMove *do_move(int src, int dst, int prompiece);
 

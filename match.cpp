@@ -163,11 +163,11 @@
         return false;
     }
 
-    bool cMatch::is_three_times_rep(uint256_t fields){
+    bool cMatch::is_three_times_rep(){
         int count = 0;
         int equalcnt = 1;
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
-            if(it->prevfields == fields){
+            if(it->prevfields == board.fields){
                 equalcnt++;
             }
             count++;

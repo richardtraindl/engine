@@ -480,8 +480,7 @@
             return true;
         }
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        uint256_t fields = match.board.fields;
-        bool is_three_times_rep = match.is_three_times_rep(fields);
+        bool is_three_times_rep = match.is_three_times_rep();
         match.undo_move();
         return is_three_times_rep;
     }
