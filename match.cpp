@@ -165,7 +165,7 @@
 
     bool cMatch::is_three_times_rep(uint256_t fields){
         int count = 0;
-        int equalcnt = 0;
+        int equalcnt = 1;
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
             if(it->prevfields == fields){
                 equalcnt++;
