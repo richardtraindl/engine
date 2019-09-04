@@ -132,11 +132,12 @@
         bool wcastling = false;
         bool bcastling = false;
         int idx = 0;
-        for(list<cMove>::iterator it = match.minutes.begin(); it != match.minutes.end(); ++it){
+        //for(list<cMove>::iterator it = match.minutes.begin(); it != match.minutes.end(); ++it){
+        for(cMove move : match.minutes){
             idx += 1;
-            int piece = it->getprevfield(it->src);
+            int piece = move.getprevfield(move.src);
             if(piece == mWKG || piece == mBKG){
-                if(abs(it->src - it->dst) == 2){
+                if(abs(move.src - move.dst) == 2){
                     if(idx % 2 == 1){
                         wcastling = true;
                     }
@@ -378,8 +379,9 @@
                 return true;
             }
 
-            for(list<cTouch>::iterator it = enmies.begin(); it != enmies.end(); ++it){
-                if(PIECES_RANKS[it->piece] < PIECES_RANKS[piece]){
+            //for(list<cTouch>::iterator it = enmies.begin(); it != enmies.end(); ++it){
+            for(cTouch touch : enmies){
+                if(PIECES_RANKS[touch.piece] < PIECES_RANKS[piece]){
                     return true;
                 }
 

@@ -31,7 +31,7 @@
         board.bRkH_first_move_on = match.board.bRkH_first_move_on;
 
         for(cMove move : match.minutes){
-            minutes.push_back((*new cMove(move.prevfields, move.src, move.dst, move.prompiece)));
+            minutes.push_back(move); //(*new cMove(move.prevfields, move.src, move.dst, move.prompiece)));
         }
     } // copy constructor
 
@@ -74,34 +74,35 @@
     };
 
     void cMatch::update_attributes(){
-        for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
+        //for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
+        for(cMove move : minutes){
             if(board.wKg_first_move_on == -1 && 
-               it->src % 8 == cBoard::COLS["E"] && it->src / 8 == cBoard::RANKS["1"]){
+               move.src % 8 == cBoard::COLS["E"] && move.src / 8 == cBoard::RANKS["1"]){
                 board.wKg_first_move_on = minutes.size();
                 continue;
             }
             if(board.bKg_first_move_on == -1 && 
-               it->src % 8 == cBoard::COLS["E"] && it->src / 8 == cBoard::RANKS["8"]){
+               move.src % 8 == cBoard::COLS["E"] && move.src / 8 == cBoard::RANKS["8"]){
                 board.bKg_first_move_on = minutes.size();
                 continue;
             }
             if(board.wRkA_first_move_on == -1 && 
-               it->src % 8 == cBoard::COLS["A"] && it->src / 8 == cBoard::RANKS["1"]){
+               move.src % 8 == cBoard::COLS["A"] && move.src / 8 == cBoard::RANKS["1"]){
                 board.wRkA_first_move_on = minutes.size();
                 continue;
             }
             if(board.wRkH_first_move_on == -1 && 
-               it->src % 8 == cBoard::COLS["H"] && it->src / 8 == cBoard::RANKS["1"]){
+               move.src % 8 == cBoard::COLS["H"] && move.src / 8 == cBoard::RANKS["1"]){
                 board.wRkH_first_move_on = minutes.size();
                 continue;
             }
             if(board.bRkA_first_move_on == -1 && 
-               it->src % 8 == cBoard::COLS["A"] && it->src / 8 == cBoard::RANKS["8"]){
+               move.src % 8 == cBoard::COLS["A"] && move.src / 8 == cBoard::RANKS["8"]){
                 board.bRkA_first_move_on = minutes.size();
                 continue;
             }
             if(board.bRkH_first_move_on == -1 && 
-               it->src % 8 == cBoard::COLS["H"] && it->src / 8 == cBoard::RANKS["8"]){
+               move.src % 8 == cBoard::COLS["H"] && move.src / 8 == cBoard::RANKS["8"]){
                 board.bRkH_first_move_on = minutes.size();
                 continue;
             }
@@ -162,17 +163,19 @@
         return false;
     }
 
-    bool cMatch::is_three_times_rep(){
-        cMatch newmatch = *this;
+    bool cMatch::is_three_times_rep(uint256_t fields){
         int count = 0;
-        int maxcnt = min((int)newmatch.minutes.size(), 8);
-        for(int i = 1; i < maxcnt; ++i){
-            newmatch.undo_move();
-            if(newmatch.board.fields == board.fields){
-                count++;
+        int equalcnt = 0;
+        for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
+            if(it->prevfields == fields){
+                equalcnt++;
+            }
+            count++;
+            if(count > 8){
+                break;
             }
         }
-        return count >= 3;
+        return equalcnt >= 3;
     }
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
@@ -218,7 +221,8 @@
 
 
     void cMatch::prnt_minutes(){
-        for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
-            cout << it->format() << endl;
+        //for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
+        for(cMove move : minutes){
+            cout << move.format() << endl;
         }
     }

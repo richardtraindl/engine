@@ -149,7 +149,6 @@
     void cPrioMove::evaluate_priority(){
         int count = 0;
         prio = PRIOS["prio3"];
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             int newprio = cTactic::DOMAINS_TO_PRIOS[tactic->domain] + cTactic::WEIGHTS_TO_ADJUST[tactic->weight] + tactic->addition;
             prio = min(prio, newprio);
@@ -161,7 +160,6 @@
     }
 
     void cPrioMove::downgrade(int domain){
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             if(tactic->domain == domain){
                 if(tactic->weight == cTactic::WEIGHTS["stormy"] ||
@@ -175,7 +173,6 @@
     }
                     
     void cPrioMove::upgrade(int domain){
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             if(tactic->domain == domain){
                 if(tactic->weight != cTactic::WEIGHTS["stormy"] && 
@@ -189,7 +186,6 @@
     }
 
     int cPrioMove::fetch_weight(int domain){
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             if(tactic->domain == domain){
                 return tactic->weight;
@@ -199,7 +195,6 @@
     }
 
     bool cPrioMove::has_domain(int domain){
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             if(tactic->domain == domain){
                 return true;
@@ -209,7 +204,6 @@
     }
 
     bool cPrioMove::has_weight(int weight){
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             if(tactic->weight == weight){
                 return true;
@@ -219,7 +213,6 @@
     }
 
     bool cPrioMove::has_tactic_ext(int domain, int weight){
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             if(tactic->domain == domain and tactic->weight == weight){
                 return true;
@@ -229,7 +222,6 @@
     }
 
     bool cPrioMove::is_tactic_stormy(){
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             if(tactic->weight == cTactic::WEIGHTS["stormy"] || 
                ((tactic->domain == cTactic::DOMAINS["promotes"] || 
@@ -244,7 +236,6 @@
 
     string cPrioMove::fmt_tactics(){
         string str_tactics = "";
-        //for(list<cTactic>::iterator it = tactics.begin(); it != tactics.end(); ++it){
         for(cTactic *tactic : tactics){
             str_tactics += reverse_lookup(cTactic::DOMAINS, tactic->domain) + " * " + reverse_lookup(cTactic::WEIGHTS, tactic->weight) + " | " ;
         }

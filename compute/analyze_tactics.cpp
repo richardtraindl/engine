@@ -8,6 +8,7 @@
     #include "../values.hpp"
 
 
+    // ToDo new!!!
     void _search_all_pindirs(cMatch &match, int color, int pos, int excl_pos, list<int*> &pindirs){
         int dirs[8] = {8, -8, 1, -1, 9, -9, 7, -7};
         int piece = match.board.getfield(pos);
@@ -98,8 +99,9 @@
             return false;
         }
         int count = 0;
-        for(list<cTouch>::iterator it = from_dstfield_attacked.begin(); it != from_dstfield_attacked.end(); ++it){
-            if(it->supporter_beyond.size() == 0 || PIECES_RANKS[it->piece] >= PIECES_RANKS[piece]){
+        //for(list<cTouch>::iterator it = from_dstfield_attacked.begin(); it != from_dstfield_attacked.end(); ++it){
+        for(cTouch touch : from_dstfield_attacked){
+            if(touch.supporter_beyond.size() == 0 || PIECES_RANKS[touch.piece] >= PIECES_RANKS[piece]){
                 count += 1;
             }
         }
@@ -244,19 +246,20 @@
         int weight_for_running_pawn = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         int touch_pos_for_running_pawn, touch_pos_for_piece;
-        for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
-            int new_weight_for_supporting = weight_for_supporting(match, piece, priomove, *it, weight);
-            if(is_supported_running_pawn(match, *it)){
+        //for(list<cTouch>::iterator it = supported.begin(); it != supported.end(); ++it){
+        for(cTouch touch : supported){
+            int new_weight_for_supporting = weight_for_supporting(match, piece, priomove, touch, weight);
+            if(is_supported_running_pawn(match, touch)){
                  if(new_weight_for_supporting < weight_for_running_pawn){
                     weight_for_running_pawn = new_weight_for_supporting;
-                    touch_pos_for_running_pawn = it->pos;
+                    touch_pos_for_running_pawn = touch.pos;
                 }
             }
             else{
-                if(it->attacker_beyond.size() > 0){
+                if(touch.attacker_beyond.size() > 0){
                     if(new_weight_for_supporting < weight_for_piece){
                         weight_for_piece = new_weight_for_supporting;
-                        touch_pos_for_piece = it->pos;
+                        touch_pos_for_piece = touch.pos;
                     }
                 }
                 else{
@@ -289,18 +292,19 @@
         int weight_for_king = cTactic::WEIGHTS["undef"];
         int weight_for_piece = cTactic::WEIGHTS["undef"];
         int touch_pos_for_king, touch_pos_for_piece;
-        for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
-            if(it->piece == mWKG || it->piece == mBKG){
+        //for(list<cTouch>::iterator it = attacked.begin(); it != attacked.end(); ++it){
+        for(cTouch touch : attacked){
+            if(touch.piece == mWKG || touch.piece == mBKG){
                 if(weight < weight_for_king){
                     weight_for_king = weight;
-                    touch_pos_for_king = it->pos;
+                    touch_pos_for_king = touch.pos;
                 }
             }
             else{
-                int new_weight_for_attacking = weight_for_attacking(match, piece, priomove, *it, weight);
+                int new_weight_for_attacking = weight_for_attacking(match, piece, priomove, touch, weight);
                 if(new_weight_for_attacking < weight_for_piece){
                     weight_for_piece = new_weight_for_attacking;
-                    touch_pos_for_piece = it->pos;
+                    touch_pos_for_piece = touch.pos;
                 }
             }
         }
@@ -476,7 +480,8 @@
             return true;
         }
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        bool is_three_times_rep = match.is_three_times_rep();
+        uint256_t fields = match.board.fields;
+        bool is_three_times_rep = match.is_three_times_rep(fields);
         match.undo_move();
         return is_three_times_rep;
     }

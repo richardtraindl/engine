@@ -105,11 +105,12 @@
         if(discl_supported.size() > 0){
             int weight_for_discl_supporting_piece = cTactic::WEIGHTS["undef"];
             int touchpos_for_piece;
-            for(list<cTouch>::iterator it = discl_supported.begin(); it != discl_supported.end(); ++it){
-                int new_weight_for_discl_supporting_piece = weight_for_discl_supporting(*it, weight);
+            //for(list<cTouch>::iterator it = discl_supported.begin(); it != discl_supported.end(); ++it){
+            for(cTouch touch : discl_supported){
+                int new_weight_for_discl_supporting_piece = weight_for_discl_supporting(touch, weight);
                 if(new_weight_for_discl_supporting_piece < weight_for_discl_supporting_piece){
                     weight_for_discl_supporting_piece = new_weight_for_discl_supporting_piece;
-                    touchpos_for_piece = it->pos;
+                    touchpos_for_piece = touch.pos;
                 }
             }
             if(weight_for_discl_supporting_piece < cTactic::WEIGHTS["undef"]){
@@ -129,11 +130,12 @@
         if(discl_attacked.size() > 0){
             int weight_for_discl_attacking_piece = cTactic::WEIGHTS["undef"];
             int touchpos_for_piece;
-            for(list<cTouch>::iterator it = discl_attacked.begin(); it != discl_attacked.end(); ++it){
-                int new_weight_for_discl_attacking_piece = weight_for_discl_attacking(*it, weight);
+            //for(list<cTouch>::iterator it = discl_attacked.begin(); it != discl_attacked.end(); ++it){
+            for(cTouch touch : discl_attacked){
+                int new_weight_for_discl_attacking_piece = weight_for_discl_attacking(touch, weight);
                 if(new_weight_for_discl_attacking_piece < weight_for_discl_attacking_piece){
                     weight_for_discl_attacking_piece = new_weight_for_discl_attacking_piece;
-                    touchpos_for_piece = it->pos;
+                    touchpos_for_piece = touch.pos;
                 }
             }
             if(weight_for_discl_attacking_piece < cTactic::WEIGHTS["undef"]){

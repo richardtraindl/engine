@@ -303,7 +303,7 @@
                     alpha = max(bestscore, alpha);
                     append_newmove(priomove, newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "\nCANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
+                        cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
                     }
                     if(alpha >= beta){
                         break;
@@ -316,7 +316,7 @@
                     beta = min(bestscore, beta);
                     append_newmove(priomove, newcandidates, rcandidates);
                     if(depth == 1){
-                        cout << "\nCANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
+                        cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
                     }
                     if(beta <= alpha){
                         break;

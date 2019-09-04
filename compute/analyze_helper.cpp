@@ -13,9 +13,10 @@
         }
         else{
             int lowest = mWKG;
-            for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
-                if(PIECES_RANKS[it->piece] < PIECES_RANKS[lowest]){
-                    lowest = it->piece;
+            //for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
+            for(cTouch touch : touches){
+                if(PIECES_RANKS[touch.piece] < PIECES_RANKS[lowest]){
+                    lowest = touch.piece;
                 }
             }
             return lowest;
@@ -49,8 +50,9 @@
 
 
     bool is_supporter_lower_attacker(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported){
-        for(list<cTouch>::iterator it = supported.attacker_beyond.begin(); it != supported.attacker_beyond.end(); ++it){
-            if(PIECES_RANKS[piece] >= PIECES_RANKS[it->piece]){
+        //for(list<cTouch>::iterator it = supported.attacker_beyond.begin(); it != supported.attacker_beyond.end(); ++it){
+        for(cTouch touch : supported.attacker_beyond){
+            if(PIECES_RANKS[piece] >= PIECES_RANKS[touch.piece]){
                 return false;
             }
         }
@@ -68,14 +70,15 @@
     bool is_supply(cMatch &match, int piece, cPrioMove &priomove){
         list<cTouch> touches;
         collect_long_distance_touches_for_color(match.board, priomove.src, PIECES_COLORS[piece], touches);
-        for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
-            if(PIECES_BARES[it->piece] == PIECES_BARES[mWQU]){
+        //for(list<cTouch>::iterator it = touches.begin(); it != touches.end(); ++it){
+        for(cTouch touch : touches){
+            if(PIECES_BARES[touch.piece] == PIECES_BARES[mWQU]){
                 return true;
             }
-            if(PIECES_BARES[it->piece] == PIECES_BARES[mWRK]){
+            if(PIECES_BARES[touch.piece] == PIECES_BARES[mWRK]){
                 return true;
             }
-            if(PIECES_BARES[it->piece] == PIECES_BARES[mWBP]){
+            if(PIECES_BARES[touch.piece] == PIECES_BARES[mWBP]){
                 return true;
             }
         }
@@ -114,7 +117,6 @@
         if(count >= maxcnt){
             return COLORS["undef"];
         }
-        //for(list<cMove>::iterator it = moves.begin(); it != moves.end(); ++it){
         for(cMove *move : moves){
             match.do_move(move->src, move->dst, move->prompiece);
             int color = _search_for_checkmate(match, count + 1, maxcnt);
@@ -128,7 +130,6 @@
 
 
     bool find_excluded(list<cExclude*> &excludes, int pos, int touch_pos, int tactic_domain){
-        //for(list<cExclude>::iterator it = excludes.begin(); it != excludes.end(); ++it){
         for(cExclude *excluded : excludes){
             if(excluded->pos == pos && excluded->touch_pos == touch_pos && excluded->tactic_domain == tactic_domain){
                 return true;
