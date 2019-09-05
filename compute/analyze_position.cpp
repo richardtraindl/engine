@@ -132,7 +132,6 @@
         bool wcastling = false;
         bool bcastling = false;
         int idx = 0;
-        //for(list<cMove>::iterator it = match.minutes.begin(); it != match.minutes.end(); ++it){
         for(cMove move : match.minutes){
             idx += 1;
             int piece = move.getprevfield(move.src);
@@ -325,8 +324,10 @@
             score = match.score;
             score += score_traps_and_touches(match);
             score += score_kings_safety(match);
-            score += score_controled_horizontal_files(match);
-            score += score_controled_vertical_files(match);
+            if(match.is_endgame() == false){
+                score += score_controled_horizontal_files(match);
+                score += score_controled_vertical_files(match);
+            }
             /*if(match.is_opening()){
                 score += score_opening(match);
             }*/
@@ -379,7 +380,6 @@
                 return true;
             }
 
-            //for(list<cTouch>::iterator it = enmies.begin(); it != enmies.end(); ++it){
             for(cTouch touch : enmies){
                 if(PIECES_RANKS[touch.piece] < PIECES_RANKS[piece]){
                     return true;
