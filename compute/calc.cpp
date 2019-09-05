@@ -293,9 +293,14 @@
                 cout << depth << ".";
             }
 
-            match.do_move(priomove->src, priomove->dst, priomove->prompiece);
-            newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, NULL, newcandidates);
-            match.undo_move();
+            if(priomove->has_domain(cTactic::DOMAINS["is-tactical-draw"])){
+                newscore = 0;
+            }
+            else{
+                match.do_move(priomove->src, priomove->dst, priomove->prompiece);
+                newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, NULL, newcandidates);
+                match.undo_move();
+            }
 
             if(maximizing){
                 if(newscore > bestscore){
@@ -388,23 +393,14 @@
             }
 
             if(maximizing){
-                if(depth == 1 && count % threadcnt == 1){
-                    cout << (count % threadcnt) << " TEST1 rscore:" << rscore << " alpha:" << alpha << " beta:" << beta << " newscore:" << newscore << " newcandidates.size:" << newcandidates.size() << " " << &rcandidates<< endl;
-                }
                 if(newscore > rscore){
                     rscore = newscore;
                     append_newmove(priomove, newcandidates, rcandidates);
                     alpha = max(rscore, alpha);
-                    if(depth == 1 && count % threadcnt == 1){
-                        cout << (count % threadcnt) << " TEST2 rscore:" << rscore << " alpha:" << alpha << " beta:" << beta << " newscore:" << newscore << " rcandidates.size:" << rcandidates.size() << " " << &rcandidates<< endl;
-                    }
                     if(depth == 1){
                         cout << "\nthread #" << offset << " CANDIDATE:      " << dec << rscore << concat_fmtmoves(rcandidates) << endl;
                     }
                     if(alpha >= beta){
-                        if(depth == 1 && count % threadcnt == 1){
-                            cout << (count % threadcnt) << " TEST3 rscore:" << rscore << " alpha:" << alpha << " beta:" << beta << " newscore:" << newscore << " rcandidates.size:" << rcandidates.size() << " " << &rcandidates << endl;
-                        }
                         break;
                     }
                 }
