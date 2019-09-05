@@ -380,27 +380,12 @@
             
             if(priomove->has_domain(cTactic::DOMAINS["is-tactical-draw"])){
                 newscore = 0;
-                if(maximizing && newscore > rscore){
-                    rscore = newscore;
-                    append_newmove(priomove, newcandidates, rcandidates);
-                    alpha = max(rscore, alpha);
-                    if(alpha >= beta){
-                        break;
-                    }
-                }
-                if(!maximizing && newscore < rscore){
-                    rscore = newscore;
-                    append_newmove(priomove, newcandidates, rcandidates);
-                    beta = min(rscore, beta);
-                    if(beta <= alpha){
-                        break;
-                    }
-                }
             }
-
-            match.do_move(priomove->src, priomove->dst, priomove->prompiece);
-            alphabeta_for_thread(match, depth + 1, threadcnt, 0, slimits, alpha, beta, !maximizing, priomove, newcandidates, newscore);
-            match.undo_move();
+            else{
+                match.do_move(priomove->src, priomove->dst, priomove->prompiece);
+                alphabeta_for_thread(match, depth + 1, threadcnt, 0, slimits, alpha, beta, !maximizing, priomove, newcandidates, newscore);
+                match.undo_move();
+            }
 
             if(maximizing){
                 if(depth == 1 && count % threadcnt == 1){
