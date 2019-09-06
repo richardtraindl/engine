@@ -349,7 +349,7 @@
         list<cPrioMove *> priomoves;
         generate_priomoves(match, dbggmove, priomoves);
         priomoves.sort(sortByPrio);
-        int maxcnt = select_movecnt(match, priomoves, depth, slimits, NULL);
+        int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
 
         if(depth == 1){
             cout << "thread #" << offset << " - priomoves count: " << priomoves.size() << endl;
@@ -423,7 +423,7 @@
     }
 
 
-    int calc_move(cMatch &match, list<cPrioMove> &rcandidates){
+    int calc_move2(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         //if(move):
@@ -442,7 +442,7 @@
     }
 
 
-    int calc_move2(cMatch &match, list<cPrioMove> &rcandidates){
+    int calc_move(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         //if(move):
