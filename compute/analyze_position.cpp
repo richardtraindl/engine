@@ -274,6 +274,8 @@
     int score_middlegame(cMatch &match){
         int score = 0;
         score += score_penalty_for_knight_bishop_on_baseline(match);
+        score += score_controled_horizontal_files(match);
+        score += score_controled_vertical_files(match);
         // score += score_weak_pawns(match)
         return score;
     }
@@ -324,19 +326,15 @@
             score = match.score;
             score += score_traps_and_touches(match);
             score += score_kings_safety(match);
-            if(match.is_endgame() == false){
-                score += score_controled_horizontal_files(match);
-                score += score_controled_vertical_files(match);
-            }
-            /*if(match.is_opening()){
+            if(match.is_opening()){
                 score += score_opening(match);
-            }*/
-            /*if(match.is_endgame){
+            }
+            if(match.is_opening() == false && match.is_endgame() == false){
+                score += score_middlegame(match);
+            }
+            if(match.is_endgame()){
                 score += score_endgame(match);
             }
-            else{
-                score += score_middlegame(match);
-            }*/
             return score;
         }
     }

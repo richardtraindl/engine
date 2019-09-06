@@ -424,7 +424,7 @@
     }
 
 
-    int calc_move(cMatch &match, list<cPrioMove> &rcandidates, int threadcnt){
+    int calc_move(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         //if(move):
@@ -443,7 +443,7 @@
     }
 
 
-    int calc_move_old(cMatch &match, list<cPrioMove> &rcandidates, int threadcnt){
+    int calc_move_old(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         //if(move):
@@ -454,33 +454,61 @@
         bool maximizing = match.next_color() == COLORS["white"];
         int alpha = SCORES[mWKG] * 10;
         int beta = SCORES[mBKG] * 10;
-        thread threads[threadcnt];
+        int threadcnt = 4;
+        thread t1, t2, t3, t4; //threads[threadcnt];
         cPrioMove *last_priomove = NULL;
         //vector<list<cPrioMove>> candidates;
-        int scores[threadcnt];
-        for(int idx = 0; idx < threadcnt; ++idx){
-            //candidates.push_back(*(new list<cPrioMove>));
-            threads[idx] = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, idx, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(*(scores + idx))); //candidates.back()
-        }
-        for(int idx = 0; idx < threadcnt; ++idx){
-            threads[idx].join();
-        }
-        int rscore;
+        list<cPrioMove> candidates1, candidates2, candidates3, candidates4;
+        int rscore, score1, score2, score3, score4; //scores[threadcnt];
+        t1 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 0, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score1)); //candidates.back()
+        t2 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 1, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score2));
+        t3 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 2, threadcnt, 2, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score3));
+        t4 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 3, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score4));
+
+        t1.join();
+        t2.join();
+        t3.join();
+        t4.join();
+
         if(maximizing){
-            rscore = SCORES[mWKG] * 10;
+            if(score1 > score2){
+                rscore = score1;
+                rcandidates.assign(candidates1.begin(), candidates1.end());
+            }
+            else{
+                rscore = score2;
+                rcandidates.assign(candidates2.begin(), candidates2.end());
+            }
+            if(score3 > rscore){
+                rscore = score3;
+                rcandidates.clear();
+                rcandidates.assign(candidates3.begin(), candidates3.end());
+            }
+            if(score4 > rscore){
+                rscore = score4;
+                rcandidates.clear();
+                rcandidates.assign(candidates4.begin(), candidates4.end());
+            }
         }
         else{
-            rscore = SCORES[mBKG] * 10;
-        }
-        for(int idx = 0; idx < threadcnt; ++idx){
-            cout << "rscore " << rscore << " scores " << scores[idx] << endl; //" candidates: " << candidates[idx].size() << " rcandidates: " << &(candidates[idx])
-            /*if(candidates[idx].size() > 0){
-                if((maximizing && scores[idx] > rscore) || (!maximizing && scores[idx] < rscore)){
-                    rscore = scores[idx];
-                    rcandidates.clear();
-                    rcandidates.assign(candidates[idx].begin(), candidates[idx].end());
-                }
-            }*/
+            if(score1 < score2){
+                rscore = score1;
+                rcandidates.assign(candidates1.begin(), candidates1.end());
+            }
+            else{
+                rscore = score2;
+                rcandidates.assign(candidates2.begin(), candidates2.end());
+            }
+            if(score3 < rscore){
+                rscore = score3;
+                rcandidates.clear();
+                rcandidates.assign(candidates3.begin(), candidates3.end());
+            }
+            if(score4 < rscore){
+                rscore = score4;
+                rcandidates.clear();
+                rcandidates.assign(candidates4.begin(), candidates4.end());
+            }
         }
 
         cout << "result: " << rscore << " match: " << match.created_at << " " << endl;
