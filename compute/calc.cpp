@@ -252,8 +252,7 @@
 
     int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
-        int newscore;
-        int bestscore;
+        int newscore, bestscore;
         int count = 0;
         
         if(maximizing){
@@ -443,7 +442,7 @@
     }
 
 
-    int calc_move_old(cMatch &match, list<cPrioMove> &rcandidates){
+    int calc_move2(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         //if(move):
@@ -460,23 +459,22 @@
         //vector<list<cPrioMove>> candidates;
         list<cPrioMove> candidates1, candidates2, candidates3, candidates4;
         int rscore, score1, score2, score3, score4; //scores[threadcnt];
-        t1 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 0, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score1)); //candidates.back()
-        t2 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 1, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score2));
-        t3 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 2, threadcnt, 2, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score3));
-        t4 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 3, ref(slimits), alpha, beta, maximizing, last_priomove, ref(*(new list<cPrioMove>)), ref(score4));
+        t1 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 0, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates1), ref(score1));
+        t2 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 1, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates2), ref(score2));
+        t3 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 2, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates3), ref(score3));
+        t4 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 3, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates4), ref(score4));
 
         t1.join();
         t2.join();
         t3.join();
         t4.join();
 
+        rscore = score1;
+        rcandidates.assign(candidates1.begin(), candidates1.end());
         if(maximizing){
-            if(score1 > score2){
-                rscore = score1;
-                rcandidates.assign(candidates1.begin(), candidates1.end());
-            }
-            else{
+            if(score2 > rscore){
                 rscore = score2;
+                rcandidates.clear();
                 rcandidates.assign(candidates2.begin(), candidates2.end());
             }
             if(score3 > rscore){
@@ -491,12 +489,9 @@
             }
         }
         else{
-            if(score1 < score2){
-                rscore = score1;
-                rcandidates.assign(candidates1.begin(), candidates1.end());
-            }
-            else{
+            if(score2 < rscore){
                 rscore = score2;
+                rcandidates.clear();
                 rcandidates.assign(candidates2.begin(), candidates2.end());
             }
             if(score3 < rscore){
