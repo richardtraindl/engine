@@ -4,11 +4,9 @@
 
     #include <map>
     #include <string>
-    #include <boost/multiprecision/cpp_int.hpp>
+    #include <cstdint>
     #include "./move.hpp"
 
-    using namespace boost::multiprecision;
-    using namespace boost::multiprecision::literals;
     using namespace std;
 
     class cBoard{
@@ -16,14 +14,28 @@
             static const int SNOK;
             static map<string, int> RANKS;
             static map<string, int> COLS;
-            const uint256_t BASE     = 0x42356324111111110000000000000000000000000000000099999999CABDEBAC_cppui;
-            const uint256_t FULL     = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui;
-            const uint256_t SINGLE   = 0xF000000000000000000000000000000000000000000000000000000000000000_cppui;
-            const uint256_t BITS1000 = 0x8888888888888888888888888888888888888888888888888888888888888888_cppui;
-            const uint256_t BITS1110 = 0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE_cppui;
-            const uint256_t BITS1100 = 0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC_cppui;
-            const uint256_t BITS0111 = 0x7777777777777777777777777777777777777777777777777777777777777777_cppui;
-            const uint256_t BITS0011 = 0x3333333333333333333333333333333333333333333333333333333333333333_cppui;
+
+            const static uint64_t BASE0        = 0x4235632411111111;
+            const static uint64_t BASE1        = 0x0000000000000000;
+            const static uint64_t BASE2        = 0x0000000000000000;
+            const static uint64_t BASE3        = 0x99999999CABDEBAC;
+
+            const static uint64_t FULL         = 0xFFFFFFFFFFFFFFFF;
+
+            const static uint64_t SINGLE       = 0xF000000000000000;
+
+            const static uint64_t POSMASK[];
+
+            const static uint64_t BITPOSMASK[];
+
+            const static uint64_t NEGMASK[];
+          
+            const static uint64_t BITS1000 = 0x8888888888888888;
+            const static uint64_t BITS1110 = 0xEEEEEEEEEEEEEEEE;
+            const static uint64_t BITS1100 = 0xCCCCCCCCCCCCCCCC;
+            const static uint64_t BITS0111 = 0x7777777777777777;
+            const static uint64_t BITS0011 = 0x3333333333333333;
+
             const string WHITE_TEXT  = "\033[97m";
             const string WHITE_BACK  = "\033[107m";
             const string YELLOW_TEXT  = "\033[93m";
@@ -39,7 +51,7 @@
             const string MAGIC       = "\033[3m";
             const string RESET_ALL   = "\033[0m";
 
-            uint256_t fields;
+            uint64_t fields[4];
             int wKg;
             int bKg;
             int wKg_first_move_on;

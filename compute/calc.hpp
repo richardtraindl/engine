@@ -21,6 +21,8 @@
     };
 
     void prnt_priomoves(list<cPrioMove *> &priomoves);
+    
+    void prnt_priomoves_for_thread(list<cPrioMove *> &priomoves, int threadcnt, int offset);
 
     string concat_fmtmoves(list<cPrioMove> &priomoves);
 

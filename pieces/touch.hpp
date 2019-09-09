@@ -21,10 +21,11 @@
     class cExclude{
         public:
             int pos;
-            int touch_pos;
-            int tactic_domain;
-         
-            cExclude(int newpos, int newtouch_pos, int newtactic_domain);
+            int touched_pos;
+            int mvdir;
+            int domain;
+
+            cExclude(int newpos, int newtouched_pos, int newmvdir, int newdomain);
     };
 
 #endif

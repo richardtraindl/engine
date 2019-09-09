@@ -9,8 +9,9 @@
     cTouch::cTouch(){
     }
 
-    cExclude::cExclude(int newpos, int newtouch_pos, int newtactic_domain){
+    cExclude::cExclude(int newpos, int newtouched_pos, int newmvdir, int newdomain){
         pos = newpos;
-        touch_pos = newtouch_pos;
-        tactic_domain = newtactic_domain;
+        touched_pos = newtouched_pos;
+        mvdir = newmvdir;
+        domain = newdomain;
     }

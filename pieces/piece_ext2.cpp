@@ -1,4 +1,5 @@
 
+    #include <cstdint>
     #include "./piece_ext2.hpp"
     #include "./searchforpiece.hpp"
     #include "../values.hpp"
@@ -254,25 +255,25 @@
     }
 
     bool is_short_castling_ok(cPiece *cpiece, int dst){
-        uint256_t shorttest, shortmask;
+        uint_fast64_t shorttest, shortmask;
         if(cpiece->pos % 8 != 4 || cpiece->pos - dst != -2){ return false; }
 
         if(cpiece->color == COLORS["white"]){
             if(cpiece->board->wKg_first_move_on != -1 || cpiece->board->wRkH_first_move_on != -1){
                 return false;
             }
-            shorttest  = 0x0000600400000000000000000000000000000000000000000000000000000000_cppui;
-            shortmask  = 0x0000FFFF00000000000000000000000000000000000000000000000000000000_cppui;
-            uint256_t fields = cpiece->board->fields & shortmask;
+            shorttest  = 0x0000600400000000;
+            shortmask  = 0x0000FFFF00000000;
+            uint_fast64_t fields = cpiece->board->fields[0] & shortmask;
             if(fields != shorttest){ return false; }
         }
         else{
             if(cpiece->board->bKg_first_move_on != -1 || cpiece->board->bRkH_first_move_on != -1){
                 return false;
             }
-            shorttest  = 0x000000000000000000000000000000000000000000000000000000000000E00C_cppui;
-            shortmask  = 0x000000000000000000000000000000000000000000000000000000000000FFFF_cppui;
-            uint256_t fields = cpiece->board->fields & shortmask;
+            shorttest  = 0x000000000000E00C;
+            shortmask  = 0x000000000000FFFF;
+            uint_fast64_t fields = cpiece->board->fields[3] & shortmask;
             if(fields != shorttest){ return false; }
         }            
 
@@ -290,25 +291,25 @@
     }
 
     bool is_long_castling_ok(cPiece *cpiece, int dst){
-        uint256_t longtest, longmask;
+        uint_fast64_t longtest, longmask;
         if(cpiece->pos % 8 != 4 || cpiece->pos - dst != 2){ return false; }
 
         if(cpiece->color == COLORS["white"]){
             if(cpiece->board->wKg_first_move_on != -1 || cpiece->board->wRkA_first_move_on != -1){
                 return false;
             }
-            longtest  = 0x4000600000000000000000000000000000000000000000000000000000000000_cppui;
-            longmask  = 0xFFFFF00000000000000000000000000000000000000000000000000000000000_cppui;
-            uint256_t fields = cpiece->board->fields & longmask;
+            longtest  = 0x4000600000000000;
+            longmask  = 0xFFFFF00000000000;
+            uint_fast64_t fields = cpiece->board->fields[0] & longmask;
             if(fields != longtest){ return false; }
         }
         else{
             if(cpiece->board->bKg_first_move_on != -1 || cpiece->board->bRkA_first_move_on != -1){
                 return false;
             }
-            longtest  = 0x00000000000000000000000000000000000000000000000000000000C000E000_cppui;
-            longmask  = 0x00000000000000000000000000000000000000000000000000000000FFFFF000_cppui;
-            uint256_t fields = cpiece->board->fields & longmask;
+            longtest  = 0x00000000C000E000;
+            longmask  = 0x00000000FFFFF000;
+            uint_fast64_t fields = cpiece->board->fields[3] & longmask;
             if(fields != longtest){ return false; }
         }
 

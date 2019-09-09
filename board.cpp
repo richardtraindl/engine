@@ -1,4 +1,5 @@
 
+    #include <iostream>
     #include "./board.hpp"
     #include "./pieces/searchforpiece.hpp"
     #include "./pieces/piece.hpp"
@@ -7,8 +8,62 @@
     #include "./helper.hpp"
 
 
+    const uint64_t cBoard::POSMASK[] = { 0xF000000000000000, 
+                                         0x0F00000000000000, 
+                                         0x00F0000000000000, 
+                                         0x000F000000000000, 
+                                         0x0000F00000000000, 
+                                         0x00000F0000000000, 
+                                         0x000000F000000000, 
+                                         0x0000000F00000000, 
+                                         0x00000000F0000000, 
+                                         0x000000000F000000, 
+                                         0x0000000000F00000, 
+                                         0x00000000000F0000, 
+                                         0x000000000000F000, 
+                                         0x0000000000000F00, 
+                                         0x00000000000000F0, 
+                                         0x000000000000000F }; 
+
+    const uint64_t cBoard::BITPOSMASK[] = { 0x1000000000000000, 
+                                            0x0100000000000000, 
+                                            0x0010000000000000, 
+                                            0x0001000000000000, 
+                                            0x0000100000000000, 
+                                            0x0000010000000000, 
+                                            0x0000001000000000, 
+                                            0x0000000100000000, 
+                                            0x0000000010000000, 
+                                            0x0000000001000000, 
+                                            0x0000000000100000, 
+                                            0x0000000000010000, 
+                                            0x0000000000001000, 
+                                            0x0000000000000100, 
+                                            0x0000000000000010, 
+                                            0x0000000000000001 };
+            
+    const uint64_t cBoard::NEGMASK[16] = { 0x0FFFFFFFFFFFFFFF, 
+                                           0xF0FFFFFFFFFFFFFF, 
+                                           0xFF0FFFFFFFFFFFFF, 
+                                           0xFFF0FFFFFFFFFFFF, 
+                                           0xFFFF0FFFFFFFFFFF, 
+                                           0xFFFFF0FFFFFFFFFF, 
+                                           0xFFFFFF0FFFFFFFFF, 
+                                           0xFFFFFFF0FFFFFFFF, 
+                                           0xFFFFFFFF0FFFFFFF, 
+                                           0xFFFFFFFFF0FFFFFF, 
+                                           0xFFFFFFFFFF0FFFFF, 
+                                           0xFFFFFFFFFFF0FFFF, 
+                                           0xFFFFFFFFFFFF0FFF, 
+                                           0xFFFFFFFFFFFFF0FF, 
+                                           0xFFFFFFFFFFFFFF0F, 
+                                           0xFFFFFFFFFFFFFFF0 };
+
     cBoard::cBoard(){ 
-        fields = BASE;
+        fields[0] = BASE0;
+        fields[1] = BASE1;
+        fields[2] = BASE2;
+        fields[3] = BASE3;
         wKg = COLS["E"] + RANKS["1"] * 8;
         bKg = COLS["E"] + RANKS["8"] * 8;
         wKg_first_move_on = -1;
@@ -51,19 +106,38 @@
         if(idx < 0 || idx > 63){
             cout << "getfield: " << idx;
         }
-        return (int)((fields >> ((63 - idx) * 4)) & 0xF);
+        int piece = 0;
+        int rank = idx >> 4;
+        int index = idx & 0xF;
+        uint64_t testmask = BITPOSMASK[index];
+        uint64_t writemask = 0x1;
+        for(int i = 0; i < 4; ++i){
+            if(fields[rank] & testmask){
+                piece = piece | writemask;
+            }
+            testmask = testmask << 1;
+            writemask = writemask << 1;
+        }
+        return piece;
     }
 
     void cBoard::setfield(int idx, int value){
         if(idx < 0 || idx > 63){
             cout << "setfield: " << idx;
         }
-        uint256_t _value = value;
-        uint256_t tmpfields = SINGLE >> (idx * 4);
-        tmpfields = tmpfields ^ FULL;
-        tmpfields = tmpfields & fields;
-        _value = (_value << ((63 - idx) * 4));
-        fields = tmpfields | _value;
+        int rank = idx >> 4;
+        int index = idx & 0xF;
+        uint64_t writemask = BITPOSMASK[index];
+        uint64_t testmask = 0x1;
+        uint64_t result = 0;
+        for(int i = 0; i < 4; ++i){
+            if(value & testmask){
+                result = result | writemask;
+            }
+            testmask = testmask << 1;
+            writemask = writemask << 1;
+        }
+        fields[rank] = (fields[rank] & NEGMASK[index]) | result;
     }
 
     bool cBoard::verify(){
@@ -569,7 +643,10 @@
     }
    
     bool cBoard::debug_compare(cBoard &board2){
-        return fields == board2.fields &&
+        return fields[0] == board2.fields[0] &&
+               fields[1] == board2.fields[1] &&
+               fields[2] == board2.fields[2] &&
+               fields[3] == board2.fields[3] &&
                wKg == board2.wKg &&
                bKg == board2.bKg &&
                wKg_first_move_on == board2.wKg_first_move_on &&

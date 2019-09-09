@@ -1,10 +1,15 @@
 
+    #include <iostream>
     #include "./move.hpp"
+    #include "./board.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
 
-    cMove::cMove(uint256_t _prevfields, int _src, int _dst, int _prompiece){ 
-        prevfields = _prevfields;
+    cMove::cMove(uint64_t *_prevfields, int _src, int _dst, int _prompiece){ 
+        prevfields[0] = *_prevfields;
+        prevfields[1] = *(_prevfields + 1);
+        prevfields[2] = *(_prevfields + 2);
+        prevfields[3] = *(_prevfields + 3);
         src = _src;
         dst = _dst;
         prompiece = _prompiece;
@@ -14,10 +19,22 @@
 
     int cMove::getprevfield(int idx){
         if(idx < 0 || idx > 63){
-            cout << "getprevfield: " << dec << idx << endl;
+            cout << "getprevfield: " << idx << endl;
             return -1;
         }
-        return (int)((prevfields >> ((63 - idx) * 4)) & 0xF);
+        int piece = 0;
+        int rank = idx >> 4;
+        int index = idx & 0xF;
+        uint64_t testmask = cBoard::BITPOSMASK[index];
+        uint64_t writemask = 0x1;
+        for(int i = 0; i < 4; ++i){
+            if(prevfields[rank] & testmask){
+                piece = piece | writemask;
+            }
+            testmask = testmask << 1;
+            writemask = writemask << 1;
+        }
+        return piece;
     }
 
     string cMove::format(){
@@ -142,7 +159,7 @@
             {"prio3",                           200} 
         };
 
-    cPrioMove::cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int _prio) :  cMove(prevfields, src, dst, prompiece){
+    cPrioMove::cPrioMove(uint64_t *prevfields, int src, int dst, int prompiece, int _prio) :  cMove(prevfields, src, dst, prompiece){
         prio = _prio;
     }
 

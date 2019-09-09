@@ -1,14 +1,10 @@
  
-    #include <boost/multiprecision/cpp_int.hpp>
     #include "./analyze_position.hpp"
     #include "./analyze_helper.hpp"
     #include "../compute/calc.hpp"
     #include "../pieces/piece.hpp"
     #include "../pieces/searchforpiece.hpp"
     #include "../values.hpp"
-
-    using namespace boost::multiprecision;
-    using namespace boost::multiprecision::literals;
 
 
     int score_traps_and_touches(cMatch &match){
@@ -87,10 +83,10 @@
                 dst = match.board.search(dst, 8, 6);
             }
             if(vertical_wrk_or_wqu){
-                score += ATTACKED_SCORES[PIECES["bRk"]];
+                score += ATTACKED_SCORES[PIECES["bBp"]];
             }
             if(vertical_brk_or_bqu){
-                score += ATTACKED_SCORES[PIECES["wRk"]];
+                score += ATTACKED_SCORES[PIECES["wBp"]];
             }
         }
         return score;
@@ -284,22 +280,20 @@
     int score_endgame(cMatch &match){
         int score = 0;
         int whiterate = ATTACKED_SCORES[mBPW];
-        int white_step_rates[8] = { 0, 0, 1, 2, 3, 4, 5, 0};
+        int white_step_rates[8] = { 0, 1, 2, 8, 12, 16, 20, 0};
         int blackrate = ATTACKED_SCORES[mWPW];
-        int black_step_rates[8] = {0, 5, 4, 3, 2, 1, 0, 0} ;
+        int black_step_rates[8] = { 0, 20, 16, 12, 8, 2, 1, 0} ;
         for(int idx = 0; idx < 64; ++idx){
             int piece = match.board.getfield(idx);
             if(piece == mWPW){
                 cPiece cpiece(match.board, idx);
                 if(cpiece.is_running_pawn()){
-                    score += whiterate;
                     score += whiterate * white_step_rates[(idx / 8)];
                 }
             }
             if(piece == mBPW){
                 cPiece cpiece(match.board, idx);
                 if(cpiece.is_running_pawn()){
-                    score += blackrate;
                     score += blackrate * black_step_rates[(idx / 8)];
                 }
             }
@@ -329,11 +323,13 @@
             if(match.is_opening()){
                 score += score_opening(match);
             }
-            if(match.is_opening() == false && match.is_endgame() == false){
-                score += score_middlegame(match);
-            }
-            if(match.is_endgame()){
-                score += score_endgame(match);
+            else{
+                if(match.is_endgame()){
+                    score += score_endgame(match);
+                }
+                else{
+                    score += score_middlegame(match);
+                }
             }
             return score;
         }

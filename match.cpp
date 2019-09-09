@@ -1,13 +1,11 @@
 
-    #include <boost/multiprecision/cpp_int.hpp>
+    #include <iostream>
     #include "./match.hpp"
     #include "./pieces/piece.hpp"
     #include "./pieces/searchforpiece.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
 
-
-    using namespace boost::multiprecision;
 
     cMatch::cMatch(){ 
         created_at = time(0); 
@@ -20,7 +18,10 @@
         score = match.score;
         level = match.level;
 
-        board.fields = match.board.fields;
+        board.fields[0] = match.board.fields[0];
+        board.fields[1] = match.board.fields[1];
+        board.fields[2] = match.board.fields[2];
+        board.fields[3] = match.board.fields[3];
         board.wKg = match.board.wKg;
         board.bKg = match.board.bKg;
         board.wKg_first_move_on = match.board.wKg_first_move_on;
@@ -74,7 +75,6 @@
     };
 
     void cMatch::update_attributes(){
-        //for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
         for(cMove move : minutes){
             if(board.wKg_first_move_on == -1 && 
                move.src % 8 == cBoard::COLS["E"] && move.src / 8 == cBoard::RANKS["1"]){
@@ -167,7 +167,10 @@
         int count = 0;
         int equalcnt = 1;
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
-            if(it->prevfields == board.fields){
+            if(*(it->prevfields) == board.fields[0] &&
+               *(it->prevfields + 1) == board.fields[1] &&
+               *(it->prevfields + 2) == board.fields[2] &&
+               *(it->prevfields + 3) == board.fields[3]){
                 equalcnt++;
             }
             count++;
@@ -221,7 +224,6 @@
 
 
     void cMatch::prnt_minutes(){
-        //for(list<cMove>::iterator it = minutes.begin(); it != minutes.end(); ++it){
         for(cMove move : minutes){
             cout << move.format() << endl;
         }

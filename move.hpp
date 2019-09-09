@@ -5,19 +5,18 @@
     #include <map>
     #include <list> 
     #include <string>
-    #include <boost/multiprecision/cpp_int.hpp>
+    #include <cstdint>
 
     using namespace std;
-    using namespace boost::multiprecision;
 
     class cMove{
         public:
-            uint256_t prevfields;
+            uint64_t prevfields[4];
             int src;
             int dst;
             int prompiece;
 
-            cMove(uint256_t prevfields, int src, int dst, int prompiece);
+            cMove(uint64_t *prevfields, int src, int dst, int prompiece);
             cMove();
 
             int getprevfield(int idx);
@@ -47,7 +46,7 @@
             int prio;
             static map<string, int> PRIOS;
 
-            cPrioMove(uint256_t prevfields, int src, int dst, int prompiece, int prio);
+            cPrioMove(uint64_t *prevfields, int src, int dst, int prompiece, int prio);
 
             void evaluate_priority();
 

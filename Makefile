@@ -9,7 +9,6 @@ all: ./values.o ./helper.o ./move.o ./board.o ./match.o ./engine.o \
 	 ./bricks/brick.o
 
 	$(CC) -Wall --std=c++17 -lpthread \
-		./bricks/brick.o \
 		./ui/play.o \
 		./pieces/touch.o ./pieces/searchforpiece.o \
 		./pieces/piece_ext1.o ./pieces/piece_ext2.o ./pieces/piece.o \

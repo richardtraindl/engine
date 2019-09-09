@@ -64,7 +64,22 @@
             cout << "\n" << dec << idx << ". ";
             cout << priomove->format() << " prio: " << priomove->prio << " is_tactic_stormy: " << priomove->is_tactic_stormy() << endl;
             cout << priomove->fmt_tactics() << endl;
-            idx += 1;
+            idx++;
+        }
+        cout << "-------------------------------------------" << endl;
+    }
+
+
+    void prnt_priomoves_for_thread(list<cPrioMove *> &priomoves, int threadcnt, int offset){
+        cout << "-------------------------------------------" << endl;
+        int idx = 0;
+        for(cPrioMove *priomove : priomoves){
+            if(idx % threadcnt == offset){ 
+                cout << "\n" << dec << (idx + 1) << ". ";
+                cout << priomove->format() << " prio: " << priomove->prio << " is_tactic_stormy: " << priomove->is_tactic_stormy() << endl;
+                cout << priomove->fmt_tactics() << endl;
+            }
+            idx++;
         }
         cout << "-------------------------------------------" << endl;
     }
@@ -353,7 +368,7 @@
 
         if(depth == 1){
             cout << "thread #" << offset << " - priomoves count: " << priomoves.size() << endl;
-            //prnt_priomoves(priomoves);
+            prnt_priomoves_for_thread(priomoves, threadcnt, offset);
         }
 
         if(priomoves.size() == 0 || maxcnt == 0){
@@ -387,7 +402,8 @@
             }
             else{
                 match.do_move(priomove->src, priomove->dst, priomove->prompiece);
-                alphabeta_for_thread(match, depth + 1, threadcnt, 0, slimits, alpha, beta, !maximizing, priomove, newcandidates, newscore);
+                newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, NULL, newcandidates);
+                //alphabeta_for_thread(match, depth + 1, threadcnt, 0, slimits, alpha, beta, !maximizing, priomove, newcandidates, newscore);
                 match.undo_move();
             }
 
@@ -423,7 +439,7 @@
     }
 
 
-    int calc_move2(cMatch &match, list<cPrioMove> &rcandidates){
+    int calc_move(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         //if(move):
@@ -442,7 +458,7 @@
     }
 
 
-    int calc_move(cMatch &match, list<cPrioMove> &rcandidates){
+    int calc_move2(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
         // move = retrieve_move(match)
         //if(move):
@@ -459,15 +475,24 @@
         //vector<list<cPrioMove>> candidates;
         list<cPrioMove> candidates1, candidates2, candidates3, candidates4;
         int rscore, score1, score2, score3, score4; //scores[threadcnt];
-        t1 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 0, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates1), ref(score1));
-        t2 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 1, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates2), ref(score2));
-        t3 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 2, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates3), ref(score3));
-        t4 = thread(alphabeta_for_thread, ref(*(new cMatch(match))), 1, threadcnt, 3, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates4), ref(score4));
+        cMatch *match1 = new cMatch(match);
+        cMatch *match2 = new cMatch(match);
+        cMatch *match3 = new cMatch(match);
+        cMatch *match4 = new cMatch(match);
+        t1 = thread(alphabeta_for_thread, ref(*match1), 1, threadcnt, 0, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates1), ref(score1));
+        t2 = thread(alphabeta_for_thread, ref(*match2), 1, threadcnt, 1, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates2), ref(score2));
+        t3 = thread(alphabeta_for_thread, ref(*match3), 1, threadcnt, 2, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates3), ref(score3));
+        t4 = thread(alphabeta_for_thread, ref(*match4), 1, threadcnt, 3, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates4), ref(score4));
 
         t1.join();
         t2.join();
         t3.join();
         t4.join();
+        
+        delete match1;
+        delete match2;
+        delete match3;
+        delete match4;
 
         rscore = score1;
         rcandidates.assign(candidates1.begin(), candidates1.end());

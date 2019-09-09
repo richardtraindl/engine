@@ -118,7 +118,10 @@
 
 
     bool undo_move_from_ext(cPiece *cpiece, cMove &move, int movecnt, int &score){
-        cpiece->board->fields = move.prevfields;
+        cpiece->board->fields[0] = move.prevfields[0];
+        cpiece->board->fields[1] = move.prevfields[1];
+        cpiece->board->fields[2] = move.prevfields[2];
+        cpiece->board->fields[3] = move.prevfields[3];
         int piece = cpiece->board->getfield(move.src);
         int dstpiece = cpiece->board->getfield(move.dst);
         score -= SCORES[dstpiece];
