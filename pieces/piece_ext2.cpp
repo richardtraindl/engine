@@ -263,13 +263,7 @@
                 return false;
             }
             uint64_t baseline, shorttest, shortmask;
-            baseline = 0;
-            for(int i = 0; i < 8; ++i){
-                baseline = baseline | cpiece->board->getfield(i);
-                if(i < 7){
-                    baseline = baseline << 8;
-                }
-            }
+            cpiece->board->cpyfields_to_bigint(0, baseline);
             shortmask  = 0x00000000FFFFFFFF;
             shorttest  = 0x0000000006000004;
             baseline = baseline & shortmask;
@@ -280,13 +274,7 @@
                 return false;
             }
             uint64_t baseline, shorttest, shortmask;
-            baseline = 0;
-            for(int i = 56; i < 64; ++i){
-                baseline = baseline | cpiece->board->getfield(i);
-                if(i < 63){
-                    baseline = baseline << 8;
-                }
-            }
+            cpiece->board->cpyfields_to_bigint(56, baseline);
             shortmask  = 0x00000000FFFFFFFF;
             shorttest  = 0x000000000E00000C;
             baseline = baseline & shortmask;
@@ -314,13 +302,7 @@
                 return false;
             }
             uint64_t baseline, longtest, longmask;
-            baseline = 0;
-            for(int i = 0; i < 8; ++i){
-                baseline = baseline | cpiece->board->getfield(i);
-                if(i < 7){
-                    baseline = baseline << 8;
-                }
-            }
+            cpiece->board->cpyfields_to_bigint(0, baseline);
             longmask  = 0xFFFFFFFF00000000;
             longtest  = 0x0400000600000000;
             baseline = baseline & longmask;
@@ -331,13 +313,7 @@
                 return false;
             }
             uint64_t baseline, longtest, longmask;
-            baseline = 0;
-            for(int i = 56; i < 64; ++i){
-                baseline = baseline | cpiece->board->getfield(i);
-                if(i < 63){
-                    baseline = baseline << 8;
-                }
-            }
+            cpiece->board->cpyfields_to_bigint(56, baseline);
             longtest  = 0x000000000C00000E;
             longmask  = 0x00000000FFFFFFFF;
             baseline = baseline & longmask;

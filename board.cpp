@@ -655,11 +655,12 @@
     }
    
     bool cBoard::debug_compare(cBoard &board2){
-        return fields[0] == board2.fields[0] &&
-               fields[1] == board2.fields[1] &&
-               fields[2] == board2.fields[2] &&
-               fields[3] == board2.fields[3] &&
-               wKg == board2.wKg &&
+        for(int i = 0; i < 64; ++i){
+            if(fields[i] != board2.fields[i]){
+                return false;
+            }
+        }
+        return wKg == board2.wKg &&
                bKg == board2.bKg &&
                wKg_first_move_on == board2.wKg_first_move_on &&
                bKg_first_move_on == board2.bKg_first_move_on &&
@@ -669,6 +670,14 @@
                bRkH_first_move_on == board2.bRkH_first_move_on;
     }
 
+    void cBoard::cpyfields_to_bigint(int startidx, uint64_t &bigint){
+        bigint = 0;
+        for(int i = startidx; i < startidx + 7; ++i){
+            bigint = bigint | getfield(i);
+            bigint = bigint << 8;
+        }
+        bigint = bigint | getfield(startidx + 7);
+    }
 
 /*
     def set_to_base(self){

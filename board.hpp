@@ -53,7 +53,6 @@
             const string MAGIC       = "\033[3m";
             const string RESET_ALL   = "\033[0m";
 
-            //uint64_t fields[4];
             uint8_t fields[64] = { mWRK, mWKN, mWBP, mWQU, mWKG, mWBP, mWKN, mWRK,
                                    mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, 
                                    mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
@@ -116,6 +115,8 @@
             void prnt();
 
             bool debug_compare(cBoard &board2);
+
+            void cpyfields_to_bigint(int startidx, uint64_t &bigint);
     };
 
 #endif
