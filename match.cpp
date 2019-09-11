@@ -18,10 +18,10 @@
         score = match.score;
         level = match.level;
 
-        board.fields[0] = match.board.fields[0];
-        board.fields[1] = match.board.fields[1];
-        board.fields[2] = match.board.fields[2];
-        board.fields[3] = match.board.fields[3];
+        //board.fields[0] = match.board.fields[0];
+        //board.fields[1] = match.board.fields[1];
+        //board.fields[2] = match.board.fields[2];
+        //board.fields[3] = match.board.fields[3];
         board.wKg = match.board.wKg;
         board.bKg = match.board.bKg;
         board.wKg_first_move_on = match.board.wKg_first_move_on;
@@ -142,7 +142,8 @@
 
     // 100 Züge davor kein Bauernzug und keine Figur geschlagen
     bool cMatch::is_fifty_moves_rule(){
-        int cnt = 0;
+        return false;
+        /*int cnt = 0;
         int maxlen = minutes.size();
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
             int srcpiece = it->getprevfield(it->src);
@@ -160,11 +161,12 @@
                 }
             }
         }
-        return false;
+        return false;*/
     }
 
     bool cMatch::is_three_times_rep(){
-        int count = 0;
+        return false;
+        /*int count = 0;
         int equalcnt = 1;
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
             if(*(it->prevfields) == board.fields[0] &&
@@ -178,12 +180,12 @@
                 break;
             }
         }
-        return equalcnt >= 3;
+        return equalcnt >= 3;*/
     }
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
         cPiece cpiece(board, src);
-        cMove *move = cpiece.do_move(dst, prompiece, minutes.size() + 1, score);
+        cMove *move = cpiece.do_move(dst, board.getfield(dst), prompiece, minutes.size() + 1, score);
         minutes.push_back(*move);
         return move;
     }

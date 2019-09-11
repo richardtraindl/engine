@@ -200,8 +200,8 @@
         return is_move_valid_from_ext(this, dst, prompiece, minutes);
     }
 
-    cMove *cPiece::do_move(int dst, int prompiece, int movecnt, int &score){
-        return do_move_from_ext(this, dst, prompiece, movecnt, score);
+    cMove *cPiece::do_move(int dst, int prev_dstpiece, int prompiece, int movecnt, int &score){
+        return do_move_from_ext(this, dst, prev_dstpiece, prompiece, movecnt, score);
     }
 
     void cPiece::undo_move(cMove &move, int movecnt, int &score){
@@ -279,7 +279,7 @@
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
-                        move = new cMove(board->fields, pos, dst, prompiece);
+                        move = new cMove(pos, dst, board->getfield(dst), prompiece);
                         moves.push_back(move);
                     }
                     if(prompiece == mBLK){
@@ -304,7 +304,7 @@
                 count += 1;
                 for(auto &prompiece : get_prom_pieces()){
                     if(board->is_move_valid(pos, dst, prompiece, match.minutes)){
-                        priomove = new cPrioMove(board->fields, pos, dst, prompiece, cPrioMove::PRIOS["prio3"]);
+                        priomove = new cPrioMove(pos, dst, board->getfield(dst), prompiece, cPrioMove::PRIOS["prio3"]);
                         add_tactics(*priomove, match, dbggmove, excludes);
                         priomoves.push_back(priomove);
                     }

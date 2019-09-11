@@ -1,10 +1,10 @@
 
     #include <iostream>
+    #include <cstring>
     #include "./board.hpp"
     #include "./pieces/searchforpiece.hpp"
     #include "./pieces/piece.hpp"
     #include "./pieces/piece_ext2.hpp"
-    #include "./values.hpp"
     #include "./helper.hpp"
 
 
@@ -60,10 +60,17 @@
                                            0xFFFFFFFFFFFFFFF0 };
 
     cBoard::cBoard(){ 
-        fields[0] = BASE0;
-        fields[1] = BASE1;
-        fields[2] = BASE2;
-        fields[3] = BASE3;
+        //uint64_t bigfields;
+        //memcpy(&bigfields, fields, 8);
+        //bigfields = BASE1;
+        //memcpy(&bigfields, (fields + 8), 8);
+        //bigfields = BASE2;
+        //bigfields[2] = BLANKS;
+        //bigfields[3] = BLANKS;
+        //bigfields[4] = BLANKS;
+        //bigfields[5] = BLANKS;
+        //bigfields[6] = BASE7;
+        //bigfields[7] = BASE8;*/
         wKg = COLS["E"] + RANKS["1"] * 8;
         bKg = COLS["E"] + RANKS["8"] * 8;
         wKg_first_move_on = -1;
@@ -103,6 +110,9 @@
 
 
     int cBoard::getfield(int idx){
+        return (int)fields[idx] & 0xFF;
+    }
+    /*int cBoard::getfield(int idx){
         if(idx < 0 || idx > 63){
             cout << "getfield: " << idx;
         }
@@ -119,9 +129,11 @@
             writemask = writemask << 1;
         }
         return piece;
-    }
-
+    }*/
     void cBoard::setfield(int idx, int value){
+        fields[idx] = (uint8_t)value;
+    }
+    /*void cBoard::setfield(int idx, int value){
         if(idx < 0 || idx > 63){
             cout << "setfield: " << idx;
         }
@@ -138,7 +150,7 @@
             writemask = writemask << 1;
         }
         fields[rank] = (fields[rank] & NEGMASK[index]) | result;
-    }
+    }*/
 
     bool cBoard::verify(){
         int wKg_cnt = 0;

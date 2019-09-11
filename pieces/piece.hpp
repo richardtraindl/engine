@@ -45,7 +45,7 @@
 
             bool is_move_valid(int dst, int prompiece, list<cMove> &minutes);
             
-            cMove *do_move(int dst, int prompiece, int movecnt, int &score);
+            cMove *do_move(int dst, int prev_dstpiece, int prompiece, int movecnt, int &score);
 
             void undo_move(cMove &move, int movecnt, int &score);
 

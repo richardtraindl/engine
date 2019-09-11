@@ -11,15 +11,13 @@
 
     class cMove{
         public:
-            uint64_t prevfields[4];
             int src;
             int dst;
+            int prev_dstpiece;
             int prompiece;
 
-            cMove(uint64_t *prevfields, int src, int dst, int prompiece);
+            cMove(int src, int dst, int prev_dstpiece, int prompiece);
             cMove();
-
-            int getprevfield(int idx);
 
             string format();
     };
@@ -46,7 +44,7 @@
             int prio;
             static map<string, int> PRIOS;
 
-            cPrioMove(uint64_t *prevfields, int src, int dst, int prompiece, int prio);
+            cPrioMove(int src, int dst, int prev_dstpiece, int prompiece, int prio);
 
             void evaluate_priority();
 

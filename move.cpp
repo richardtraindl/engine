@@ -1,72 +1,47 @@
 
     #include <iostream>
+    #include <cstring>
     #include "./move.hpp"
     #include "./board.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
 
-    cMove::cMove(uint64_t *_prevfields, int _src, int _dst, int _prompiece){ 
-        prevfields[0] = *_prevfields;
-        prevfields[1] = *(_prevfields + 1);
-        prevfields[2] = *(_prevfields + 2);
-        prevfields[3] = *(_prevfields + 3);
-        src = _src;
-        dst = _dst;
-        prompiece = _prompiece;
+    cMove::cMove(int newsrc, int newdst, int newprev_dstpiece, int newprompiece){ 
+        src = newsrc;
+        dst = newdst;
+        prev_dstpiece = newprev_dstpiece;
+        prompiece = newprompiece;
     }
     cMove::cMove(){
     }
 
-    int cMove::getprevfield(int idx){
-        if(idx < 0 || idx > 63){
-            cout << "getprevfield: " << idx << endl;
-            return -1;
-        }
-        int piece = 0;
-        int rank = idx >> 4;
-        int index = idx & 0xF;
-        uint64_t testmask = cBoard::BITPOSMASK[index];
-        uint64_t writemask = 0x1;
-        for(int i = 0; i < 4; ++i){
-            if(prevfields[rank] & testmask){
-                piece = piece | writemask;
-            }
-            testmask = testmask << 1;
-            writemask = writemask << 1;
-        }
-        return piece;
-    }
-
     string cMove::format(){
-        int piece = getprevfield(src);
-        if(piece == mWKG || piece == mBKG){
+        /*if(piece == mWKG || piece == mBKG){
             if(src % 8 - dst % 8 == -2){
                 return string("0-0");
             }
             if(src % 8 - dst % 8 == 2){
                 return string("0-0-0");
             }
-        }
+        }*/
 
-        int dstpiece = getprevfield(dst);
         string hyphen = "";
         string trailing = "";
-        if(dstpiece == mBLK){
+        if(prev_dstpiece == mBLK){
             hyphen = "-";
         }
         else{
             hyphen = "x";
         }
-        if(piece == mWPW || piece == mBPW){
-            if(prompiece != mBLK){
-                trailing = ", " + reverse_lookup(PIECES, prompiece);
-            }
-            else{
-                if(dstpiece == mBLK && src % 8 != dst % 8){
-                    trailing = " e.p.";
-                }
-            }
+
+        if(prompiece != mBLK){
+            trailing = ", " + reverse_lookup(PIECES, prompiece);
         }
+        /*else{
+            if(prev_dstpiece == mBLK && src % 8 != dst % 8){
+                trailing = " e.p.";
+            }
+        }*/
         return index_to_coord(src) + hyphen + index_to_coord(dst) + trailing;
     }
 
@@ -159,7 +134,7 @@
             {"prio3",                           200} 
         };
 
-    cPrioMove::cPrioMove(uint64_t *prevfields, int src, int dst, int prompiece, int _prio) :  cMove(prevfields, src, dst, prompiece){
+    cPrioMove::cPrioMove(int src, int dst, int prev_dstpiece, int prompiece, int _prio) : cMove(src, dst, prev_dstpiece, prompiece){
         prio = _prio;
     }
 

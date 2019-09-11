@@ -6,6 +6,7 @@
     #include <string>
     #include <cstdint>
     #include "./move.hpp"
+    #include "./values.hpp"
 
     using namespace std;
 
@@ -15,10 +16,11 @@
             static map<string, int> RANKS;
             static map<string, int> COLS;
 
-            const static uint64_t BASE0        = 0x4235632411111111;
-            const static uint64_t BASE1        = 0x0000000000000000;
-            const static uint64_t BASE2        = 0x0000000000000000;
-            const static uint64_t BASE3        = 0x99999999CABDEBAC;
+            const static uint64_t BASE1        = 0x0402030506030204;
+            const static uint64_t BASE2        = 0x0101010101010101;
+            const static uint64_t BLANKS       = 0x0000000000000000;
+            const static uint64_t BASE7        = 0x0909090909090909;
+            const static uint64_t BASE8        = 0x0C0A0B0D0E0B0A0C;
 
             const static uint64_t FULL         = 0xFFFFFFFFFFFFFFFF;
 
@@ -51,7 +53,15 @@
             const string MAGIC       = "\033[3m";
             const string RESET_ALL   = "\033[0m";
 
-            uint64_t fields[4];
+            //uint64_t fields[4];
+            uint8_t fields[64] = { mWRK, mWKN, mWBP, mWQU, mWKG, mWBP, mWKN, mWRK,
+                                   mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, 
+                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
+                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
+                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
+                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
+                                   mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, 
+                                   mBRK, mBKN, mBBP, mBQU, mBKG, mBBP, mBKN, mBRK };
             int wKg;
             int bKg;
             int wKg_first_move_on;

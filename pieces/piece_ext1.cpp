@@ -2,12 +2,12 @@
     #include "./piece_ext1.hpp"
     #include "../values.hpp"
 
-    cMove *do_move_from_ext(cPiece *cpiece, int dst, int prompiece, int movecnt, int &score){
-        int dstpiece = cpiece->board->getfield(dst);
-        cMove *move = new cMove(cpiece->board->fields, cpiece->pos, dst, prompiece);
+
+    cMove *do_move_from_ext(cPiece *cpiece, int dst, int prev_dstpiece, int prompiece, int movecnt, int &score){
+        cMove *move = new cMove(cpiece->pos, dst, prev_dstpiece, prompiece);
         cpiece->board->setfield(move->src, mBLK);
         cpiece->board->setfield(move->dst, cpiece->piece);
-        score += SCORES[dstpiece];
+        score += SCORES[prev_dstpiece];
         
         if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
            cpiece->piece == mWKN || cpiece->piece == mBKN ||
@@ -21,14 +21,14 @@
                 score += REVERSED_SCORES[prompiece] - REVERSED_SCORES[mWPW];
                 return move;
             }
-            if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
+            if(prev_dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];
                 return move;
             }
-            if(dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
+            if(prev_dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
                 int enpass = cpiece->pos - 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
@@ -44,14 +44,14 @@
                 score += REVERSED_SCORES[prompiece] - REVERSED_SCORES[mBPW];
                 return move;
             }
-            if(dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
+            if(prev_dstpiece == mBLK && cpiece->pos % 8 < dst % 8){
                 int enpass = cpiece->pos + 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
                 score += SCORES[captpiece];
                 return move;
             }
-            if(dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
+            if(prev_dstpiece == mBLK && cpiece->pos % 8 > dst % 8){
                 int enpass = cpiece->pos - 1;
                 int captpiece = cpiece->board->getfield(enpass);
                 cpiece->board->setfield(enpass, mBLK);
@@ -118,46 +118,46 @@
 
 
     bool undo_move_from_ext(cPiece *cpiece, cMove &move, int movecnt, int &score){
-        cpiece->board->fields[0] = move.prevfields[0];
-        cpiece->board->fields[1] = move.prevfields[1];
-        cpiece->board->fields[2] = move.prevfields[2];
-        cpiece->board->fields[3] = move.prevfields[3];
-        int piece = cpiece->board->getfield(move.src);
-        int dstpiece = cpiece->board->getfield(move.dst);
-        score -= SCORES[dstpiece];
+        cpiece->board->setfield(move.src, cpiece->piece);
+        cpiece->board->setfield(move.dst, move.prev_dstpiece);
+        score -= SCORES[move.prev_dstpiece];
 
-        if(piece == mWBP || piece == mBBP || 
-           piece == mWKN || piece == mBKN ||
-           piece == mWQU || piece == mBQU){
+        if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
+           cpiece->piece == mWKN || cpiece->piece == mBKN ||
+           cpiece->piece == mWQU || cpiece->piece == mBQU){
             return true;
         }
 
-        if(piece == mWPW){
+        if(cpiece->piece == mWPW){
             if(move.prompiece != mBLK){
+                cpiece->board->setfield(move.src, mWPW);
                 score += SCORES[move.prompiece] - SCORES[mWPW];
                 return true;
 
             }
-            if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
+            if(move.prev_dstpiece == mBLK && move.src % 8 != move.dst % 8){
+                cpiece->board->setfield((move.dst - 8), mBPW);
                 score -= SCORES[mBPW];
                 return true;
             }
             return true;
         }
 
-        if(piece == mBPW){
+        if(cpiece->piece == mBPW){
             if(move.prompiece != mBLK){
+                cpiece->board->setfield(move.src, mBPW);
                 score += SCORES[move.prompiece] - SCORES[mBPW];
                 return true;
             }
-            if(dstpiece == mBLK && move.src % 8 != move.dst % 8){
+            if(move.prev_dstpiece == mBLK && move.src % 8 != move.dst % 8){
+                cpiece->board->setfield((move.dst + 8), mWPW);
                 score -= SCORES[mWPW];
                 return true;
             }
             return true;
         }
 
-        if(piece == mWRK){
+        if(cpiece->piece == mWRK){
             if(cpiece->board->wRkA_first_move_on != -1 && cpiece->board->wRkA_first_move_on == movecnt){
                 cpiece->board->wRkA_first_move_on = -1;
             }
@@ -167,7 +167,7 @@
             return true;
         }
 
-        if(piece == mBRK){
+        if(cpiece->piece == mBRK){
             if(cpiece->board->bRkA_first_move_on != -1 && cpiece->board->bRkA_first_move_on == movecnt){
                 cpiece->board->bRkA_first_move_on = -1;
             }
@@ -177,20 +177,31 @@
             return true;
         }
 
-        if(piece == mWKG){
-            if(cpiece->board->wKg_first_move_on != -1 && cpiece->board->wKg_first_move_on == movecnt){
-                cpiece->board->wKg_first_move_on = -1;
+        if(cpiece->piece == mWKG || cpiece->piece == mBKG){
+            if(move.src - move.dst == -2){
+                int rook = cpiece->board->getfield(move.src + 1);
+                cpiece->board->setfield(move.src + 1, mBLK);
+                cpiece->board->setfield(move.dst + 1, rook);
             }
-            cpiece->board->wKg = move.src;
-            return true;
-        }
-        
-        if(piece == mBKG){
-            if(cpiece->board->bKg_first_move_on != -1 && cpiece->board->bKg_first_move_on == movecnt){
-                cpiece->board->bKg_first_move_on = -1;
+            if(move.src - move.dst == 2){
+                int rook = cpiece->board->getfield(move.src - 1);
+                cpiece->board->setfield(move.src - 1, mBLK);
+                cpiece->board->setfield(move.dst -2 , rook);
             }
-            cpiece->board->bKg = move.src;
-            return true;
+            if(cpiece->piece == mWKG){
+                if(cpiece->board->wKg_first_move_on != -1 && cpiece->board->wKg_first_move_on == movecnt){
+                    cpiece->board->wKg_first_move_on = -1;
+                }
+                cpiece->board->wKg = move.src;
+                return true;
+            }
+            else{
+                if(cpiece->board->bKg_first_move_on != -1 && cpiece->board->bKg_first_move_on == movecnt){
+                    cpiece->board->bKg_first_move_on = -1;
+                }
+                cpiece->board->bKg = move.src;
+                return true;
+            }
         }
         return true;
     }

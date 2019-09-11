@@ -128,7 +128,7 @@
         bool wcastling = false;
         bool bcastling = false;
         int idx = 0;
-        for(cMove move : match.minutes){
+        /*for(cMove move : match.minutes){
             idx += 1;
             int piece = move.getprevfield(move.src);
             if(piece == mWKG || piece == mBKG){
@@ -141,7 +141,7 @@
                     }
                 }
             }
-        }
+        }*/
         if(wcastling == false && (match.board.wKg_first_move_on != -1 ||
            (match.board.wRkA_first_move_on != -1 || match.board.wRkH_first_move_on != -1))){
             score += ATTACKED_SCORES[mWRK] * 2;
