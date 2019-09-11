@@ -303,8 +303,8 @@
             }
             uint64_t baseline, longtest, longmask;
             cpiece->board->cpyfields_to_bigint(0, baseline);
-            longmask  = 0xFFFFFFFF00000000;
-            longtest  = 0x0400000600000000;
+            longmask  = 0xFFFFFFFFFF000000;
+            longtest  = 0x0400000006000000;
             baseline = baseline & longmask;
             if(baseline != longtest){ return false; }
         }
@@ -314,8 +314,8 @@
             }
             uint64_t baseline, longtest, longmask;
             cpiece->board->cpyfields_to_bigint(56, baseline);
-            longtest  = 0x000000000C00000E;
-            longmask  = 0x00000000FFFFFFFF;
+            longmask  = 0xFFFFFFFFFF000000;
+            longtest  = 0x0C0000000E000000;
             baseline = baseline & longmask;
             if(baseline != longtest){ return false; }
         }
