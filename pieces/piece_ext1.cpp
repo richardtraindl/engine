@@ -118,23 +118,26 @@
 
 
     bool undo_move_from_ext(cPiece *cpiece, cMove &move, int movecnt, int &score){
-        cpiece->board->setfield(move.src, cpiece->piece);
-        cpiece->board->setfield(move.dst, move.prev_dstpiece);
-        score -= SCORES[move.prev_dstpiece];
-
-        if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
-           cpiece->piece == mWKN || cpiece->piece == mBKN ||
-           cpiece->piece == mWQU || cpiece->piece == mBQU){
+         if(move.prompiece != mBLK){
+            if(cpiece->color == COLORS["white"]){
+                cpiece->piece = mWPW;
+            }
+            else{
+                cpiece->piece = mBPW;
+            }
+            cpiece->board->setfield(move.src, cpiece->piece);
+            cpiece->board->setfield(move.dst, move.prev_dstpiece);
+            score -= SCORES[move.prev_dstpiece];
+            score += SCORES[move.prompiece] - SCORES[cpiece->piece];
             return true;
+        }
+        else{
+            cpiece->board->setfield(move.src, cpiece->piece);
+            cpiece->board->setfield(move.dst, move.prev_dstpiece);
+            score -= SCORES[move.prev_dstpiece];
         }
 
         if(cpiece->piece == mWPW){
-            if(move.prompiece != mBLK){
-                cpiece->board->setfield(move.src, mWPW);
-                score += SCORES[move.prompiece] - SCORES[mWPW];
-                return true;
-
-            }
             if(move.prev_dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 cpiece->board->setfield((move.dst - 8), mBPW);
                 score -= SCORES[mBPW];
@@ -144,11 +147,6 @@
         }
 
         if(cpiece->piece == mBPW){
-            if(move.prompiece != mBLK){
-                cpiece->board->setfield(move.src, mBPW);
-                score += SCORES[move.prompiece] - SCORES[mBPW];
-                return true;
-            }
             if(move.prev_dstpiece == mBLK && move.src % 8 != move.dst % 8){
                 cpiece->board->setfield((move.dst + 8), mWPW);
                 score -= SCORES[mWPW];
@@ -157,6 +155,12 @@
             return true;
         }
 
+        if(cpiece->piece == mWBP || cpiece->piece == mBBP || 
+           cpiece->piece == mWKN || cpiece->piece == mBKN ||
+           cpiece->piece == mWQU || cpiece->piece == mBQU){
+            return true;
+        }
+        
         if(cpiece->piece == mWRK){
             if(cpiece->board->wRkA_first_move_on != -1 && cpiece->board->wRkA_first_move_on == movecnt){
                 cpiece->board->wRkA_first_move_on = -1;
