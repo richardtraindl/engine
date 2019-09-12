@@ -219,21 +219,6 @@
     }
 
 
-/* def score_weak_pawns(cMatch &match):
-    value = 0
-    for idx in range(64):
-        piece = match.board.getfield(idx)
-        if(piece == mWPW):
-            cpawn = cWhitePawn(match, idx)
-            if(cpawn.is_weak()):
-                value += ATTACKED_SCORES[mWRK]
-        elif(piece == mBPW):
-            cpawn = cBlackPawn(match, idx)
-            if(cpawn.is_weak()):
-                value += ATTACKED_SCORES[mBRK]
-    return value */
-
-
     int score_penalty_for_weak_fianchetto(cMatch &match){
         int score = 0;
         int piece = match.board.getfield(cBoard::COLS["B"] + cBoard::RANKS["2"] * 8);
