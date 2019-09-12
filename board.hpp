@@ -114,7 +114,7 @@
 
             void prnt();
 
-            bool debug_compare(cBoard &board2);
+            bool compare(cBoard &board2);
 
             void cpyfields_to_bigint(int startidx, int count, uint64_t &bigint);
     };
