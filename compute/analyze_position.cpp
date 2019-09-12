@@ -127,21 +127,16 @@
         int score = 0;
         bool wcastling = false;
         bool bcastling = false;
-        int idx = 0;
-        /*for(cMove move : match.minutes){
-            idx += 1;
-            int piece = move.getprevfield(move.src);
-            if(piece == mWKG || piece == mBKG){
-                if(abs(move.src - move.dst) == 2){
-                    if(idx % 2 == 1){
-                        wcastling = true;
-                    }
-                    else{
-                        bcastling = true;
-                    }
-                }
+        cMatch newmatch = match;
+        for(list<cMove>::reverse_iterator it = match.minutes.rbegin(); it != match.minutes.rend(); ++it){
+            newmatch.undo_move();
+            if(newmatch.board.getfield(it->src) == mWKG && abs(it->src - it->dst) == 2){
+                wcastling = true;
             }
-        }*/
+            if(newmatch.board.getfield(it->src) == mBKG && abs(it->src - it->dst) == 2){
+                bcastling = true;
+            }
+        }
         if(wcastling == false && (match.board.wKg_first_move_on != -1 ||
            (match.board.wRkA_first_move_on != -1 || match.board.wRkH_first_move_on != -1))){
             score += ATTACKED_SCORES[mWRK] * 2;
