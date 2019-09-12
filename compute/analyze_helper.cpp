@@ -186,14 +186,14 @@
             if(is_move_out_of_soft_pin(match, piece, priomove) == false){
                 return cTactic::WEIGHTS["stormy"];
             }
-            if(match.board.eval_soft_pin_dir(priomove.dst) != DIRS["undef"] && 
-               is_supply(match, piece, priomove)){
-                return cTactic::WEIGHTS["stormy"];
-            }
             if(PIECES_RANKS[piece] == PIECES_RANKS[dstpiece]){
                 return cTactic::WEIGHTS["better-deal"];
             }
             return cTactic::WEIGHTS["good-deal"];
+        }
+        if(match.board.eval_soft_pin_dir(priomove.dst) != DIRS["undef"] && 
+           is_supply(match, piece, priomove)){
+            return cTactic::WEIGHTS["stormy"];
         }
         return cTactic::WEIGHTS["vague-deal"];
     }

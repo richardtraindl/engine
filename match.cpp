@@ -142,26 +142,30 @@
 
     // 100 Züge davor kein Bauernzug und keine Figur geschlagen
     bool cMatch::is_fifty_moves_rule(){
-        return false;
-        /*int cnt = 0;
-        int maxlen = minutes.size();
+        int rulecnt = 0;
+        int cnt = 0;
+        cMatch newmatch = *this;
         for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
-            int srcpiece = it->getprevfield(it->src);
-            int dstpiece = it->getprevfield(it->dst);
-            if(srcpiece == mWPW || srcpiece == mBPW || dstpiece != mBLK){
-                cnt = 0;
+            cnt++;
+            if(cnt > 101){
+                return false;
             }
-            else{
-                cnt += 1;
-                if(cnt > 100){
-                    return true;
-                }
-                if(maxlen - cnt < 100){
-                    return false;
-                }
+            if(it->prev_dstpiece != mBLK){
+                rulecnt = 0;
+                continue;
+            }
+            newmatch.undo_move();
+            if(newmatch.board.getfield(it->src) == mWPW ||
+               newmatch.board.getfield(it->src) == mBPW){
+                rulecnt = 0;
+                continue;
+            }
+            rulecnt++;
+            if(rulecnt > 100){
+                return true;
             }
         }
-        return false;*/
+        return false;
     }
 
     bool cMatch::is_three_times_rep(){
@@ -190,18 +194,19 @@
         return move;
     }
 
-    void cMatch::undo_move(){
+    bool cMatch::undo_move(){
         cMove move;
         if(minutes.size() > 0){
             move = minutes.back();
         }
         else{
             cout << "return " << endl;
-            return;
+            return false;
         }
         cPiece cpiece(board, move.dst);
         cpiece.undo_move(move, minutes.size(), score);
         minutes.pop_back();
+        return true;
         // delete move;
     }
 

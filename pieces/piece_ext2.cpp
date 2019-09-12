@@ -263,9 +263,9 @@
                 return false;
             }
             uint64_t baseline, shorttest, shortmask;
-            cpiece->board->cpyfields_to_bigint(0, baseline);
-            shortmask  = 0x00000000FFFFFFFF;
-            shorttest  = 0x0000000006000004;
+            cpiece->board->cpyfields_to_bigint(0, 8, baseline);
+            shortmask  = 0x0000FFFF;
+            shorttest  = 0x00006004;
             baseline = baseline & shortmask;
             if(baseline != shorttest){ return false; }
         }
@@ -274,9 +274,9 @@
                 return false;
             }
             uint64_t baseline, shorttest, shortmask;
-            cpiece->board->cpyfields_to_bigint(56, baseline);
-            shortmask  = 0x00000000FFFFFFFF;
-            shorttest  = 0x000000000E00000C;
+            cpiece->board->cpyfields_to_bigint(56, 8, baseline);
+            shortmask  = 0x0000FFFF;
+            shorttest  = 0x0000E00C;
             baseline = baseline & shortmask;
             if(baseline != shorttest){ return false; }
         }            
@@ -302,9 +302,9 @@
                 return false;
             }
             uint64_t baseline, longtest, longmask;
-            cpiece->board->cpyfields_to_bigint(0, baseline);
-            longmask  = 0xFFFFFFFFFF000000;
-            longtest  = 0x0400000006000000;
+            cpiece->board->cpyfields_to_bigint(0, 8, baseline);
+            longmask  = 0xFFFFF000;
+            longtest  = 0x40006000;
             baseline = baseline & longmask;
             if(baseline != longtest){ return false; }
         }
@@ -313,9 +313,9 @@
                 return false;
             }
             uint64_t baseline, longtest, longmask;
-            cpiece->board->cpyfields_to_bigint(56, baseline);
-            longmask  = 0xFFFFFFFFFF000000;
-            longtest  = 0x0C0000000E000000;
+            cpiece->board->cpyfields_to_bigint(56, 8, baseline);
+            longmask  = 0xFFFFF000;
+            longtest  = 0xC000E000;
             baseline = baseline & longmask;
             if(baseline != longtest){ return false; }
         }

@@ -45,7 +45,7 @@
 
             cMove *do_move(int src, int dst, int prompiece);
 
-            void undo_move();
+            bool undo_move();
 
             int eval_status();
             

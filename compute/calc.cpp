@@ -21,7 +21,7 @@
                 dpth_stage2 = 3;
                 //dpth_max = 7;
             }
-            dpth_max = 7;
+            dpth_max = 9;
             mvcnt_stage1 = 8;
             mvcnt_stage2 = 6;
             return;

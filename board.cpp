@@ -670,13 +670,14 @@
                bRkH_first_move_on == board2.bRkH_first_move_on;
     }
 
-    void cBoard::cpyfields_to_bigint(int startidx, uint64_t &bigint){
+    void cBoard::cpyfields_to_bigint(int startidx, int count, uint64_t &bigint){
         bigint = 0;
-        for(int i = startidx; i < startidx + 7; ++i){
-            bigint = bigint | getfield(i);
-            bigint = bigint << 8;
+        int endidx = startidx + count;
+        for(int i = startidx; i < endidx - 1; ++i){
+            bigint = bigint | (getfield(i) & 0xF);
+            bigint = bigint << 4;
         }
-        bigint = bigint | getfield(startidx + 7);
+        bigint = bigint | (getfield(endidx - 1) & 0xF);
     }
 
 /*
