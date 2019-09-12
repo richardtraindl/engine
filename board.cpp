@@ -654,7 +654,7 @@
         }
     }
    
-    bool cBoard::debug_compare(cBoard &board2){
+    bool cBoard::compare(cBoard &board2){
         for(int i = 0; i < 64; ++i){
             if(fields[i] != board2.fields[i]){
                 return false;
