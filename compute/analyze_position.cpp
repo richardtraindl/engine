@@ -154,41 +154,6 @@
     }
 
 
-/* def score_penalty_for_multiple_moves(cMatch &match):
-    value = 0
-    white_moves = []
-    black_moves = []
-    for i in range(2):
-        for move in match.minutes:
-            if(move.captpiece):
-                continue
-            if(move.count % 2 == 1):
-                white_moves.append(move)
-            else:
-                black_moves.append(move)
-    for i in range(2):
-        if(i == 0):
-            moves = white_moves
-            rate =  ATTACKED_SCORES[mWRK]
-        else:
-            moves = black_moves
-            rate =  ATTACKED_SCORES[mBRK]
-        idx = 0
-        for move in moves:
-            idx += 1
-            mvtcnt = 0
-            if(idx == len(moves)):
-                break
-            lower_move = move
-            for higher_move in moves[idx:]:
-                if(lower_move.dst == higher_move.src):
-                    lower_move = higher_move
-                    mvtcnt += 1
-            if(mvtcnt >= 2):
-                value += rate
-    return value */
-
-
     int score_penalty_for_knight_bishop_on_baseline(cMatch &match){
         int score = 0;
         int idx;
@@ -243,10 +208,8 @@
 
     int score_opening(cMatch &match){
         int score = 0;
-        // score += score_penalty_for_multiple_moves(match);
         score += score_penalty_for_knight_bishop_on_baseline(match);
         score += score_penalty_for_lost_castlings(match);
-        // score += score_weak_pawns(match);
         score += score_penalty_for_weak_fianchetto(match);
         return score;
     }
@@ -257,7 +220,6 @@
         score += score_penalty_for_knight_bishop_on_baseline(match);
         score += score_controled_horizontal_files(match);
         score += score_controled_vertical_files(match);
-        // score += score_weak_pawns(match)
         return score;
     }
 
