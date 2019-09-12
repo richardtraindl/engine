@@ -60,17 +60,6 @@
                                            0xFFFFFFFFFFFFFFF0 };
 
     cBoard::cBoard(){ 
-        //uint64_t bigfields;
-        //memcpy(&bigfields, fields, 8);
-        //bigfields = BASE1;
-        //memcpy(&bigfields, (fields + 8), 8);
-        //bigfields = BASE2;
-        //bigfields[2] = BLANKS;
-        //bigfields[3] = BLANKS;
-        //bigfields[4] = BLANKS;
-        //bigfields[5] = BLANKS;
-        //bigfields[6] = BASE7;
-        //bigfields[7] = BASE8;*/
         wKg = COLS["E"] + RANKS["1"] * 8;
         bKg = COLS["E"] + RANKS["8"] * 8;
         wKg_first_move_on = -1;
@@ -112,45 +101,10 @@
     int cBoard::getfield(int idx){
         return (int)fields[idx] & 0xFF;
     }
-    /*int cBoard::getfield(int idx){
-        if(idx < 0 || idx > 63){
-            cout << "getfield: " << idx;
-        }
-        int piece = 0;
-        int rank = idx >> 4;
-        int index = idx & 0xF;
-        uint64_t testmask = BITPOSMASK[index];
-        uint64_t writemask = 0x1;
-        for(int i = 0; i < 4; ++i){
-            if(fields[rank] & testmask){
-                piece = piece | writemask;
-            }
-            testmask = testmask << 1;
-            writemask = writemask << 1;
-        }
-        return piece;
-    }*/
+
     void cBoard::setfield(int idx, int value){
         fields[idx] = (uint8_t)value;
     }
-    /*void cBoard::setfield(int idx, int value){
-        if(idx < 0 || idx > 63){
-            cout << "setfield: " << idx;
-        }
-        int rank = idx >> 4;
-        int index = idx & 0xF;
-        uint64_t writemask = BITPOSMASK[index];
-        uint64_t testmask = 0x1;
-        uint64_t result = 0;
-        for(int i = 0; i < 4; ++i){
-            if(value & testmask){
-                result = result | writemask;
-            }
-            testmask = testmask << 1;
-            writemask = writemask << 1;
-        }
-        fields[rank] = (fields[rank] & NEGMASK[index]) | result;
-    }*/
 
     bool cBoard::verify(){
         int wKg_cnt = 0;
@@ -679,53 +633,3 @@
         }
         bigint = bigint | (getfield(endidx - 1) & 0xF);
     }
-
-/*
-    def set_to_base(self){
-        self.fields = self.BASE
-        self.wKg = self.COLS["E"] + self.RANKS["1"] * 8
-        self.bKg = self.COLS["E"] + self.RANKS["8"] * 8
-        self.wKg_first_move_on = None
-        self.bKg_first_move_on = None
-        self.wRkA_first_move_on = None
-        self.wRkH_first_move_on = None
-        self.bRkA_first_move_on = None
-        self.bRkH_first_move_on = None
-
-    def clear(self){
-        self.fields = 0x0
-        self.wKg = None
-        self.bKg = None
-        self.wKg_first_move_on = None
-        self.bKg_first_move_on = None
-        self.wRkA_first_move_on = None
-        self.wRkH_first_move_on = None
-        self.bRkA_first_move_on = None
-        self.bRkH_first_move_on = None
-
-    
-
-    @classmethod
-    def erase_whites(cls, fields){
-        mask = fields & cls.BITS1000
-        mask = mask | mask >> 1 | mask >> 2 | mask >> 3
-        return fields & mask
-
-    @classmethod
-    def erase_blacks(cls, fields){
-        mask = fields & cls.BITS1000
-        mask = (mask | mask >> 1 | mask >> 2 | mask >> 3)
-        return fields & (mask ^ cls.FULL)
-
-    @classmethod
-    def mask_pieces(cls, fields, piece){
-        negative = fields ^ PIECES_MASK[piece]
-        negative = negative | ((negative & cls.BITS1110) >> 1)
-        negative = negative | ((negative & cls.BITS1100) >> 2)
-        negative = negative | ((negative & cls.BITS0111) << 1)
-        negative = negative | ((negative & cls.BITS0011) << 2)
-        return fields & (negative ^ cls.FULL)
-
-# class end
-
-*/
