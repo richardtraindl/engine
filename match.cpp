@@ -17,11 +17,7 @@
         created_at = time(0);
         score = match.score;
         level = match.level;
-
-        //board.fields[0] = match.board.fields[0];
-        //board.fields[1] = match.board.fields[1];
-        //board.fields[2] = match.board.fields[2];
-        //board.fields[3] = match.board.fields[3];
+        //board - copy cunstructor of board?
         board.wKg = match.board.wKg;
         board.bKg = match.board.bKg;
         board.wKg_first_move_on = match.board.wKg_first_move_on;
@@ -161,7 +157,7 @@
                 continue;
             }
             rulecnt++;
-            if(rulecnt > 100){
+            if(rulecnt >= 100){
                 return true;
             }
         }
@@ -169,22 +165,15 @@
     }
 
     bool cMatch::is_three_times_rep(){
-        return false;
-        /*int count = 0;
         int equalcnt = 1;
-        for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
-            if(*(it->prevfields) == board.fields[0] &&
-               *(it->prevfields + 1) == board.fields[1] &&
-               *(it->prevfields + 2) == board.fields[2] &&
-               *(it->prevfields + 3) == board.fields[3]){
+        cMatch newmatch = *this;
+        for(int cnt = 0; (cnt < newmatch.minutes.size() || cnt <= 8); ++cnt){
+            newmatch.undo_move();
+            if(match.board.compare(newmatch.board)){
                 equalcnt++;
             }
-            count++;
-            if(count > 8){
-                break;
-            }
         }
-        return equalcnt >= 3;*/
+        return equalcnt >= 3;
     }
 
     cMove *cMatch::do_move(int src, int dst, int prompiece){
