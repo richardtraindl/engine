@@ -627,9 +627,10 @@
     void cBoard::cpyfields_to_bigint(int startidx, int count, uint64_t &bigint){
         bigint = 0;
         int endidx = startidx + count;
-        for(int i = startidx; i < endidx - 1; ++i){
+        for(int i = startidx; i < endidx; ++i){
             bigint = bigint | (getfield(i) & 0xF);
-            bigint = bigint << 4;
+            if(i < endidx - 1){
+                bigint = bigint << 4;
+            }
         }
-        bigint = bigint | (getfield(endidx - 1) & 0xF);
     }

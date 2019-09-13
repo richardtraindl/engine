@@ -167,9 +167,9 @@
     bool cMatch::is_three_times_rep(){
         int equalcnt = 1;
         cMatch newmatch = *this;
-        for(int cnt = 0; (cnt < newmatch.minutes.size() || cnt <= 8); ++cnt){
+        for(int cnt = 0; (cnt < (int)newmatch.minutes.size() || cnt <= 8); ++cnt){
             newmatch.undo_move();
-            if(match.board.compare(newmatch.board)){
+            if(board.compare(newmatch.board)){
                 equalcnt++;
             }
         }

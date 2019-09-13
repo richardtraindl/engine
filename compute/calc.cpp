@@ -12,7 +12,7 @@
 
     cSearchLimits::cSearchLimits(int level, bool is_endgame){
         if(level == cMatch::LEVELS["blitz"]){
-            dpth_stage1 = 1;
+            dpth_stage1 = 3;
             if(is_endgame){
                 dpth_stage2 = 5;
                 //dpth_max = 9;
@@ -221,8 +221,6 @@
             return 0;
         }
         if(depth <= slimits.dpth_stage1 && last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["attacks-king"])){
-        //if(depth <= slimits.dpth_stage1 && priomoves.front()->has_domain(cTactic::DOMAINS["defends-check"])){
-            cout << "movecnt defends-check: " << priomoves.size() << endl;
             return priomoves.size();
         }
         
