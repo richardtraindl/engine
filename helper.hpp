@@ -12,4 +12,6 @@
     string index_to_coord(int idx);
 
     string reverse_lookup(const map<string, int>& dict, int value);
+
+    void prnt_fmttime(string msg, int seconds);
 #endif

@@ -14,14 +14,14 @@
         if(level == cMatch::LEVELS["blitz"]){
             dpth_stage1 = 3;
             if(is_endgame){
-                dpth_stage2 = 5;
+                dpth_stage2 = 4;
                 //dpth_max = 9;
             }
             else{
-                dpth_stage2 = 3;
+                dpth_stage2 = 5;
                 //dpth_max = 7;
             }
-            dpth_max = 9;
+            dpth_max = 20;
             mvcnt_stage1 = 8;
             mvcnt_stage2 = 6;
             return;
@@ -94,16 +94,6 @@
     }
 
 
-    void prnt_fmttime(string msg, int seconds){
-        int sec, minute, hour;
-        hour = seconds / (60 * 60);
-        int remaining = seconds % (60 * 60);
-        minute = remaining / 60;
-        sec = remaining % 60;
-        cout << msg << hour << minute << sec << endl;
-    }
-
-
     void generate_moves(cMatch &match, list<cMove *> &moves){
         int color = match.next_color();
         for(int idx = 0; idx < 64; ++idx){
@@ -165,58 +155,63 @@
     //}
 
 
-    bool resort_exchange_moves(list<cPrioMove *> &priomoves, int new_prio, cPrioMove *last_pmove, bool with_stormy){
-        if(with_stormy == false && 
-           (last_pmove == NULL || (last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["captures"]) == false))){
-            return false;
-        }
-        list<cPrioMove *> goodes;
+    void resort_exchange_and_stormy_moves(list<cPrioMove *> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange, list<cPrioMove*> &exchanges, list<cPrioMove*> &stormies){
         cPrioMove *first_silent = NULL;
         cPrioMove *first_bad_capture = NULL;
         for(cPrioMove *priomove : priomoves){
-            if(with_stormy && priomove->is_tactic_stormy()){
-                goodes.push_back(priomove);
-                continue;
-            }
             if(priomove->has_domain(cTactic::DOMAINS["captures"])){
-                if(priomove->fetch_weight(cTactic::DOMAINS["captures"]) == cTactic::WEIGHTS["bad-deal"]){
+                if(priomove->fetch_weight(cTactic::DOMAINS["captures"]) == cTactic::WEIGHTS["bad-deal"] ||
+                   priomove->fetch_weight(cTactic::DOMAINS["captures"]) == cTactic::WEIGHTS["vague-deal"]){
                     if(first_bad_capture == NULL){
                         first_bad_capture = priomove;
                     }
                 }
                 else{
-                    goodes.push_back(priomove);
+                    priomove->prio = min(priomove->prio, (new_prio + priomove->prio % 10) - 20);
+                    exchanges.push_back(priomove);
                 }
+                continue;
             }
-            else{
-                if(first_silent == NULL){
-                    first_silent = priomove;
+            if(priomove->has_weight(cTactic::WEIGHTS["stormy"])){
+                if(only_exchange){
+                    priomove->prio = min(priomove->prio, (new_prio + priomove->prio % 2) - 20);
                 }
+                else{
+                    priomove->prio = min(priomove->prio, (new_prio + priomove->prio % 10) - 20);
+                }
+                stormies.push_back(priomove);
+                continue;
+            }
+            if(first_silent == NULL){
+                first_silent = priomove;
+                continue;
             }
         }
-        if(goodes.size() > 0){
-            for(cPrioMove *priomove : goodes){
-                priomove->prio = min(priomove->prio, (new_prio + priomove->prio % 10) - 20);
-            }
+
+        if(exchanges.size() > 0){
             priomoves.sort(sortByPrio);
-            return true;
+            return;
         }
-        if(last_pmove != NULL && last_pmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["bad-deal"])){
+        if(last_pmove != NULL && 
+           (last_pmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["vague-deal"]) ||
+            last_pmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["bad-deal"]))){
             if(first_bad_capture != NULL){
                 first_bad_capture->prio = min(first_bad_capture->prio, (new_prio + first_bad_capture->prio % 10) - 20);
-                if(first_silent != NULL){
+                exchanges.push_back(first_bad_capture);
+                if(first_silent != NULL && stormies.size() == 0){
                     first_silent->prio = min(first_silent->prio, (new_prio + first_silent->prio % 10) - 10);
+                    stormies.push_back(first_silent);
                 }
-                priomoves.sort(sortByPrio);
-                return true;
             }
         }
-        return false;
+        priomoves.sort(sortByPrio);
+        return;
     }
 
 
     int select_movecnt(cMatch &match, list<cPrioMove *> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove){
         int count;
+        list<cPrioMove*> exchanges, stormies;
         if(priomoves.size() == 0 || depth > slimits.dpth_max){
             return 0;
         }
@@ -225,26 +220,17 @@
         }
         
         if(depth <= slimits.dpth_stage1){
-            resort_exchange_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, true);
-            //int stormycnt = count_up_within_stormy(priomoves);
-            count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
-            if(count == 0){
-                count = slimits.mvcnt_stage1;
-            }
-            else{
-                count = min(count, slimits.mvcnt_stage1);
-            }
-            return count; //max(stormycnt, count);
+            resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false, exchanges, stormies);
+            return max(slimits.mvcnt_stage1, (int)(exchanges.size() + stormies.size())); // min(slimits.mvcnt_stage1, resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, true));
         }
         if(depth <= slimits.dpth_stage2){
-            resort_exchange_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, true);
-            //int stormycnt = count_up_within_stormy(priomoves);
-            count = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio2"]);
-            return count; //max(stormycnt, count);
+            resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false, exchanges, stormies);
+            return max(slimits.mvcnt_stage2, (int)(exchanges.size() + stormies.size()));
         }
         else{
-            if(resort_exchange_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, false)){
-                return count_up_to_prio(priomoves, cPrioMove::PRIOS["prio0"]);
+            if(last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["captures"])){
+                resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true, exchanges, stormies);
+                return min(2, (int)(exchanges.size() + 1));
             }
             else{
                 return 0;

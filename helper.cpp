@@ -1,5 +1,7 @@
 
     #include <sstream>
+    #include <iostream>
+    #include <iomanip>
     #include "./helper.hpp"
 
 
@@ -32,4 +34,15 @@
         }
         return "";
   }
+
+    void prnt_fmttime(string msg, int seconds){
+        int sec, minute, hour;
+        hour = seconds / (60 * 60);
+        int remaining = seconds % (60 * 60);
+        minute = remaining / 60;
+        sec = remaining % 60;
+        cout << msg << setw(2) << setfill('0') << hour << ":";
+        cout << setw(2) << setfill('0') <<  minute << ":";
+        cout << setw(2) << setfill('0') << sec << endl;
+    }
 

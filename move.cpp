@@ -81,11 +81,11 @@
             {"stormy",                  1},
             {"better-deal",             2},
             {"good-deal",               3},
-            {"vague-deal",              4},
+            {"upgraded",                4},
             {"downgraded",              5},
-            {"upgraded",                6},
-            {"bad-deal",                7},
-            {"undef",                   8}
+            {"vague-deal",              6},
+            {"undef",                   7},
+            {"bad-deal",                8}
         };
 
         map<int, int> cTactic::DOMAINS_TO_PRIOS = {

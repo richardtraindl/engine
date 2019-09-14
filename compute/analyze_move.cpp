@@ -45,7 +45,14 @@
 
 
         if(promotes(priomove)){
-            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["promotes"], standard_weight, PIECES_RANKS[piece]));
+            int promote_weight;
+            if(analyzedst.is_field_ok){
+                promote_weight = cTactic::WEIGHTS["stormy"];
+            }
+            else{
+                promote_weight = standard_weight;
+            }
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["promotes"], promote_weight, PIECES_RANKS[piece]));
         }
 
 
