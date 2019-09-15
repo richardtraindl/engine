@@ -481,3 +481,8 @@
         return diff2 < diff1;
     }
 
+
+    bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove){
+        return false;
+    }
+

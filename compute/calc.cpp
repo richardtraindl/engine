@@ -14,7 +14,7 @@
         if(level == cMatch::LEVELS["blitz"]){
             dpth_stage1 = 3;
             if(is_endgame){
-                dpth_stage2 = 4;
+                dpth_stage2 = 5;
                 //dpth_max = 9;
             }
             else{
@@ -33,25 +33,25 @@
                 //dpth_max = 11;
             }
             else{
-                dpth_stage2 = 5;
+                dpth_stage2 = 7;
                 //dpth_max = 9;
             }
-            dpth_max = 9;
+            dpth_max = 20;
             mvcnt_stage1 = 10;
             mvcnt_stage2 = 6;
             return;
         }
         //medium high
-        dpth_stage1 = 3;
+        dpth_stage1 = 5;
         if(is_endgame){
             dpth_stage2 = 7;
             //dpth_max = 13;
         }
         else{
-            dpth_stage2 = 5;
+            dpth_stage2 = 7;
             //dpth_max = 11;
         }
-        dpth_max = 11;
+        dpth_max = 20;
         mvcnt_stage1 = 12;
         mvcnt_stage2 = 6;
     }
@@ -285,7 +285,7 @@
             newcandidates.clear();
 
             if(depth == 1){
-                cout << "\nCURRENT SEARCH: " << " [" + priomove->format() + "] " << concat_fmtmoves(newcandidates) << endl;
+                cout << "\n" << count << "/" << maxcnt << " CURRENT SEARCH: " << " [" + priomove->format() + "] " << concat_fmtmoves(newcandidates) << endl;
             }
             if(depth > slimits.mvcnt_stage2){
                 cout << depth << ".";
@@ -435,7 +435,7 @@
         int alpha = SCORES[mWKG] * 10;
         int beta = SCORES[mBKG] * 10;
         int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, NULL, rcandidates);
-        cout << "result: " << rscore << " match: " << match.created_at << " " << endl;
+        cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
         cout << concat_fmtmoves(rcandidates) << endl;
         prnt_fmttime("\ncalc-time: ", time(0) - time_start);
         return rscore;

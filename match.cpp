@@ -138,6 +138,9 @@
 
     // 100 Züge davor kein Bauernzug und keine Figur geschlagen
     bool cMatch::is_fifty_moves_rule(){
+        if(minutes.size() < 100){
+            return false;
+        }
         int rulecnt = 0;
         int cnt = 0;
         cMatch newmatch = *this;
@@ -167,7 +170,7 @@
     bool cMatch::is_three_times_rep(){
         int equalcnt = 1;
         cMatch newmatch = *this;
-        for(int cnt = 0; (cnt < (int)newmatch.minutes.size() || cnt <= 8); ++cnt){
+        for(int cnt = 0; (cnt < (int)newmatch.minutes.size() && cnt <= 8); ++cnt){
             newmatch.undo_move();
             if(board.compare(newmatch.board)){
                 equalcnt++;
@@ -189,7 +192,6 @@
             move = minutes.back();
         }
         else{
-            cout << "return " << endl;
             return false;
         }
         cPiece cpiece(board, move.dst);
