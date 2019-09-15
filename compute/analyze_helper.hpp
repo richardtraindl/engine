@@ -70,4 +70,5 @@
 
     int weight_for_attack(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, cAnalyzeField &analyzedst);
 
+    int weight_for_attack_on_king(cMatch &match, int piece, cPrioMove &priomove, cAnalyzeField &analyzedst);
 #endif

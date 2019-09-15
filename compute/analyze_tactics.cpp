@@ -273,8 +273,9 @@
 
     void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &attacked, cAnalyzeField &analyzedst, list<cExclude*> &excludes){
         for(cTouch touch : attacked){
-            int weight = weight_for_attack(match, piece, priomove, touch, analyzedst);
+            
             if(touch.piece == mWKG || touch.piece == mBKG){
+                int weight = weight_for_attack_on_king(match, piece, priomove, analyzedst);
                 priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["attacks-king"], weight, PIECES_RANKS[piece]));
                 if(find_excluded(excludes, priomove.src, touch.pos, DIRS["undef"], cTactic::DOMAINS["attacks-king"])){
                     priomove.downgrade(cTactic::DOMAINS["attacks-king"]);
@@ -284,6 +285,7 @@
                 }
             }
             else{
+                int weight = weight_for_attack(match, piece, priomove, touch, analyzedst);
                 priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["attacks"], weight, PIECES_RANKS[piece]));
                 if(find_excluded(excludes, priomove.src, touch.pos, DIRS["undef"], cTactic::DOMAINS["attacks"])){
                     priomove.downgrade(cTactic::DOMAINS["attacks"]);
@@ -482,7 +484,18 @@
     }
 
 
-    bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove){
+    /*bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove){
+        int pawnpos = find_closest_running_pawn(
         return false;
     }
+    
+    int find_closest_running_pawn(
+        const uint64_t NEGMASKWPW = 0xE0000000E0000000;
+        const uint64_t NEGMASKBPW = 0x6000000060000000;
+        const uint64_t cBrick::BITS1111 = 0xFFFFFFFFFFFFFFFF;
+        const uint64_t cBrick::BITS1000 = 0x8888888888888888;
+    cPiece cpiece(match.board, supported.pos);
+        return cpiece.is_running_pawn();*/
+    
+    
 

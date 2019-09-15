@@ -67,5 +67,5 @@
 
     bool is_approach_to_opp_king(cMatch &match, int piece, cPrioMove &priomove);
 
-    bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove);
+    //bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove);
 #endif

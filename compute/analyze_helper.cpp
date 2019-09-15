@@ -275,3 +275,22 @@
         }
         return cTactic::WEIGHTS["bad-deal"];
     }
+
+
+    int weight_for_attack_on_king(cMatch &match, int piece, cPrioMove &priomove, cAnalyzeField &analyzedst){
+        if(piece != mWKG && piece != mBKG){
+            return cTactic::WEIGHTS["undef"];
+        }
+        cPiece cking(match.board, priomove.src);
+        if(analyzedst.is_field_ok){
+            if(cking.is_king_safe() == false){
+                return cTactic::WEIGHTS["stormy"];
+            }
+            else{
+                return cTactic::WEIGHTS["good-deal"];
+            }
+        }
+        else{
+            return cTactic::WEIGHTS["bad-deal"];
+        }
+    }
