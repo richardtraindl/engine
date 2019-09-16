@@ -189,8 +189,13 @@
         */
 
 
-        if(match.is_endgame() && is_approach_to_opp_king(match, piece, priomove)){
-            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["approach-opp-king"], standard_weight, PIECES_RANKS[piece]));
+        if(match.is_endgame()){
+            if(is_approach_to_opp_king(match, piece, priomove)){
+                priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["approach-opp-king"], standard_weight, PIECES_RANKS[piece]));
+            }
+            if(leads_pawn_to_promotion(match, piece, priomove)){
+                priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["guards-pawn-to-promotion"], standard_weight, PIECES_RANKS[piece]));
+            }
         }
 
 

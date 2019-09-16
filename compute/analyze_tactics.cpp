@@ -7,6 +7,13 @@
     #include "../values.hpp"
 
 
+    cAnalyzedPawn::cAnalyzedPawn(int newpiece, int newpos, bool newisrunning, int newprio){
+            piece = newpiece;
+            pos = newpos;
+            isrunning = newisrunning;
+            prio = newprio;
+    }
+
     // ToDo new!!!
     void _search_all_pindirs(cMatch &match, int color, int pos, int excl_pos, list<int*> &pindirs){
         int dirs[8] = {8, -8, 1, -1, 9, -9, 7, -7};
@@ -484,18 +491,67 @@
     }
 
 
-    /*bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove){
-        int pawnpos = find_closest_running_pawn(
+    bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove){
+        if(piece != PIECES["wKg"] && piece != PIECES["bKg"]){
+            return false;
+        }
+        list<cAnalyzedPawn> pawns;
+        find_pawns(match, piece, pawns);
+        for(cAnalyzedPawn pawn : pawns){
+            if(pawn.isrunning){
+                int diff_before = abs(pawn.pos / 8 - priomove.src / 8);
+                int diff_after = abs(pawn.pos / 8 - priomove.dst / 8);
+                if(PIECES_COLORS[piece] == COLORS["white"]){
+                    if(priomove.dst / 8 < pawn.pos / 8){
+                        if(diff_after < diff_before){
+                            return true;
+                        }
+                    }
+                    else{
+                        if(diff_after <= diff_before + 1){
+                            return true;
+                        }
+                    }
+                }
+                else{
+                    if(priomove.dst / 8 > pawn.pos / 8){
+                        if(diff_after < diff_before){
+                            return true;
+                        }
+                    }
+                    else{
+                        if(diff_after <= diff_before - 1){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
-    
-    int find_closest_running_pawn(
-        const uint64_t NEGMASKWPW = 0xE0000000E0000000;
-        const uint64_t NEGMASKBPW = 0x6000000060000000;
-        const uint64_t cBrick::BITS1111 = 0xFFFFFFFFFFFFFFFF;
-        const uint64_t cBrick::BITS1000 = 0x8888888888888888;
-    cPiece cpiece(match.board, supported.pos);
-        return cpiece.is_running_pawn();*/
-    
-    
 
+
+    void find_pawns(cMatch &match, int piece, list<cAnalyzedPawn> &pawns){
+        int target;
+        if(PIECES_COLORS[piece] == COLORS["white"]){
+            target = mWPW;
+        }
+        else{
+            target = mBPW;
+        }
+        for(int idx = 0; idx < 64; ++idx){
+            int newpiece = match.board.getfield(idx);
+            if(newpiece == target){
+                cPiece cpiece(match.board, idx);
+                if(cpiece.is_running_pawn()){
+                    pawns.push_back(cAnalyzedPawn(newpiece, idx, true, 0));
+                }
+                else{
+                    pawns.push_back(cAnalyzedPawn(newpiece, idx, false, 0));
+                }
+            }
+        }
+    }
+
+                
+                

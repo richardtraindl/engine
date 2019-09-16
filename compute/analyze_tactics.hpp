@@ -9,12 +9,13 @@
 
     using namespace std;
 
-    class cDirTouch{
+    class cAnalyzedPawn{
         public:
             int piece;
             int pos;
-            int dir;
-            cDirTouch(int piece, int pos, int dir);
+            bool isrunning;
+            int prio;
+            cAnalyzedPawn(int piece, int pos, bool isrunning, int prio);
     };
 
     void _search_all_pindirs(cMatch &match, int color, int pos, int excl_pos, list<int*> &pindirs);
@@ -67,5 +68,8 @@
 
     bool is_approach_to_opp_king(cMatch &match, int piece, cPrioMove &priomove);
 
-    //bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove);
+    bool leads_pawn_to_promotion(cMatch &match, int piece, cPrioMove &priomove);
+
+    void find_pawns(cMatch &match, int piece, list<cAnalyzedPawn> &pawns);
+
 #endif
