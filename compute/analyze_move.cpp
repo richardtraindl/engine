@@ -27,6 +27,8 @@
 
         int standard_weight = weight_for_standard(match, piece, priomove, analyzedst);
 
+        bool is_endgame = match.is_endgame();
+
 
         if(defends_check(match)){
             priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["defends-check"], standard_weight, PIECES_RANKS[piece]));
@@ -169,17 +171,6 @@
         }
 
 
-        if(running_pawn(match, priomove)){
-            int addition;
-            if(PIECES_COLORS[piece] == COLORS["white"]){
-                addition = priomove.dst;
-            }
-            else{
-                addition = 8 - priomove.dst;
-            }
-            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["is-running-pawn"], standard_weight, addition));
-        }
-
         /*
         if(controles_file(match, move)):
             priomove.tactics.append(cTactic(cTactic.DOMAINS["controles-file"], weight))
@@ -189,13 +180,37 @@
         */
 
 
-        if(match.is_endgame()){
-            if(is_approach_to_opp_king(match, piece, priomove)){
-                priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["approach-opp-king"], standard_weight, PIECES_RANKS[piece]));
+        if(running_pawn(match, priomove)){
+            int running_weight = max(standard_weight, cTactic::WEIGHTS["undef"]);
+            int running_addition = 0;
+            if(is_endgame){
+                if(PIECES_COLORS[piece] == COLORS["white"]){
+                    running_addition = priomove.dst;
+                }
+                else{
+                    running_addition = 8 - priomove.dst;
+                }
+                running_weight = standard_weight;
             }
-            if(leads_pawn_to_promotion(match, piece, priomove)){
-                priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["guards-pawn-to-promotion"], standard_weight, PIECES_RANKS[piece]));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["is-running-pawn"], running_weight, running_addition));
+        }
+
+
+        if(is_approach_to_opp_king(match, piece, priomove)){
+            int approach_weight = max(standard_weight, cTactic::WEIGHTS["undef"]);
+            if(is_endgame){
+                 approach_weight = standard_weight;
             }
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["approach-opp-king"], approach_weight, PIECES_RANKS[piece]));
+        }
+
+
+        if(leads_pawn_to_promotion(match, piece, priomove)){
+            int leading_weight = max(standard_weight, cTactic::WEIGHTS["undef"]);
+            if(is_endgame){
+                 leading_weight = standard_weight;
+            }
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["guards-pawn-to-promotion"], leading_weight, PIECES_RANKS[piece]));
         }
 
 
