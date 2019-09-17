@@ -60,7 +60,7 @@
 
         if(captures(match, priomove)){
             int capture_weight = weight_for_capture(match, piece, dstpiece, priomove, analyzedst);
-            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["captures"], capture_weight, PIECES_RANKS[piece]));
+            priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["captures"], capture_weight, PIECES_RANKS[dstpiece]));
         }
         if(captures_enpassant(match, piece, priomove)){
             priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["good-deal"], PIECES_RANKS[piece]));
