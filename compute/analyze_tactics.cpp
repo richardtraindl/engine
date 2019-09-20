@@ -340,7 +340,7 @@
 
 
     void find_disclosures(cMatch &match, int piece, cPrioMove &priomove, list<cTouch> &discl_supported, list<cTouch> &discl_attacked){
-        int mvdir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
+        //int mvdir = cPiece::dir_for_move(piece, priomove.src, priomove.dst);
         int STEPS[4] = {8, 1, 9, 7};
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
         for(auto &step : STEPS){

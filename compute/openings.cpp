@@ -1,248 +1,265 @@
 
-import random
-
-from ..match import *
-from ..board import cBoard
-from ..move import *
-from ..helper import coord_to_index
-
-
-class cOpenings:
-    MAXDEPTH = 4
-    def __init__(self):
-        self.stages =  [[],[],[],[]]
-
-    def add_node(self, node, depth):
-        if(depth >= 0 and depth < self.MAXDEPTH):
-            self.stages[depth].append(node)
-# class end
+    #include "./openings.hpp"
+    #include "../helper.hpp"
+    #include <iostream>
+    #include <algorithm>
+    #include <iterator>
 
 
-class cNode:
-    def __init__(self, fields, candidates):
-        self.fields = fields
-        self.candidates = candidates
-# class end
+    cNode::cNode(uint64_t newfields[4], vector<string> &newcandidates){
+        for(int idx = 0; idx < 4; ++idx){
+            fields[idx] = newfields[idx];
+        }
+        for(int i = 0; i < newcandidates.size(); i++){
+            candidates.push_back(newcandidates[i]); 
+        }
+    }
+
+    cOpenings::cOpenings(){
+    }
 
 
-def populate_openings():
-    openings = cOpenings()
-
-    #################
-    node = cNode(cBoard.BASE, \
-                 ["e2-e4", "d2-d4", "c2-c4", "g1-f3", "g2-g3", "d2-d3"])
-    openings.add_node(node, 0)
-
-    #################
-    #e2-e4
-    node = cNode(0X42356324111101110000000000001000000000000000000099999999CABDEBAC, \
-                 ["e7-e5","c7-c5","e7-e6","g8-f6","g7-g6"])
-    openings.add_node(node, 1)
-
-    #d2-d4
-    node = cNode(0X42356324111011110000000000010000000000000000000099999999CABDEBAC, \
-                 ["d7-d5","f7-f5","g8-f6","g7-g6","e7-e6"])
-    openings.add_node(node, 1)
-
-    #c2-c4
-    node = cNode(0X42356324110111110000000000100000000000000000000099999999CABDEBAC, \
-                 ["e7-e5","c7-c5","b8-c6","g8-f6","g7-g6"])
-    openings.add_node(node, 1)
-
-    #g1-f3
-    node = cNode(0X42356304111111110000020000000000000000000000000099999999CABDEBAC, \
-                 ["d7-d5","g8-f6","g7-g6","c7-c5","b8-c6"])
-    openings.add_node(node, 1)
-
-    #g2-g3
-    node = cNode(0X42356324111111010000001000000000000000000000000099999999CABDEBAC, \
-                 ["e7-e5","d7-d5","c7-c5","g8-f6","g7-g6"])
-    openings.add_node(node, 1)
-
-    #d2-d3
-    node = cNode(0X42356324111011110001000000000000000000000000000099999999CABDEBAC, \
-                 ["e7-e5","d7-d5","c7-c5","g8-f6","g7-g6"])
-    openings.add_node(node, 1)
-    #################
-
-    #################
-    #e2-e4, e7-e5
-    node = cNode(0X42356324111101110000000000001000000090000000000099990999CABDEBAC, \
-                 ["g1-f3", "b1-c3", "f1-c4"])
-    openings.add_node(node, 2)
-
-    #e2-e4, c7-c5
-    node = cNode(0X42356324111101110000000000001000009000000000000099099999CABDEBAC, \
-                 ["g1-f3", "d2-d4", "f1-c4", "b1-c3"])
-    openings.add_node(node, 2)
-    
-    #e2-e4, e7-e6
-    node = cNode(0X42356324111101110000000000001000000000000000900099990999CABDEBAC, \
-                 ["d2-d4", "g1-f3", "b1-c3"])
-    openings.add_node(node, 2)
- 
-    #"e2-e4, d7-d6
-    node = cNode(0X42356324111101110000000000001000000000000009000099909999CABDEBAC, \
-                 ["d2-d4", "g1-f3", "f1-c4", "b1-c3"])
-    openings.add_node(node, 2)
-    
-    #d2-d4, d7-d5
-    node = cNode(0X42356324111011110000000000010000000900000000000099909999CABDEBAC, \
-                 ["c2-c4", "g1-f3", "c1-f4"])
-    openings.add_node(node, 2)
-
-    #d2-d4, f7-f5
-    node = cNode(0X42356324111011110000000000010000000009000000000099999099CABDEBAC, \
-                 ["c2-c4", "g1-f3", "g2-g3", "e2-e4"])
-    openings.add_node(node, 2)
-
-    #d2-d4, d7-d6
-    node = cNode(0X42356324111011110000000000010000000000000009000099909999CABDEBAC, \
-                 ["e2-e4", "c2-c4", "g1-f3", "c1-f4"])
-    openings.add_node(node, 2)
-
-    #d2-d4, e7-e6
-    node = cNode(0X42356324111011110000000000010000000000000000900099990999CABDEBAC, \
-                 ["e2-e4", "c2-c4", "g1-f3", "c1-f4"])
-    openings.add_node(node, 2)
-
-    #d2-d4, g8-f6
-    node = cNode(0X423563241110111100000000000100000000000000000A0099999999CABDEB0C, \
-                 ["c2-c4", "g1-f3", "c1-f4"])
-    openings.add_node(node, 2)
-
-    #c2-c4, e7-e5
-    node = cNode(0X42356324110111110000000000100000000090000000000099990999CABDEBAC, \
-                 ["b1-c3", "d2-d3", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #c2-c4, c7-c5
-    node = cNode(0X42356324110111110000000000100000009000000000000099099999CABDEBAC, \
-                 ["b1-c3", "g1-f3", "g2-g3", "e2-e3"])
-    openings.add_node(node, 2)
-
-    #c2-c4, g8-f6
-    node = cNode(0X423563241101111100000000001000000000000000000A0099999999CABDEB0C, \
-                 ["d2-d4", "b1-c3", "g1-f3", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #c2-c4, d7-d6
-    node = cNode(0X42356324110111110000000000100000000000000009000099909999CABDEBAC, \
-                 ["d2-d4", "b1-c3", "g1-f3", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #c2-c4, g7-g6
-    node = cNode(0X42356324110111110000000000100000000000000000009099999909CABDEBAC, \
-                 ["d2-d4", "g1-f3", "b1-c3", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #g1-f3, d7-d5
-    node = cNode(0X42356304111111110000020000000000000900000000000099909999CABDEBAC, \
-                 ["d2-d4", "d2-d3", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #g1-f3, c7-c5
-    node = cNode(0X42356304111111110000020000000000009000000000000099099999CABDEBAC, \
-                 ["e2-e4", "c2-c4", "g2-g3", "d2-d4"])
-    openings.add_node(node, 2)
-
-    #g1-f3, g8-f6
-    node = cNode(0X423563041111111100000200000000000000000000000A0099999999CABDEB0C, \
-                 ["d2-d4", "c2-c4", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #g1-f3, d7-d6
-    node = cNode(0X42356304111111110000020000000000000000000009000099909999CABDEBAC, \
-                 ["e2-e4", "d2-d4", "c2-c4", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #g1-f3, e7-e6
-    node = cNode(0X42356304111111110000020000000000000000000000900099990999CABDEBAC, \
-                 ["e2-e4", "d2-d4", "c2-c4", "g2-g3"])
-    openings.add_node(node, 2)
-
-    #g2-g3, g7-g6
-    node = cNode(0X42356324111111010000001000000000000000000000009099999909CABDEBAC, ["f1-g2"])
-    openings.add_node(node, 2)
-
-    #g2-g3, e7-e5
-    node = cNode(0X42356324111111010000001000000000000090000000000099990999CABDEBAC, ["f1-g2"])
-    openings.add_node(node, 2)
-
-    #g2-g3, d7-d5
-    node = cNode(0X42356324111111010000001000000000000900000000000099909999CABDEBAC, ["f1-g2"])
-    openings.add_node(node, 2)
-
-    #g2-g3, c7-c5
-    node = cNode(0X42356324111111010000001000000000009000000000000099099999CABDEBAC, ["f1-g2"])
-    openings.add_node(node, 2)
-
-    #g2-g3, f8-g6
-    node = cNode(0X423563241111110100000010000000000000000000000A0099999999CABDEB0C, ["f1-g2"])
-    openings.add_node(node, 2)
-
-    #d2-d3, e7-e5
-    node = cNode(0X42356324111011110001000000000000000090000000000099990999CABDEBAC, \
-                 ["e2-e4, c2-c4", "g1-f3"])
-    openings.add_node(node, 2)
-
-    #d2-d3, d7-d5
-    node = cNode(0X42356324111011110001000000000000000900000000000099909999CABDEBAC, \
-                 ["g1-f3, g2-g3", "e2-e3"])
-    openings.add_node(node, 2)
-
-    #d2-d3, c7-c5
-    node = cNode(0X42356324111011110001000000000000009000000000000099099999CABDEBAC, \
-                 ["e2-e4", "g1-f3"])
-    openings.add_node(node, 2)
-
-    #d2-d3, g8-f6
-    node = cNode(0X423563241110111100010000000000000000000000000A0099999999CABDEB0C, \
-                 ["e2-e4", "c2-c4", "g1-f3"])
-    openings.add_node(node, 2)
-
-    #d2-d3, g7-g6
-    node = cNode(0X42356324111011110001000000000000000000000000009099999909CABDEBAC, \
-                 ["c2-c4", "e2-e4", "g1-f3"])
-    openings.add_node(node, 2)
-    #################
-
-    #################
-    #d2-d4, f7-f5, e2-e4
-    node = cNode(0X42356324111001110000000000011000000009000000000099999099CABDEBAC, \
-                 ["g8-f6"])
-    openings.add_node(node, 3)
-
-    return openings
+    void cOpenings::add_node(cNode &node, int depth){
+        if(depth >= 0 && depth < cOpenings::MAXDEPTH){
+            stages[depth].push_back(node);
+        }
+    }
 
 
-def retrieve_move(match):
-    candidates = None
-    prevfields = cBoard.BASE
-    if(match.minutes.size() >= cOpenings.MAXDEPTH):
-        print("### openings: depth not supported ###")
-        return candidates
+    cMove *retrieve_move(cMatch &match){
+        vector<string> candidates;
+        if(match.minutes.size() >= cOpenings::MAXDEPTH){
+            cout << "### openings: depth not supported ###" << endl;
+            return NULL;
+        }
 
-    openings = populate_openings()
-    stage = openings.stages[match.minutes.size()]
-    if(match.minutes.size() == 0):
-        if(stage[0].fields == match.board.fields):
-            candidates = stage[0].candidates
-    else:
-        move = match.minutes[-1]
-        for node in stage:
-            if(node.fields == match.board.fields):
-                candidates = node.candidates
-                prevfields = node.fields
-                break
+        cOpenings *openings = populate_openings();
+        vector<cNode> nodes = openings->stages[match.minutes.size()];
+        uint64_t currfields[4];
+        for(int idx = 0; idx < 4; ++idx){
+            match.board.cpyfields_to_bigint((idx * 16), 16, currfields[idx]);
+        }
+        for(cNode node : nodes){                    
+            if(node.fields[0] == currfields[0] &&
+               node.fields[1] == currfields[1] &&
+               node.fields[2] == currfields[2] &&
+               node.fields[3] == currfields[3]){
+                for(int i = 0; i < node.candidates.size(); i++){
+                    candidates.push_back(node.candidates[i]); 
+                }
+                break;
+            }
+        }
+        if(candidates.size() == 0){
+            cout << "### openings: no opening move found ###" << endl;
+            return NULL;
+        }
+        srand(time(0));
+        int idx = (rand() % candidates.size());
+        int src = coord_to_index(candidates[idx].substr(0,2));
+        int dst = coord_to_index(candidates[idx].substr(3,2));
+        int prev_dstpiece = match.board.getfield(dst);
+        return new cMove(src, dst, prev_dstpiece, mBLK);
+    }
 
-    if(candidates is None):
-        print("### openings: no opening move found ###")
-        return candidates
 
-    idx = random.randint(0, len(candidates) - 1)
-    candidate = candidates[idx]
-    src = coord_to_index(candidate[:2])
-    dst = coord_to_index(candidate[3:])
-    return cMove(prevfields, src, dst, PIECES['blk'])
+    cOpenings *populate_openings(){
+        cOpenings *openings = new cOpenings();
+
+        //#################
+        uint64_t base1[] = {{cBoard::BASE1}, {cBoard::BASE2}, {cBoard::BASE3}, {cBoard::BASE4}};
+        vector<string> candidates1 = {{"e2-e4"}, {"d2-d4"}, {"c2-c4"}, {"g1-f3"}, {"g2-g3"}, {"d2-d3"}};
+        cNode node1(base1, candidates1);
+        openings->add_node(node1, 0);
+
+        //e2-e4
+        uint64_t base2[] = {{0X4235632411110111}, {0x0000000000001000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        vector<string> candidates2 = {{"e7-e5"}, {"c7-c5"}, {"e7-e6"}, {"g8-f6"}, {"g7-g6"}};
+        cNode node2(base2, candidates2);
+        openings->add_node(node2, 1);
+
+        //d2-d4
+        uint64_t base3[] = {{0X4235632411101111}, {0x0000000000010000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        vector<string> candidates3 = {{"d7-d5"}, {"f7-f5"}, {"g8-f6"}, {"g7-g6"}, {"e7-e6"}};
+        cNode node3(base3, candidates3);
+        openings->add_node(node3, 1);
+
+        //c2-c4
+        uint64_t base4[] = {{0x4235632411011111}, {0x0000000000100000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        vector<string> candidates4 = {{"e7-e5"}, {"c7-c5"}, {"b8-c6"}, {"g8-f6"}, {"g7-g6"}};
+        cNode node4(base4, candidates4);
+        openings->add_node(node4, 1);
+
+        //g1-f3
+        uint64_t base5[] = {{0X4235630411111111}, {0x0000020000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        vector<string> candidates5 = {{"d7-d5"}, {"g8-f6"}, {"g7-g6"}, {"c7-c5"}, {"b8-c6"}};
+        cNode node5(base5, candidates5);
+        openings->add_node(node5, 1);
+
+        //g2-g3
+        uint64_t base6[] = {{0X4235632411111101}, {0x0000001000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        vector<string> candidates6 = {{"e7-e5"}, {"d7-d5"}, {"c7-c5"}, {"g8-f6"}, {"g7-g6"}};
+        cNode node6(base6, candidates6);
+        openings->add_node(node6, 1);
+
+        //d2-d3
+        uint64_t base7[] = {{0X4235632411101111}, {0x0001000000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        vector<string> candidates7 = {{"e7-e5"}, {"d7-d5"}, {"c7-c5"}, {"g8-f6"}, {"g7-g6"}};
+        cNode node7(base7, candidates7);
+        openings->add_node(node7, 1);
+        //#################
+
+        //#################
+        //e2-e4, e7-e5
+        uint64_t base8[] = {{0X4235632411110111}, {0x0000000000001000}, {0x0000900000000000}, {0x99990999CABDEBAC}};
+        vector<string> candidates8 = {{"g1-f3"}, {"b1-c3"}, {"f1-c4"}};
+        cNode node8(base8, candidates8);
+        openings->add_node(node8, 2);
+
+    /*    
+        //e2-e4, c7-c5
+        node = cNode(0X42356324111101110000000000001000009000000000000099099999CABDEBAC, \
+                     ["g1-f3", "d2-d4", "f1-c4", "b1-c3"])
+        openings.add_node(node, 2)
+        
+        //e2-e4, e7-e6
+        node = cNode(0X42356324111101110000000000001000000000000000900099990999CABDEBAC, \
+                     ["d2-d4", "g1-f3", "b1-c3"])
+        openings.add_node(node, 2)
+     
+        //e2-e4, d7-d6
+        node = cNode(0X42356324111101110000000000001000000000000009000099909999CABDEBAC, \
+                     ["d2-d4", "g1-f3", "f1-c4", "b1-c3"])
+        openings.add_node(node, 2)
+        
+        #d2-d4, d7-d5
+        node = cNode(0X42356324111011110000000000010000000900000000000099909999CABDEBAC, \
+                     ["c2-c4", "g1-f3", "c1-f4"])
+        openings.add_node(node, 2)
+
+        //d2-d4, f7-f5
+        node = cNode(0X42356324111011110000000000010000000009000000000099999099CABDEBAC, \
+                     ["c2-c4", "g1-f3", "g2-g3", "e2-e4"])
+        openings.add_node(node, 2)
+
+        //d2-d4, d7-d6
+        node = cNode(0X42356324111011110000000000010000000000000009000099909999CABDEBAC, \
+                     ["e2-e4", "c2-c4", "g1-f3", "c1-f4"])
+        openings.add_node(node, 2)
+
+        //d2-d4, e7-e6
+        node = cNode(0X42356324111011110000000000010000000000000000900099990999CABDEBAC, \
+                     ["e2-e4", "c2-c4", "g1-f3", "c1-f4"])
+        openings.add_node(node, 2)
+
+        //d2-d4, g8-f6
+        node = cNode(0X423563241110111100000000000100000000000000000A0099999999CABDEB0C, \
+                     ["c2-c4", "g1-f3", "c1-f4"])
+        openings.add_node(node, 2)
+
+        //c2-c4, e7-e5
+        node = cNode(0X42356324110111110000000000100000000090000000000099990999CABDEBAC, \
+                     ["b1-c3", "d2-d3", "g2-g3"])
+        openings.add_node(node, 2)
+
+        #c2-c4, c7-c5
+        node = cNode(0X42356324110111110000000000100000009000000000000099099999CABDEBAC, \
+                     ["b1-c3", "g1-f3", "g2-g3", "e2-e3"])
+        openings.add_node(node, 2)
+
+        //c2-c4, g8-f6
+        node = cNode(0X423563241101111100000000001000000000000000000A0099999999CABDEB0C, \
+                     ["d2-d4", "b1-c3", "g1-f3", "g2-g3"])
+        openings.add_node(node, 2)
+
+        //c2-c4, d7-d6
+        node = cNode(0X42356324110111110000000000100000000000000009000099909999CABDEBAC, \
+                     ["d2-d4", "b1-c3", "g1-f3", "g2-g3"])
+        openings.add_node(node, 2)
+
+        #c2-c4, g7-g6
+        node = cNode(0X42356324110111110000000000100000000000000000009099999909CABDEBAC, \
+                     ["d2-d4", "g1-f3", "b1-c3", "g2-g3"])
+        openings.add_node(node, 2)
+
+        //g1-f3, d7-d5
+        node = cNode(0X42356304111111110000020000000000000900000000000099909999CABDEBAC, \
+                     ["d2-d4", "d2-d3", "g2-g3"])
+        openings.add_node(node, 2)
+
+        //g1-f3, c7-c5
+        node = cNode(0X42356304111111110000020000000000009000000000000099099999CABDEBAC, \
+                     ["e2-e4", "c2-c4", "g2-g3", "d2-d4"])
+        openings.add_node(node, 2)
+
+        #g1-f3, g8-f6
+        node = cNode(0X423563041111111100000200000000000000000000000A0099999999CABDEB0C, \
+                     ["d2-d4", "c2-c4", "g2-g3"])
+        openings.add_node(node, 2)
+
+        //g1-f3, d7-d6
+        node = cNode(0X42356304111111110000020000000000000000000009000099909999CABDEBAC, \
+                     ["e2-e4", "d2-d4", "c2-c4", "g2-g3"])
+        openings.add_node(node, 2)
+
+        //g1-f3, e7-e6
+        node = cNode(0X42356304111111110000020000000000000000000000900099990999CABDEBAC, \
+                     ["e2-e4", "d2-d4", "c2-c4", "g2-g3"])
+        openings.add_node(node, 2)
+
+        //g2-g3, g7-g6
+        node = cNode(0X42356324111111010000001000000000000000000000009099999909CABDEBAC, ["f1-g2"])
+        openings.add_node(node, 2)
+
+        //g2-g3, e7-e5
+        node = cNode(0X42356324111111010000001000000000000090000000000099990999CABDEBAC, ["f1-g2"])
+        openings.add_node(node, 2)
+
+        //g2-g3, d7-d5
+        node = cNode(0X42356324111111010000001000000000000900000000000099909999CABDEBAC, ["f1-g2"])
+        openings.add_node(node, 2)
+
+        //g2-g3, c7-c5
+        node = cNode(0X42356324111111010000001000000000009000000000000099099999CABDEBAC, ["f1-g2"])
+        openings.add_node(node, 2)
+
+        //g2-g3, f8-g6
+        node = cNode(0X423563241111110100000010000000000000000000000A0099999999CABDEB0C, ["f1-g2"])
+        openings.add_node(node, 2)
+
+        //d2-d3, e7-e5
+        node = cNode(0X42356324111011110001000000000000000090000000000099990999CABDEBAC, \
+                     ["e2-e4, c2-c4", "g1-f3"])
+        openings.add_node(node, 2)
+
+        //d2-d3, d7-d5
+        node = cNode(0X42356324111011110001000000000000000900000000000099909999CABDEBAC, \
+                     ["g1-f3, g2-g3", "e2-e3"])
+        openings.add_node(node, 2)
+
+        //d2-d3, c7-c5
+        node = cNode(0X42356324111011110001000000000000009000000000000099099999CABDEBAC, \
+                     ["e2-e4", "g1-f3"])
+        openings.add_node(node, 2)
+
+        //d2-d3, g8-f6
+        node = cNode(0X423563241110111100010000000000000000000000000A0099999999CABDEB0C, \
+                     ["e2-e4", "c2-c4", "g1-f3"])
+        openings.add_node(node, 2)
+
+        //d2-d3, g7-g6
+        node = cNode(0X42356324111011110001000000000000000000000000009099999909CABDEBAC, \
+                     ["c2-c4", "e2-e4", "g1-f3"])
+        openings.add_node(node, 2)
+        #################
+
+        #################
+        #d2-d4, f7-f5, e2-e4
+        node = cNode(0X42356324111001110000000000011000000009000000000099999099CABDEBAC, \
+                     ["g8-f6"])
+        openings.add_node(node, 3)
+        */
+
+        return openings;
+    }
 

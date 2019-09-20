@@ -4,6 +4,7 @@
     #include <algorithm>
     #include <vector>
     #include "./calc.hpp"
+    #include "./openings.hpp"
     #include "../pieces/piece.hpp"
     #include "./analyze_position.hpp"
     #include "../helper.hpp"
@@ -210,7 +211,7 @@
 
 
     int select_movecnt(cMatch &match, list<cPrioMove *> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove){
-        int count;
+        //int count;
         list<cPrioMove*> exchanges, stormies;
         if(priomoves.size() == 0 || depth > slimits.dpth_max){
             return 0;
@@ -425,20 +426,25 @@
 
     int calc_move(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
-        // move = retrieve_move(match)
-        //if(move):
-        //    candidates.append(move)
-        //    score = match.score
-        //else:
-        cSearchLimits slimits(match.level, match.is_endgame());
-        bool maximizing = match.next_color() == COLORS["white"];
-        int alpha = SCORES[mWKG] * 10;
-        int beta = SCORES[mBKG] * 10;
-        int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, NULL, rcandidates);
-        cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
-        cout << concat_fmtmoves(rcandidates) << endl;
-        prnt_fmttime("\ncalc-time: ", time(0) - time_start);
-        return rscore;
+        
+        cMove *cmove = retrieve_move(match);
+        if(cmove != NULL){
+            int prev_dstpiece = match.board.getfield(cmove->dst);
+            cPrioMove priomove(cmove->src, cmove->dst, prev_dstpiece, cmove->prompiece, 0);
+            rcandidates.push_back(priomove);
+            return match.score;
+        }
+        else{
+            cSearchLimits slimits(match.level, match.is_endgame());
+            bool maximizing = match.next_color() == COLORS["white"];
+            int alpha = SCORES[mWKG] * 10;
+            int beta = SCORES[mBKG] * 10;
+            int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, NULL, rcandidates);
+            cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
+            cout << concat_fmtmoves(rcandidates) << endl;
+            prnt_fmttime("\ncalc-time: ", time(0) - time_start);
+            return rscore;
+        }
     }
 
 

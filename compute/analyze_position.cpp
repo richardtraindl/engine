@@ -95,7 +95,7 @@
 
     int score_kings_safety(cMatch &match){
         int value = 0;
-        int color = COLORS["undef"];
+        //int color = COLORS["undef"];
 
         cPiece cwhite_piece(match.board, match.board.wKg);
         bool white_king_is_safe = cwhite_piece.is_king_safe();

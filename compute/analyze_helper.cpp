@@ -1,6 +1,5 @@
 
     #include <iostream>
-    #include <list>
     #include "./analyze_helper.hpp"
     #include "./calc.hpp"
     #include "../pieces/piece.hpp"

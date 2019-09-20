@@ -12,7 +12,7 @@
     int main(void){
         cMatch match;
         match.board.prnt();
-        match.do_move(coord_to_index("e2"), coord_to_index("e4"), mBLK);
+        /*match.do_move(coord_to_index("e2"), coord_to_index("e4"), mBLK);
         match.do_move(coord_to_index("e7"), coord_to_index("e5"), mBLK);
         match.do_move(coord_to_index("g1"), coord_to_index("f3"), mBLK);
         match.do_move(coord_to_index("d7"), coord_to_index("d6"), mBLK);
@@ -38,7 +38,7 @@
         match.do_move(coord_to_index("e1"), coord_to_index("c1"), mBLK);
         match.do_move(coord_to_index("a8"), coord_to_index("d8"), mBLK);
         match.do_move(coord_to_index("d1"), coord_to_index("d7"), mBLK);
-        match.do_move(coord_to_index("d8"), coord_to_index("d7"), mBLK);
+        match.do_move(coord_to_index("d8"), coord_to_index("d7"), mBLK);*/
         //match.do_move(coord_to_index("h1"), coord_to_index("d1"), mBLK);
         //match.do_move(coord_to_index("e7"), coord_to_index("e6"), mBLK);
 

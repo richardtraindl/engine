@@ -1,9 +1,12 @@
 CC = g++
 
-all: ./analyze_helper.o ./analyze_tactics.o ./analyze_move.o ./analyze_position.o ./calc.o
+all: ./analyze_helper.o ./analyze_tactics.o ./analyze_move.o ./analyze_position.o openings.o ./calc.o
 
 calc.o: ./calc.cpp ./calc.hpp
 	$(CC) -Wall --std=c++17 -c ./calc.cpp -o ./calc.o
+
+openings.o: ./openings.hpp ./openings.cpp
+	$(CC) -Wall --std=c++17 -c ./openings.cpp -o ./openings.o
 
 analyze_position.o: ./analyze_position.hpp ./analyze_position.cpp
 	$(CC) -Wall --std=c++17 -c ./analyze_position.cpp -o ./analyze_position.o

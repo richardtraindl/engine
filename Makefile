@@ -2,7 +2,7 @@ CC = g++
 
 all: ./values.o ./helper.o ./move.o ./board.o ./match.o ./engine.o \
 	 ./compute/analyze_helper.o ./compute/analyze_tactics.o \
-	 ./compute/analyze_move.o ./compute/analyze_position.o ./compute/calc.o \
+	 ./compute/analyze_move.o ./compute/analyze_position.o ./compute/openings.o ./compute/calc.o \
 	 ./pieces/touch.o ./pieces/searchforpiece.o ./pieces/piece_ext2.o \
 	 ./pieces/piece_ext1.o ./pieces/piece.o \
 	 ./ui/play.o \
@@ -13,7 +13,7 @@ all: ./values.o ./helper.o ./move.o ./board.o ./match.o ./engine.o \
 		./pieces/touch.o ./pieces/searchforpiece.o \
 		./pieces/piece_ext1.o ./pieces/piece_ext2.o ./pieces/piece.o \
 		./compute/analyze_helper.o ./compute/analyze_tactics.o \
-		./compute/analyze_move.o ./compute/analyze_position.o ./compute/calc.o \
+		./compute/analyze_move.o ./compute/analyze_position.o ./compute/openings.o ./compute/calc.o \
 		./helper.o ./values.o ./move.o ./board.o ./match.o ./engine.o -o ./engine
 
 engine.o: ./engine.cpp
