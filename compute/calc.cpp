@@ -349,6 +349,7 @@
             matches[idx] = new cMatch(match);
             threads[idx] = thread(alphabeta_as_thread, (idx + 1), ref(*matches[idx]), depth, ref(slimits), alpha, beta, maximizing, last_pmove, ref(candidates[idx]), ref(scores[idx]));
         }
+
         for(int idx = 0; idx < 4; ++idx){
             threads[idx].join();
             cout << "thread # " << (idx + 1) << " joined ";
@@ -358,47 +359,20 @@
 
         rscore = scores[0];
         rcandidates.assign(candidates[0].begin(), candidates[0].end());
-        cout << "score1 " << scores[0] << endl;
-        if(maximizing){
-            cout << "maximizing" << endl;
-            if(scores[1] > rscore){
-                cout << "score2 " << scores[1] << endl;
-                rscore = scores[1];
-                rcandidates.clear();
-                rcandidates.assign(candidates[1].begin(), candidates[1].end());
+        for(int idx = 1; idx < 4; ++idx){
+            if(maximizing){
+                if(scores[idx] > rscore){
+                    rscore = scores[idx];
+                    rcandidates.clear();
+                    rcandidates.assign(candidates[idx].begin(), candidates[idx].end());
+                }
             }
-            if(scores[2] > rscore){
-                cout << "score3 " << scores[2] << endl;
-                rscore = scores[2];
-                rcandidates.clear();
-                rcandidates.assign(candidates[2].begin(), candidates[2].end());
-            }
-            if(scores[3] > rscore){
-                cout << "score4 " << scores[3] << endl;
-                rscore = scores[3];
-                rcandidates.clear();
-                rcandidates.assign(candidates[3].begin(), candidates[3].end());
-            }
-        }
-        else{
-            cout << "minimizing" << endl;
-            if(scores[1] < rscore){
-                cout << "score2 " << scores[1] << endl;
-                rscore = scores[1];
-                rcandidates.clear();
-                rcandidates.assign(candidates[1].begin(), candidates[1].end());
-            }
-            if(scores[2] < rscore){
-                cout << "score3 " << scores[2] << endl;
-                rscore = scores[2];
-                rcandidates.clear();
-                rcandidates.assign(candidates[2].begin(), candidates[2].end());
-            }
-            if(scores[3] < rscore){
-                cout << "score4 " << scores[3] << endl;
-                rscore = scores[3];
-                rcandidates.clear();
-                rcandidates.assign(candidates[3].begin(), candidates[3].end());
+            else{
+                if(scores[idx] < rscore){
+                    rscore = scores[idx];
+                    rcandidates.clear();
+                    rcandidates.assign(candidates[idx].begin(), candidates[idx].end());
+                }
             }
         }
         return rscore;
