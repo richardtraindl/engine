@@ -16,11 +16,9 @@
             dpth_stage1 = 3;
             if(is_endgame){
                 dpth_stage2 = 5;
-                //dpth_max = 9;
             }
             else{
                 dpth_stage2 = 5;
-                //dpth_max = 7;
             }
             dpth_max = 20;
             mvcnt_stage1 = 8;
@@ -30,12 +28,10 @@
         if(level == cMatch::LEVELS["low"]){
             dpth_stage1 = 3;
             if(is_endgame){
-                dpth_stage2 = 7;
-                //dpth_max = 11;
+                dpth_stage2 = 9;
             }
             else{
-                dpth_stage2 = 7;
-                //dpth_max = 9;
+                dpth_stage2 = 9;
             }
             dpth_max = 20;
             mvcnt_stage1 = 10;
@@ -45,12 +41,10 @@
         //medium high
         dpth_stage1 = 5;
         if(is_endgame){
-            dpth_stage2 = 7;
-            //dpth_max = 13;
+            dpth_stage2 = 9;
         }
         else{
-            dpth_stage2 = 7;
-            //dpth_max = 11;
+            dpth_stage2 = 9;
         }
         dpth_max = 20;
         mvcnt_stage1 = 12;
@@ -71,11 +65,11 @@
     }
 
 
-    void prnt_priomoves_for_thread(list<cPrioMove *> &priomoves, int threadcnt, int offset){
+    void prnt_priomoves_for_thread(list<cPrioMove *> &priomoves, int threadcnt){
         cout << "-------------------------------------------" << endl;
         int idx = 0;
         for(cPrioMove *priomove : priomoves){
-            if(idx % threadcnt == offset){ 
+            if(idx % 4 == (threadcnt - 1)){ 
                 cout << "\n" << dec << (idx + 1) << ". ";
                 cout << priomove->format() << " prio: " << priomove->prio << " is_tactic_stormy: " << priomove->is_tactic_stormy() << endl;
                 cout << priomove->fmt_tactics() << endl;
@@ -213,7 +207,7 @@
     int select_movecnt(cMatch &match, list<cPrioMove *> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove){
         //int count;
         list<cPrioMove*> exchanges, stormies;
-        if(priomoves.size() == 0 || depth > slimits.dpth_max){
+        if(priomoves.size() == 0){
             return 0;
         }
         if(depth <= slimits.dpth_stage1 && last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["attacks-king"])){
@@ -229,13 +223,19 @@
             return max(slimits.mvcnt_stage2, (int)(exchanges.size() + stormies.size()));
         }
         else{
-            if(last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["captures"])){
-                resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true, exchanges, stormies);
-                return min(2, (int)(exchanges.size() + 1));
-            }
-            else{
-                return 0;
-            }
+            //if(depth < slimits.dpth_max){
+                if(last_pmove != NULL && 
+                   last_pmove->has_domain(cTactic::DOMAINS["captures"])){
+                    resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true, exchanges, stormies);
+                    return min(2, (int)(exchanges.size() + 1));
+                }
+                else{
+                    return 0;
+                }
+            //}
+            //else{
+                //return 0;
+            //}
         }
     }
 
@@ -250,7 +250,7 @@
     }
 
 
-    int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, cPrioMove *candidate, list<cPrioMove> &rcandidates){
+    int alphabeta(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates){
         list<cPrioMove> newcandidates;
         int newscore, bestscore;
         int count = 0;
@@ -285,9 +285,9 @@
             }
             newcandidates.clear();
 
-            if(depth == 1){
-                cout << "\n" << count << "/" << maxcnt << " CURRENT SEARCH: " << " [" + priomove->format() + "] " << concat_fmtmoves(newcandidates) << endl;
-            }
+            //if(depth == 1){
+                //cout << "\n" << count << "/" << maxcnt << " CURRENT SEARCH: " << " [" + priomove->format() + "] " << concat_fmtmoves(newcandidates) << endl;
+            //}
             if(depth > slimits.mvcnt_stage2){
                 cout << depth << ".";
             }
@@ -297,7 +297,12 @@
             }
             else{
                 match.do_move(priomove->src, priomove->dst, priomove->prompiece);
-                newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, NULL, newcandidates);
+                //if(depth == 1){
+                //    newscore = start_alphabeta_threads(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, newcandidates);
+                //}
+                //else{
+                    newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, newcandidates);
+                //}
                 match.undo_move();
             }
 
@@ -306,9 +311,9 @@
                     bestscore = newscore;
                     alpha = max(bestscore, alpha);
                     append_newmove(priomove, newcandidates, rcandidates);
-                    if(depth == 1){
-                        cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
-                    }
+                    //if(depth == 1){
+                        //cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
+                    //}
                     if(alpha >= beta){
                         break;
                     }
@@ -319,9 +324,9 @@
                     bestscore = newscore;
                     beta = min(bestscore, beta);
                     append_newmove(priomove, newcandidates, rcandidates);
-                    if(depth == 1){
-                        cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
-                    }
+                    //if(depth == 1){
+                        //cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
+                    //}
                     if(beta <= alpha){
                         break;
                     }
@@ -332,29 +337,94 @@
         return bestscore;
     }
 
- 
-    void alphabeta_for_thread(cMatch &match, int depth, int threadcnt, int offset, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates, int &rscore){
+
+    int start_alphabeta_threads(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates){
+        array<list<cPrioMove>, 4> candidates;
+        array<cMatch*, 4> matches;
+        thread threads[4];
+        int rscore;
+        int scores[4];
+
+        for(int idx = 0; idx < 4; ++idx){
+            matches[idx] = new cMatch(match);
+            threads[idx] = thread(alphabeta_as_thread, (idx + 1), ref(*matches[idx]), depth, ref(slimits), alpha, beta, maximizing, last_pmove, ref(candidates[idx]), ref(scores[idx]));
+        }
+        for(int idx = 0; idx < 4; ++idx){
+            threads[idx].join();
+            cout << "thread # " << (idx + 1) << " joined ";
+            cout << scores[idx] << " " << concat_fmtmoves(candidates[idx]) << endl;
+            delete matches[idx];
+        }
+
+        rscore = scores[0];
+        rcandidates.assign(candidates[0].begin(), candidates[0].end());
+        cout << "score1 " << scores[0] << endl;
+        if(maximizing){
+            cout << "maximizing" << endl;
+            if(scores[1] > rscore){
+                cout << "score2 " << scores[1] << endl;
+                rscore = scores[1];
+                rcandidates.clear();
+                rcandidates.assign(candidates[1].begin(), candidates[1].end());
+            }
+            if(scores[2] > rscore){
+                cout << "score3 " << scores[2] << endl;
+                rscore = scores[2];
+                rcandidates.clear();
+                rcandidates.assign(candidates[2].begin(), candidates[2].end());
+            }
+            if(scores[3] > rscore){
+                cout << "score4 " << scores[3] << endl;
+                rscore = scores[3];
+                rcandidates.clear();
+                rcandidates.assign(candidates[3].begin(), candidates[3].end());
+            }
+        }
+        else{
+            cout << "minimizing" << endl;
+            if(scores[1] < rscore){
+                cout << "score2 " << scores[1] << endl;
+                rscore = scores[1];
+                rcandidates.clear();
+                rcandidates.assign(candidates[1].begin(), candidates[1].end());
+            }
+            if(scores[2] < rscore){
+                cout << "score3 " << scores[2] << endl;
+                rscore = scores[2];
+                rcandidates.clear();
+                rcandidates.assign(candidates[2].begin(), candidates[2].end());
+            }
+            if(scores[3] < rscore){
+                cout << "score4 " << scores[3] << endl;
+                rscore = scores[3];
+                rcandidates.clear();
+                rcandidates.assign(candidates[3].begin(), candidates[3].end());
+            }
+        }
+        return rscore;
+    }
+
+        
+    void alphabeta_as_thread(int threadcnt, cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates, int &rscore){
         list<cPrioMove> newcandidates;
         int newscore;
         int count = 0;
 
         if(maximizing){
-            rscore = SCORES[mWKG] * 10;;
+            rscore = SCORES[mWKG] * 10;
         }
         else{
-            rscore = SCORES[mBKG] * 10;;
+            rscore = SCORES[mBKG] * 10;
         }
 
-        cMove *dbggmove = NULL; //new cMove(0x0, coord_to_index("d1"), coord_to_index("d7"), mBLK);
+        cMove *dbggmove = NULL;
         list<cPrioMove *> priomoves;
         generate_priomoves(match, dbggmove, priomoves);
         priomoves.sort(sortByPrio);
         int maxcnt = select_movecnt(match, priomoves, depth, slimits, last_pmove);
 
-        if(depth == 1){
-            cout << "thread #" << offset << " - priomoves count: " << priomoves.size() << endl;
-            prnt_priomoves_for_thread(priomoves, threadcnt, offset);
-        }
+        cout << "thread #" << threadcnt << " - priomoves count: " << priomoves.size() << endl;
+        prnt_priomoves_for_thread(priomoves, threadcnt);
 
         if(priomoves.size() == 0 || maxcnt == 0){
             rscore = score_position(match, priomoves.size());
@@ -369,26 +439,18 @@
                 break;
             }
 
-            if(depth == 1 && count % threadcnt != offset){
+            if(count % 4 != (threadcnt - 1)){
                 count++;
                 continue;
             }
             count++;
 
-            if(depth == 1){
-                cout << "\nthread #" << offset << " CURRENT SEARCH: " << " [" + priomove->format() + "] " << concat_fmtmoves(newcandidates) << endl;
-            }
-            if(depth > slimits.mvcnt_stage2){
-                cout << ".";
-            }
-            
             if(priomove->has_domain(cTactic::DOMAINS["is-tactical-draw"])){
                 newscore = 0;
             }
             else{
                 match.do_move(priomove->src, priomove->dst, priomove->prompiece);
-                newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, NULL, newcandidates);
-                //alphabeta_for_thread(match, depth + 1, threadcnt, 0, slimits, alpha, beta, !maximizing, priomove, newcandidates, newscore);
+                newscore = alphabeta(match, depth + 1, slimits, alpha, beta, !maximizing, priomove, newcandidates);
                 match.undo_move();
             }
 
@@ -396,10 +458,8 @@
                 if(newscore > rscore){
                     rscore = newscore;
                     append_newmove(priomove, newcandidates, rcandidates);
+                    cout << "\nthread #" << threadcnt << "   CANDIDATE:      " << dec << rscore << concat_fmtmoves(rcandidates) << endl;
                     alpha = max(rscore, alpha);
-                    if(depth == 1){
-                        cout << "\nthread #" << offset << " CANDIDATE:      " << dec << rscore << concat_fmtmoves(rcandidates) << endl;
-                    }
                     if(alpha >= beta){
                         break;
                     }
@@ -409,9 +469,7 @@
                 if(newscore < rscore){
                     rscore = newscore;
                     append_newmove(priomove, newcandidates, rcandidates);
-                    if(depth == 1){
-                        cout << "\nthread #" << offset << " CANDIDATE:      " << dec << rscore << concat_fmtmoves(rcandidates) << endl;
-                    }
+                    cout << "\nthread #" << threadcnt << "   CANDIDATE:      " << dec << rscore << concat_fmtmoves(rcandidates) << endl;
                     beta = min(rscore, beta);
                     if(beta <= alpha){
                         break;
@@ -432,6 +490,7 @@
             int prev_dstpiece = match.board.getfield(cmove->dst);
             cPrioMove priomove(cmove->src, cmove->dst, prev_dstpiece, cmove->prompiece, 0);
             rcandidates.push_back(priomove);
+            delete cmove;
             return match.score;
         }
         else{
@@ -439,91 +498,12 @@
             bool maximizing = match.next_color() == COLORS["white"];
             int alpha = SCORES[mWKG] * 10;
             int beta = SCORES[mBKG] * 10;
-            int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, NULL, rcandidates);
+            int rscore = start_alphabeta_threads(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
+            //int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
             cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
             cout << concat_fmtmoves(rcandidates) << endl;
             prnt_fmttime("\ncalc-time: ", time(0) - time_start);
             return rscore;
         }
-    }
-
-
-    int calc_move2(cMatch &match, list<cPrioMove> &rcandidates){
-        time_t time_start = time(0);
-        // move = retrieve_move(match)
-        //if(move):
-        //    candidates.append(move)
-        //    score = match.score
-        //else:
-        cSearchLimits slimits(match.level, match.is_endgame());
-        bool maximizing = match.next_color() == COLORS["white"];
-        int alpha = SCORES[mWKG] * 10;
-        int beta = SCORES[mBKG] * 10;
-        int threadcnt = 4;
-        thread t1, t2, t3, t4; //threads[threadcnt];
-        cPrioMove *last_priomove = NULL;
-        //vector<list<cPrioMove>> candidates;
-        list<cPrioMove> candidates1, candidates2, candidates3, candidates4;
-        int rscore, score1, score2, score3, score4; //scores[threadcnt];
-        cMatch *match1 = new cMatch(match);
-        cMatch *match2 = new cMatch(match);
-        cMatch *match3 = new cMatch(match);
-        cMatch *match4 = new cMatch(match);
-        t1 = thread(alphabeta_for_thread, ref(*match1), 1, threadcnt, 0, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates1), ref(score1));
-        t2 = thread(alphabeta_for_thread, ref(*match2), 1, threadcnt, 1, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates2), ref(score2));
-        t3 = thread(alphabeta_for_thread, ref(*match3), 1, threadcnt, 2, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates3), ref(score3));
-        t4 = thread(alphabeta_for_thread, ref(*match4), 1, threadcnt, 3, ref(slimits), alpha, beta, maximizing, last_priomove, ref(candidates4), ref(score4));
-
-        t1.join();
-        t2.join();
-        t3.join();
-        t4.join();
-        
-        delete match1;
-        delete match2;
-        delete match3;
-        delete match4;
-
-        rscore = score1;
-        rcandidates.assign(candidates1.begin(), candidates1.end());
-        if(maximizing){
-            if(score2 > rscore){
-                rscore = score2;
-                rcandidates.clear();
-                rcandidates.assign(candidates2.begin(), candidates2.end());
-            }
-            if(score3 > rscore){
-                rscore = score3;
-                rcandidates.clear();
-                rcandidates.assign(candidates3.begin(), candidates3.end());
-            }
-            if(score4 > rscore){
-                rscore = score4;
-                rcandidates.clear();
-                rcandidates.assign(candidates4.begin(), candidates4.end());
-            }
-        }
-        else{
-            if(score2 < rscore){
-                rscore = score2;
-                rcandidates.clear();
-                rcandidates.assign(candidates2.begin(), candidates2.end());
-            }
-            if(score3 < rscore){
-                rscore = score3;
-                rcandidates.clear();
-                rcandidates.assign(candidates3.begin(), candidates3.end());
-            }
-            if(score4 < rscore){
-                rscore = score4;
-                rcandidates.clear();
-                rcandidates.assign(candidates4.begin(), candidates4.end());
-            }
-        }
-
-        cout << "result: " << rscore << " match: " << match.created_at << " " << endl;
-        cout << concat_fmtmoves(rcandidates) << endl;
-        prnt_fmttime("\ncalc-time: ", time(0) - time_start);
-        return rscore;
     }
 

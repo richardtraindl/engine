@@ -17,7 +17,9 @@
         created_at = time(0);
         score = match.score;
         level = match.level;
-        //board - copy cunstructor of board?
+        for(int idx = 0; idx < 64; ++idx){
+            board.fields[idx] = match.board.fields[idx];
+        }
         board.wKg = match.board.wKg;
         board.bKg = match.board.bKg;
         board.wKg_first_move_on = match.board.wKg_first_move_on;

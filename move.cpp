@@ -67,15 +67,14 @@
             {"blocks",                   120},
             {"promotes",                 130}, 
             {"is-tactical-draw",         140},
-            {"prev-candidate",           150},
-            {"is-running-pawn",          160}, 
-            {"controles-file",           170},
-            {"castles",                  180},
-            {"is-progress",              190},
-            {"opposition",               200},
-            {"approach-opp-king",        210},
-            {"guards-pawn-to-promotion", 220},
-            {"undef",                    230}
+            {"is-running-pawn",          150}, 
+            {"controles-file",           160},
+            {"castles",                  170},
+            {"is-progress",              180},
+            {"opposition",               190},
+            {"approach-opp-king",        200},
+            {"guards-pawn-to-promotion", 210},
+            {"undef",                    220}
         };
 
         map<string, int> cTactic::WEIGHTS = {
@@ -96,7 +95,6 @@
             {DOMAINS["is-running-pawn"],        102},
             {DOMAINS["is-tactical-draw"],       103},
             {DOMAINS["defends-check"] ,         104},
-            {DOMAINS["prev-candidate"] ,        105},
             // ### level 2 ###
             {DOMAINS["castles"],                   120},
             {DOMAINS["attacks-king"],              121},
@@ -122,10 +120,10 @@
             {WEIGHTS["stormy"],                 -40},
             {WEIGHTS["better-deal"],            -30},
             {WEIGHTS["good-deal"],                0},
-            {WEIGHTS["vague-deal"],              10},
             {WEIGHTS["upgraded"],                 0},
-            {WEIGHTS["undef"],                    0},
             {WEIGHTS["downgraded"],              40},
+            {WEIGHTS["vague-deal"],              10},
+            {WEIGHTS["undef"],                    0},
             {WEIGHTS["bad-deal"],                50}
         };
 

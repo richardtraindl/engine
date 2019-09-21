@@ -247,9 +247,9 @@
            analyzedst.is_field_ok){
             int lowest_attacker = cAnalyzeField::lowest_piece(supported.attacker_beyond);
             if(supported.attacker_beyond.size() > 0 && 
-               supported.attacker_beyond.size() > supported.supporter_beyond.size() && 
-               (PIECES_RANKS[piece] <= PIECES_RANKS[lowest_attacker] || 
-                match.board.eval_soft_pin_dir(supported.pos) != DIRS["undef"])){
+               ((supported.attacker_beyond.size() >= supported.supporter_beyond.size() &&
+                 PIECES_RANKS[piece] > PIECES_RANKS[lowest_attacker]) || 
+                 match.board.eval_soft_pin_dir(supported.pos) != DIRS["undef"])){
                 return cTactic::WEIGHTS["stormy"];
             }
             else{

@@ -79,7 +79,7 @@
         openings->add_node(node2, 1);
 
         //d2-d4
-        uint64_t base3[] = {{0X4235632411101111}, {0x0000000000010000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        uint64_t base3[] = {{0x4235632411101111}, {0x0000000000010000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
         vector<string> candidates3 = {{"d7-d5"}, {"f7-f5"}, {"g8-f6"}, {"g7-g6"}, {"e7-e6"}};
         cNode node3(base3, candidates3);
         openings->add_node(node3, 1);
@@ -91,19 +91,19 @@
         openings->add_node(node4, 1);
 
         //g1-f3
-        uint64_t base5[] = {{0X4235630411111111}, {0x0000020000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        uint64_t base5[] = {{0x4235630411111111}, {0x0000020000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
         vector<string> candidates5 = {{"d7-d5"}, {"g8-f6"}, {"g7-g6"}, {"c7-c5"}, {"b8-c6"}};
         cNode node5(base5, candidates5);
         openings->add_node(node5, 1);
 
         //g2-g3
-        uint64_t base6[] = {{0X4235632411111101}, {0x0000001000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        uint64_t base6[] = {{0x4235632411111101}, {0x0000001000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
         vector<string> candidates6 = {{"e7-e5"}, {"d7-d5"}, {"c7-c5"}, {"g8-f6"}, {"g7-g6"}};
         cNode node6(base6, candidates6);
         openings->add_node(node6, 1);
 
         //d2-d3
-        uint64_t base7[] = {{0X4235632411101111}, {0x0001000000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
+        uint64_t base7[] = {{0x4235632411101111}, {0x0001000000000000}, {0x0000000000000000}, {0x99999999CABDEBAC}};
         vector<string> candidates7 = {{"e7-e5"}, {"d7-d5"}, {"c7-c5"}, {"g8-f6"}, {"g7-g6"}};
         cNode node7(base7, candidates7);
         openings->add_node(node7, 1);
@@ -111,32 +111,36 @@
 
         //#################
         //e2-e4, e7-e5
-        uint64_t base8[] = {{0X4235632411110111}, {0x0000000000001000}, {0x0000900000000000}, {0x99990999CABDEBAC}};
+        uint64_t base8[] = {{0x4235632411110111}, {0x0000000000001000}, {0x0000900000000000}, {0x99990999CABDEBAC}};
         vector<string> candidates8 = {{"g1-f3"}, {"b1-c3"}, {"f1-c4"}};
         cNode node8(base8, candidates8);
         openings->add_node(node8, 2);
 
-    /*    
         //e2-e4, c7-c5
-        node = cNode(0X42356324111101110000000000001000009000000000000099099999CABDEBAC, \
-                     ["g1-f3", "d2-d4", "f1-c4", "b1-c3"])
-        openings.add_node(node, 2)
+        uint64_t base9[] = {{0x4235632411110111}, {0x0000000000001000}, {0x0090000000000000}, {0x99099999CABDEBAC}};
+        vector<string> candidates9 = {{"g1-f3"}, {"d2-d4"}, {"f1-c4"}, {"b1-c3"}};
+        cNode node9(base9, candidates9);
+        openings->add_node(node9, 2);
         
         //e2-e4, e7-e6
-        node = cNode(0X42356324111101110000000000001000000000000000900099990999CABDEBAC, \
-                     ["d2-d4", "g1-f3", "b1-c3"])
-        openings.add_node(node, 2)
+        uint64_t base10[] = {{0x4235632411110111}, {0x0000000000001000}, {0x0000000000009000}, {0x99990999CABDEBAC}};
+        vector<string> candidates10 = {{"d2-d4"}, {"g1-f3"}, {"b1-c3"}};
+        cNode node10(base10, candidates10);
+        openings->add_node(node10, 2);
      
         //e2-e4, d7-d6
-        node = cNode(0X42356324111101110000000000001000000000000009000099909999CABDEBAC, \
-                     ["d2-d4", "g1-f3", "f1-c4", "b1-c3"])
-        openings.add_node(node, 2)
+        uint64_t base11[] = {{0x4235632411110111}, {0x0000000000001000}, {0x0000000000090000}, {0x99909999CABDEBAC}};
+        vector<string> candidates11 = {{"d2-d4"}, {"g1-f3"}, {"f1-c4"}, {"b1-c3"}};
+        cNode node11(base11, candidates11);
+        openings->add_node(node11, 2);
         
-        #d2-d4, d7-d5
-        node = cNode(0X42356324111011110000000000010000000900000000000099909999CABDEBAC, \
-                     ["c2-c4", "g1-f3", "c1-f4"])
-        openings.add_node(node, 2)
+        //d2-d4, d7-d5
+        uint64_t base12[] = {{0x4235632411101111}, {0x0000000000010000}, {0x0009000000000000}, {0x99909999CABDEBAC}};
+        vector<string> candidates12 = {{"c2-c4"}, {"g1-f3"}, {"c1-f4"}};
+        cNode node12(base12, candidates12);
+        openings->add_node(node12, 2);
 
+    /*  
         //d2-d4, f7-f5
         node = cNode(0X42356324111011110000000000010000000009000000000099999099CABDEBAC, \
                      ["c2-c4", "g1-f3", "g2-g3", "e2-e4"])
