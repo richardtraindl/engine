@@ -15,14 +15,14 @@
         if(level == cMatch::LEVELS["blitz"]){
             dpth_stage1 = 3;
             if(is_endgame){
-                dpth_stage2 = 5;
+                dpth_stage2 = 7;
             }
             else{
-                dpth_stage2 = 5;
+                dpth_stage2 = 7;
             }
             dpth_max = 20;
             mvcnt_stage1 = 8;
-            mvcnt_stage2 = 6;
+            mvcnt_stage2 = 4;
             return;
         }
         if(level == cMatch::LEVELS["low"]){
@@ -145,9 +145,6 @@
     bool sortByPrio(cPrioMove *A, cPrioMove *B){
         return (A->prio < B->prio);
     }
-    //bool sortByPrio(cPrioMove &A, cPrioMove &B){
-    //    return (A.prio < B.prio);
-    //}
 
 
     void resort_exchange_and_stormy_moves(list<cPrioMove *> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange, list<cPrioMove*> &exchanges, list<cPrioMove*> &stormies){
@@ -202,12 +199,11 @@
         priomoves.sort(sortByPrio);
         return;
     }
-
-
+    
+   
     int select_movecnt(cMatch &match, list<cPrioMove *> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove){
-        //int count;
         list<cPrioMove*> exchanges, stormies;
-        if(priomoves.size() == 0){
+        if(priomoves.size() == 0){ // || depth < slimits.dpth_max
             return 0;
         }
         if(depth <= slimits.dpth_stage1 && last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["attacks-king"])){
@@ -216,26 +212,24 @@
         
         if(depth <= slimits.dpth_stage1){
             resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false, exchanges, stormies);
-            return max(slimits.mvcnt_stage1, (int)(exchanges.size() + stormies.size())); // min(slimits.mvcnt_stage1, resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, true));
+            return max(slimits.mvcnt_stage1, (int)(exchanges.size() + stormies.size()));
         }
-        if(depth <= slimits.dpth_stage2){
+        if(depth <= slimits.dpth_stage2 &&
+           last_pmove != NULL && 
+           (last_pmove->has_domain(cTactic::DOMAINS["captures"]) ||
+            last_pmove->is_tactic_stormy())){
             resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio1"], last_pmove, false, exchanges, stormies);
-            return max(slimits.mvcnt_stage2, (int)(exchanges.size() + stormies.size()));
+            return min(slimits.mvcnt_stage2, (int)(exchanges.size() + stormies.size()));
         }
         else{
-            //if(depth < slimits.dpth_max){
-                if(last_pmove != NULL && 
-                   last_pmove->has_domain(cTactic::DOMAINS["captures"])){
-                    resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true, exchanges, stormies);
-                    return min(2, (int)(exchanges.size() + 1));
-                }
-                else{
-                    return 0;
-                }
-            //}
-            //else{
-                //return 0;
-            //}
+            if(last_pmove != NULL && 
+               last_pmove->has_domain(cTactic::DOMAINS["captures"])){
+                resort_exchange_and_stormy_moves(priomoves, cPrioMove::PRIOS["prio0"], last_pmove, true, exchanges, stormies);
+                return min(2, (int)(exchanges.size() + 1));
+            }
+            else{
+                return 0;
+            }
         }
     }
 
@@ -339,27 +333,28 @@
 
 
     int start_alphabeta_threads(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates){
-        array<list<cPrioMove>, 4> candidates;
-        array<cMatch*, 4> matches;
-        thread threads[4];
+        const int threadcnt = 8;
+        array<list<cPrioMove>, threadcnt> candidates;
+        array<cMatch*, threadcnt> matches;
+        thread threads[threadcnt];
         int rscore;
-        int scores[4];
+        int scores[threadcnt];
 
-        for(int idx = 0; idx < 4; ++idx){
+        for(int idx = 0; idx < threadcnt; ++idx){
             matches[idx] = new cMatch(match);
             threads[idx] = thread(alphabeta_as_thread, (idx + 1), ref(*matches[idx]), depth, ref(slimits), alpha, beta, maximizing, last_pmove, ref(candidates[idx]), ref(scores[idx]));
         }
 
-        for(int idx = 0; idx < 4; ++idx){
+        for(int idx = 0; idx < threadcnt; ++idx){
             threads[idx].join();
-            cout << "thread # " << (idx + 1) << " joined ";
+            cout << "\nthread # " << (idx + 1) << " joined ";
             cout << scores[idx] << " " << concat_fmtmoves(candidates[idx]) << endl;
             delete matches[idx];
         }
 
         rscore = scores[0];
         rcandidates.assign(candidates[0].begin(), candidates[0].end());
-        for(int idx = 1; idx < 4; ++idx){
+        for(int idx = 1; idx < threadcnt; ++idx){
             if(maximizing){
                 if(scores[idx] > rscore){
                     rscore = scores[idx];

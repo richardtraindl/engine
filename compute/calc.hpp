@@ -26,7 +26,6 @@
 
     string concat_fmtmoves(list<cPrioMove> &priomoves);
 
-    //bool sortByPrio(cPrioMove &A, cPrioMove &B);
     bool sortByPrio(cPrioMove *A, cPrioMove *B);
 
     void generate_moves(cMatch &match, list<cMove *> &moves);
