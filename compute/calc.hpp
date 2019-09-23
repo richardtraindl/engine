@@ -46,7 +46,7 @@
 
     int start_alphabeta_threads(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates);
 
-    void alphabeta_as_thread(int threadcnt, cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates, int &rscore);
+    void alphabeta_as_thread(const int threadcnt, const int maxthreads, cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates, int &rscore);
 
     int calc_move(cMatch &match, list<cPrioMove> &candidates);
 

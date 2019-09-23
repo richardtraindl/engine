@@ -333,19 +333,19 @@
 
 
     int start_alphabeta_threads(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates){
-        const int threadcnt = 8;
-        array<list<cPrioMove>, threadcnt> candidates;
-        array<cMatch*, threadcnt> matches;
-        thread threads[threadcnt];
+        const int maxthreads = 1;
+        array<list<cPrioMove>, maxthreads> candidates;
+        array<cMatch*, maxthreads> matches;
+        thread threads[maxthreads];
         int rscore;
-        int scores[threadcnt];
+        int scores[maxthreads];
 
-        for(int idx = 0; idx < threadcnt; ++idx){
+        for(int idx = 0; idx < maxthreads; ++idx){
             matches[idx] = new cMatch(match);
-            threads[idx] = thread(alphabeta_as_thread, (idx + 1), ref(*matches[idx]), depth, ref(slimits), alpha, beta, maximizing, last_pmove, ref(candidates[idx]), ref(scores[idx]));
+            threads[idx] = thread(alphabeta_as_thread, (idx + 1), maxthreads, ref(*matches[idx]), depth, ref(slimits), alpha, beta, maximizing, last_pmove, ref(candidates[idx]), ref(scores[idx]));
         }
 
-        for(int idx = 0; idx < threadcnt; ++idx){
+        for(int idx = 0; idx < maxthreads; ++idx){
             threads[idx].join();
             cout << "\nthread # " << (idx + 1) << " joined ";
             cout << scores[idx] << " " << concat_fmtmoves(candidates[idx]) << endl;
@@ -354,7 +354,7 @@
 
         rscore = scores[0];
         rcandidates.assign(candidates[0].begin(), candidates[0].end());
-        for(int idx = 1; idx < threadcnt; ++idx){
+        for(int idx = 1; idx < maxthreads; ++idx){
             if(maximizing){
                 if(scores[idx] > rscore){
                     rscore = scores[idx];
@@ -374,7 +374,7 @@
     }
 
         
-    void alphabeta_as_thread(int threadcnt, cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates, int &rscore){
+    void alphabeta_as_thread(const int threadcnt, const int maxthreads, cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates, int &rscore){
         list<cPrioMove> newcandidates;
         int newscore;
         int count = 0;
@@ -408,7 +408,7 @@
                 break;
             }
 
-            if(count % 4 != (threadcnt - 1)){
+            if(count % maxthreads != (threadcnt - 1)){
                 count++;
                 continue;
             }
@@ -468,7 +468,7 @@
             int alpha = SCORES[mWKG] * 10;
             int beta = SCORES[mBKG] * 10;
             int rscore = start_alphabeta_threads(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
-            //int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
+            // int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
             cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
             cout << concat_fmtmoves(rcandidates) << endl;
             prnt_fmttime("\ncalc-time: ", time(0) - time_start);

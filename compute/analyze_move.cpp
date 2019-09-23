@@ -7,7 +7,7 @@
 
 
     void add_tactics(cPrioMove &priomove, cMatch &match, cMove *dbggmove, list<cExclude *> &excludes){
-        int rook = mBLK;
+        int castlrook = mBLK;
         list<cTouch> from_castl_rk_supported, from_castl_rk_attacked;
 
         int piece = match.board.getfield(priomove.src);
@@ -37,7 +37,7 @@
 
         if(castles(match, piece, priomove)){
             priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["castles"], standard_weight, PIECES_RANKS[piece]));
-            find_rook_touches_after_castling(match, priomove, rook, from_castl_rk_supported, from_castl_rk_attacked);
+            find_rook_touches_after_castling(match, priomove, castlrook, from_castl_rk_supported, from_castl_rk_attacked);
         }
 
 
@@ -103,18 +103,18 @@
 
 
         if(from_dstfield_supported.size() > 0){
-            fill_supported(match, piece, priomove, from_dstfield_supported, analyzedst, excludes);
+            fill_supported(match, piece, priomove, false, from_dstfield_supported, analyzedst, excludes);
         }
-        if(rook != mBLK){
-            fill_supported(match, rook, priomove, from_castl_rk_supported, analyzedst, excludes);
+        if(castlrook != mBLK){
+            fill_supported(match, castlrook, priomove, true, from_castl_rk_supported, analyzedst, excludes);
         }
 
 
         if(from_dstfield_attacked.size() > 0){
-            fill_attacked(match, piece, priomove, from_dstfield_attacked, analyzedst, excludes);
+            fill_attacked(match, piece, priomove, false, from_dstfield_attacked, analyzedst, excludes);
         }
-        if(rook != mBLK){
-            fill_attacked(match, rook, priomove, from_castl_rk_attacked, analyzedst, excludes);
+        if(castlrook != mBLK){
+            fill_attacked(match, castlrook, priomove, true, from_castl_rk_attacked, analyzedst, excludes);
         }
 
 

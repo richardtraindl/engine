@@ -242,9 +242,14 @@
     }
 
 
-    int weight_for_support(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported, cAnalyzeField &analyzedst){
+    int weight_for_support(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, cTouch &supported, cAnalyzeField &analyzedst){
         if(is_move_out_of_soft_pin(match, piece, priomove) == false &&
            analyzedst.is_field_ok){
+            if(iscastlrook == false && 
+               cPiece::dir_for_move(piece, priomove.src, supported.pos) ==
+               cPiece::dir_for_move(piece, priomove.dst, supported.pos)){
+                return cTactic::WEIGHTS["downgraded"];
+            }
             int lowest_attacker = cAnalyzeField::lowest_piece(supported.attacker_beyond);
             if(supported.attacker_beyond.size() > 0 && 
                ((supported.attacker_beyond.size() >= supported.supporter_beyond.size() &&
@@ -260,9 +265,14 @@
     }
 
 
-    int weight_for_attack(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, cAnalyzeField &analyzedst){
+    int weight_for_attack(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, cTouch &attacked, cAnalyzeField &analyzedst){
         if(is_move_out_of_soft_pin(match, piece, priomove) == false &&
            analyzedst.is_field_ok){
+            if(iscastlrook == false && 
+               cPiece::dir_for_move(piece, priomove.src, attacked.pos) ==
+               cPiece::dir_for_move(piece, priomove.dst, attacked.pos)){
+                return cTactic::WEIGHTS["downgraded"];
+            }
             if(are_fairy_equal(piece, attacked.piece) && 
                match.board.eval_soft_pin_dir(attacked.pos) != DIRS["undef"]){
                 return cTactic::WEIGHTS["stormy"];
@@ -276,12 +286,13 @@
     }
 
 
-    int weight_for_attack_on_king(cMatch &match, int piece, cPrioMove &priomove, cAnalyzeField &analyzedst){
-        if(piece != mWKG && piece != mBKG){
-            return cTactic::WEIGHTS["undef"];
-        }
+    int weight_for_attack_on_king(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, cAnalyzeField &analyzedst){
         cPiece cking(match.board, priomove.src);
         if(analyzedst.is_field_ok){
+            if(cPiece::dir_for_move(piece, priomove.src, attacked.pos) ==
+               cPiece::dir_for_move(piece, priomove.dst, attacked.pos)){
+                return cTactic::WEIGHTS["downgraded"];
+            }
             if(cking.is_king_safe() == false){
                 return cTactic::WEIGHTS["stormy"];
             }
