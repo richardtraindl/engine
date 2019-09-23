@@ -103,18 +103,40 @@
 
 
         if(from_dstfield_supported.size() > 0){
-            fill_supported(match, piece, priomove, false, from_dstfield_supported, analyzedst, excludes);
+            fill_supported(match, piece, priomove, NULL, from_dstfield_supported, analyzedst, excludes);
         }
         if(castlrook != mBLK){
-            fill_supported(match, castlrook, priomove, true, from_castl_rk_supported, analyzedst, excludes);
+            int src, dst;
+            if((priomove.src % 8) + 2 == priomove.dst % 8){
+                src = priomove.dst + 1;
+                dst = priomove.dst - 1;
+            }
+            else{
+                src = priomove.dst - 2;
+                dst = priomove.dst + 1;
+            }
+            cPrioMove *pmove_for_castlrook = new cPrioMove(src, dst, mBLK, mBLK, 0);
+            fill_supported(match, castlrook, priomove, pmove_for_castlrook, from_castl_rk_supported, analyzedst, excludes);
+            delete pmove_for_castlrook;
         }
 
 
         if(from_dstfield_attacked.size() > 0){
-            fill_attacked(match, piece, priomove, false, from_dstfield_attacked, analyzedst, excludes);
+            fill_attacked(match, piece, priomove, NULL, from_dstfield_attacked, analyzedst, excludes);
         }
         if(castlrook != mBLK){
-            fill_attacked(match, castlrook, priomove, true, from_castl_rk_attacked, analyzedst, excludes);
+            int src, dst;
+            if((priomove.src % 8) + 2 == priomove.dst % 8){
+                src = priomove.dst + 1;
+                dst = priomove.dst - 1;
+            }
+            else{
+                src = priomove.dst - 2;
+                dst = priomove.dst + 1;
+            }
+            cPrioMove *pmove_for_castlrook = new cPrioMove(src, dst, mBLK, mBLK, 0);
+            fill_attacked(match, castlrook, priomove, pmove_for_castlrook, from_castl_rk_attacked, analyzedst, excludes);
+            delete pmove_for_castlrook;
         }
 
 

@@ -66,9 +66,9 @@
 
     int weight_for_discl_attack(cMatch &match, int piece, cPrioMove &priomove, cTouch &discl_attacked, cAnalyzeField &analyzedst);
 
-    int weight_for_support(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, cTouch &supported, cAnalyzeField &analyzedst);
+    int weight_for_support(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported, cAnalyzeField &analyzedst);
 
-    int weight_for_attack(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, cTouch &attacked, cAnalyzeField &analyzedst);
+    int weight_for_attack(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, cAnalyzeField &analyzedst);
 
     int weight_for_attack_on_king(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, cAnalyzeField &analyzedst);
 #endif

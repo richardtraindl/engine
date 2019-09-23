@@ -242,11 +242,10 @@
     }
 
 
-    int weight_for_support(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, cTouch &supported, cAnalyzeField &analyzedst){
+    int weight_for_support(cMatch &match, int piece, cPrioMove &priomove, cTouch &supported, cAnalyzeField &analyzedst){
         if(is_move_out_of_soft_pin(match, piece, priomove) == false &&
            analyzedst.is_field_ok){
-            if(iscastlrook == false && 
-               cPiece::dir_for_move(piece, priomove.src, supported.pos) ==
+            if(cPiece::dir_for_move(piece, priomove.src, supported.pos) ==
                cPiece::dir_for_move(piece, priomove.dst, supported.pos)){
                 return cTactic::WEIGHTS["downgraded"];
             }
@@ -265,11 +264,10 @@
     }
 
 
-    int weight_for_attack(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, cTouch &attacked, cAnalyzeField &analyzedst){
+    int weight_for_attack(cMatch &match, int piece, cPrioMove &priomove, cTouch &attacked, cAnalyzeField &analyzedst){
         if(is_move_out_of_soft_pin(match, piece, priomove) == false &&
            analyzedst.is_field_ok){
-            if(iscastlrook == false && 
-               cPiece::dir_for_move(piece, priomove.src, attacked.pos) ==
+            if(cPiece::dir_for_move(piece, priomove.src, attacked.pos) ==
                cPiece::dir_for_move(piece, priomove.dst, attacked.pos)){
                 return cTactic::WEIGHTS["downgraded"];
             }

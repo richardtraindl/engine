@@ -140,27 +140,31 @@
         cNode node12(base12, candidates12);
         openings->add_node(node12, 2);
 
-    /*  
         //d2-d4, f7-f5
-        node = cNode(0X42356324111011110000000000010000000009000000000099999099CABDEBAC, \
-                     ["c2-c4", "g1-f3", "g2-g3", "e2-e4"])
-        openings.add_node(node, 2)
+        uint64_t base13[] = {{0x4235632411101111}, {0x0000000000010000}, {0x0000090000000000}, {0x99999099CABDEBAC}};
+        vector<string> candidates13 = {{"c2-c4"}, {"g1-f3"}, {"g2-g3"}, {"e2-e4"}};
+        cNode node13(base13, candidates13);
+        openings->add_node(node13, 2);
 
         //d2-d4, d7-d6
-        node = cNode(0X42356324111011110000000000010000000000000009000099909999CABDEBAC, \
-                     ["e2-e4", "c2-c4", "g1-f3", "c1-f4"])
-        openings.add_node(node, 2)
+        uint64_t base14[] = {{0x4235632411101111}, {0x0000000000010000}, {0x0000000000090000}, {0x99909999CABDEBAC}};
+        vector<string> candidates14 = {{"e2-e4"}, {"c2-c4"}, {"g1-f3"}, {"c1-f4"}};
+        cNode node14(base14, candidates14);
+        openings->add_node(node14, 2);
 
         //d2-d4, e7-e6
-        node = cNode(0X42356324111011110000000000010000000000000000900099990999CABDEBAC, \
-                     ["e2-e4", "c2-c4", "g1-f3", "c1-f4"])
-        openings.add_node(node, 2)
+        uint64_t base15[] = {{0x4235632411101111}, {0x0000000000010000}, {0x0000000000009000}, {0x99990999CABDEBAC}};
+        vector<string> candidates15 = {{"e2-e4"}, {"c2-c4"}, {"g1-f3"}, {"c1-f4"}};
+        cNode node15(base15, candidates15);
+        openings->add_node(node15, 2);
 
         //d2-d4, g8-f6
-        node = cNode(0X423563241110111100000000000100000000000000000A0099999999CABDEB0C, \
-                     ["c2-c4", "g1-f3", "c1-f4"])
-        openings.add_node(node, 2)
+        uint64_t base16[] = {{0x4235632411101111}, {0x0000000000010000}, {0x0000000000000A00}, {0x99999999CABDEB0C}};
+        vector<string> candidates16 = {{"c2-c4"}, {"g1-f3"}, {"c1-f4"}};
+        cNode node16(base16, candidates16);
+        openings->add_node(node16, 2);
 
+    /*  
         //c2-c4, e7-e5
         node = cNode(0X42356324110111110000000000100000000090000000000099990999CABDEBAC, \
                      ["b1-c3", "d2-d3", "g2-g3"])

@@ -333,7 +333,7 @@
 
 
     int start_alphabeta_threads(cMatch &match, int depth, cSearchLimits &slimits, int alpha, int beta, bool maximizing, cPrioMove *last_pmove, list<cPrioMove> &rcandidates){
-        const int maxthreads = 1;
+        const int maxthreads = 8;
         array<list<cPrioMove>, maxthreads> candidates;
         array<cMatch*, maxthreads> matches;
         thread threads[maxthreads];
@@ -467,8 +467,8 @@
             bool maximizing = match.next_color() == COLORS["white"];
             int alpha = SCORES[mWKG] * 10;
             int beta = SCORES[mBKG] * 10;
-            int rscore = start_alphabeta_threads(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
-            // int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
+            //int rscore = start_alphabeta_threads(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
+            int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
             cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
             cout << concat_fmtmoves(rcandidates) << endl;
             prnt_fmttime("\ncalc-time: ", time(0) - time_start);

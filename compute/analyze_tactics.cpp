@@ -248,9 +248,15 @@
     }
 
 
-    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, list<cTouch> &supported, cAnalyzeField &analyzedst, list<cExclude*> &excludes){
+    void fill_supported(cMatch &match, int piece, cPrioMove &priomove, cPrioMove *pmove_for_castlrook, list<cTouch> &supported, cAnalyzeField &analyzedst, list<cExclude*> &excludes){
+        int weight;
         for(cTouch touch : supported){
-            int weight = weight_for_support(match, piece, priomove, iscastlrook, touch, analyzedst);
+            if(pmove_for_castlrook == NULL){
+                weight = weight_for_support(match, piece, priomove, touch, analyzedst);
+            }
+            else{
+                weight = weight_for_support(match, piece, *pmove_for_castlrook, touch, analyzedst);
+            }
             if(is_supported_running_pawn(match, touch)){
                 priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["supports-running-pawn"], weight, PIECES_RANKS[piece]));
                 if(find_excluded(excludes, priomove.src, touch.pos, DIRS["undef"], cTactic::DOMAINS["supports-running-pawn"])){
@@ -278,7 +284,7 @@
     }
 
 
-    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, bool iscastlrook, list<cTouch> &attacked, cAnalyzeField &analyzedst, list<cExclude*> &excludes){
+    void fill_attacked(cMatch &match, int piece, cPrioMove &priomove, cPrioMove *pmove_for_castlrook, list<cTouch> &attacked, cAnalyzeField &analyzedst, list<cExclude*> &excludes){
         for(cTouch touch : attacked){
             if(touch.piece == mWKG || touch.piece == mBKG){
                 int weight = weight_for_attack_on_king(match, piece, priomove, touch, analyzedst);
@@ -291,7 +297,13 @@
                 }
             }
             else{
-                int weight = weight_for_attack(match, piece, priomove, iscastlrook, touch, analyzedst);
+                int weight;
+                if(pmove_for_castlrook == NULL){
+                    weight = weight_for_attack(match, piece, priomove, touch, analyzedst);
+                }
+                else{
+                    weight = weight_for_attack(match, piece, *pmove_for_castlrook, touch, analyzedst);
+                }
                 priomove.tactics.push_back(new cTactic(cTactic::DOMAINS["attacks"], weight, PIECES_RANKS[piece]));
                 if(find_excluded(excludes, priomove.src, touch.pos, DIRS["undef"], cTactic::DOMAINS["attacks"])){
                     priomove.downgrade(cTactic::DOMAINS["attacks"]);
