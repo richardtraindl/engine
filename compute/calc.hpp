@@ -13,7 +13,7 @@
         public:
             int dpth_stage1;
             int dpth_stage2;
-            int dpth_max;
+            int maxdpth;
             int mvcnt_stage1;
             int mvcnt_stage2;
 
@@ -36,7 +36,9 @@
 
     int count_up_to_prio(list<cPrioMove *> &priomoves, int priolimit);
 
-    void resort_exchange_and_stormy_moves(list<cPrioMove *> &priomoves, int new_prio, cPrioMove *last_pmove, bool only_exchange, list<cPrioMove*> &exchanges, list<cPrioMove*> &stormies);
+    int resort_exchange_moves(list<cPrioMove *> &priomoves, cPrioMove *last_pmove);
+
+    void resort_exchange_move(list<cPrioMove *> &priomoves, cPrioMove *lastpmove);
 
     int select_movecnt(cMatch &match, list<cPrioMove *> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove);
 

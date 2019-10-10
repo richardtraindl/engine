@@ -84,8 +84,8 @@
             {"upgraded",                4},
             {"downgraded",              5},
             {"vague-deal",              6},
-            {"undef",                   7},
-            {"bad-deal",                8}
+            {"bad-deal",                7},
+            {"undef",                   8}
         };
 
         map<int, int> cTactic::DOMAINS_TO_PRIOS = {
@@ -113,18 +113,18 @@
             {DOMAINS["approach-opp-king"],         134},
             {DOMAINS["guards-pawn-to-promotion"],  135},
             // ### level 3 ###
-            {DOMAINS["undef"],                     150}
+            {DOMAINS["undef"],                     136}
         };
 
         map<int, int> cTactic::WEIGHTS_TO_ADJUST = {
-            {WEIGHTS["stormy"],                 -40},
-            {WEIGHTS["better-deal"],            -30},
-            {WEIGHTS["good-deal"],                0},
-            {WEIGHTS["upgraded"],                 0},
-            {WEIGHTS["downgraded"],              40},
-            {WEIGHTS["vague-deal"],              10},
-            {WEIGHTS["undef"],                    0},
-            {WEIGHTS["bad-deal"],                50}
+            {WEIGHTS["stormy"],                 -60},
+            {WEIGHTS["better-deal"],            -40},
+            {WEIGHTS["good-deal"],              -20},
+            {WEIGHTS["upgraded"],               -20},
+            {WEIGHTS["downgraded"],              20},
+            {WEIGHTS["vague-deal"],              20},
+            {WEIGHTS["bad-deal"],                40},
+            {WEIGHTS["undef"],                    0}
         };
 
         map<string, int> cPrioMove::PRIOS = {

@@ -35,7 +35,8 @@
         match.do_move(coord_to_index("c4"), coord_to_index("b5"), mBLK);
         match.do_move(coord_to_index("b8"), coord_to_index("d7"), mBLK);
 
-        match.do_move(coord_to_index("g5"), coord_to_index("f6"), mBLK);
+        //match.do_move(coord_to_index("b5"), coord_to_index("d7"), mBLK);
+        //match.do_move(coord_to_index("f6"), coord_to_index("d7"), mBLK);
 
         //match.do_move(coord_to_index("e1"), coord_to_index("c1"), mBLK);
         //match.do_move(coord_to_index("a8"), coord_to_index("d8"), mBLK);
