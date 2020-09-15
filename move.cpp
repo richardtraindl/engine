@@ -1,236 +1,74 @@
 
-    #include <iostream>
-    #include <cstring>
     #include "./move.hpp"
-    #include "./board.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
 
-    cMove::cMove(int newsrc, int newdst, int newprev_dstpiece, int newprompiece){ 
+
+    cGMove::cGMove(uint64_t newsrc, uint64_t newdst, uint8_t newprompiece){ 
         src = newsrc;
         dst = newdst;
-        prev_dstpiece = newprev_dstpiece;
         prompiece = newprompiece;
     }
-    cMove::cMove(){
+
+    cGMove::cGMove(){
     }
 
-    string cMove::format(){
-        /*if(piece == mWKG || piece == mBKG){
-            if(src % 8 - dst % 8 == -2){
-                return string("0-0");
-            }
-            if(src % 8 - dst % 8 == 2){
-                return string("0-0-0");
-            }
-        }*/
 
-        string hyphen = "";
+    string cGMove::format(){
+        string hyphen = "-";
         string trailing = "";
-        if(prev_dstpiece == mBLK){
-            hyphen = "-";
-        }
-        else{
-            hyphen = "x";
-        }
 
         if(prompiece != mBLK){
             trailing = ", " + reverse_lookup(PIECES, prompiece);
         }
-        /*else{
-            if(prev_dstpiece == mBLK && src % 8 != dst % 8){
-                trailing = " e.p.";
-            }
-        }*/
-        return index_to_coord(src) + hyphen + index_to_coord(dst) + trailing;
+
+        return pos_to_coord(src) + hyphen + pos_to_coord(dst) + trailing;
     }
 
 
-    cTactic::cTactic(int _domain, int _weight, int _addition){ 
-        domain = _domain;
-        weight = _weight;
-        addition = _addition;
-    }
-
-    map<string, int> cTactic::DOMAINS = {
-            {"defends-check",            10},
-            {"captures",                 20},
-            {"attacks-king",             30},
-            {"attacks",                  40},
-            {"supports",                 50},
-            {"supports-running-pawn",    60},
-            {"flees",                    70},
-            {"forks",                    80},
-            {"threatens-fork",           90},
-            {"defends-fork",             100},
-            {"unpins",                   110},
-            {"blocks",                   120},
-            {"promotes",                 130}, 
-            {"is-tactical-draw",         140},
-            {"is-running-pawn",          150}, 
-            {"controles-file",           160},
-            {"castles",                  170},
-            {"is-progress",              180},
-            {"opposition",               190},
-            {"approach-opp-king",        200},
-            {"guards-pawn-to-promotion", 210},
-            {"undef",                    220}
-        };
-
-        map<string, int> cTactic::WEIGHTS = {
-            {"stormy",                  1},
-            {"better-deal",             2},
-            {"good-deal",               3},
-            {"upgraded",                4},
-            {"downgraded",              5},
-            {"vague-deal",              6},
-            {"bad-deal",                7},
-            {"undef",                   8}
-        };
-
-        map<int, int> cTactic::DOMAINS_TO_PRIOS = {
-            // ### level 1 ###
-            {DOMAINS["promotes"],               100},
-            {DOMAINS["captures"],               101},
-            {DOMAINS["is-running-pawn"],        102},
-            {DOMAINS["is-tactical-draw"],       103},
-            {DOMAINS["defends-check"] ,         104},
-            // ### level 2 ###
-            {DOMAINS["castles"],                   120},
-            {DOMAINS["attacks-king"],              121},
-            {DOMAINS["forks"],                     122}, 
-            {DOMAINS["threatens-fork"],            123},
-            {DOMAINS["defends-fork"],              124}, 
-            {DOMAINS["unpins"],                    125}, 
-            {DOMAINS["supports-running-pawn"],     126}, 
-            {DOMAINS["flees"],                     127}, 
-            {DOMAINS["blocks"],                    128},
-            {DOMAINS["controles-file"],            129}, 
-            {DOMAINS["is-progress"],               130},
-            {DOMAINS["supports"],                  131},
-            {DOMAINS["attacks"],                   132},
-            {DOMAINS["opposition"],                133},
-            {DOMAINS["approach-opp-king"],         134},
-            {DOMAINS["guards-pawn-to-promotion"],  135},
-            // ### level 3 ###
-            {DOMAINS["undef"],                     136}
-        };
-
-        map<int, int> cTactic::WEIGHTS_TO_ADJUST = {
-            {WEIGHTS["stormy"],                 -60},
-            {WEIGHTS["better-deal"],            -40},
-            {WEIGHTS["good-deal"],              -20},
-            {WEIGHTS["upgraded"],               -20},
-            {WEIGHTS["downgraded"],              20},
-            {WEIGHTS["vague-deal"],              20},
-            {WEIGHTS["bad-deal"],                40},
-            {WEIGHTS["undef"],                    0}
-        };
-
-        map<string, int> cPrioMove::PRIOS = {
-            {"prio0",                            50},
-            {"prio1",                           100},
-            {"prio2",                           150},
-            {"prio3",                           200} 
-        };
-
-    cPrioMove::cPrioMove(int src, int dst, int prev_dstpiece, int prompiece, int _prio) : cMove(src, dst, prev_dstpiece, prompiece){
-        prio = _prio;
-    }
-
-    void cPrioMove::evaluate_priority(){
-        int count = 0;
-        prio = PRIOS["prio3"];
-        for(cTactic *tactic : tactics){
-            int newprio = cTactic::DOMAINS_TO_PRIOS[tactic->domain] + cTactic::WEIGHTS_TO_ADJUST[tactic->weight] + tactic->addition;
-            prio = min(prio, newprio);
-            if(tactic->weight <= cTactic::WEIGHTS["downgraded"]){
-                count += 2;
-            }
-        }
-        prio -= count;
-    }
-
-    void cPrioMove::downgrade(int domain){
-        for(cTactic *tactic : tactics){
-            if(tactic->domain == domain){
-                if(tactic->weight == cTactic::WEIGHTS["stormy"] ||
-                   tactic->weight == cTactic::WEIGHTS["better-deal"] ||
-                   tactic->weight == cTactic::WEIGHTS["good-deal"]){
-                    tactic->weight = cTactic::WEIGHTS["downgraded"];
-                    return;
-                }
-            }
+    cMove::cMove(uint8_t newtype, 
+                 uint64_t newsrc, 
+                 uint64_t newdst, 
+                 uint8_t newprompiece, 
+                 uint64_t *newprev_fields){ 
+        type = newtype;
+        src = newsrc;
+        dst = newdst;
+        prompiece = newprompiece;
+        for(int i = 0; i < 8; ++i){
+            prev_fields[i] = *(newprev_fields + i);
         }
     }
-                    
-    void cPrioMove::upgrade(int domain){
-        for(cTactic *tactic : tactics){
-            if(tactic->domain == domain){
-                if(tactic->weight != cTactic::WEIGHTS["stormy"] && 
-                   tactic->weight != cTactic::WEIGHTS["better-deal"] && 
-                   tactic->weight != cTactic::WEIGHTS["good-deal"]){
-                    tactic->weight = cTactic::WEIGHTS["upgraded"];
-                    return;
-                }
-            }
-        }
+    cMove::cMove(){
     }
 
-    int cPrioMove::fetch_weight(int domain){
-        for(cTactic *tactic : tactics){
-            if(tactic->domain == domain){
-                return tactic->weight;
-            }
-        }
-        return cTactic::WEIGHTS["undef"];
-    }
 
-    bool cPrioMove::has_domain(int domain){
-        for(cTactic *tactic : tactics){
-            if(tactic->domain == domain){
-                return true;
-            }
+    string cMove::format(){
+        string trailing = "";
+        if(prompiece != mBLK){
+            trailing = ", " + reverse_lookup(PIECES, prompiece);
         }
-        return false;
-    }
 
-    bool cPrioMove::has_weight(int weight){
-        for(cTactic *tactic : tactics){
-            if(tactic->weight == weight){
-                return true;
-            }
+        if(type == MOVE_TYPE["standard"]){
+            return pos_to_coord(src) + "-" + pos_to_coord(dst) + trailing;
         }
-        return false;
-    }
 
-    bool cPrioMove::has_tactic_ext(int domain, int weight){
-        for(cTactic *tactic : tactics){
-            if(tactic->domain == domain and tactic->weight == weight){
-                return true;
-            }
+        if(type == MOVE_TYPE["capture"]){
+            return pos_to_coord(src) + "x" + pos_to_coord(dst) + trailing;
         }
-        return false;
-    }
 
-    bool cPrioMove::is_tactic_stormy(){
-        for(cTactic *tactic : tactics){
-            if(tactic->weight == cTactic::WEIGHTS["stormy"] || 
-               ((tactic->domain == cTactic::DOMAINS["promotes"] || 
-                 tactic->domain == cTactic::DOMAINS["captures"]) &&  
-                (tactic->weight == cTactic::WEIGHTS["better-deal"] || 
-                 tactic->weight == cTactic::WEIGHTS["good-deal"]))){
-                return true;
-            }
+        if(type == MOVE_TYPE["en-passant"]){
+            return pos_to_coord(src) + "x" + pos_to_coord(dst) + ", e.p.";
         }
-        return false;
-    }
 
-    string cPrioMove::fmt_tactics(){
-        string str_tactics = "";
-        for(cTactic *tactic : tactics){
-            str_tactics += reverse_lookup(cTactic::DOMAINS, tactic->domain) + " * " + reverse_lookup(cTactic::WEIGHTS, tactic->weight) + " | " ;
+        if(type == MOVE_TYPE["short-castling"]){
+            return string("0-0");
         }
-        return str_tactics;
+
+        if(type == MOVE_TYPE["long-castling"]){
+            return string("0-0-0");
+        }
+        
+        return "";
     }
 

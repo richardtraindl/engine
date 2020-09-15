@@ -10,7 +10,7 @@
         for(int idx = 0; idx < 4; ++idx){
             fields[idx] = newfields[idx];
         }
-        for(int i = 0; i < newcandidates.size(); i++){
+        for(unsigned int i = 0; i < newcandidates.size(); i++){
             candidates.push_back(newcandidates[i]); 
         }
     }
@@ -44,7 +44,7 @@
                node.fields[1] == currfields[1] &&
                node.fields[2] == currfields[2] &&
                node.fields[3] == currfields[3]){
-                for(int i = 0; i < node.candidates.size(); i++){
+                for(unsigned int i = 0; i < node.candidates.size(); i++){
                     candidates.push_back(node.candidates[i]); 
                 }
                 break;

@@ -5,117 +5,151 @@
     #include <map>
     #include <string>
     #include <cstdint>
+    #include <list> 
+    #include <iostream>
     #include "./move.hpp"
+    #include "./helper.hpp"
     #include "./values.hpp"
+
 
     using namespace std;
 
+
+    class cStep{
+        public:
+            uint8_t owner;
+            bool rightshift;
+            uint8_t shiftcnt;
+            uint8_t stepcnt;
+            uint64_t border;
+
+            cStep(uint8_t newowner, bool newrightshift, uint8_t newshiftcnt, uint8_t newstepcnt, uint64_t newborder);
+
+            cStep();
+    };
+
+
     class cBoard{
         public:
-            static const int SNOK;
-            static map<string, int> RANKS;
-            static map<string, int> COLS;
+            uint64_t fields[8] = { 0b1111111111111111000000000000000000000000000000000000000000000000,
+                                   0b0000000000000000000000000000000000000000000000001111111111111111,
+                                   0b0000100000000000000000000000000000000000000000000000000000001000,
+                                   0b0001000000000000000000000000000000000000000000000000000000010000,
+                                   0b1000000100000000000000000000000000000000000000000000000010000001,
+                                   0b0010010000000000000000000000000000000000000000000000000000100100,
+                                   0b0100001000000000000000000000000000000000000000000000000001000010, 
+                                   0b0000000011111111000000000000000000000000000000001111111100000000 };
 
-            const static uint64_t BASE1        = 0x4235632411111111;
-            const static uint64_t BASE2        = 0x0000000000000000;
-            const static uint64_t BASE3        = 0x0000000000000000;
-            const static uint64_t BASE4        = 0x99999999CABDEBAC;
+            const cStep rk_steps[4] =  { 
+                cStep(STEP_OWNER["rook"], true, 1, 7, mEST_BORDER),
+                cStep(STEP_OWNER["rook"], false, 1, 7, mWST_BORDER),
+                cStep(STEP_OWNER["rook"], true, 8, 7, mNTH_BORDER),
+                cStep(STEP_OWNER["rook"], false, 8, 7, mSTH_BORDER) };
 
-            const static uint64_t FULL         = 0xFFFFFFFFFFFFFFFF;
+            const cStep bp_steps[4] = { 
+                cStep(STEP_OWNER["bishop"], true, 9, 7, mNTH_EST_BORDER),
+                cStep(STEP_OWNER["bishop"], false, 9, 7, mSTH_WST_BORDER),
+                cStep(STEP_OWNER["bishop"], true, 7, 7, mNTH_WST_BORDER),
+                cStep(STEP_OWNER["bishop"], false, 7, 7, mSTH_EST_BORDER) };
 
-            const static uint64_t SINGLE       = 0xF000000000000000;
+            const cStep qu_steps[8] = { 
+                rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3], 
+                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3] };
 
-            const static uint64_t POSMASK[];
+            const cStep kg_steps_generic[8] = { 
+                cStep(STEP_OWNER["king"], true, 1, 1, mEST_BORDER),
+                cStep(STEP_OWNER["king"], false, 1, 1, mWST_BORDER),
+                cStep(STEP_OWNER["king"], true, 8, 1, mNTH_BORDER),
+                cStep(STEP_OWNER["king"], false, 8, 1, mSTH_BORDER), 
+                cStep(STEP_OWNER["king"], true, 9, 1, mNTH_EST_BORDER),
+                cStep(STEP_OWNER["king"], false, 9, 1, mSTH_WST_BORDER),
+                cStep(STEP_OWNER["king"], true, 7, 1, mNTH_WST_BORDER),
+                cStep(STEP_OWNER["king"], false, 7, 1, mSTH_EST_BORDER) };
 
-            const static uint64_t BITPOSMASK[];
+            const cStep wkg_steps_and_castl[10] = { 
+                kg_steps_generic[0], kg_steps_generic[1], 
+                kg_steps_generic[2], kg_steps_generic[3], 
+                kg_steps_generic[4], kg_steps_generic[5], 
+                kg_steps_generic[6], kg_steps_generic[7],
+                cStep(STEP_OWNER["king"], true, 2, 1, mWHITE_CASTL_BORDER),
+                cStep(STEP_OWNER["king"], false, 2, 1, mWHITE_CASTL_BORDER) };
 
-            const static uint64_t NEGMASK[];
-          
-            const static uint64_t BITS1000 = 0x8888888888888888;
-            const static uint64_t BITS1110 = 0xEEEEEEEEEEEEEEEE;
-            const static uint64_t BITS1100 = 0xCCCCCCCCCCCCCCCC;
-            const static uint64_t BITS0111 = 0x7777777777777777;
-            const static uint64_t BITS0011 = 0x3333333333333333;
+            const cStep bkg_steps_and_castl[10] = { 
+                kg_steps_generic[0], kg_steps_generic[1], 
+                kg_steps_generic[2], kg_steps_generic[3], 
+                kg_steps_generic[4], kg_steps_generic[5], 
+                kg_steps_generic[6], kg_steps_generic[7],
+                cStep(STEP_OWNER["king"], true, 2, 1, mBLACK_CASTL_BORDER),
+                cStep(STEP_OWNER["king"], false, 2, 1, mBLACK_CASTL_BORDER) };
 
-            const string WHITE_TEXT  = "\033[97m";
-            const string WHITE_BACK  = "\033[107m";
-            const string YELLOW_TEXT  = "\033[93m";
-            const string YELLOW_BACK  = "\033[103m";
-            const string BLACK_TEXT  = "\033[30m";
-            
-            const string BLUE_BACK   = "\033[104m";
-            const string CYAN_BACK   = "\033[106m";            
-            const string MAGENTA_BACK = "\033[44m";
-            const string GREEN_BACK  = "\033[42m";
-            const string BOLD_ON     = "\033[1m";
-            const string BOLD_OFF    = "\033[2m";
-            const string MAGIC       = "\033[3m";
-            const string RESET_ALL   = "\033[0m";
+            const cStep kn_steps[8] = { 
+                cStep(STEP_OWNER["knight"], true, 6, 1, mNTH1_WST2_BORDER),
+                cStep(STEP_OWNER["knight"], true, 15, 1, mNTH2_WST1_BORDER),
+                cStep(STEP_OWNER["knight"], true, 17, 1, mNTH2_EST1_BORDER),
+                cStep(STEP_OWNER["knight"], true, 10, 1, mNTH1_EST2_BORDER), 
+                cStep(STEP_OWNER["knight"], false, 6, 1, mSTH1_EST2_BORDER),
+                cStep(STEP_OWNER["knight"], false, 15, 1, mSTH2_EST1_BORDER),
+                cStep(STEP_OWNER["knight"], false, 17, 1, mSTH2_WST1_BORDER),
+                cStep(STEP_OWNER["knight"], false, 10, 1, mSTH1_WST2_BORDER) };
 
-            uint8_t fields[64] = { mWRK, mWKN, mWBP, mWQU, mWKG, mWBP, mWKN, mWRK,
-                                   mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, 
-                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
-                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
-                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
-                                   mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, 
-                                   mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, 
-                                   mBRK, mBKN, mBBP, mBQU, mBKG, mBBP, mBKN, mBRK };
-            int wKg;
-            int bKg;
-            int wKg_first_move_on;
-            int bKg_first_move_on;
-            int wRkA_first_move_on;
-            int wRkH_first_move_on;
-            int bRkA_first_move_on;
-            int bRkH_first_move_on;
+            const cStep wpw_steps_attack[2] = { 
+                cStep(STEP_OWNER["wpawn"], true, 9, 1, mNTH_EST_BORDER),
+                cStep(STEP_OWNER["wpawn"], true, 7, 1, mNTH_WST_BORDER) };
+
+            const cStep wpw_steps[3] = { 
+                cStep(wpw_steps_attack[0]),
+                cStep(wpw_steps_attack[1]),
+                cStep(STEP_OWNER["wpawn"], true, 8, 2, mNTH_BORDER) };
+
+            const cStep bpw_steps_attack[2] = { 
+                cStep(STEP_OWNER["bpawn"], false, 9, 1, mSTH_WST_BORDER),
+                cStep(STEP_OWNER["bpawn"], false, 7, 1, mSTH_EST_BORDER) };
+
+            const cStep bpw_steps[3] = { 
+                cStep(bpw_steps_attack[0]),
+                cStep(bpw_steps_attack[1]),
+                cStep(STEP_OWNER["bpawn"], false, 8, 2, mSTH_BORDER) };
 
             cBoard();
 
             cBoard(const cBoard &board);
             // copy constructor
 
-            int getfield(int idx);
+            uint8_t getfield(uint64_t pos);
 
-            void setfield(int idx, int value);
+            void setfield(uint64_t pos, uint8_t piece);
+
+            static bool is_piece_white(uint8_t piece);
+
+            static bool is_piece_black(uint8_t piece);
+
+            bool is_field_busy(uint64_t pos);
+
+            bool is_field_white_busy(uint64_t pos);
+
+            bool is_field_black_busy(uint64_t pos);
 
             bool verify();
             
             void eval_count_of_officers(int &wofficers, int &bofficers);
 
-            static bool is_inbounds_core(int src, int dst);
-
-            static bool is_inbounds(int src, int dst, int step);
-
-            int search(int src, int step, int maxcnt);
-
-            bool search_for_two_pieces_within_dir(int &first, int &second, int src, int step, int maxcnt);
-
-            bool search_bi_dirs(int &first, int &second, int src, int step, int maxcnt);
-
-            static bool is_nth(int src, int dst);
-            static bool is_sth(int src, int dst);
-            static bool is_est(int src, int dst);
-            static bool is_wst(int src, int dst);
-            static bool is_nth_est(int src, int dst);
-            static bool is_sth_wst(int src, int dst);
-            static bool is_nth_wst(int src, int dst);
-            static bool is_sth_est(int src, int dst);
-
-            int eval_pin_dir(int src);
-
-            int eval_soft_pin_dir(int src);
-
-            bool is_king_after_move_attacked(int src, int dst, list<cMove> &minutes);
-
-            bool is_move_valid(int src, int dst, int prompiece, list<cMove> &minutes);
-
-            bool is_move_available(list<cMove> &minutes);
-
             void prnt();
 
-            bool compare(cBoard &board2);
+            bool compare(cBoard &newboard);
 
-            void cpyfields_to_bigint(int startidx, int count, uint64_t &bigint);
+            bool is_field_enemy_touched(uint64_t pos);
+
+            bool tst_en_passant(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
+            bool tst_wpw_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
+            bool tst_bpw_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
+            bool tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
+            bool tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
+            void gen_moves(list<cMove> &minutes);
     };
 
 #endif

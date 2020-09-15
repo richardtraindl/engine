@@ -13,6 +13,7 @@
     class cAnalyzeField{
         private:
             cBoard *board;
+            int color;
             int pos;
             int piece;
             list<cTouch> friends_on_field;
@@ -36,8 +37,9 @@
             bool is_suppsize_lt_attsize;
             bool is_suppsize_gt_attsize;
             bool is_soft_pinned;
-            int lowest_attacker;
-            cAnalyzeField(cBoard &newboard, int newpos);
+            int lowest_friend;
+            int lowest_enemy;
+            cAnalyzeField(cBoard &newboard, int newcolor, int newpos);
             static int lowest_piece(list<cTouch> touches);
     };
     

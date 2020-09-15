@@ -38,7 +38,7 @@
 
     int resort_exchange_moves(list<cPrioMove *> &priomoves, cPrioMove *last_pmove);
 
-    void resort_exchange_move(list<cPrioMove *> &priomoves, cPrioMove *lastpmove);
+    void resort_moves(list<cPrioMove *> &priomoves, cPrioMove *lastpmove);
 
     int select_movecnt(cMatch &match, list<cPrioMove *> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove);
 

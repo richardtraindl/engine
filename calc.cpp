@@ -12,7 +12,7 @@
 
 
     cSearchLimits::cSearchLimits(int level, bool is_endgame){
-        int maxdpth = 11;
+        maxdpth = 15;
         if(level == cMatch::LEVELS["blitz"]){
             dpth_stage1 = 3;
             dpth_stage2 = 5;
@@ -114,8 +114,8 @@
     int count_up_to_prio(list<cPrioMove *> &priomoves, int priolimit){
         int count = 0;
         for(cPrioMove *priomove : priomoves){
-            if(priomove->prio <= priolimit || priomove->is_tactic_stormy()){
-                count += 1;
+            if(priomove->prio <= priolimit ){ // || priomove->is_tactic_stormy()
+                count++;
             }
             else{
                 break;
@@ -181,15 +181,29 @@
     }
 
 
-    void resort_exchange_move(list<cPrioMove *> &priomoves, cPrioMove *lastpmove){
-        if(lastpmove != NULL && 
-           lastpmove->has_domain(cTactic::DOMAINS["captures"] == false)){
+    void resort_moves(list<cPrioMove *> &priomoves, cPrioMove *lastpmove){
+        if(lastpmove == NULL ||
+           (lastpmove != NULL && 
+            lastpmove->has_domain(cTactic::DOMAINS["captures"] == false))){
             return;
         }
 
+        bool capture = false;
+        bool silent = true;
+        if(lastpmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["bad-deal"]) ||
+           lastpmove->has_tactic_ext(cTactic::DOMAINS["captures"], cTactic::WEIGHTS["vague-deal"])){
+            silent = false;
+        }
         for(cPrioMove *priomove : priomoves){
-            if(priomove->has_domain(cTactic::DOMAINS["captures"])){
-                priomove->prio = min(priomove->prio, (cPrioMove::PRIOS["prio0"] + priomove->prio % 10));
+            if(priomove->has_domain(cTactic::DOMAINS["captures"]) && capture == false){
+                priomove->prio = min(priomove->prio, (0 + priomove->prio % 10));
+                capture = true;
+            }
+            if(priomove->has_domain(cTactic::DOMAINS["captures"]) == false && silent == false){
+                priomove->prio = min(priomove->prio, (0 + priomove->prio % 10));
+                silent = true;
+            }
+            if(capture && silent){
                 return;
             }
         }
@@ -197,31 +211,29 @@
 
 
     int select_movecnt(cMatch &match, list<cPrioMove *> &priomoves, int depth, cSearchLimits &slimits, cPrioMove *last_pmove){
-        int movecnt = 0;
         if(priomoves.size() == 0){
-            return movecnt;
+            return 0;
         }
+
+        int movecnt = 0;
         if(depth <= slimits.dpth_stage1 && 
            last_pmove != NULL && last_pmove->has_domain(cTactic::DOMAINS["attacks-king"])){
             return priomoves.size();
         }
 
-        resort_exchange_move(priomoves, last_pmove);
+        resort_moves(priomoves, last_pmove);
         if(depth <= slimits.dpth_stage1){
             movecnt = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio1"]);
             return max(slimits.mvcnt_stage1, movecnt);
         }
         if(depth <= slimits.dpth_stage2){
-            movecnt = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio0"]);
-            return max(slimits.mvcnt_stage2, movecnt);
+            movecnt = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio1"]);
+            return min(slimits.mvcnt_stage2, movecnt);
         }
         if(depth <= slimits.maxdpth){
             movecnt = count_up_to_prio(priomoves, cPrioMove::PRIOS["prio0"]);
-            if( movecnt > 0 || 
-                (last_pmove != NULL && 
-                 (last_pmove->has_domain(cTactic::DOMAINS["captures"]) || 
-                  last_pmove->is_tactic_stormy() || 
-                  last_pmove->has_domain(cTactic::DOMAINS["attacks-king"]))) ){
+            if(last_pmove != NULL && 
+               last_pmove->is_tactic_stormy()){ // || last_pmove->has_domain(cTactic::DOMAINS["attacks-king"])
                 return max(2, movecnt);
             }
             else{
@@ -279,11 +291,11 @@
             }
             newcandidates.clear();
 
-            //if(depth == 1){
-                //cout << "\n" << count << "/" << maxcnt << " CURRENT SEARCH: " << " [" + priomove->format() + "] " << concat_fmtmoves(newcandidates) << endl;
-            //}
+            if(depth == 1){
+                cout << "\n" << count << "/" << maxcnt << " CURRENT SEARCH: " << " [" + priomove->format() + "] " << concat_fmtmoves(newcandidates) << endl;
+            }
             if(depth > slimits.mvcnt_stage2){
-                cout << depth << ".";
+                cout << "-" << depth << "-";
             }
 
             if(priomove->has_domain(cTactic::DOMAINS["is-tactical-draw"])){
@@ -305,9 +317,9 @@
                     bestscore = newscore;
                     alpha = max(bestscore, alpha);
                     append_newmove(priomove, newcandidates, rcandidates);
-                    //if(depth == 1){
-                        //cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
-                    //}
+                    if(depth == 1){
+                        cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
+                    }
                     if(alpha >= beta){
                         break;
                     }
@@ -318,9 +330,9 @@
                     bestscore = newscore;
                     beta = min(bestscore, beta);
                     append_newmove(priomove, newcandidates, rcandidates);
-                    //if(depth == 1){
-                        //cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
-                    //}
+                    if(depth == 1){
+                        cout << "\n!!!CANDIDATE:      " << dec << bestscore << concat_fmtmoves(rcandidates) << endl;
+                    }
                     if(beta <= alpha){
                         break;
                     }
@@ -402,17 +414,16 @@
         }
 
         for(cPrioMove *priomove : priomoves){
-            newcandidates.clear();
-
-            if(count >= maxcnt){
+            count++;
+            if(count > maxcnt){
                 break;
             }
-
-            if(count % maxthreads != (threadcnt - 1)){
-                count++;
+            
+            if((count - 1) % maxthreads != (threadcnt - 1)){
                 continue;
             }
-            count++;
+
+            newcandidates.clear();
 
             if(priomove->has_domain(cTactic::DOMAINS["is-tactical-draw"])){
                 newscore = 0;
@@ -453,7 +464,7 @@
 
     int calc_move(cMatch &match, list<cPrioMove> &rcandidates){
         time_t time_start = time(0);
-        
+
         cMove *cmove = retrieve_move(match);
         if(cmove != NULL){
             int prev_dstpiece = match.board.getfield(cmove->dst);
@@ -467,8 +478,8 @@
             bool maximizing = match.next_color() == COLORS["white"];
             int alpha = SCORES[mWKG] * 10;
             int beta = SCORES[mBKG] * 10;
-            int rscore = start_alphabeta_threads(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
-            //int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
+            //int rscore = start_alphabeta_threads(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
+            int rscore = alphabeta(match, 1, slimits, alpha, beta, maximizing, NULL, rcandidates);
             cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
             cout << concat_fmtmoves(rcandidates) << endl;
             prnt_fmttime("\ncalc-time: ", time(0) - time_start);

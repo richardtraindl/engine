@@ -97,10 +97,12 @@
         int value = 0;
         //int color = COLORS["undef"];
 
-        cPiece cwhite_piece(match.board, match.board.wKg);
+        uint64_t wkg = match.board.fields[0] & match.board.fields[2];
+        cPiece cwhite_piece(match.board, wkg);
         bool white_king_is_safe = cwhite_piece.is_king_safe();
 
-        cPiece cblack_piece(match.board, match.board.bKg);
+        uint64_t bkg = match.board.fields[1] & match.board.fields[2];
+        cPiece cblack_piece(match.board, bkg);
         bool black_king_is_safe = cblack_piece.is_king_safe();
 
         /*if(white_king_is_safe == false || black_king_is_safe == false){

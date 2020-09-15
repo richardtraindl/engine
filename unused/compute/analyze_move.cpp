@@ -19,10 +19,10 @@
         list<cTouch> discl_supported, discl_attacked;
         find_disclosures(match, piece, priomove, discl_supported, discl_attacked);
 
-        cAnalyzeField analyzesrc(match.board, priomove.src);
+        cAnalyzeField analyzesrc(match.board, PIECES_COLORS[piece], priomove.src);
 
         match.do_move(priomove.src, priomove.dst, priomove.prompiece);
-        cAnalyzeField analyzedst(match.board, priomove.dst);
+        cAnalyzeField analyzedst(match.board, PIECES_COLORS[piece], priomove.dst);
         match.undo_move();
 
         int standard_weight = weight_for_standard(match, piece, priomove, analyzedst);

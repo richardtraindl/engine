@@ -76,13 +76,11 @@
                 if(cpiece->board->wKg_first_move_on == -1){
                     cpiece->board->wKg_first_move_on = movecnt;
                 }
-                cpiece->board->wKg = dst;
-            }
+             }
             else{
                 if(cpiece->board->bKg_first_move_on == -1){
                     cpiece->board->bKg_first_move_on = movecnt;
                 }
-                cpiece->board->bKg = dst;
             }
             return move;
         }
@@ -196,14 +194,12 @@
                 if(cpiece->board->wKg_first_move_on != -1 && cpiece->board->wKg_first_move_on == movecnt){
                     cpiece->board->wKg_first_move_on = -1;
                 }
-                cpiece->board->wKg = move.src;
                 return true;
             }
             else{
                 if(cpiece->board->bKg_first_move_on != -1 && cpiece->board->bKg_first_move_on == movecnt){
                     cpiece->board->bKg_first_move_on = -1;
                 }
-                cpiece->board->bKg = move.src;
                 return true;
             }
         }

@@ -1,110 +1,76 @@
 
-    #include <iostream>
-    #include <cstring>
     #include "./board.hpp"
-    #include "./pieces/searchforpiece.hpp"
-    #include "./pieces/piece.hpp"
-    #include "./pieces/piece_ext2.hpp"
-    #include "./helper.hpp"
 
 
-    const uint64_t cBoard::POSMASK[] = { 0xF000000000000000, 
-                                         0x0F00000000000000, 
-                                         0x00F0000000000000, 
-                                         0x000F000000000000, 
-                                         0x0000F00000000000, 
-                                         0x00000F0000000000, 
-                                         0x000000F000000000, 
-                                         0x0000000F00000000, 
-                                         0x00000000F0000000, 
-                                         0x000000000F000000, 
-                                         0x0000000000F00000, 
-                                         0x00000000000F0000, 
-                                         0x000000000000F000, 
-                                         0x0000000000000F00, 
-                                         0x00000000000000F0, 
-                                         0x000000000000000F }; 
+    cStep::cStep(uint8_t newowner, bool newrightshift, uint8_t newshiftcnt, uint8_t newstepcnt, uint64_t newborder){ 
+        owner = newowner;
+        rightshift = newrightshift;
+        shiftcnt = newshiftcnt;
+        stepcnt = newstepcnt;
+        border = newborder;
+    }
 
-    const uint64_t cBoard::BITPOSMASK[] = { 0x1000000000000000, 
-                                            0x0100000000000000, 
-                                            0x0010000000000000, 
-                                            0x0001000000000000, 
-                                            0x0000100000000000, 
-                                            0x0000010000000000, 
-                                            0x0000001000000000, 
-                                            0x0000000100000000, 
-                                            0x0000000010000000, 
-                                            0x0000000001000000, 
-                                            0x0000000000100000, 
-                                            0x0000000000010000, 
-                                            0x0000000000001000, 
-                                            0x0000000000000100, 
-                                            0x0000000000000010, 
-                                            0x0000000000000001 };
-            
-    const uint64_t cBoard::NEGMASK[16] = { 0x0FFFFFFFFFFFFFFF, 
-                                           0xF0FFFFFFFFFFFFFF, 
-                                           0xFF0FFFFFFFFFFFFF, 
-                                           0xFFF0FFFFFFFFFFFF, 
-                                           0xFFFF0FFFFFFFFFFF, 
-                                           0xFFFFF0FFFFFFFFFF, 
-                                           0xFFFFFF0FFFFFFFFF, 
-                                           0xFFFFFFF0FFFFFFFF, 
-                                           0xFFFFFFFF0FFFFFFF, 
-                                           0xFFFFFFFFF0FFFFFF, 
-                                           0xFFFFFFFFFF0FFFFF, 
-                                           0xFFFFFFFFFFF0FFFF, 
-                                           0xFFFFFFFFFFFF0FFF, 
-                                           0xFFFFFFFFFFFFF0FF, 
-                                           0xFFFFFFFFFFFFFF0F, 
-                                           0xFFFFFFFFFFFFFFF0 };
+    cStep::cStep(){
+    }
+
 
     cBoard::cBoard(){ 
-        wKg = COLS["E"] + RANKS["1"] * 8;
-        bKg = COLS["E"] + RANKS["8"] * 8;
-        wKg_first_move_on = -1;
-        bKg_first_move_on = -1;
-        wRkA_first_move_on = -1;
-        wRkH_first_move_on = -1;
-        bRkA_first_move_on = -1;
-        bRkH_first_move_on = -1;
     }
 
     cBoard::cBoard(const cBoard &board){
     } // copy constructor
 
-    const int cBoard::SNOK = -1;
 
-    map<string, int> cBoard::RANKS = {
-        {"1", 0},
-        {"2", 1},
-        {"3", 2},
-        {"4", 3},
-        {"5", 4},
-        {"6", 5},
-        {"7", 6},
-        {"8", 7}
-    };
-
-    map<string, int> cBoard::COLS = {
-        {"A", 0},
-        {"B", 1},
-        {"C", 2},
-        {"D", 3},
-        {"E", 4},
-        {"F", 5},
-        {"G", 6},
-        {"H", 7}
-    };
-
-
-    int cBoard::getfield(int idx){
-        return (int)fields[idx] & 0xFF;
+    uint8_t cBoard::getfield(uint64_t pos){
+        uint8_t piece = 0;
+        uint8_t test = 0b10000000;
+        for(int i = 0; i < 8; i++){
+            if((fields[i] & pos) > 0){
+                piece = (piece | test);
+            }
+            test = (test >> 1);
+        }
+        return piece;
     }
 
-    void cBoard::setfield(int idx, int value){
-        fields[idx] = (uint8_t)value;
+
+    void cBoard::setfield(uint64_t pos, uint8_t piece){
+        uint8_t test = 0b10000000;
+        uint64_t negmask = (0xFFFFFFFFFFFFFFFF ^ pos);
+        for(int i = 0; i < 8; i++){
+            fields[i] = (fields[i] & negmask);
+            if((piece & test) > 0){
+                fields[i] = (fields[i] | pos);
+            }
+            test = (test >> 1);
+        }
     }
+
+
+    bool cBoard::is_piece_white(uint8_t piece){
+        return (piece & mWHITE) > 0;
+    }
+
+
+    bool cBoard::is_piece_black(uint8_t piece){
+        return (piece & mBLACK) > 0;
+    }
+
+
+    bool cBoard::is_field_busy(uint64_t pos){
+        return (pos & fields[mIDX_WHITE]) > 0 || (pos & fields[mIDX_BLACK]) > 0;
+    }
+
+
+    bool cBoard::is_field_white_busy(uint64_t pos){
+        return (pos & fields[mIDX_WHITE]) > 0;
+    }
+
+
+    bool cBoard::is_field_black_busy(uint64_t pos){
+        return (pos & fields[mIDX_BLACK]) > 0;
+    }
+
 
     bool cBoard::verify(){
         int wKg_cnt = 0;
@@ -113,8 +79,10 @@
         int bPw_cnt = 0;
         int wOfficer_cnt = 0;
         int bOfficer_cnt = 0;
-        for(int idx = 0; idx < 64; ++idx){
-            int piece = getfield(idx);
+        uint64_t pos = 0x8000000000000000; 
+
+        while(pos > 0){
+            uint8_t piece = getfield(pos);
             if(piece == mWKG){
                 wKg_cnt += 1; 
                 continue;
@@ -139,6 +107,7 @@
                 bOfficer_cnt += 1;
                 continue;
             }
+            pos = (pos >> 1);
         }
         if(wKg_cnt != 1 || bKg_cnt != 1){
             return false;
@@ -152,20 +121,23 @@
         if(bPw_cnt + bOfficer_cnt > 15){
             return false;
         }
-        if(wKg == -1 || bKg == -1){
+        if((fields[mIDX_WHITE] & fields[mIDX_KING]) == 0 || 
+            (fields[mIDX_BLACK] & fields[mIDX_KING]) == 0 ){
             return false;
         }
-        if(abs(wKg / 8 - bKg / 8) < 2 && abs(wKg % 8 - bKg % 8) < 2){
-            return false;
-        }
+        // ToDo
+        //if(abs(wKg / 8 - bKg / 8) < 2 && abs(wKg % 8 - bKg % 8) < 2){
+        //    return false;
+        //}
         return true;
     }
+
 
     void cBoard::eval_count_of_officers(int &wofficers, int &bofficers){
         wofficers = 0;
         bofficers = 0;
-        for(int idx = 0; idx < 64; ++idx){
-            int piece = getfield(idx);
+        for(uint64_t pos = 0x8000000000000000; pos != 0; pos = (pos >> 1)){
+            int piece = getfield(pos);
             if(piece == mWRK || piece == mWBP || piece == mWKN || piece == mWQU){
                 wofficers += 1;
                 continue;
@@ -177,460 +149,368 @@
         }
     }
 
-    bool cBoard::is_inbounds_core(int src, int dst){
-        if(src < 0 || src > 63 || dst < 0 || dst > 63){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-
-    bool cBoard::is_inbounds(int src, int dst, int step){
-        if(src < 0 || src > 63 || dst < 0 || dst > 63){
-            return false;
-        }
-        if(step == 0){
-            return true;
-        }
-        int dir = DIRS_FOR_STEP[step];
-        if(dir == 0){
-            return false;
-        }
-        if(dir == DIRS["nth"] || dir == DIRS["sth"]){
-            return true;
-        }
-        if(dir == DIRS["est"] || dir == DIRS["nth-est"] || dir == DIRS["sth-est"]){
-            return (src % 8) < (dst % 8);
-        }
-        if(dir == DIRS["wst"] || dir == DIRS["sth-wst"] || dir == DIRS["nth-wst"]){
-            return (src % 8) > (dst % 8);
-        }
-        if(dir == DIRS["2nth-est"] || dir == DIRS["nth-2est"] || 
-           dir == DIRS["sth-2est"] || dir == DIRS["2sth-est"]){
-            return (src % 8) < (dst % 8);
-        }
-        if(dir == DIRS["2sth-wst"] || dir == DIRS["sth-2wst"] || 
-           dir == DIRS["nth-2wst"] || dir == DIRS["2nth-wst"]){
-            return (src % 8) > (dst % 8);
-        }
-        return false;
-    }
-
-    int cBoard::search(int src, int step, int maxcnt){
-        int cnt = 0;
-        int dst = src + step;
-        while(is_inbounds(src, dst, step) && cnt < maxcnt){
-            int piece = getfield(dst);
-            if(piece != mBLK){
-                return dst;
-            }
-            cnt += 1;
-            dst += step;
-        }
-        return SNOK;
-    }
-
-    bool cBoard::search_for_two_pieces_within_dir(int &first, int &second, int src, int step, int maxcnt){
-        int cnt = 0;
-        first = SNOK;
-        int dst = src + step;
-        while(is_inbounds(src, dst, step) && cnt < maxcnt){
-            int piece = getfield(dst);
-            if(piece != mBLK){
-                if(first == SNOK){
-                    first = dst;
-                    continue;
-                }
-                else{
-                    second = dst;
-                    return true;
-                }
-            }
-            cnt += 1;
-            dst += step;
-        }
-        return false;
-    }
-
-    bool cBoard::search_bi_dirs(int &first, int &second, int src, int step, int maxcnt){
-        int cnt = 0;
-        first = SNOK;
-        int bisteps[2] = {step, (step * -1)};
-        for(const int bistep : bisteps){
-            int dst = src + bistep;
-            while(is_inbounds(src, dst, bistep) && cnt < maxcnt){
-                int piece = getfield(dst);
-                if(piece != mBLK){
-                    if(first == SNOK){
-                        first = dst;
-                        break;
-                    }
-                    else{
-                        second = dst;
-                        return true;
-                    }
-                }
-                cnt += 1;
-                dst += bistep;
-            }
-            if(first == SNOK){
-                break;
-            }
-        }
-        return false;
-    }
-
-    bool cBoard::is_nth(int src, int dst){
-        if(src < dst && abs((int)src - (int)dst) % 8 == 0){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool cBoard::is_sth(int src, int dst){
-        if(src > dst && abs((int)src - (int)dst) % 8 == 0){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool cBoard::is_est(int src, int dst){
-        if(src % 8 < dst % 8 && src / 8 == dst / 8){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool cBoard::is_wst(int src, int dst){
-        if(src % 8 > dst % 8 && src / 8 == dst / 8){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool cBoard::is_nth_est(int src, int dst){
-        if(abs((int)src - (int)dst) % 9 == 0 && src < dst && src % 8 < dst % 8){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool cBoard::is_sth_wst(int src, int dst){
-        if(abs((int)src - (int)dst) % 9 == 0 && src > dst && src % 8 > dst % 8){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool cBoard::is_nth_wst(int src, int dst){
-        if(abs((int)src - (int)dst) % 7 == 0 && src < dst && src % 8 > dst % 8){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool cBoard::is_sth_est(int src, int dst){
-        if(abs((int)src - (int)dst) % 7 == 0 && src > dst && src % 8 < dst % 8){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    int cBoard::eval_pin_dir(int src){
-        int piece = getfield(src);
-        int color = PIECES_COLORS[piece];
-        int kg_pos;
-        int first, second, fstpiece, sndpiece;
-        int enmyfaces[2];
-        int dir_ary[2];
-        int step;
-        if(color == COLORS["white"]){
-            kg_pos = wKg;
-        }
-        else{
-            kg_pos = bKg;
-        }        
-        for(int j = 0; j < 2; ++j){
-            if(j == 0){
-                dir_ary[0] = DIRS["nth"];
-                dir_ary[1] = DIRS["est"];
-                if(color == COLORS["white"]){
-                    enmyfaces[0] = mBRK;
-                    enmyfaces[1] = mBQU;
-                }
-                else{
-                    enmyfaces[0] = mWRK;
-                    enmyfaces[1] = mWQU;
-                }
-            }
-            else{
-                dir_ary[0] = DIRS["nth-est"];
-                dir_ary[1] = DIRS["nth-wst"];
-                if(color == COLORS["white"]){
-                    enmyfaces[0] = mBBP;
-                    enmyfaces[1] = mBQU;
-                }
-                else{
-                    enmyfaces[0] = mWBP;
-                    enmyfaces[1] = mWQU;
-                }
-            }
-            for(int i = 0; i < 2; ++i){
-                if(j == 0){
-                    step = cPiece::step_for_dir(mWRK, dir_ary[i]);
-                }
-                else{
-                    step = cPiece::step_for_dir(mWBP, dir_ary[i]);
-                }
-                if(search_bi_dirs(first, second, src, step, 6)){
-                    fstpiece = getfield(first);
-                    sndpiece = getfield(second);
-                    if(PIECES_COLORS[fstpiece] != PIECES_COLORS[sndpiece]){
-                        if(PIECES_COLORS[fstpiece] == color && kg_pos == first &&
-                           (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
-                            return dir_ary[i];
-                        }
-                        if(PIECES_COLORS[sndpiece] == color && kg_pos == second && 
-                           (enmyfaces[0] == fstpiece || enmyfaces[1] == fstpiece)){
-                            return REVERSE_DIRS[dir_ary[i]];
-                        }
-                    }
-                }
-            }
-        }
-        return DIRS["undef"];
-    }
-
-    int cBoard::eval_soft_pin_dir(int src){
-        int piece = getfield(src);
-        int color = PIECES_COLORS[piece];
-        int first, second, fstpiece, sndpiece;
-        int enmyfaces[2];
-        int dir_ary[2];
-        int step;
-        for(int j = 0; j < 2; ++j){
-            if(j == 0){
-                dir_ary[0] = DIRS["nth"];
-                dir_ary[1] = DIRS["est"];
-                if(color == COLORS["white"]){
-                    enmyfaces[0] = mBRK;
-                    enmyfaces[1] = mBQU;
-                }
-                else{
-                    enmyfaces[0] = mWRK;
-                    enmyfaces[1] = mWQU;
-                }
-            }
-            else{
-                dir_ary[0] = DIRS["nth-est"];
-                dir_ary[1] = DIRS["nth-wst"];
-                if(color == COLORS["white"]){
-                    enmyfaces[0] = mBBP;
-                    enmyfaces[1] = mBQU;
-                }
-                else{
-                    enmyfaces[0] = mWBP;
-                    enmyfaces[1] = mWQU;
-                }
-            }
-            for(int i = 0; i < 2; ++i){
-                if(j == 0){
-                    step = cPiece::step_for_dir(mWRK, dir_ary[i]);
-                }
-                else{
-                    step = cPiece::step_for_dir(mWBP, dir_ary[i]);
-                }
-                if(search_bi_dirs(first, second, src, step, 6)){
-                    fstpiece = getfield(first);
-                    sndpiece = getfield(second);
-                    if(PIECES_COLORS[fstpiece] != PIECES_COLORS[sndpiece]){
-                        if(PIECES_COLORS[fstpiece] == color && 
-                           PIECES_RANKS[fstpiece] > PIECES_RANKS[sndpiece] &&
-                           PIECES_RANKS[fstpiece] > PIECES_RANKS[piece] &&
-                           (enmyfaces[0] == sndpiece || enmyfaces[1] == sndpiece)){
-                            return dir_ary[i];
-                        }
-                        if(PIECES_COLORS[sndpiece] == color && 
-                           PIECES_RANKS[sndpiece] > PIECES_RANKS[fstpiece] &&
-                           PIECES_RANKS[sndpiece] > PIECES_RANKS[piece] &&
-                           (enmyfaces[0] == fstpiece || enmyfaces[1] == fstpiece)){
-                            return REVERSE_DIRS[dir_ary[i]];
-                        }
-                    }
-                }
-            }
-        }
-        return DIRS["undef"];
-    }
-
-    bool cBoard::is_king_after_move_attacked(int src, int dst, list<cMove> &minutes){
-        int srcpiece = getfield(src);
-        int dstpiece;
-        int pawnenmy = mBLK;
-        bool flag;
-        if(srcpiece == mWPW){
-            cPiece cpiece(*this, src);
-            if(is_ep_move_ok_for_whitepawn(&cpiece, dst, minutes)){
-                pawnenmy = getfield(dst);
-                setfield(dst, mBLK);
-            }
-        }
-        if(srcpiece == mBPW){
-        cPiece cpiece(*this, src);
-            if(is_ep_move_ok_for_blackpawn(&cpiece, dst, minutes)){
-                pawnenmy = getfield(dst);
-                setfield(dst, mBLK);
-            }
-        }
-
-        setfield(src, mBLK);
-        dstpiece = getfield(dst);
-        setfield(dst, srcpiece);
-        if(PIECES_COLORS[srcpiece] == COLORS["white"]){
-            flag = is_field_touched(*this, wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
-        }
-        else{
-            flag = is_field_touched(*this, bKg, COLORS["white"], EVAL_MODES["ignore-pins"]);
-        }
-        setfield(dst, dstpiece);
-        setfield(src, srcpiece);
-        if(pawnenmy != mBLK){
-            setfield(dst, pawnenmy);
-        }
-        return flag;
-    }
-
-    bool cBoard::is_move_valid(int src, int dst, int prompiece, list<cMove> &minutes){
-        int piece = getfield(src);
-        int direction = cPiece::dir_for_move(piece, src, dst);
-        int step = cPiece::step_for_dir(piece, direction);
-        if(is_inbounds(src, dst, step) == false){
-            return false; // RETURN_CODES["out-of-bounds"]
-        }
-        if(minutes.size() % 2 == 0 && PIECES_COLORS[piece] != COLORS["white"]){
-            return false; // RETURN_CODES["wrong-color"]
-        }
-        if(minutes.size() % 2 == 1 && PIECES_COLORS[piece] != COLORS["black"]){
-            return false; // RETURN_CODES["wrong-color"]
-        }
-        if(piece != mWKG && piece != mBKG){
-            if(is_king_after_move_attacked(src, dst, minutes)){
-                return false; // RETURN_CODES["king-attacked-error"]
-            }
-        }
-        cPiece cpiece(*this, src);
-        if(cpiece.is_move_valid(dst, prompiece, minutes)){
-            return true; // RETURN_CODES["ok"]
-        }
-        else{
-            return false; // RETURN_CODES["piece-error"]
-        }
-    }
-
-    bool cBoard::is_move_available(list<cMove> &minutes){
-        int color;
-        if(minutes.size() % 2 == 0){
-            color = COLORS["white"];
-        }
-        else{
-            color = COLORS["black"];
-        }
-        for(int idx = 0; idx < 64; ++idx){
-            int piece = getfield(idx);
-            if(color == PIECES_COLORS[piece]){
-                cPiece cpiece(*this, idx);
-                for(auto &step : cpiece.get_mv_steps()){
-                    if(step == 0){ break; }
-                    int count = 0;
-                    int dst = cpiece.pos + step;
-                    while(is_inbounds(cpiece.pos, dst, step) && count < cpiece.get_maxcnt()){
-                        int dstpiece = getfield(dst);
-                        if(PIECES_COLORS[dstpiece] == cpiece.color){ break; }
-                        count += 1;
-                        for(auto &prompiece : cpiece.get_prom_pieces()){
-                            if(is_move_valid(cpiece.pos, dst, prompiece, minutes)){
-                                return true;
-                            }
-                            if(prompiece == mBLK){ break; }
-                        }
-                        dst += step;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     void cBoard::prnt(){
         string textcolor, backcolor, strpiece;
+        uint64_t startpos = 0x0000000000000080;
         for(int y = 7; y >=0; --y){
+            uint64_t pos = startpos;
             for(int x = 0; x < 8; ++x){
-                int piece = getfield(y * 8 + x);
+                uint8_t piece = getfield(pos);
                 if(piece == mBLK){
                     strpiece = "   ";
                 }
                 else{
                     strpiece = reverse_lookup(PIECES, piece);
                 }
-                if(PIECES_COLORS[piece] == COLORS["white"]){
-                    textcolor = WHITE_TEXT + BOLD_ON;
+                if(is_piece_white(piece)){
+                    textcolor = mWHITE_TEXT + mBOLD_ON;
                 }
                 else{
-                    textcolor = BLACK_TEXT + BOLD_ON;
+                    textcolor = mBLACK_TEXT + mBOLD_ON;
                 }
                 if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
-                    backcolor = BLUE_BACK;
+                    backcolor = mBLUE_BACK;
                 }
                 else{
-                    backcolor = GREEN_BACK;
+                    backcolor = mGREEN_BACK;
                 }
                 // "\e#3" \e#4"
-                cout << backcolor + textcolor + strpiece + RESET_ALL; 
+                cout << backcolor + textcolor + strpiece + mRESET_ALL;
+
+                pos = (pos >> 1);
             }
             cout << endl;
+
+            startpos = (startpos << 8);
         }
     }
-   
-    bool cBoard::compare(cBoard &board2){
-        for(int i = 0; i < 64; ++i){
-            if(fields[i] != board2.fields[i]){
+
+
+    bool cBoard::compare(cBoard &newboard){
+        for(int i = 0; i < 8; ++i){
+            if(fields[i] != newboard.fields[i]){
                 return false;
             }
         }
-        return wKg == board2.wKg &&
-               bKg == board2.bKg &&
-               wKg_first_move_on == board2.wKg_first_move_on &&
-               bKg_first_move_on == board2.bKg_first_move_on &&
-               wRkA_first_move_on == board2.wRkA_first_move_on &&
-               wRkH_first_move_on == board2.wRkH_first_move_on &&
-               bRkA_first_move_on == board2.bRkA_first_move_on &&
-               bRkH_first_move_on == board2.bRkH_first_move_on;
+        return true;
     }
 
-    void cBoard::cpyfields_to_bigint(int startidx, int count, uint64_t &bigint){
-        bigint = 0;
-        int endidx = startidx + count;
-        for(int i = startidx; i < endidx; ++i){
-            bigint = bigint | (getfield(i) & 0xF);
-            if(i < endidx - 1){
-                bigint = bigint << 4;
+    bool cBoard::is_field_enemy_touched(uint64_t pos){
+        list<const cStep *> steps;
+        uint8_t piece = getfield(pos);
+        uint8_t enemycolor;        
+        if(is_piece_white(piece)){
+            enemycolor = mBLACK;
+        }
+        else{
+            enemycolor = mWHITE;
+        }
+
+        steps.push_back(rk_steps);
+        steps.push_back(bp_steps);
+        steps.push_back(kg_steps_generic);
+        steps.push_back(kn_steps);
+        if(enemycolor == mWHITE){
+            steps.push_back(wpw_steps_attack);
+        }
+        else{
+            steps.push_back(bpw_steps_attack);
+        }
+
+        for(const cStep *step : steps){
+            uint64_t newpos = pos;
+
+            for(int k = 0; k < step->stepcnt; ++k){
+                if((newpos & step->border) > 0){
+                    break;
+                }
+                if(step->rightshift){
+                    newpos = (newpos >> step->shiftcnt);
+                }
+                else{
+                    newpos = (newpos << step->shiftcnt);
+                }
+                if(is_field_busy(newpos) == false){
+                    continue;
+                }
+                if((fields[mIDX_WHITE] & newpos) > 0 && enemycolor == mWHITE){
+                    if(step->owner == STEP_OWNER["rook"] &&
+                       (piece == mWRK || piece == mWQU)){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["bishop"] &&
+                       (piece == mWBP || piece == mWQU)){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["king"] && piece == mWKG){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["knight"] && piece == mWKN){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["wpawn"] && piece == mWPW){
+                        return true;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                else if((fields[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
+                    if(step->owner == STEP_OWNER["rook"] &&
+                       (piece == mBRK || piece == mBQU)){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["bishop"] &&
+                       (piece == mBBP || piece == mBQU)){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["king"] && piece == mBKG){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["knight"] && piece == mBKN){
+                        return true;
+                    }
+                    else if(step->owner == STEP_OWNER["bpawn"] && piece == mBPW){
+                        return true;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                else{
+                    break;
+                }
             }
+        }
+        return false;
+    }
+
+
+    bool cBoard::tst_en_passant(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        if(minutes.size() > 0){
+            cMove move = minutes.back();
+
+            if(is_field_white_busy(pos)){
+                uint64_t opp_pawn_src = (newpos >> 8);
+                uint64_t opp_pawn_dst = (newpos << 8);
+                return (move.src == opp_pawn_src && 
+                        move.dst == opp_pawn_dst &&
+                        getfield(opp_pawn_dst) == mBPW);
+            }
+            if(is_field_black_busy(pos)){
+                uint64_t opp_pawn_src = (newpos << 8);
+                uint64_t opp_pawn_dst = (newpos >> 8);
+                return (move.src == opp_pawn_src && 
+                        move.dst == opp_pawn_dst &&
+                        getfield(opp_pawn_dst) == mWPW);
+            }
+        }
+        return false;
+    }
+
+
+    bool cBoard::tst_wpw_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        // check, if field after one step forward is blank
+        if((pos >> 8) == newpos){
+            return (fields[mIDX_WHITE] & newpos) == 0 && 
+                   (fields[mIDX_BLACK] & newpos) == 0;
+        }
+        // check, if fields after two step forward are blank
+        else if((pos >> 16) == newpos){
+            return (fields[mIDX_WHITE] & newpos) == 0 && 
+                   (fields[mIDX_BLACK] & newpos) == 0 && 
+                   (fields[mIDX_WHITE] & (pos >> 8)) == 0 && 
+                   (fields[mIDX_BLACK] & (pos >> 8)) == 0;
+        }
+        else if((pos >> 9) == newpos || (pos >> 7) == newpos){
+            return (fields[mIDX_BLACK] & newpos) > 0;
+        }
+        else{
+            return tst_en_passant(pos, newpos, minutes);
+        }
+    }
+
+
+    bool cBoard::tst_bpw_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        // check, if field after one step forward is blank
+        if((pos << 8) == newpos){
+            return (fields[mIDX_WHITE] & newpos) == 0 && 
+                   (fields[mIDX_BLACK] & newpos) == 0;
+        }
+        // check, if fields after two step forward are blank
+        else if((pos << 16) == newpos){
+            return (fields[mIDX_WHITE] & newpos) == 0 && 
+                   (fields[mIDX_BLACK] & newpos) == 0 && 
+                   (fields[mIDX_WHITE] & (pos << 8)) == 0 && 
+                   (fields[mIDX_BLACK] & (pos << 8)) == 0;
+        }
+        else if((pos << 9) == newpos || (pos << 7) == newpos){
+            return (fields[mIDX_WHITE] & newpos) > 0;
+        }
+        else{
+            return tst_en_passant(pos, newpos, minutes);
+        }
+    }
+
+
+    bool cBoard::tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        uint64_t mask;
+        uint8_t color_idx;
+        
+        if(is_field_white_busy(pos)){
+            color_idx = mIDX_WHITE;
+            if((pos >> 2) == newpos){
+                mask = 0x0900000000000000;
+            }
+            else{
+                mask = 0x8800000000000000;
+            }
+        }
+        else{
+            color_idx = mIDX_BLACK;
+            if((pos >> 2) == newpos){
+                mask = 0x0000000000000009;
+            }
+            else{
+                mask = 0x0000000000000088;
+            }
+        }
+
+        for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
+            if((it->prev_fields[color_idx] & mask) != mask){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    bool cBoard::tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        uint8_t idx_color;
+
+        if(is_field_white_busy(pos)){
+            idx_color = mIDX_WHITE;
+        }
+        else{
+            idx_color = mIDX_WHITE;
+        }
+
+        if((pos >> 2) == newpos){
+            if(is_field_busy((pos >> 1)) == false &&
+               is_field_busy((pos >> 2)) == false &&
+               (fields[idx_color] & (pos >> 3)) > 0 &&
+               (fields[mIDX_ROOK] & (pos >> 3)) > 0){
+                for(int i = 0; i < 3; ++i){
+                    if(is_field_enemy_touched((pos >> i))){
+                        return false;
+                    }
+                }
+                return tst_castling(pos, newpos, minutes);
+            }
+            else{
+                return false;
+            }
+        }
+        if((pos << 2) == newpos){
+            if(is_field_busy((pos << 1)) == false &&
+               is_field_busy((pos << 2)) == false &&
+               is_field_busy((pos << 3)) == false &&
+               (fields[idx_color] & (pos << 4)) > 0 &&
+               (fields[mIDX_ROOK] & (pos << 4)) > 0){
+                for(int i = 0; i < 3; ++i){
+                    if(is_field_enemy_touched((pos << i))){
+                        return false;
+                    }
+                }
+                return tst_castling(pos, newpos, minutes);
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            return (is_field_enemy_touched(newpos) == false);
+        }
+    }
+
+
+    void cBoard::gen_moves(list<cMove> &minutes){
+        uint64_t pos = 0x8000000000000000;
+        uint8_t color;
+        const cStep *steps;
+        bool tstcolor, tstmove;
+
+        if((minutes.size() % 2) == 0){
+            color = mWHITE;
+        }
+        else{
+            color = mBLACK;
+        }
+
+        while(pos > 0){
+            uint8_t piece = getfield(pos);
+            int maxidx;
+            
+            if((piece & color) > 0){
+                if(piece == mWRK || piece == mBRK){ steps = rk_steps; maxidx = 4; }
+                else if(piece == mWBP || piece == mBBP){ steps = bp_steps; maxidx = 4; }
+                else if(piece == mWQU || piece == mBQU){ steps = qu_steps; maxidx = 8; }
+                else if(piece == mWKG){ steps = wkg_steps_and_castl; maxidx = 10; }
+                else if(piece == mBKG){ steps = bkg_steps_and_castl; maxidx = 10; }
+                else if(piece == mWKN || piece == mBKN){ steps = kn_steps; maxidx = 8; }
+                else if(piece == mWPW){ steps = wpw_steps; maxidx = 3; }
+                else if(piece == mBPW){ steps = bpw_steps; maxidx = 3; }
+
+                cout << "-----" << endl;
+                cout << PIECES_STR[piece] << endl;
+
+                for(int i = 0; i < maxidx; ++i){
+                    uint64_t newpos = pos;
+
+                    for(int k = 0; k < (steps + i)->stepcnt; ++k){
+                        if((newpos & (steps + i)->border) > 0){
+                            break;
+                        }
+                        if((steps + i)->rightshift){
+                            newpos = (newpos >> (steps + i)->shiftcnt);
+                        }
+                        else{
+                            newpos = (newpos << (steps + i)->shiftcnt);
+                        }
+                        if((color & mWHITE) > 0){
+                            tstcolor = (fields[mIDX_WHITE] & newpos) > 0;
+                        }
+                        else{
+                            tstcolor = (fields[mIDX_BLACK] & newpos) > 0;
+                        }
+                        if(tstcolor){
+                            break;
+                        }
+                        else{
+                            if(piece == mWPW){
+                                tstmove = tst_wpw_move(pos, newpos, minutes);
+                            }
+                            else if(piece == mBPW){
+                                tstmove = tst_bpw_move(pos, newpos, minutes);
+                            }
+                            else if(piece == mWKG || piece == mBKG){
+                                tstmove = tst_kg_move(pos, newpos, minutes);
+                            }
+                            else{
+                                tstmove = true;
+                            }
+                            if(tstmove){
+                                cout << pos_to_coord(pos) << "-" << pos_to_coord(newpos) << endl;
+                            }
+                            if((fields[mIDX_WHITE] & newpos) > 0 || 
+                               (fields[mIDX_BLACK] & newpos) > 0){
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            pos = (pos >> 1);
         }
     }

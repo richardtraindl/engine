@@ -31,8 +31,6 @@
             
             ~cMatch();
 
-            void update_attributes();
-
             int next_color();
 
             bool is_opening();
@@ -43,13 +41,23 @@
 
             bool is_three_times_rep();
 
-            cMove *do_move(int src, int dst, int prompiece);
+            cMove *do_move(uint64_t src, uint64_t dst, uint8_t prompiece);
 
             bool undo_move();
 
-            int eval_status();
-            
+            // int eval_status();
+
             void prnt_minutes();
+
+            bool tst_wpw_move(uint64_t pos, uint64_t newpos);
+
+            bool tst_bpw_move(uint64_t pos, uint64_t newpos);
+
+            bool tst_wkg_move(uint64_t pos, uint64_t newpos);
+
+            bool tst_bkg_move(uint64_t pos, uint64_t newpos);
+
+            void gen_moves(uint8_t color);
     };
 
 #endif

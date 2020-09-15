@@ -7,11 +7,15 @@
     #include "../values.hpp"
 
 
-    cAnalyzeField::cAnalyzeField(cBoard &newboard, int newpos){
+    cAnalyzeField::cAnalyzeField(cBoard &newboard, int newcolor, int newpos){
         board = &newboard;
+        color = newcolor;
         pos = newpos;
         piece = board->getfield(pos);
-        collect_touches_for_both_colors(*board, pos, PIECES_COLORS[piece], friends_on_field, enmies_on_field);
+        collect_touches_for_both_colors(*board, pos, color, friends_on_field, enmies_on_field);
+        lowest_friend = lowest_piece(friends_on_field);
+        lowest_enemy = lowest_piece(enmies_on_field);
+        _is_field_ok();
         _is_clean();
         _is_supported();
         _is_attacked();
@@ -19,7 +23,6 @@
         _is_suppsize_lt_attsize();
         _is_suppsize_gt_attsize();
         _is_soft_pinned();
-        lowest_attacker = lowest_piece(enmies_on_field);
     }
 
     void cAnalyzeField::_is_field_ok(){
@@ -28,7 +31,7 @@
             return;
         }
         if(friends_on_field.size() >= enmies_on_field.size() && 
-           PIECES_RANKS[piece] <= PIECES_RANKS[lowest_attacker]){
+           PIECES_RANKS[piece] <= PIECES_RANKS[lowest_enemy]){
             is_field_ok = true;
             return;
         }
@@ -128,12 +131,14 @@
         generate_moves(match, moves);
         if(moves.size() == 0){
             if(match.next_color() == COLORS["white"]){
-                if(is_field_touched(match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
+                uint64_t wkg = match.board.fields[0] & match.board.fields[2];
+                if(is_field_touched(match.board, wkg, COLORS["black"], EVAL_MODES["ignore-pins"])){
                     return COLORS["white"];
                 }
             }
             else{
-                if(is_field_touched(match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
+                uint64_t bkg = match.board.fields[1] & match.board.fields[2];
+                if(is_field_touched(match.board, bkg, COLORS["white"], EVAL_MODES["ignore-pins"])){
                     return COLORS["black"];
                 }
             }
@@ -178,23 +183,25 @@
 
 
     int weight_for_capture(cMatch &match, int piece,  int dstpiece, cPrioMove &priomove, cAnalyzeField &analyzedst){
+        bool out_of_softpin = is_move_out_of_soft_pin(match, piece, priomove);
         if(PIECES_RANKS[piece] < PIECES_RANKS[dstpiece]){
             return cTactic::WEIGHTS["stormy"];
         }
-        if(match.board.eval_soft_pin_dir(priomove.dst) != DIRS["undef"] && 
-           is_supply(match, piece, priomove)){
+        if(out_of_softpin == false && analyzedst.is_field_ok){
             return cTactic::WEIGHTS["stormy"];
         }
-        if(analyzedst.is_field_ok){
-            if(is_move_out_of_soft_pin(match, piece, priomove) == false){
-                return cTactic::WEIGHTS["stormy"];
-            }
-            if(PIECES_RANKS[piece] == PIECES_RANKS[dstpiece]){
+        if(out_of_softpin == false && is_supply(match, piece, priomove)){
+            return cTactic::WEIGHTS["stormy"];
+        }
+        if(out_of_softpin == false && analyzedst.is_field_ok){
+            if(are_fairy_equal(piece, dstpiece)){
                 return cTactic::WEIGHTS["better-deal"];
             }
-            return cTactic::WEIGHTS["good-deal"];
+            else{
+                return cTactic::WEIGHTS["good-deal"];
+            }
         }
-        return cTactic::WEIGHTS["vague-deal"];
+        return cTactic::WEIGHTS["bad-deal"];
     }
 
 
@@ -202,7 +209,7 @@
         if(is_move_out_of_soft_pin(match, piece, priomove) == false &&
            analyzedst.is_field_ok){
             if(analyzesrc.is_attacked && 
-               PIECES_RANKS[piece] < PIECES_RANKS[analyzesrc.lowest_attacker]){
+               PIECES_RANKS[piece] < PIECES_RANKS[analyzesrc.lowest_enemy]){
                 return cTactic::WEIGHTS["stormy"];
             }
             if(analyzesrc.is_suppsize_lt_attsize){
@@ -271,14 +278,20 @@
                cPiece::dir_for_move(piece, priomove.dst, attacked.pos)){
                 return cTactic::WEIGHTS["downgraded"];
             }
-            if(are_fairy_equal(piece, attacked.piece) && 
-               match.board.eval_soft_pin_dir(attacked.pos) != DIRS["undef"]){
-                return cTactic::WEIGHTS["stormy"];
+            if(are_fairy_equal(piece, attacked.piece)){
+                if(match.board.eval_soft_pin_dir(attacked.pos) != DIRS["undef"]){
+                    return cTactic::WEIGHTS["stormy"];
+                }
+                else{
+                    return cTactic::WEIGHTS["good-deal"];
+                }
             }
             if(PIECES_RANKS[piece] < PIECES_RANKS[attacked.piece]){
                 return cTactic::WEIGHTS["better-deal"];
             }
-            return cTactic::WEIGHTS["good-deal"];
+            if(attacked.supporter_beyond.size() == 0){
+                return cTactic::WEIGHTS["better-deal"];
+            }
         }
         return cTactic::WEIGHTS["bad-deal"];
     }

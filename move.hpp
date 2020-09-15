@@ -2,67 +2,38 @@
 #ifndef MOVE_HPP
     #define MOVE_HPP
 
-    #include <map>
-    #include <list> 
-    #include <string>
+    //#include "./board.hpp"
     #include <cstdint>
+    #include <string>
 
     using namespace std;
 
-    class cMove{
-        public:
-            int src;
-            int dst;
-            int prev_dstpiece;
-            int prompiece;
 
-            cMove(int src, int dst, int prev_dstpiece, int prompiece);
-            cMove();
+    class cGMove{
+        public:
+            uint64_t src;
+            uint64_t dst;
+            uint8_t prompiece;
+
+            cGMove(uint64_t src, uint64_t dst, uint8_t prompiece);
+            cGMove();
 
             string format();
     };
 
 
-    class cTactic{
+    class cMove{
         public:
-            static map<string, int> DOMAINS;
-            static map<string, int> WEIGHTS;
-            static map<int, int> DOMAINS_TO_PRIOS;
-            static map<int, int> WEIGHTS_TO_ADJUST;
+            uint8_t type;
+            uint64_t src;
+            uint64_t dst;
+            uint8_t prompiece;
+            uint64_t prev_fields[8];
 
-            int domain;
-            int weight;
-            int addition;
+            cMove(uint8_t type, uint64_t src, uint64_t dst, uint8_t prompiece, uint64_t *prev_fields);
+            cMove();
 
-            cTactic(int domain, int weight, int addition);
-    };
-
-
-    class cPrioMove : public cMove{
-        public:
-            list<cTactic *> tactics;
-            int prio;
-            static map<string, int> PRIOS;
-
-            cPrioMove(int src, int dst, int prev_dstpiece, int prompiece, int prio);
-
-            void evaluate_priority();
-
-            void downgrade(int domain);
-
-            void upgrade(int domain);
-
-            int fetch_weight(int domain);
-
-            bool has_domain(int domain);
-
-            bool has_weight(int weight);
-
-            bool has_tactic_ext(int domain, int weight);
-
-            bool is_tactic_stormy();
-
-            string fmt_tactics();
+            string format();
     };
 
 #endif

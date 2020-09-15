@@ -1,8 +1,8 @@
 
     #include <iostream>
     #include "./match.hpp"
-    #include "./pieces/piece.hpp"
-    #include "./pieces/searchforpiece.hpp"
+    //#include "./pieces/piece.hpp"
+    //#include "./pieces/searchforpiece.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
 
@@ -13,24 +13,18 @@
         level = LEVELS["blitz"];
         cBoard board;
     } 
+
     cMatch::cMatch(const cMatch &match){
         created_at = time(0);
         score = match.score;
         level = match.level;
-        for(int idx = 0; idx < 64; ++idx){
+        for(int idx = 0; idx < 8; ++idx){
             board.fields[idx] = match.board.fields[idx];
         }
-        board.wKg = match.board.wKg;
-        board.bKg = match.board.bKg;
-        board.wKg_first_move_on = match.board.wKg_first_move_on;
-        board.bKg_first_move_on = match.board.bKg_first_move_on;
-        board.wRkA_first_move_on = match.board.wRkA_first_move_on;
-        board.wRkH_first_move_on = match.board.wRkH_first_move_on;
-        board.bRkA_first_move_on = match.board.bRkA_first_move_on;
-        board.bRkH_first_move_on = match.board.bRkH_first_move_on;
 
         for(cMove move : match.minutes){
-            minutes.push_back(move); //(*new cMove(move.prevfields, move.src, move.dst, move.prompiece)));
+            minutes.push_back(move); 
+            //(*new cMove(move.prevfields, move.src, move.dst, move.prompiece)));
         }
     } // copy constructor
 
@@ -72,65 +66,21 @@
         {"general-error", 20}
     };
 
-    void cMatch::update_attributes(){
-        for(cMove move : minutes){
-            if(board.wKg_first_move_on == -1 && 
-               move.src % 8 == cBoard::COLS["E"] && move.src / 8 == cBoard::RANKS["1"]){
-                board.wKg_first_move_on = minutes.size();
-                continue;
-            }
-            if(board.bKg_first_move_on == -1 && 
-               move.src % 8 == cBoard::COLS["E"] && move.src / 8 == cBoard::RANKS["8"]){
-                board.bKg_first_move_on = minutes.size();
-                continue;
-            }
-            if(board.wRkA_first_move_on == -1 && 
-               move.src % 8 == cBoard::COLS["A"] && move.src / 8 == cBoard::RANKS["1"]){
-                board.wRkA_first_move_on = minutes.size();
-                continue;
-            }
-            if(board.wRkH_first_move_on == -1 && 
-               move.src % 8 == cBoard::COLS["H"] && move.src / 8 == cBoard::RANKS["1"]){
-                board.wRkH_first_move_on = minutes.size();
-                continue;
-            }
-            if(board.bRkA_first_move_on == -1 && 
-               move.src % 8 == cBoard::COLS["A"] && move.src / 8 == cBoard::RANKS["8"]){
-                board.bRkA_first_move_on = minutes.size();
-                continue;
-            }
-            if(board.bRkH_first_move_on == -1 && 
-               move.src % 8 == cBoard::COLS["H"] && move.src / 8 == cBoard::RANKS["8"]){
-                board.bRkH_first_move_on = minutes.size();
-                continue;
-            }
-        }
-        score = 0;
-        for(int idx = 0; idx < 64; ++idx){
-            int piece = board.getfield(idx);
-            score -= SCORES[(int)piece];
-            if(piece == mWKG){
-                board.wKg = idx;
-                continue;
-            }
-            if(piece == mBKG){
-                board.bKg = idx;
-            }
-        }
-    }
 
     int cMatch::next_color(){
         if(minutes.size() % 2 == 0){
-            return COLORS["white"];
+            return mWHITE;
         }
         else{
-            return COLORS["black"];
+            return mBLACK;
         }
     }
+
 
     bool cMatch::is_opening(){
         return minutes.size() <= 20;
     }
+
 
     bool cMatch::is_endgame(){
         int wofficers, bofficers;
@@ -151,11 +101,13 @@
             if(cnt > 101){
                 return false;
             }
-            if(it->prev_dstpiece != mBLK){
+
+            newmatch.undo_move();
+
+            if(newmatch.board.getfield(it->dst) != mBLK){ 
                 rulecnt = 0;
                 continue;
             }
-            newmatch.undo_move();
             if(newmatch.board.getfield(it->src) == mWPW ||
                newmatch.board.getfield(it->src) == mBPW){
                 rulecnt = 0;
@@ -169,6 +121,7 @@
         return false;
     }
 
+
     bool cMatch::is_three_times_rep(){
         int equalcnt = 1;
         cMatch newmatch = *this;
@@ -181,12 +134,94 @@
         return equalcnt >= 3;
     }
 
-    cMove *cMatch::do_move(int src, int dst, int prompiece){
-        cPiece cpiece(board, src);
-        cMove *move = cpiece.do_move(dst, board.getfield(dst), prompiece, minutes.size() + 1, score);
-        minutes.push_back(*move);
-        return move;
-    }
+
+    cMove *cMatch::do_move(uint64_t src, uint64_t dst, uint8_t prompiece){
+        uint8_t srcpiece = board.getfield(src);
+        uint8_t dstpiece = board.getfield(dst);
+
+        if((srcpiece == mWKG || srcpiece == mBKG) &&
+           ((src >> 2) == dst || (src << 2) == dst)){
+            if((src >> 2) == dst){
+                uint64_t rkpos = (dst >> 1);
+                uint8_t rkpiece = board.getfield(rkpos);
+                board.setfield(src, mBLK);
+                board.setfield(dst, srcpiece);
+                board.setfield(rkpos, mBLK);
+                board.setfield((dst << 1), rkpiece);
+                cMove *move = new cMove(MOVE_TYPE["short-castling"], src, dst, prompiece, board.fields);
+                minutes.push_back(*move);
+                return move;
+            }
+            else{
+                uint64_t rkpos = (dst << 2);
+                uint8_t rkpiece = board.getfield(rkpos);
+                board.setfield(src, mBLK);
+                board.setfield(dst, srcpiece);
+                board.setfield(rkpos, mBLK);
+                board.setfield((dst >> 1), rkpiece);
+                cMove *move = new cMove(MOVE_TYPE["long-castling"], src, dst, prompiece, board.fields);
+                minutes.push_back(*move);
+                return move;
+            }
+        }
+
+        if(srcpiece == mWPW && dstpiece == mBLK &&
+           (src >> 8) != dst && (src >> 16) != dst){
+            uint64_t eppos = (dst << 8);
+            uint8_t eppiece = board.getfield(eppos);
+            board.setfield(src, mBLK);
+            board.setfield(dst, srcpiece);
+            board.setfield(eppos, mBLK);
+            score += SCORES[eppiece];
+            cMove *move = new cMove(MOVE_TYPE["en-passant"], src, dst, prompiece, board.fields);
+            minutes.push_back(*move);
+            return move;
+        }
+
+        if(srcpiece == mBPW && dstpiece == mBLK &&
+           (src << 8) != dst && (src << 16) != dst){
+            uint64_t eppos = (dst >> 8);
+            uint8_t eppiece = board.getfield(eppos);
+            board.setfield(src, mBLK);
+            board.setfield(dst, srcpiece);
+            board.setfield(eppos, mBLK);
+            score += SCORES[eppiece];
+            cMove *move = new cMove(MOVE_TYPE["en-passant"], src, dst, prompiece, board.fields);
+            minutes.push_back(*move);
+            return move;
+        }
+
+        if((srcpiece == mWPW || srcpiece == mBPW) && prompiece != mBLK){
+            board.setfield(src, mBLK);
+            board.setfield(dst, prompiece);
+            score += REVERSED_SCORES[prompiece] - REVERSED_SCORES[srcpiece];
+            if(dstpiece == mBLK){
+                cMove *move = new cMove(MOVE_TYPE["standard"], src, dst, prompiece, board.fields);
+                minutes.push_back(*move);
+                return move;
+            }
+            else{
+                cMove *move = new cMove(MOVE_TYPE["capture"], src, dst, prompiece, board.fields);
+                minutes.push_back(*move);
+                return move;
+            }
+        }
+
+        board.setfield(src, mBLK);
+        board.setfield(dst, srcpiece);
+        score += SCORES[dstpiece];
+        if(dstpiece == mBLK){
+            cMove *move = new cMove(MOVE_TYPE["standard"], src, dst, prompiece, board.fields);
+            minutes.push_back(*move);
+            return move;
+        }
+        else{
+            cMove *move = new cMove(MOVE_TYPE["capture"], src, dst, prompiece, board.fields);
+            minutes.push_back(*move);
+            return move;
+        }
+     }
+
 
     bool cMatch::undo_move(){
         cMove move;
@@ -196,31 +231,54 @@
         else{
             return false;
         }
-        cPiece cpiece(board, move.dst);
-        cpiece.undo_move(move, minutes.size(), score);
+
+        uint8_t prev_dstpiece = board.getfield(move.dst);
+
+        for(int i = 0; i < 8; ++i){
+            board.fields[i] = move.prev_fields[i];
+        }
+
+        uint8_t pawn;
+        if(move.prompiece != mBLK){
+            if(cBoard::is_piece_white(move.prompiece)){
+                pawn = mWPW;
+            }
+            else{
+                pawn = mBPW;
+            }
+            score -= SCORES[prev_dstpiece];
+            score += SCORES[move.prompiece] - SCORES[pawn];
+            return true;
+        }
+        else{
+            score -= SCORES[prev_dstpiece];
+        }
+        
         minutes.pop_back();
         return true;
         // delete move;
     }
 
-    int cMatch::eval_status(){
+    /*int cMatch::eval_status(){
         if(board.is_move_available(minutes)){
             return STATUS["open"];
         }
         else{
             if(next_color() == COLORS["black"]){
-                if(is_field_touched(board, board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"])){
+                uint64_t bkg = board.fields[1] & board.fields[2];
+                if(is_field_touched(board, bkg, COLORS["white"], EVAL_MODES["ignore-pins"])){
                     return STATUS["winner-white"];
                 }
             }
             else{
-                if(is_field_touched(board, board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"])){
+                uint64_t wkg = board.fields[0] & board.fields[2];
+                if(is_field_touched(board, wkg, COLORS["black"], EVAL_MODES["ignore-pins"])){
                     return STATUS["winner-black"];
                 }
             }
         }
         return STATUS["draw"];
-    }
+    }*/
 
 
     void cMatch::prnt_minutes(){

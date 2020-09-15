@@ -5,7 +5,7 @@
     #include "./helper.hpp"
 
 
-    int coord_to_index(string coord){
+    uint64_t coord_to_pos(string coord){
         int x = int(coord[0]);
         int y = int(coord[1]);
         if(x > (int)'H'){
@@ -15,25 +15,41 @@
             x -= (int)'A';
         }
         y -= (int)'1';
-        return x + y * 8;
+        return (0x8000000000000000 >> (x + (y * 8)));
     };
 
 
-    string index_to_coord(int idx){
+    string pos_to_coord(uint64_t pos){
         ostringstream outstream;
-        outstream << (char)(idx % 8 + (int)'a' ) << (char)(idx / 8 + (int)'1');
+        uint64_t xmask = 0x8080808080808080;
+        uint64_t ymask = 0xFF00000000000000;
+        uint8_t x = (int)'a';
+        uint8_t y = (int)'1';
+
+        while((pos & xmask) == 0){
+            x += 1;
+            xmask = (xmask >> 1);
+        }
+
+        while((pos & ymask) == 0){
+            y += 1;
+            ymask = (ymask >> 8);
+        }
+
+        outstream << (char)x << (char)y;
         return outstream.str();
     };
 
 
-    string reverse_lookup(const map<string, int> &dict, int value){
+    string reverse_lookup(const map<string, uint8_t> &dict, uint8_t value){
         for(auto &x: dict){
             if(x.second == value){
                 return x.first;
             }
         }
         return "";
-  }
+    }
+
 
     void prnt_fmttime(string msg, int seconds){
         int sec, minute, hour;

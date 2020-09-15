@@ -342,10 +342,12 @@
 
     bool defends_check(cMatch &match){
         if(match.next_color() == COLORS["white"]){
-            return is_field_touched(match.board, match.board.wKg, COLORS["black"], EVAL_MODES["ignore-pins"]);
+            uint64_t wkg = match.board.fields[0] & match.board.fields[2];
+            return is_field_touched(match.board, wkg, COLORS["black"], EVAL_MODES["ignore-pins"]);
         }
         else{
-            return is_field_touched(match.board, match.board.bKg, COLORS["white"], EVAL_MODES["ignore-pins"]);
+            uint64_t bkg = match.board.fields[1] & match.board.fields[2];
+            return is_field_touched(match.board, bkg, COLORS["white"], EVAL_MODES["ignore-pins"]);
         }
     }
 
@@ -485,10 +487,10 @@
         
         int oppkg;
         if(PIECES_COLORS[piece] == COLORS["white"]){
-            oppkg = match.board.bKg;
+            uint64_t oppkg = match.board.fields[1] & match.board.fields[2];
         }
         else{
-            oppkg = match.board.wKg;
+            uint64_t oppkg = match.board.fields[0] & match.board.fields[2];
         }
         int kgx = oppkg % 8;
         int kgy = oppkg / 8;
