@@ -1,5 +1,4 @@
 
 *.geany
 *.o
-*.py
 engine
