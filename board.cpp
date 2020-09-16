@@ -14,6 +14,16 @@
     }
 
 
+    cPin:: cPin(){
+        pins[5] = { 0x0, 0x0, 0x0, 0x0, 0x0 };
+    }
+
+
+    bool cPin::is_pinned(uint64_t pos){
+        return (pin & pos) > 0;
+    }
+
+
     cBoard::cBoard(){ 
     }
 
