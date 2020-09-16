@@ -168,6 +168,7 @@
         }
     }
 
+
     void cBoard::prnt(){
         string textcolor, backcolor, strpiece;
         uint64_t startpos = 0x0000000000000080;
@@ -213,6 +214,7 @@
         }
         return true;
     }
+
 
     bool cBoard::is_field_enemy_touched(uint64_t pos){
         list<cStep> steps;
@@ -265,7 +267,7 @@
             steps.push_back(bpw_steps_attack[2]);
         }
 
-        for(cStep step : steps){
+        for(const cStep step : steps){
             uint64_t newpos = pos;
 
             for(int k = 0; k < step.stepcnt; ++k){

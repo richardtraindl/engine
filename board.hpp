@@ -51,21 +51,24 @@
                                    0b0100001000000000000000000000000000000000000000000000000001000010, 
                                    0b0000000011111111000000000000000000000000000000001111111100000000 };
 
-            const cStep rk_steps[4] =  { 
+            const cStep rk_steps[4] = { 
                 cStep(STEP_OWNER["rook"], true, 1, 7, mEST_BORDER),
                 cStep(STEP_OWNER["rook"], false, 1, 7, mWST_BORDER),
                 cStep(STEP_OWNER["rook"], true, 8, 7, mNTH_BORDER),
-                cStep(STEP_OWNER["rook"], false, 8, 7, mSTH_BORDER) };
+                cStep(STEP_OWNER["rook"], false, 8, 7, mSTH_BORDER) 
+            };
 
             const cStep bp_steps[4] = { 
                 cStep(STEP_OWNER["bishop"], true, 9, 7, mNTH_EST_BORDER),
                 cStep(STEP_OWNER["bishop"], false, 9, 7, mSTH_WST_BORDER),
                 cStep(STEP_OWNER["bishop"], true, 7, 7, mNTH_WST_BORDER),
-                cStep(STEP_OWNER["bishop"], false, 7, 7, mSTH_EST_BORDER) };
+                cStep(STEP_OWNER["bishop"], false, 7, 7, mSTH_EST_BORDER) 
+            };
 
             const cStep qu_steps[8] = { 
                 rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3], 
-                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3] };
+                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3] 
+            };
 
             const cStep kg_steps_generic[8] = { 
                 cStep(STEP_OWNER["king"], true, 1, 1, mEST_BORDER),
@@ -75,7 +78,8 @@
                 cStep(STEP_OWNER["king"], true, 9, 1, mNTH_EST_BORDER),
                 cStep(STEP_OWNER["king"], false, 9, 1, mSTH_WST_BORDER),
                 cStep(STEP_OWNER["king"], true, 7, 1, mNTH_WST_BORDER),
-                cStep(STEP_OWNER["king"], false, 7, 1, mSTH_EST_BORDER) };
+                cStep(STEP_OWNER["king"], false, 7, 1, mSTH_EST_BORDER) 
+            };
 
             const cStep wkg_steps_and_castl[10] = { 
                 kg_steps_generic[0], kg_steps_generic[1], 
@@ -83,7 +87,8 @@
                 kg_steps_generic[4], kg_steps_generic[5], 
                 kg_steps_generic[6], kg_steps_generic[7],
                 cStep(STEP_OWNER["king"], true, 2, 1, mWHITE_CASTL_BORDER),
-                cStep(STEP_OWNER["king"], false, 2, 1, mWHITE_CASTL_BORDER) };
+                cStep(STEP_OWNER["king"], false, 2, 1, mWHITE_CASTL_BORDER) 
+            };
 
             const cStep bkg_steps_and_castl[10] = { 
                 kg_steps_generic[0], kg_steps_generic[1], 
@@ -91,7 +96,8 @@
                 kg_steps_generic[4], kg_steps_generic[5], 
                 kg_steps_generic[6], kg_steps_generic[7],
                 cStep(STEP_OWNER["king"], true, 2, 1, mBLACK_CASTL_BORDER),
-                cStep(STEP_OWNER["king"], false, 2, 1, mBLACK_CASTL_BORDER) };
+                cStep(STEP_OWNER["king"], false, 2, 1, mBLACK_CASTL_BORDER) 
+            };
 
             const cStep kn_steps[8] = { 
                 cStep(STEP_OWNER["knight"], true, 6, 1, mNTH1_WST2_BORDER),
@@ -101,25 +107,30 @@
                 cStep(STEP_OWNER["knight"], false, 6, 1, mSTH1_EST2_BORDER),
                 cStep(STEP_OWNER["knight"], false, 15, 1, mSTH2_EST1_BORDER),
                 cStep(STEP_OWNER["knight"], false, 17, 1, mSTH2_WST1_BORDER),
-                cStep(STEP_OWNER["knight"], false, 10, 1, mSTH1_WST2_BORDER) };
+                cStep(STEP_OWNER["knight"], false, 10, 1, mSTH1_WST2_BORDER) 
+            };
 
             const cStep wpw_steps_attack[2] = { 
                 cStep(STEP_OWNER["wpawn"], true, 9, 1, mNTH_EST_BORDER),
-                cStep(STEP_OWNER["wpawn"], true, 7, 1, mNTH_WST_BORDER) };
+                cStep(STEP_OWNER["wpawn"], true, 7, 1, mNTH_WST_BORDER) 
+            };
 
             const cStep wpw_steps[3] = { 
                 cStep(wpw_steps_attack[0]),
                 cStep(wpw_steps_attack[1]),
-                cStep(STEP_OWNER["wpawn"], true, 8, 2, mNTH_BORDER) };
+                cStep(STEP_OWNER["wpawn"], true, 8, 2, mNTH_BORDER) 
+            };
 
-            const cStep bpw_steps_attack[2] = { 
+            const cStep bpw_steps_attack[2] = {
                 cStep(STEP_OWNER["bpawn"], false, 9, 1, mSTH_WST_BORDER),
-                cStep(STEP_OWNER["bpawn"], false, 7, 1, mSTH_EST_BORDER) };
+                cStep(STEP_OWNER["bpawn"], false, 7, 1, mSTH_EST_BORDER) 
+            };
 
             const cStep bpw_steps[3] = { 
                 cStep(bpw_steps_attack[0]),
                 cStep(bpw_steps_attack[1]),
-                cStep(STEP_OWNER["bpawn"], false, 8, 2, mSTH_BORDER) };
+                cStep(STEP_OWNER["bpawn"], false, 8, 2, mSTH_BORDER) 
+            };
 
             cBoard();
 
