@@ -181,6 +181,12 @@
     #endif
 
 
+    // useful Bitmasks
+    #if !defined(mPOS_A1)
+        #define mPOS_A1                 0x8000000000000000
+    #endif
+
+
     // terminal colors
     #if !defined(mWHITE_TEXT)
         #define mWHITE_TEXT     string("\033[97m")
