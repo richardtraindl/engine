@@ -392,7 +392,7 @@
             idx_color = mIDX_WHITE;
         }
         else{
-            idx_color = mIDX_WHITE;
+            idx_color = mIDX_BLACK;
         }
 
         if((pos >> 2) == newpos){
