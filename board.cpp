@@ -47,6 +47,16 @@
     }
 
 
+    uint64_t cBoard::getwk_pos(){
+        return (fields[mWHITE] & fields[mKINGS]);
+    }
+
+
+    uint64_t cBoard::getbk_pos(){
+        return (fields[mBLACK] & fields[mKINGS]);
+    }
+
+
     bool cBoard::is_piece_white(uint8_t piece){
         return (piece & mWHITE) > 0;
     }
