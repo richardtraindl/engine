@@ -29,6 +29,16 @@
     };
 
 
+    class cPin{
+        public:
+            uint64_t pins[5] = { 0x0, 0x0, 0x0, 0x0, 0x0 };
+
+            cPin();
+
+            bool is_pinned(uint64_t pos);
+    };
+
+
     class cBoard{
         public:
             uint64_t fields[8] = { 0b1111111111111111000000000000000000000000000000000000000000000000,
