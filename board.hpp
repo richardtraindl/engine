@@ -7,6 +7,7 @@
     #include <cstdint>
     #include <list> 
     #include <iostream>
+    #include  <iomanip>
     #include "./move.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
@@ -162,6 +163,8 @@
             bool tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
             bool tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
+            cPin *gather_pins(uint8_t color);
 
             void gen_moves(list<cMove> &minutes);
     };

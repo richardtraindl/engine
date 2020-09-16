@@ -15,12 +15,11 @@
 
 
     cPin:: cPin(){
-        pins[5] = { 0x0, 0x0, 0x0, 0x0, 0x0 };
     }
 
 
     bool cPin::is_pinned(uint64_t pos){
-        return (pins[IDX_PIN] & pos) > 0;
+        return (pins[mIDX_PIN] & pos) > 0;
     }
 
 
@@ -58,12 +57,12 @@
 
 
     uint64_t cBoard::getwk_pos(){
-        return (fields[mWHITE] & fields[mKINGS]);
+        return (fields[mIDX_WHITE] & fields[mIDX_KING]);
     }
 
 
     uint64_t cBoard::getbk_pos(){
-        return (fields[mBLACK] & fields[mKINGS]);
+        return (fields[mIDX_BLACK] & fields[mIDX_KING]);
     }
 
 
@@ -216,8 +215,9 @@
     }
 
     bool cBoard::is_field_enemy_touched(uint64_t pos){
-        list<const cStep *> steps;
+        list<cStep> steps;
         uint8_t piece = getfield(pos);
+        uint8_t enemy;
         uint8_t enemycolor;        
         if(is_piece_white(piece)){
             enemycolor = mBLACK;
@@ -226,49 +226,81 @@
             enemycolor = mWHITE;
         }
 
-        steps.push_back(rk_steps);
-        steps.push_back(bp_steps);
-        steps.push_back(kg_steps_generic);
-        steps.push_back(kn_steps);
+        steps.push_back(rk_steps[0]);
+        steps.push_back(rk_steps[1]);
+        steps.push_back(rk_steps[2]);
+        steps.push_back(rk_steps[3]);
+
+        steps.push_back(bp_steps[0]);
+        steps.push_back(bp_steps[1]);
+        steps.push_back(bp_steps[2]);
+        steps.push_back(bp_steps[3]);
+
+        steps.push_back(kg_steps_generic[0]);
+        steps.push_back(kg_steps_generic[1]);
+        steps.push_back(kg_steps_generic[2]);
+        steps.push_back(kg_steps_generic[3]);
+        steps.push_back(kg_steps_generic[4]);
+        steps.push_back(kg_steps_generic[5]);
+        steps.push_back(kg_steps_generic[6]);
+        steps.push_back(kg_steps_generic[7]);
+
+        steps.push_back(kn_steps[0]);
+        steps.push_back(kn_steps[1]);
+        steps.push_back(kn_steps[2]);
+        steps.push_back(kn_steps[3]);
+        steps.push_back(kn_steps[4]);
+        steps.push_back(kn_steps[5]);
+        steps.push_back(kn_steps[6]);
+        steps.push_back(kn_steps[7]);
+
         if(enemycolor == mWHITE){
-            steps.push_back(wpw_steps_attack);
-        }
+            steps.push_back(wpw_steps_attack[0]);
+            steps.push_back(wpw_steps_attack[1]);
+            steps.push_back(wpw_steps_attack[2]);
+          }
         else{
-            steps.push_back(bpw_steps_attack);
+            steps.push_back(bpw_steps_attack[0]);
+            steps.push_back(bpw_steps_attack[1]);
+            steps.push_back(bpw_steps_attack[2]);
         }
 
-        for(const cStep *step : steps){
+        for(cStep step : steps){
             uint64_t newpos = pos;
 
-            for(int k = 0; k < step->stepcnt; ++k){
-                if((newpos & step->border) > 0){
+            for(int k = 0; k < step.stepcnt; ++k){
+                if((newpos & step.border) > 0){
                     break;
                 }
-                if(step->rightshift){
-                    newpos = (newpos >> step->shiftcnt);
+
+                if(step.rightshift){
+                    newpos = (newpos >> step.shiftcnt);
                 }
                 else{
-                    newpos = (newpos << step->shiftcnt);
+                    newpos = (newpos << step.shiftcnt);
                 }
+
                 if(is_field_busy(newpos) == false){
                     continue;
                 }
+
+                enemy = getfield(newpos);
                 if((fields[mIDX_WHITE] & newpos) > 0 && enemycolor == mWHITE){
-                    if(step->owner == STEP_OWNER["rook"] &&
-                       (piece == mWRK || piece == mWQU)){
+                    if(step.owner == STEP_OWNER["rook"] &&
+                       (enemy == mWRK || enemy == mWQU)){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["bishop"] &&
-                       (piece == mWBP || piece == mWQU)){
+                    else if(step.owner == STEP_OWNER["bishop"] &&
+                       (enemy == mWBP || enemy == mWQU)){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["king"] && piece == mWKG){
+                    else if(step.owner == STEP_OWNER["king"] && enemy == mWKG){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["knight"] && piece == mWKN){
+                    else if(step.owner == STEP_OWNER["knight"] && enemy == mWKN){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["wpawn"] && piece == mWPW){
+                    else if(step.owner == STEP_OWNER["wpawn"] && enemy == mWPW){
                         return true;
                     }
                     else{
@@ -276,21 +308,21 @@
                     }
                 }
                 else if((fields[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
-                    if(step->owner == STEP_OWNER["rook"] &&
-                       (piece == mBRK || piece == mBQU)){
+                    if(step.owner == STEP_OWNER["rook"] &&
+                       (enemy == mBRK || enemy == mBQU)){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["bishop"] &&
-                       (piece == mBBP || piece == mBQU)){
+                    else if(step.owner == STEP_OWNER["bishop"] &&
+                       (enemy == mBBP || enemy == mBQU)){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["king"] && piece == mBKG){
+                    else if(step.owner == STEP_OWNER["king"] && enemy == mBKG){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["knight"] && piece == mBKN){
+                    else if(step.owner == STEP_OWNER["knight"] && enemy == mBKN){
                         return true;
                     }
-                    else if(step->owner == STEP_OWNER["bpawn"] && piece == mBPW){
+                    else if(step.owner == STEP_OWNER["bpawn"] && enemy == mBPW){
                         return true;
                     }
                     else{
@@ -454,6 +486,94 @@
     }
 
 
+    cPin *cBoard::gather_pins(uint8_t color){
+        list<cStep> steps;
+        uint64_t kg_pos;
+        cPin *cpin = new cPin();
+
+        steps.push_back(rk_steps[0]);
+        steps.push_back(rk_steps[1]);
+        steps.push_back(rk_steps[2]);
+        steps.push_back(rk_steps[3]);
+        steps.push_back(bp_steps[0]);
+        steps.push_back(bp_steps[1]);
+        steps.push_back(bp_steps[2]);
+        steps.push_back(bp_steps[3]);
+        
+        if(color == mWHITE){
+            kg_pos = getwk_pos();
+        }
+        else{
+            kg_pos = getbk_pos();
+        }
+
+        for(const cStep step : steps){
+            uint64_t newpos = kg_pos;
+            uint64_t friend_pos = 0;
+
+            for(int k = 0; k < step.stepcnt; ++k){
+                if((newpos & step.border) > 0){
+                    break;
+                }
+
+                if(step.rightshift){
+                    newpos = (newpos >> step.shiftcnt);
+                }
+                else{
+                    newpos = (newpos << step.shiftcnt);
+                }
+
+                if(is_field_busy(newpos) == false){
+                    continue;
+                }
+
+                if((is_field_white_busy(newpos) && color == mWHITE) ||
+                   (is_field_black_busy(newpos) && color == mBLACK)){
+                    if(friend_pos > 0){
+                        break;
+                    }
+                    else{
+                        friend_pos = newpos;
+                        continue;
+                    }
+                }
+
+                // enemy found because of checks above
+                uint8_t enemy = getfield(newpos);
+
+                if(step.owner == STEP_OWNER["rook"] &&
+                   (enemy == mWRK || enemy == mBRK || 
+                    enemy == mWQU || enemy == mBQU) && 
+                   friend_pos > 0){
+                    cpin->pins[mIDX_PIN] = (cpin->pins[mIDX_PIN] | friend_pos);
+
+                    if(step.shiftcnt == 1){
+                        cpin->pins[mIDX_WST_EST] = (cpin->pins[mIDX_WST_EST] | friend_pos);
+                    }
+                    else{
+                       cpin->pins[mIDX_STH_NTH] = (cpin->pins[mIDX_STH_NTH] | friend_pos);
+                    }
+                }
+                else if(step.owner == STEP_OWNER["bishop"] &&
+                        (enemy == mWBP || enemy == mBBP || 
+                         enemy == mWQU || enemy == mBQU) && 
+                        friend_pos > 0){
+                    cpin->pins[mIDX_PIN] = (cpin->pins[mIDX_PIN] | friend_pos);
+
+                    if(step.shiftcnt == 9){
+                        cpin->pins[mIDX_STH_WST_NTH_EST] = (cpin->pins[mIDX_STH_WST_NTH_EST] | friend_pos);
+                    }
+                    else{
+                       cpin->pins[mIDX_STH_EST_NTH_WST] = (cpin->pins[mIDX_STH_EST_NTH_WST] | friend_pos);
+                    }
+                }
+                break;
+            }
+        }
+        return cpin;
+    }
+
+
     void cBoard::gen_moves(list<cMove> &minutes){
         uint64_t pos = mPOS_A1;
         uint8_t color;
@@ -465,6 +585,12 @@
         }
         else{
             color = mBLACK;
+        }
+        
+        cPin *cpin = gather_pins(color);
+        for(uint8_t i = 0; i < 5; ++i){
+            cout << "0x" << hex << setfill('0') << setw(64);
+            cout << cpin->pins[i] << endl;
         }
 
         while(pos > 0){
