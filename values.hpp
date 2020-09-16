@@ -107,6 +107,28 @@
     #endif
 
 
+    // pin indices
+    #if !defined(mIDX_PIN)
+        #define mIDX_PIN                0
+    #endif
+
+    #if !defined(mIDX_WST_EST)
+        #define mIDX_WST_EST            1
+    #endif
+
+    #if !defined(mIDX_STH_NTH)
+        #define mIDX_STH_NTH            2
+    #endif
+
+    #if !defined(mIDX_STH_WST_NTH_EST)
+        #define mIDX_STH_WST_NTH_EST    3
+    #endif
+
+    #if !defined(mIDX_STH_EST_NTH_WST)
+        #define mIDX_STH_EST_NTH_WST    4
+    #endif
+
+
     // Borders
     #if !defined(mEST_BORDER)
         #define mEST_BORDER             0x0101010101010101
