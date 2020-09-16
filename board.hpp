@@ -118,6 +118,10 @@
             uint8_t getfield(uint64_t pos);
 
             void setfield(uint64_t pos, uint8_t piece);
+        
+            uint64_t getwk_pos();
+
+            uint64_t getbk_pos();
 
             static bool is_piece_white(uint8_t piece);
 
