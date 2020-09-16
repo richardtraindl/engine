@@ -79,7 +79,7 @@
         int bPw_cnt = 0;
         int wOfficer_cnt = 0;
         int bOfficer_cnt = 0;
-        uint64_t pos = 0x8000000000000000; 
+        uint64_t pos = mPOS_A1; 
 
         while(pos > 0){
             uint8_t piece = getfield(pos);
@@ -136,7 +136,7 @@
     void cBoard::eval_count_of_officers(int &wofficers, int &bofficers){
         wofficers = 0;
         bofficers = 0;
-        for(uint64_t pos = 0x8000000000000000; pos != 0; pos = (pos >> 1)){
+        for(uint64_t pos = mPOS_A1; pos != 0; pos = (pos >> 1)){
             int piece = getfield(pos);
             if(piece == mWRK || piece == mWBP || piece == mWKN || piece == mWQU){
                 wofficers += 1;
@@ -435,7 +435,7 @@
 
 
     void cBoard::gen_moves(list<cMove> &minutes){
-        uint64_t pos = 0x8000000000000000;
+        uint64_t pos = mPOS_A1;
         uint8_t color;
         const cStep *steps;
         bool tstcolor, tstmove;
