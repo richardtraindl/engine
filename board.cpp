@@ -20,7 +20,7 @@
 
 
     bool cPin::is_pinned(uint64_t pos){
-        return (pins[IDX_PINS] & pos) > 0;
+        return (pins[IDX_PIN] & pos) > 0;
     }
 
 
