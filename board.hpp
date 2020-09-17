@@ -137,7 +137,7 @@
                 bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3]
             };
 
-            const cStep steps_for_white_enemy_search[27] = { 
+            const cStep steps_for_white_enemies_search[27] = { 
                 rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
                 bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
                 kg_steps_generic[0], kg_steps_generic[1],
@@ -149,7 +149,7 @@
                 wpw_steps_attack[0], wpw_steps_attack[1], wpw_steps_attack[2]
             };
 
-            const cStep steps_for_black_enemy_search[27] = { 
+            const cStep steps_for_black_enemies_search[27] = { 
                 rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
                 bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
                 kg_steps_generic[0], kg_steps_generic[1],
