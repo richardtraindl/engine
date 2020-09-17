@@ -197,7 +197,7 @@
             void gen_moves(list<cMove> &minutes);
  
         private:
-            bool is_square_enemy_touched(uint64_t pos);
+            bool is_square_enemy_touched(uint64_t pos, list<uint64_t> &enemies);
 
             bool tst_en_passant(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
