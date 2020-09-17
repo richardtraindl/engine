@@ -162,7 +162,7 @@
             };
 
  
-            const cStep steps_for_search_white_checks_[19] = { 
+            const cStep steps_for_search_white_checks[19] = { 
                 rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
                 bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
                 kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
@@ -171,7 +171,7 @@
             };
 
 
-            const cStep steps_for_search_black_checks_[19] = { 
+            const cStep steps_for_search_black_checks[19] = { 
                 rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
                 bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
                 kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
