@@ -30,13 +30,13 @@
                  uint64_t newsrc, 
                  uint64_t newdst, 
                  uint8_t newprompiece, 
-                 uint64_t *newprev_fields){ 
+                 uint64_t *newprev_field){ 
         type = newtype;
         src = newsrc;
         dst = newdst;
         prompiece = newprompiece;
         for(int i = 0; i < 8; ++i){
-            prev_fields[i] = *(newprev_fields + i);
+            prev_field[i] = *(newprev_field + i);
         }
     }
     cMove::cMove(){
