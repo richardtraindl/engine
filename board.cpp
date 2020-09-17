@@ -145,8 +145,8 @@
         if(bPw_cnt + bOfficer_cnt > 15){
             return false;
         }
-        if((fields[mIDX_WHITE] & fields[mIDX_KING]) == 0 || 
-            (fields[mIDX_BLACK] & fields[mIDX_KING]) == 0 ){
+        if((field[mIDX_WHITE] & field[mIDX_KING]) == 0 || 
+            (field[mIDX_BLACK] & field[mIDX_KING]) == 0 ){
             return false;
         }
         // ToDo
@@ -402,7 +402,7 @@
                         break;
                     }
                 }
-                else if((fields[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
+                else if((field[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
                     if(step.owner == STEP_OWNER["rook"] &&
                        (enemy == mBRK || enemy == mBQU)){
                         return true;
