@@ -342,11 +342,11 @@
         uint8_t enemycolor;        
         if(is_piece_white(piece)){
             enemycolor = mBLACK;
-            steps = steps_for_black_enemy_search;
+            steps = steps_for_black_enemies_search;
         }
         else{
             enemycolor = mWHITE;
-            steps = steps_for_white_enemy_search;
+            steps = steps_for_white_enemies_search;
         }
 
         for(uint8_t i = 0; i < 27; ++i){
