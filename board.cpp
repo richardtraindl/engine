@@ -106,7 +106,7 @@
         uint64_t pos = mPOS_A1; 
 
         while(pos > 0){
-            uint8_t piece = getfield(pos);
+            uint8_t piece = read(pos);
             if(piece == mWKG){
                 wKg_cnt += 1; 
                 continue;
@@ -161,7 +161,7 @@
         wofficers = 0;
         bofficers = 0;
         for(uint64_t pos = mPOS_A1; pos != 0; pos = (pos >> 1)){
-            int piece = getfield(pos);
+            int piece = read(pos);
             if(piece == mWRK || piece == mWBP || piece == mWKN || piece == mWQU){
                 wofficers += 1;
                 continue;
@@ -309,7 +309,7 @@
     }
 
 
-    bool cBoard::is_field_enemy_touched(uint64_t pos){
+    bool cBoard::is_square_enemy_touched(uint64_t pos){
         list<cStep> steps;
         uint8_t piece = getfield(pos);
         uint8_t enemy;
