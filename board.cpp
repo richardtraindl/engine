@@ -56,12 +56,12 @@
     }
 
 
-    uint64_t cBoard::read_wk_pos(){
+    uint64_t cBoard::read_wkg_pos(){
         return (field[mIDX_WHITE] & field[mIDX_KING]);
     }
 
 
-    uint64_t cBoard::read_bk_pos(){
+    uint64_t cBoard::read_bkg_pos(){
         return (field[mIDX_BLACK] & field[mIDX_KING]);
     }
 
@@ -174,43 +174,6 @@
     }
 
 
-    void cBoard::prnt(){
-        string textcolor, backcolor, strpiece;
-        uint64_t startpos = 0x0000000000000080;
-        for(int y = 7; y >=0; --y){
-            uint64_t pos = startpos;
-            for(int x = 0; x < 8; ++x){
-                uint8_t piece = read(pos);
-                if(piece == mBLK){
-                    strpiece = "   ";
-                }
-                else{
-                    strpiece = reverse_lookup(PIECES, piece);
-                }
-                if(is_piece_white(piece)){
-                    textcolor = mWHITE_TEXT + mBOLD_ON;
-                }
-                else{
-                    textcolor = mBLACK_TEXT + mBOLD_ON;
-                }
-                if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
-                    backcolor = mBLUE_BACK;
-                }
-                else{
-                    backcolor = mGREEN_BACK;
-                }
-                // "\e#3" \e#4"
-                cout << backcolor + textcolor + strpiece + mRESET_ALL;
-
-                pos = (pos >> 1);
-            }
-            cout << endl;
-
-            startpos = (startpos << 8);
-        }
-    }
-
-
     bool cBoard::compare(cBoard &newboard){
         for(int i = 0; i < 8; ++i){
             if(field[i] != newboard.field[i]){
@@ -235,10 +198,12 @@
         }
         
         cPin *cpin = determine_pins(color);
-        //for(uint8_t i = 0; i < 5; ++i){
-        //    cout << "0x" << hex << setfill('0') << setw(64);
-        //    cout << cpin->pins[i] << endl;
-        //}
+
+        uint64_t fst_enemy_pos, sec_enemy_pos;
+        determine_checks(color, fst_enemy_pos, sec_enemy_pos);
+        cout << "determine_checks: " << endl;
+        prnt_pos(fst_enemy_pos);
+        prnt_pos(sec_enemy_pos);
 
         while(pos > 0){
             uint8_t piece = read(pos);
@@ -335,6 +300,49 @@
     }
 
 
+    void cBoard::prnt(){
+        string textcolor, backcolor, strpiece;
+        uint64_t startpos = 0x0000000000000080;
+        for(int y = 7; y >=0; --y){
+            uint64_t pos = startpos;
+            for(int x = 0; x < 8; ++x){
+                uint8_t piece = read(pos);
+                if(piece == mBLK){
+                    strpiece = "   ";
+                }
+                else{
+                    strpiece = reverse_lookup(PIECES, piece);
+                }
+                if(is_piece_white(piece)){
+                    textcolor = mWHITE_TEXT + mBOLD_ON;
+                }
+                else{
+                    textcolor = mBLACK_TEXT + mBOLD_ON;
+                }
+                if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
+                    backcolor = mBLUE_BACK;
+                }
+                else{
+                    backcolor = mGREEN_BACK;
+                }
+                // "\e#3" \e#4"
+                cout << backcolor + textcolor + strpiece + mRESET_ALL;
+
+                pos = (pos >> 1);
+            }
+            cout << endl;
+
+            startpos = (startpos << 8);
+        }
+    }
+
+
+    void cBoard::prnt_pos(uint64_t pos){
+        cout << "0x" << hex << setfill('0') << setw(16);
+        cout << pos << endl;
+    }
+
+
     bool cBoard::is_square_enemy_touched(uint64_t pos){
         const cStep *steps;
         uint8_t piece = read(pos);
@@ -372,21 +380,11 @@
 
                 enemy = read(newpos);
                 if((field[mIDX_WHITE] & newpos) > 0 && enemycolor == mWHITE){
-                    if(step.owner == STEP_OWNER["rook"] &&
-                       (enemy == mWRK || enemy == mWQU)){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["bishop"] &&
-                       (enemy == mWBP || enemy == mWQU)){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["king"] && enemy == mWKG){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["knight"] && enemy == mWKN){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["wpawn"] && enemy == mWPW){
+                    if((step.owner == STEP_OWNER["rook"] && (enemy == mWRK || enemy == mWQU)) ||
+                       (step.owner == STEP_OWNER["bishop"] && (enemy == mWBP || enemy == mWQU)) ||
+                       (step.owner == STEP_OWNER["king"] && enemy == mWKG) ||
+                       (step.owner == STEP_OWNER["knight"] && enemy == mWKN) ||
+                       (step.owner == STEP_OWNER["wpawn"] && enemy == mWPW)){
                         return true;
                     }
                     else{
@@ -394,21 +392,11 @@
                     }
                 }
                 else if((field[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
-                    if(step.owner == STEP_OWNER["rook"] &&
-                       (enemy == mBRK || enemy == mBQU)){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["bishop"] &&
-                       (enemy == mBBP || enemy == mBQU)){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["king"] && enemy == mBKG){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["knight"] && enemy == mBKN){
-                        return true;
-                    }
-                    else if(step.owner == STEP_OWNER["bpawn"] && enemy == mBPW){
+                    if((step.owner == STEP_OWNER["rook"] && (enemy == mBRK || enemy == mBQU)) ||
+                       (step.owner == STEP_OWNER["bishop"] && (enemy == mBBP || enemy == mBQU)) ||
+                       (step.owner == STEP_OWNER["king"] && enemy == mBKG) ||
+                       (step.owner == STEP_OWNER["knight"] && enemy == mBKN) ||
+                       (step.owner == STEP_OWNER["bpawn"] && enemy == mBPW)){
                         return true;
                     }
                     else{
@@ -577,10 +565,10 @@
         cPin *cpin = new cPin();
 
         if(color == mWHITE){
-            kg_pos = read_wk_pos();
+            kg_pos = read_wkg_pos();
         }
         else{
-            kg_pos = read_bk_pos();
+            kg_pos = read_bkg_pos();
         }
 
         for(uint8_t i = 0; i < 8; ++i){
@@ -652,28 +640,28 @@
     }
 
 
-    void cBoard::determine_checks(uint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy){
+    void cBoard::determine_checks(uint8_t color, uint64_t &fst_enemy_pos, uint64_t &sec_enemy_pos){
         const cStep *steps;
-        uint8_t king;
+        uint8_t kg_pos;
         uint8_t enemy;
         uint8_t enemycolor;
         if(color == mWHITE){
-            king = read_wkg_pos();
+            kg_pos = read_wkg_pos();
             enemycolor = mBLACK;
             steps = steps_for_search_black_checks;
         }
         else{
-            king = read_bkg_pos();
+            kg_pos = read_bkg_pos();
             enemycolor = mWHITE;
             steps = steps_for_search_white_checks;
         }
-        fst_enemy = 0;
-        sec_enemy = 0;
+        fst_enemy_pos = 0;
+        sec_enemy_pos = 0;
  
         for(uint8_t i = 0; i < 19; ++i){
             cStep step = steps[i];
 
-            uint64_t newpos = pos;
+            uint64_t newpos = kg_pos;
 
             for(int k = 0; k < step.stepcnt; ++k){
                 if((newpos & step.border) > 0){
@@ -697,12 +685,12 @@
                        (step.owner == STEP_OWNER["bishop"] && (enemy == mWBP || enemy == mWQU)) ||
                        (step.owner == STEP_OWNER["knight"] && enemy == mWKN) ||
                        (step.owner == STEP_OWNER["wpawn"] && enemy == mWPW)){
-                        if(fst_enemy == 0){
-                            fst_enemy = enemy;
+                        if(fst_enemy_pos == 0){
+                            fst_enemy_pos = newpos;
                             continue;
                         }
                         else{
-                            sec_enemy = enemy;
+                            sec_enemy_pos = newpos;
                             return;
                         }
                     }
@@ -715,12 +703,12 @@
                        (step.owner == STEP_OWNER["bishop"] && (enemy == mBBP || enemy == mBQU)) ||
                        (step.owner == STEP_OWNER["knight"] && enemy == mBKN)||
                        (step.owner == STEP_OWNER["bpawn"] && enemy == mBPW)){
-                        if(fst_enemy == 0){
-                            fst_enemy = enemy;
+                        if(fst_enemy_pos == 0){
+                            fst_enemy_pos = newpos;
                             continue;
                         }
                         else{
-                            sec_enemy = enemy;
+                            sec_enemy_pos = newpos;
                             return;
                         }
                     }

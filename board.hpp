@@ -195,9 +195,9 @@
 
             bool is_square_black_occupied(uint64_t pos);
  
-            uint64_t read_wk_pos();
+            uint64_t read_wkg_pos();
 
-            uint64_t read_bk_pos();
+            uint64_t read_bkg_pos();
 
             static bool is_piece_blank(uint8_t piece);
  
@@ -209,11 +209,13 @@
  
             void eval_count_of_officers(int &wofficers, int &bofficers);
 
+            bool compare(cBoard &newboard);
+
+            void gen_moves(list<cMove> &minutes);
+
             void prnt();
 
-            bool compare(cBoard &newboard);
-        
-            void gen_moves(list<cMove> &minutes);
+            void prnt_pos(uint64_t pos);
  
         private:
             bool is_square_enemy_touched(uint64_t pos);
@@ -230,7 +232,7 @@
 
             cPin *determine_pins(uint8_t color);
         
-            void determine_checks(uint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy);
+            void determine_checks(uint8_t color, uint64_t &fst_enemy_pos, uint64_t &sec_enemy_pos);
     };
 
 #endif

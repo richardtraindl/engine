@@ -36,7 +36,8 @@
         match.do_move(coord_to_pos("c4"), coord_to_pos("b5"), mBLK);
         match.do_move(coord_to_pos("b8"), coord_to_pos("d7"), mBLK);
         
-        match.do_move(coord_to_pos("e1"), coord_to_pos("c1"), mBLK);
+        match.do_move(coord_to_pos("b5"), coord_to_pos("d7"), mBLK);
+        //match.do_move(coord_to_pos("e1"), coord_to_pos("c1"), mBLK);
 
 
         /*
