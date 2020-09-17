@@ -143,9 +143,9 @@
 
             bool is_square_blank(uint64_t pos);
 
-            bool is_square_white_busy(uint64_t pos);
+            bool is_square_white_occupied(uint64_t pos);
 
-            bool is_square_black_busy(uint64_t pos);
+            bool is_square_black_occupied(uint64_t pos);
  
             uint64_t read_wk_pos();
 
