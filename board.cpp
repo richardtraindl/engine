@@ -335,7 +335,7 @@
     }
 
 
-    bool cBoard::is_square_enemy_touched(uint64_t pos){
+    bool cBoard::is_square_enemy_touched(uint64_t pos, list<uint64_t> &enemies){
         const cStep *steps;
         uint8_t piece = read(pos);
         uint8_t enemy;
