@@ -660,17 +660,17 @@
         if(color == mWHITE){
             king = read_wkg_pos();
             enemycolor = mBLACK;
-            steps = steps_for_black_enemies_search;
+            steps = steps_for_search_black_checks;
         }
         else{
             king = read_bkg_pos();
             enemycolor = mWHITE;
-            steps = steps_for_white_enemies_search;
+            steps = steps_for_search_white_checks;
         }
         fst_enemy = 0;
         sec_enemy = 0;
  
-        for(uint8_t i = 0; i < 27; ++i){
+        for(uint8_t i = 0; i < 19; ++i){
             cStep step = steps[i];
 
             uint64_t newpos = pos;
