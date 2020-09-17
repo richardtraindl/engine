@@ -235,10 +235,10 @@
         }
         
         cPin *cpin = determine_pins(color);
-        for(uint8_t i = 0; i < 5; ++i){
-            cout << "0x" << hex << setfill('0') << setw(64);
-            cout << cpin->pins[i] << endl;
-        }
+        //for(uint8_t i = 0; i < 5; ++i){
+        //    cout << "0x" << hex << setfill('0') << setw(64);
+        //    cout << cpin->pins[i] << endl;
+        //}
 
         while(pos > 0){
             uint8_t piece = read(pos);
@@ -261,6 +261,32 @@
                     uint64_t newpos = pos;
 
                     for(int k = 0; k < (steps + i)->stepcnt; ++k){
+                        if((cpin->pins[mIDX_PIN] & pos) > 0){
+                            if(piece == mWKN || piece == mBKN){
+                                break;
+                            }
+                            else if((cpin->pins[mIDX_WST_EST] & pos) > 0){
+                                if((steps + i)->shiftcnt != 1){
+                                    break;
+                                }
+                            }
+                            else if((cpin->pins[mIDX_STH_NTH] & pos) > 0){
+                                if((steps + i)->shiftcnt != 8){
+                                    break;
+                                }
+                            }
+                            else if((cpin->pins[mIDX_STH_WST_NTH_EST] & pos) > 0){
+                                if((steps + i)->shiftcnt != 9){
+                                    break;
+                                }
+                            }
+                            else if((cpin->pins[mIDX_STH_EST_NTH_WST] & pos) > 0){
+                                if((steps + i)->shiftcnt != 7){
+                                    break;
+                                }
+                            }
+                        }
+
                         if((newpos & (steps + i)->border) > 0){
                             break;
                         }
@@ -310,57 +336,22 @@
 
 
     bool cBoard::is_square_enemy_touched(uint64_t pos){
-        list<cStep> steps;
-        uint8_t piece = getfield(pos);
+        const cStep *steps;
+        uint8_t piece = read(pos);
         uint8_t enemy;
         uint8_t enemycolor;        
         if(is_piece_white(piece)){
             enemycolor = mBLACK;
+            steps = steps_for_black_enemy_search;
         }
         else{
             enemycolor = mWHITE;
+            steps = steps_for_white_enemy_search;
         }
 
-        steps.push_back(rk_steps[0]);
-        steps.push_back(rk_steps[1]);
-        steps.push_back(rk_steps[2]);
-        steps.push_back(rk_steps[3]);
+        for(uint8_t i = 0; i < 27; ++i){
+            cStep step = steps[i];
 
-        steps.push_back(bp_steps[0]);
-        steps.push_back(bp_steps[1]);
-        steps.push_back(bp_steps[2]);
-        steps.push_back(bp_steps[3]);
-
-        steps.push_back(kg_steps_generic[0]);
-        steps.push_back(kg_steps_generic[1]);
-        steps.push_back(kg_steps_generic[2]);
-        steps.push_back(kg_steps_generic[3]);
-        steps.push_back(kg_steps_generic[4]);
-        steps.push_back(kg_steps_generic[5]);
-        steps.push_back(kg_steps_generic[6]);
-        steps.push_back(kg_steps_generic[7]);
-
-        steps.push_back(kn_steps[0]);
-        steps.push_back(kn_steps[1]);
-        steps.push_back(kn_steps[2]);
-        steps.push_back(kn_steps[3]);
-        steps.push_back(kn_steps[4]);
-        steps.push_back(kn_steps[5]);
-        steps.push_back(kn_steps[6]);
-        steps.push_back(kn_steps[7]);
-
-        if(enemycolor == mWHITE){
-            steps.push_back(wpw_steps_attack[0]);
-            steps.push_back(wpw_steps_attack[1]);
-            steps.push_back(wpw_steps_attack[2]);
-          }
-        else{
-            steps.push_back(bpw_steps_attack[0]);
-            steps.push_back(bpw_steps_attack[1]);
-            steps.push_back(bpw_steps_attack[2]);
-        }
-
-        for(const cStep step : steps){
             uint64_t newpos = pos;
 
             for(int k = 0; k < step.stepcnt; ++k){
@@ -582,19 +573,9 @@
 
 
     cPin *cBoard::determine_pins(uint8_t color){
-        list<cStep> steps;
         uint64_t kg_pos;
         cPin *cpin = new cPin();
 
-        steps.push_back(rk_steps[0]);
-        steps.push_back(rk_steps[1]);
-        steps.push_back(rk_steps[2]);
-        steps.push_back(rk_steps[3]);
-        steps.push_back(bp_steps[0]);
-        steps.push_back(bp_steps[1]);
-        steps.push_back(bp_steps[2]);
-        steps.push_back(bp_steps[3]);
-        
         if(color == mWHITE){
             kg_pos = read_wk_pos();
         }
@@ -602,7 +583,9 @@
             kg_pos = read_bk_pos();
         }
 
-        for(const cStep step : steps){
+        for(uint8_t i = 0; i < 8; ++i){
+            const cStep step = steps_for_pin_search[i];
+
             uint64_t newpos = kg_pos;
             uint64_t friend_pos = 0;
 
@@ -622,7 +605,7 @@
                     continue;
                 }
 
-                if((is_square_white_occupies(newpos) && color == mWHITE) ||
+                if((is_square_white_occupied(newpos) && color == mWHITE) ||
                    (is_square_black_occupied(newpos) && color == mBLACK)){
                     if(friend_pos > 0){
                         break;
@@ -669,6 +652,6 @@
     }
 
 
-    void cBoard::determine_checks(unint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy)
+    void cBoard::determine_checks(uint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy){
     }
 

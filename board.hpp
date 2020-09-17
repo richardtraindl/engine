@@ -132,6 +132,35 @@
                 cStep(STEP_OWNER["bpawn"], false, 8, 2, mSTH_BORDER) 
             };
 
+            const cStep steps_for_pin_search[8] = { 
+                rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3]
+            };
+
+            const cStep steps_for_white_enemy_search[27] = { 
+                rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+                kg_steps_generic[0], kg_steps_generic[1],
+                kg_steps_generic[2], kg_steps_generic[3],
+                kg_steps_generic[4], kg_steps_generic[5],
+                kg_steps_generic[6], kg_steps_generic[7],
+                kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+                kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+                wpw_steps_attack[0], wpw_steps_attack[1], wpw_steps_attack[2]
+            };
+
+            const cStep steps_for_black_enemy_search[27] = { 
+                rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+                kg_steps_generic[0], kg_steps_generic[1],
+                kg_steps_generic[2], kg_steps_generic[3],
+                kg_steps_generic[4], kg_steps_generic[5],
+                kg_steps_generic[6], kg_steps_generic[7],
+                kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+                kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+                bpw_steps_attack[0], bpw_steps_attack[1], bpw_steps_attack[2]
+            };
+
             cBoard();
 
             cBoard(const cBoard &board);
@@ -182,7 +211,7 @@
 
             cPin *determine_pins(uint8_t color);
         
-            void determine_checks(unint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy);
+            void determine_checks(uint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy);
     };
 
 #endif
