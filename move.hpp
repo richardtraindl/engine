@@ -28,9 +28,9 @@
             uint64_t src;
             uint64_t dst;
             uint8_t prompiece;
-            uint64_t prev_fields[8];
+            uint64_t prev_field[8];
 
-            cMove(uint8_t type, uint64_t src, uint64_t dst, uint8_t prompiece, uint64_t *prev_fields);
+            cMove(uint8_t type, uint64_t src, uint64_t dst, uint8_t prompiece, uint64_t *prev_field);
             cMove();
 
             string format();
