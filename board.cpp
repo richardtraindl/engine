@@ -335,7 +335,7 @@
     }
 
 
-    bool cBoard::is_square_enemy_touched(uint64_t pos, list<uint64_t> &enemies){
+    bool cBoard::is_square_enemy_touched(uint64_t pos){
         const cStep *steps;
         uint8_t piece = read(pos);
         uint8_t enemy;
@@ -653,5 +653,90 @@
 
 
     void cBoard::determine_checks(uint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy){
+         const cStep *steps;
+        uint8_t piece = read(pos);
+        uint8_t enemy;
+        uint8_t enemycolor;        
+        if(is_piece_white(piece)){
+            enemycolor = mBLACK;
+            steps = steps_for_black_enemy_search;
+        }
+        else{
+            enemycolor = mWHITE;
+            steps = steps_for_white_enemy_search;
+        }
+
+        for(uint8_t i = 0; i < 27; ++i){
+            cStep step = steps[i];
+
+            uint64_t newpos = pos;
+
+            for(int k = 0; k < step.stepcnt; ++k){
+                if((newpos & step.border) > 0){
+                    break;
+                }
+
+                if(step.rightshift){
+                    newpos = (newpos >> step.shiftcnt);
+                }
+                else{
+                    newpos = (newpos << step.shiftcnt);
+                }
+
+                if(is_square_blank(newpos)){
+                    continue;
+                }
+
+                enemy = read(newpos);
+                if((field[mIDX_WHITE] & newpos) > 0 && enemycolor == mWHITE){
+                    if(step.owner == STEP_OWNER["rook"] &&
+                       (enemy == mWRK || enemy == mWQU)){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["bishop"] &&
+                       (enemy == mWBP || enemy == mWQU)){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["king"] && enemy == mWKG){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["knight"] && enemy == mWKN){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["wpawn"] && enemy == mWPW){
+                        return true;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                else if((field[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
+                    if(step.owner == STEP_OWNER["rook"] &&
+                       (enemy == mBRK || enemy == mBQU)){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["bishop"] &&
+                       (enemy == mBBP || enemy == mBQU)){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["king"] && enemy == mBKG){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["knight"] && enemy == mBKN){
+                        return true;
+                    }
+                    else if(step.owner == STEP_OWNER["bpawn"] && enemy == mBPW){
+                        return true;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                else{
+                    break;
+                }
+            }
+        }
+        return false;
     }
 
