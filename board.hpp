@@ -161,6 +161,25 @@
                 bpw_steps_attack[0], bpw_steps_attack[1], bpw_steps_attack[2]
             };
 
+ 
+            const cStep steps_for_search_white_checks_[19] = { 
+                rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+                kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+                kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+                wpw_steps_attack[0], wpw_steps_attack[1], wpw_steps_attack[2]
+            };
+
+
+            const cStep steps_for_search_black_checks_[19] = { 
+                rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+                bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+                kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+                kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+                bpw_steps_attack[0], bpw_steps_attack[1], bpw_steps_attack[2]
+            };
+ 
+  
             cBoard();
 
             cBoard(const cBoard &board);
