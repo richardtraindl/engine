@@ -42,7 +42,7 @@
 
     class cBoard{
         public:
-            uint64_t fields[8] = { 0b1111111111111111000000000000000000000000000000000000000000000000,
+            uint64_t field[8] = { 0b1111111111111111000000000000000000000000000000000000000000000000,
                                    0b0000000000000000000000000000000000000000000000001111111111111111,
                                    0b0000100000000000000000000000000000000000000000000000000000001000,
                                    0b0001000000000000000000000000000000000000000000000000000000010000,
@@ -137,33 +137,38 @@
             cBoard(const cBoard &board);
             // copy constructor
 
-            uint8_t getfield(uint64_t pos);
+            uint8_t read(uint64_t pos);
 
-            void setfield(uint64_t pos, uint8_t piece);
-        
-            uint64_t getwk_pos();
+            void write(uint64_t pos, uint8_t piece);
 
-            uint64_t getbk_pos();
+            bool is_square_blank(uint64_t pos);
 
+            bool is_square_white_busy(uint64_t pos);
+
+            bool is_square_black_busy(uint64_t pos);
+ 
+            uint64_t read_wk_pos();
+
+            uint64_t read_bk_pos();
+
+            static bool is_piece_blank(uint8_t piece);
+ 
             static bool is_piece_white(uint8_t piece);
 
             static bool is_piece_black(uint8_t piece);
 
-            bool is_field_busy(uint64_t pos);
-
-            bool is_field_white_busy(uint64_t pos);
-
-            bool is_field_black_busy(uint64_t pos);
-
             bool verify();
-            
+ 
             void eval_count_of_officers(int &wofficers, int &bofficers);
 
             void prnt();
 
             bool compare(cBoard &newboard);
-
-            bool is_field_enemy_touched(uint64_t pos);
+        
+            void gen_moves(list<cMove> &minutes);
+ 
+        private:
+            bool is_square_enemy_touched(uint64_t pos);
 
             bool tst_en_passant(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
@@ -175,9 +180,9 @@
 
             bool tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
-            cPin *gather_pins(uint8_t color);
-
-            void gen_moves(list<cMove> &minutes);
+            cPin *determine_pins(uint8_t color);
+        
+            void determine_checks(unint8_t color, uint64_t &fst_enemy, uint64_t &sec_enemy);
     };
 
 #endif
