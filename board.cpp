@@ -188,7 +188,7 @@
         uint64_t pos = mPOS_A1;
         uint8_t color;
         const cStep *steps;
-        bool tstcolor, tstmove;
+        bool tstmove;
 
         if((minutes.size() % 2) == 0){
             color = mWHITE;
@@ -204,6 +204,15 @@
         cout << "determine_checks: " << endl;
         prnt_pos(fst_enemy_pos);
         prnt_pos(sec_enemy_pos);
+        if(fst_enemy_pos > 0 && sec_enemy_pos > 0){
+            gen_kg_moves(minutes);
+            return;
+        }
+        else if(fst_enemy_pos > 0){
+            gen_kg_moves(minutes);
+            gen_kg_support_moves(minutes);
+            return;
+        }
 
         while(pos > 0){
             uint8_t piece = read(pos);
@@ -255,19 +264,18 @@
                         if((newpos & (steps + i)->border) > 0){
                             break;
                         }
+
                         if((steps + i)->rightshift){
                             newpos = (newpos >> (steps + i)->shiftcnt);
                         }
                         else{
                             newpos = (newpos << (steps + i)->shiftcnt);
                         }
-                        if((color & mWHITE) > 0){
-                            tstcolor = (field[mIDX_WHITE] & newpos) > 0;
+
+                        if(is_piece_white(piece) && (field[mIDX_WHITE] & newpos) > 0){
+                            break;
                         }
-                        else{
-                            tstcolor = (field[mIDX_BLACK] & newpos) > 0;
-                        }
-                        if(tstcolor){
+                        else if(is_piece_black(piece) && (field[mIDX_BLACK] & newpos) > 0){
                             break;
                         }
                         else{
@@ -721,5 +729,60 @@
                 }
             }
         }
+    }
+
+
+    void cBoard::gen_kg_moves(list<cMove> &minutes){
+        uint64_t kg_pos;
+        uint8_t king, tstsquare;
+
+        if((minutes.size() % 2) == 0){
+            kg_pos = read_wkg_pos();
+            king = read(kg_pos);
+        }
+        else{
+            kg_pos = read_bkg_pos();
+            king = read(kg_pos);
+        }
+
+        cout << "-----" << endl;
+        cout << PIECES_STR[king] << endl;
+
+
+        for(int i = 0; i < 8; ++i){
+            uint64_t newpos = kg_pos;
+            cStep step = kg_steps_generic[i];
+
+            if((newpos & step.border) > 0){
+                break;
+            }
+
+            if(step.rightshift){
+                newpos = (newpos >> step.shiftcnt);
+            }
+            else{
+                newpos = (newpos << step.shiftcnt);
+            }
+
+            if(is_piece_white(king) && (field[mIDX_WHITE] & newpos) > 0){
+                break;
+            }
+            else if(is_piece_black(king) && (field[mIDX_BLACK] & newpos) > 0){
+                break;
+            }
+            else{
+                write(kg_pos, mBLK);
+                tstsquare = is_square_enemy_touched(newpos);
+                write(kg_pos, king);
+
+                if(tstsquare){
+                    cout << pos_to_coord(kg_pos) << "-" << pos_to_coord(newpos) << endl;
+                }
+            }
+        }
+    }
+
+
+    void cBoard::gen_kg_support_moves(list<cMove> &minutes){
     }
 

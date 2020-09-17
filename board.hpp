@@ -233,6 +233,11 @@
             cPin *determine_pins(uint8_t color);
         
             void determine_checks(uint8_t color, uint64_t &fst_enemy_pos, uint64_t &sec_enemy_pos);
+            
+            void gen_kg_moves(list<cMove> &minutes);
+
+            void gen_kg_support_moves(list<cMove> &minutes);
+
     };
 
 #endif
