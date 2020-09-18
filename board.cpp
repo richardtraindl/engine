@@ -57,7 +57,7 @@
     uint8_t cBoard::read(uint64_t pos){
         uint8_t piece = 0;
         uint8_t test = 0b10000000;
-        for(int i = 0; i < 8; i++){
+        for(uint8_t i = 0; i < 8; ++i){
             if((field[i] & pos) > 0){
                 piece = (piece | test);
             }
@@ -70,7 +70,7 @@
     void cBoard::write(uint64_t pos, uint8_t piece){
         uint8_t test = 0b10000000;
         uint64_t negmask = (0xFFFFFFFFFFFFFFFF ^ pos);
-        for(int i = 0; i < 8; i++){
+        for(uint8_t i = 0; i < 8; ++i){
             field[i] = (field[i] & negmask);
             if((piece & test) > 0){
                 field[i] = (field[i] | pos);
@@ -157,6 +157,7 @@
             }
             pos = (pos >> 1);
         }
+
         if(wKg_cnt != 1 || bKg_cnt != 1){
             return false;
         }
@@ -173,10 +174,25 @@
             (field[mIDX_BLACK] & field[mIDX_KING]) == 0 ){
             return false;
         }
-        // ToDo
-        //if(abs(wKg / 8 - bKg / 8) < 2 && abs(wKg % 8 - bKg % 8) < 2){
-        //    return false;
-        //}
+        
+        uint64_t wkg_pos = read_wkg_pos();
+        uint64_t bkg_pos = read_bkg_pos();
+        for(cStep step : kg_steps_generic){
+            if((wkg_pos & step.border) > 0){
+                continue;
+            }
+            if(step.shiftright){
+                if((wkg_pos >> step.shiftcnt) == bkg_pos){
+                    return false;
+                }
+                else{
+                    if((wkg_pos << step.shiftcnt) == bkg_pos){
+                        return false;
+                    }
+                }
+            }
+        }
+
         return true;
     }
 
