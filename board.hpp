@@ -19,14 +19,38 @@
     class cStep{
         public:
             uint8_t owner;
+            uint8_t dir;
             bool rightshift;
             uint8_t shiftcnt;
             uint8_t stepcnt;
             uint64_t border;
 
-            cStep(uint8_t newowner, bool newrightshift, uint8_t newshiftcnt, uint8_t newstepcnt, uint64_t newborder);
+            cStep(uint8_t newowner,
+                  uint8_t newdir, 
+                  bool newrightshift, 
+                  uint8_t newshiftcnt, 
+                  uint8_t newstepcnt, 
+                  uint64_t newborder);
 
             cStep();
+    };
+
+
+    class cLink{
+        public:
+            uint64_t posA;
+            uint8_t pieceA;
+            uint64_t posB;
+            uint8_t pieceB;
+            uint8_t dirAB;
+
+            cLink(uint64_t newposA, 
+                  uint8_t newpieceA, 
+                  uint64_t newposB, 
+                  uint8_t newpieceB,
+                  uint8_t newdirAB);
+
+            cLink();
     };
 
 
@@ -52,17 +76,17 @@
                                    0b0000000011111111000000000000000000000000000000001111111100000000 };
 
             const cStep rk_steps[4] = { 
-                cStep(STEP_OWNER["rook"], true, 1, 7, mEST_BORDER),
-                cStep(STEP_OWNER["rook"], false, 1, 7, mWST_BORDER),
-                cStep(STEP_OWNER["rook"], true, 8, 7, mNTH_BORDER),
-                cStep(STEP_OWNER["rook"], false, 8, 7, mSTH_BORDER) 
+                cStep(STEP_OWNER["rook"], mEST, true, 1, 7, mEST_BORDER),
+                cStep(STEP_OWNER["rook"], mWST, false, 1, 7, mWST_BORDER),
+                cStep(STEP_OWNER["rook"], mNTH, true, 8, 7, mNTH_BORDER),
+                cStep(STEP_OWNER["rook"], mSTH, false, 8, 7, mSTH_BORDER) 
             };
 
             const cStep bp_steps[4] = { 
-                cStep(STEP_OWNER["bishop"], true, 9, 7, mNTH_EST_BORDER),
-                cStep(STEP_OWNER["bishop"], false, 9, 7, mSTH_WST_BORDER),
-                cStep(STEP_OWNER["bishop"], true, 7, 7, mNTH_WST_BORDER),
-                cStep(STEP_OWNER["bishop"], false, 7, 7, mSTH_EST_BORDER) 
+                cStep(STEP_OWNER["bishop"], mNTH_EST, true, 9, 7, mNTH_EST_BORDER),
+                cStep(STEP_OWNER["bishop"], mSTH_WST, false, 9, 7, mSTH_WST_BORDER),
+                cStep(STEP_OWNER["bishop"], mNTH_WST, true, 7, 7, mNTH_WST_BORDER),
+                cStep(STEP_OWNER["bishop"], mSTH_EST, false, 7, 7, mSTH_EST_BORDER)
             };
 
             const cStep qu_steps[8] = { 
@@ -71,14 +95,14 @@
             };
 
             const cStep kg_steps_generic[8] = { 
-                cStep(STEP_OWNER["king"], true, 1, 1, mEST_BORDER),
-                cStep(STEP_OWNER["king"], false, 1, 1, mWST_BORDER),
-                cStep(STEP_OWNER["king"], true, 8, 1, mNTH_BORDER),
-                cStep(STEP_OWNER["king"], false, 8, 1, mSTH_BORDER), 
-                cStep(STEP_OWNER["king"], true, 9, 1, mNTH_EST_BORDER),
-                cStep(STEP_OWNER["king"], false, 9, 1, mSTH_WST_BORDER),
-                cStep(STEP_OWNER["king"], true, 7, 1, mNTH_WST_BORDER),
-                cStep(STEP_OWNER["king"], false, 7, 1, mSTH_EST_BORDER) 
+                cStep(STEP_OWNER["king"], mEST, true, 1, 1, mEST_BORDER),
+                cStep(STEP_OWNER["king"], mWST, false, 1, 1, mWST_BORDER),
+                cStep(STEP_OWNER["king"], mNTH, true, 8, 1, mNTH_BORDER),
+                cStep(STEP_OWNER["king"], mSTH, false, 8, 1, mSTH_BORDER), 
+                cStep(STEP_OWNER["king"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+                cStep(STEP_OWNER["king"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+                cStep(STEP_OWNER["king"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER),
+                cStep(STEP_OWNER["king"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER) 
             };
 
             const cStep wkg_steps_and_castl[10] = { 
@@ -86,8 +110,8 @@
                 kg_steps_generic[2], kg_steps_generic[3], 
                 kg_steps_generic[4], kg_steps_generic[5], 
                 kg_steps_generic[6], kg_steps_generic[7],
-                cStep(STEP_OWNER["king"], true, 2, 1, mWHITE_CASTL_BORDER),
-                cStep(STEP_OWNER["king"], false, 2, 1, mWHITE_CASTL_BORDER) 
+                cStep(STEP_OWNER["king"], m2EST, true, 2, 1, mWHITE_CASTL_BORDER),
+                cStep(STEP_OWNER["king"], m2WST, false, 2, 1, mWHITE_CASTL_BORDER) 
             };
 
             const cStep bkg_steps_and_castl[10] = { 
@@ -95,41 +119,41 @@
                 kg_steps_generic[2], kg_steps_generic[3], 
                 kg_steps_generic[4], kg_steps_generic[5], 
                 kg_steps_generic[6], kg_steps_generic[7],
-                cStep(STEP_OWNER["king"], true, 2, 1, mBLACK_CASTL_BORDER),
-                cStep(STEP_OWNER["king"], false, 2, 1, mBLACK_CASTL_BORDER) 
+                cStep(STEP_OWNER["king"], m2EST, true, 2, 1, mBLACK_CASTL_BORDER),
+                cStep(STEP_OWNER["king"], m2WST, false, 2, 1, mBLACK_CASTL_BORDER) 
             };
 
             const cStep kn_steps[8] = { 
-                cStep(STEP_OWNER["knight"], true, 6, 1, mNTH1_WST2_BORDER),
-                cStep(STEP_OWNER["knight"], true, 15, 1, mNTH2_WST1_BORDER),
-                cStep(STEP_OWNER["knight"], true, 17, 1, mNTH2_EST1_BORDER),
-                cStep(STEP_OWNER["knight"], true, 10, 1, mNTH1_EST2_BORDER), 
-                cStep(STEP_OWNER["knight"], false, 6, 1, mSTH1_EST2_BORDER),
-                cStep(STEP_OWNER["knight"], false, 15, 1, mSTH2_EST1_BORDER),
-                cStep(STEP_OWNER["knight"], false, 17, 1, mSTH2_WST1_BORDER),
-                cStep(STEP_OWNER["knight"], false, 10, 1, mSTH1_WST2_BORDER) 
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, true, 6, 1, mNTH1_WST2_BORDER),
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, true, 15, 1, mNTH2_WST1_BORDER),
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, true, 17, 1, mNTH2_EST1_BORDER),
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, true, 10, 1, mNTH1_EST2_BORDER), 
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, false, 6, 1, mSTH1_EST2_BORDER),
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, false, 15, 1, mSTH2_EST1_BORDER),
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, false, 17, 1, mSTH2_WST1_BORDER),
+                cStep(STEP_OWNER["knight"], mKNIGHT_DIRS, false, 10, 1, mSTH1_WST2_BORDER) 
             };
 
             const cStep wpw_steps_attack[2] = { 
-                cStep(STEP_OWNER["wpawn"], true, 9, 1, mNTH_EST_BORDER),
-                cStep(STEP_OWNER["wpawn"], true, 7, 1, mNTH_WST_BORDER) 
+                cStep(STEP_OWNER["wpawn"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+                cStep(STEP_OWNER["wpawn"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER) 
             };
 
             const cStep wpw_steps[3] = { 
                 cStep(wpw_steps_attack[0]),
                 cStep(wpw_steps_attack[1]),
-                cStep(STEP_OWNER["wpawn"], true, 8, 2, mNTH_BORDER) 
+                cStep(STEP_OWNER["wpawn"], mNTH, true, 8, 2, mNTH_BORDER) 
             };
 
             const cStep bpw_steps_attack[2] = {
-                cStep(STEP_OWNER["bpawn"], false, 9, 1, mSTH_WST_BORDER),
-                cStep(STEP_OWNER["bpawn"], false, 7, 1, mSTH_EST_BORDER) 
+                cStep(STEP_OWNER["bpawn"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+                cStep(STEP_OWNER["bpawn"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER) 
             };
 
             const cStep bpw_steps[3] = { 
                 cStep(bpw_steps_attack[0]),
                 cStep(bpw_steps_attack[1]),
-                cStep(STEP_OWNER["bpawn"], false, 8, 2, mSTH_BORDER) 
+                cStep(STEP_OWNER["bpawn"], mSTH, false, 8, 2, mSTH_BORDER) 
             };
 
             const cStep steps_for_pin_search[8] = { 
@@ -231,9 +255,9 @@
             bool tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
             cPin *determine_pins(uint8_t color);
-        
-            void determine_checks(uint8_t color, uint64_t &fst_enemy_pos, uint64_t &sec_enemy_pos);
-            
+
+            void determine_checks(uint8_t color, list<cLink *> &attackers);
+
             void gen_kg_moves(list<cMove> &minutes);
 
             void gen_kg_support_moves(list<cMove> &minutes);

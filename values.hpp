@@ -73,37 +73,83 @@
     #endif
 
 
+    // directions
+    #if !defined(mEST)
+        #define mEST                0
+    #endif
+
+    #if !defined(mWST)
+        #define mWST                1
+    #endif
+
+    #if !defined(mNTH)
+        #define mNTH                2
+    #endif
+
+    #if !defined(mSTH)
+        #define mSTH                3
+    #endif
+
+    #if !defined(mNTH_EST)
+        #define mNTH_EST            4
+    #endif
+
+    #if !defined(mNTH_WST)
+        #define mNTH_WST            5
+    #endif
+
+    #if !defined(mSTH_EST)
+        #define mSTH_EST            6
+    #endif
+
+    #if !defined(mSTH_WST)
+        #define mSTH_WST            7
+    #endif
+
+    #if !defined(m2EST)
+        #define m2EST               8
+    #endif
+
+    #if !defined(m2WST)
+        #define m2WST               9
+    #endif
+
+    #if !defined(mKNIGHT_DIRS)
+        #define mKNIGHT_DIRS        10
+    #endif
+
+
     // field indices
     #if !defined(mIDX_WHITE)
-        #define mIDX_WHITE    0
+        #define mIDX_WHITE  0
     #endif
 
     #if !defined(mIDX_BLACK)
-        #define mIDX_BLACK   1
+        #define mIDX_BLACK  1
     #endif
 
     #if !defined(mIDX_KING)
-        #define mIDX_KING    2
+        #define mIDX_KING   2
     #endif
 
     #if !defined(mIDX_QUEEN)
-        #define mIDX_QUEEN    3
+        #define mIDX_QUEEN  3
     #endif
 
     #if !defined(mIDX_ROOK)
-        #define mIDX_ROOK    4
+        #define mIDX_ROOK   4
     #endif
 
     #if !defined(mIDX_BISHOP)
-        #define mIDX_BISHOP    5
+        #define mIDX_BISHOP 5
     #endif
 
     #if !defined(mIDX_KNIGHT)
-        #define mIDX_KNIGHT    6
+        #define mIDX_KNIGHT 6
     #endif
 
     #if !defined(mIDX_PAWN)
-        #define mIDX_PAWN       7    
+        #define mIDX_PAWN   7    
     #endif
 
 

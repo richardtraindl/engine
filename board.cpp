@@ -2,15 +2,39 @@
     #include "./board.hpp"
 
 
-    cStep::cStep(uint8_t newowner, bool newrightshift, uint8_t newshiftcnt, uint8_t newstepcnt, uint64_t newborder){ 
+    cStep::cStep(uint8_t newowner, 
+                 uint8_t newdir, 
+                 bool newrightshift, 
+                 uint8_t newshiftcnt, 
+                 uint8_t newstepcnt, 
+                 uint64_t newborder){ 
         owner = newowner;
+        dir = newdir;
         rightshift = newrightshift;
         shiftcnt = newshiftcnt;
         stepcnt = newstepcnt;
         border = newborder;
     }
 
+
     cStep::cStep(){
+    }
+
+
+    cLink::cLink(uint64_t newposA, 
+                 uint8_t newpieceA, 
+                 uint64_t newposB, 
+                 uint8_t newpieceB,
+                 uint8_t newdirAB){
+        posA = newposA;
+        pieceA = newpieceA;
+        posB = newposB;
+        pieceB = newpieceB;
+        dirAB = newdirAB;
+    }
+
+
+    cLink::cLink(){
     }
 
 
@@ -199,17 +223,23 @@
         
         cPin *cpin = determine_pins(color);
 
-        uint64_t fst_enemy_pos, sec_enemy_pos;
-        determine_checks(color, fst_enemy_pos, sec_enemy_pos);
+        list <cLink *> attackers;
+        determine_checks(color, attackers);
         cout << "determine_checks: " << endl;
-        prnt_pos(fst_enemy_pos);
-        prnt_pos(sec_enemy_pos);
+        for(cLink *attacker : attackers){
+            cout << "1" << endl;
+            prnt_pos(attacker->posA);
+            cout << "2" << endl;
+            prnt_pos(attacker->posB);
+            cout << "3" << endl;
+            prnt_pos(attacker->dirAB);
+        }
 
-        if(fst_enemy_pos > 0 && sec_enemy_pos > 0){
+        if(attackers.size() > 1){
             gen_kg_moves(minutes);
             return;
         }
-        else if(fst_enemy_pos > 0){
+        else if(attackers.size() == 1){
             gen_kg_moves(minutes);
             gen_kg_support_moves(minutes);
             return;
@@ -389,8 +419,10 @@
 
                 enemy = read(newpos);
                 if((field[mIDX_WHITE] & newpos) > 0 && enemycolor == mWHITE){
-                    if((step.owner == STEP_OWNER["rook"] && (enemy == mWRK || enemy == mWQU)) ||
-                       (step.owner == STEP_OWNER["bishop"] && (enemy == mWBP || enemy == mWQU)) ||
+                    if((step.owner == STEP_OWNER["rook"] && 
+                        (enemy == mWRK || enemy == mWQU)) ||
+                       (step.owner == STEP_OWNER["bishop"] && 
+                        (enemy == mWBP || enemy == mWQU)) ||
                        (step.owner == STEP_OWNER["king"] && enemy == mWKG) ||
                        (step.owner == STEP_OWNER["knight"] && enemy == mWKN) ||
                        (step.owner == STEP_OWNER["wpawn"] && enemy == mWPW)){
@@ -401,8 +433,10 @@
                     }
                 }
                 else if((field[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
-                    if((step.owner == STEP_OWNER["rook"] && (enemy == mBRK || enemy == mBQU)) ||
-                       (step.owner == STEP_OWNER["bishop"] && (enemy == mBBP || enemy == mBQU)) ||
+                    if((step.owner == STEP_OWNER["rook"] && 
+                        (enemy == mBRK || enemy == mBQU)) ||
+                       (step.owner == STEP_OWNER["bishop"] && 
+                        (enemy == mBBP || enemy == mBQU)) ||
                        (step.owner == STEP_OWNER["king"] && enemy == mBKG) ||
                        (step.owner == STEP_OWNER["knight"] && enemy == mBKN) ||
                        (step.owner == STEP_OWNER["bpawn"] && enemy == mBPW)){
@@ -649,7 +683,7 @@
     }
 
 
-    void cBoard::determine_checks(uint8_t color, uint64_t &fst_enemy_pos, uint64_t &sec_enemy_pos){
+    void cBoard::determine_checks(uint8_t color, list<cLink *> &attackers){
         const cStep *steps;
         uint8_t kg_pos;
         uint8_t enemy;
@@ -664,8 +698,6 @@
             enemycolor = mWHITE;
             steps = steps_for_search_white_checks;
         }
-        fst_enemy_pos = 0;
-        sec_enemy_pos = 0;
  
         for(uint8_t i = 0; i < 19; ++i){
             cStep step = steps[i];
@@ -690,36 +722,30 @@
 
                 enemy = read(newpos);
                 if((field[mIDX_WHITE] & newpos) > 0 && enemycolor == mWHITE){
-                    if((step.owner == STEP_OWNER["rook"] && (enemy == mWRK || enemy == mWQU)) ||
-                       (step.owner == STEP_OWNER["bishop"] && (enemy == mWBP || enemy == mWQU)) ||
+                    if((step.owner == STEP_OWNER["rook"] && 
+                        (enemy == mWRK || enemy == mWQU)) ||
+                       (step.owner == STEP_OWNER["bishop"] && 
+                        (enemy == mWBP || enemy == mWQU)) ||
                        (step.owner == STEP_OWNER["knight"] && enemy == mWKN) ||
                        (step.owner == STEP_OWNER["wpawn"] && enemy == mWPW)){
-                        if(fst_enemy_pos == 0){
-                            fst_enemy_pos = newpos;
-                            continue;
-                        }
-                        else{
-                            sec_enemy_pos = newpos;
-                            return;
-                        }
+                        uint8_t king = read(kg_pos);
+                        attackers.push_back(new cLink(kg_pos, king, newpos, enemy, step.dir));
+                        continue;
                     }
                     else{
                         break;
                     }
                 }
                 else if((field[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
-                    if((step.owner == STEP_OWNER["rook"] && (enemy == mBRK || enemy == mBQU)) ||
-                       (step.owner == STEP_OWNER["bishop"] && (enemy == mBBP || enemy == mBQU)) ||
-                       (step.owner == STEP_OWNER["knight"] && enemy == mBKN)||
+                    if((step.owner == STEP_OWNER["rook"] && 
+                        (enemy == mBRK || enemy == mBQU)) ||
+                       (step.owner == STEP_OWNER["bishop"] && 
+                        (enemy == mBBP || enemy == mBQU)) ||
+                       (step.owner == STEP_OWNER["knight"] && enemy == mBKN) ||
                        (step.owner == STEP_OWNER["bpawn"] && enemy == mBPW)){
-                        if(fst_enemy_pos == 0){
-                            fst_enemy_pos = newpos;
-                            continue;
-                        }
-                        else{
-                            sec_enemy_pos = newpos;
-                            return;
-                        }
+                        uint8_t king = read(kg_pos);
+                        attackers.push_back(new cLink(kg_pos, king, newpos, enemy, step.dir));
+                        continue;
                     }
                     else{
                         break;
