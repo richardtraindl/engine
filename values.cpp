@@ -54,35 +54,35 @@
 
     map<uint8_t, int16_t> SCORES = {
         {PIECES["blk"], 0},
-        {PIECES["wPw"], -100},
-        {PIECES["wKn"], -340},
-        {PIECES["wBp"], -340},
-        {PIECES["wRk"], -450},
-        {PIECES["wQu"], -900},
-        {PIECES["wKg"], -20000},
-        {PIECES["bPw"], 100},
-        {PIECES["bKn"], 340},
-        {PIECES["bBp"], 340},
-        {PIECES["bRk"], 450},
-        {PIECES["bQu"], 900},
-        {PIECES["bKg"], 20000}
+        {PIECES["wPw"], -10},
+        {PIECES["wKn"], -34},
+        {PIECES["wBp"], -34},
+        {PIECES["wRk"], -45},
+        {PIECES["wQu"], -90},
+        {PIECES["wKg"], -10000},
+        {PIECES["bPw"], 10},
+        {PIECES["bKn"], 34},
+        {PIECES["bBp"], 34},
+        {PIECES["bRk"], 45},
+        {PIECES["bQu"], 90},
+        {PIECES["bKg"], 10000}
     };
 
 
     map<uint8_t, int16_t> REVERSED_SCORES = {
         {PIECES["blk"], 0},
-        {PIECES["wPw"], 100},
-        {PIECES["wKn"], 340},
-        {PIECES["wBp"], 340},
-        {PIECES["wRk"], 450},
-        {PIECES["wQu"], 900},
-        {PIECES["wKg"], 20000},
-        {PIECES["bPw"], -100},
-        {PIECES["bKn"], -340},
-        {PIECES["bBp"], -340},
-        {PIECES["bRk"], -450},
-        {PIECES["bQu"], -900},
-        {PIECES["bKg"], -20000}
+        {PIECES["wPw"], 10},
+        {PIECES["wKn"], 34},
+        {PIECES["wBp"], 34},
+        {PIECES["wRk"], 45},
+        {PIECES["wQu"], 90},
+        {PIECES["wKg"], 10000},
+        {PIECES["bPw"], -10},
+        {PIECES["bKn"], -34},
+        {PIECES["bBp"], -34},
+        {PIECES["bRk"], -45},
+        {PIECES["bQu"], -90},
+        {PIECES["bKg"], -10000}
     };
 
 

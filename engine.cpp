@@ -37,9 +37,12 @@
         match.do_move(coord_to_pos("b8"), coord_to_pos("d7"), mBLK);
         
         //match.do_move(coord_to_pos("b5"), coord_to_pos("d7"), mBLK);
-        //match.do_move(coord_to_pos("e1"), coord_to_pos("c1"), mBLK);
-
-
+        match.do_move(coord_to_pos("e1"), coord_to_pos("c1"), mBLK);
+        match.do_move(coord_to_pos("a8"), coord_to_pos("d8"), mBLK);
+        match.do_move(coord_to_pos("d1"), coord_to_pos("d7"), mBLK);
+        match.do_move(coord_to_pos("h7"), coord_to_pos("h6"), mBLK);
+        match.do_move(coord_to_pos("d7"), coord_to_pos("e7"), mBLK);
+        
         /*
         bool maximizing;
         if(match.next_color() == COLORS["white"]){

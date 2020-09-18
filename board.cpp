@@ -204,6 +204,7 @@
         cout << "determine_checks: " << endl;
         prnt_pos(fst_enemy_pos);
         prnt_pos(sec_enemy_pos);
+
         if(fst_enemy_pos > 0 && sec_enemy_pos > 0){
             gen_kg_moves(minutes);
             return;
@@ -753,30 +754,32 @@
             uint64_t newpos = kg_pos;
             cStep step = kg_steps_generic[i];
 
-            if((newpos & step.border) > 0){
-                break;
-            }
+            for(int k = 0; k < step.stepcnt; ++k){
+                if((newpos & step.border) > 0){
+                    break;
+                }
 
-            if(step.rightshift){
-                newpos = (newpos >> step.shiftcnt);
-            }
-            else{
-                newpos = (newpos << step.shiftcnt);
-            }
+                if(step.rightshift){
+                    newpos = (newpos >> step.shiftcnt);
+                }
+                else{
+                    newpos = (newpos << step.shiftcnt);
+                }
 
-            if(is_piece_white(king) && (field[mIDX_WHITE] & newpos) > 0){
-                break;
-            }
-            else if(is_piece_black(king) && (field[mIDX_BLACK] & newpos) > 0){
-                break;
-            }
-            else{
-                write(kg_pos, mBLK);
-                tstsquare = is_square_enemy_touched(newpos);
-                write(kg_pos, king);
+                if(is_piece_white(king) && (field[mIDX_WHITE] & newpos) > 0){
+                    break;
+                }
+                else if(is_piece_black(king) && (field[mIDX_BLACK] & newpos) > 0){
+                    break;
+                }
+                else{
+                    write(kg_pos, mBLK);
+                    tstsquare = is_square_enemy_touched(newpos);
+                    write(kg_pos, king);
 
-                if(tstsquare){
-                    cout << pos_to_coord(kg_pos) << "-" << pos_to_coord(newpos) << endl;
+                    if(tstsquare){
+                        cout << pos_to_coord(kg_pos) << "-" << pos_to_coord(newpos) << endl;
+                    }
                 }
             }
         }
