@@ -542,44 +542,41 @@
                 cout << PIECES_STR[piece] << endl;
 
                 for(int i = 0; i < maxidx; ++i){
+                    cStep step = steps[i];
                     uint64_t newpos = pos;
 
-                    for(int k = 0; k < (steps + i)->stepcnt; ++k){
+                    for(int k = 0; k < step.stepcnt; ++k){
                         if((cpin->pins[mIDX_PIN] & pos) > 0){
                             if(piece == mWKN || piece == mBKN){
                                 break;
                             }
-                            else if((cpin->pins[mIDX_WST_EST] & pos) > 0){
-                                if((steps + i)->shiftcnt != 1){
-                                    break;
-                                }
+                            else if((cpin->pins[mIDX_WST_EST] & pos) > 0 &&
+                                    step.dir != mWST && step.dir != mEST){
+                                break;
                             }
-                            else if((cpin->pins[mIDX_STH_NTH] & pos) > 0){
-                                if((steps + i)->shiftcnt != 8){
-                                    break;
-                                }
+                            else if((cpin->pins[mIDX_STH_NTH] & pos) > 0 &&
+                                    step.dir != mNTH && step.dir != mSTH){
+                                break;
                             }
-                            else if((cpin->pins[mIDX_STH_WST_NTH_EST] & pos) > 0){
-                                if((steps + i)->shiftcnt != 9){
-                                    break;
-                                }
-                            }
-                            else if((cpin->pins[mIDX_STH_EST_NTH_WST] & pos) > 0){
-                                if((steps + i)->shiftcnt != 7){
-                                    break;
-                                }
+                            else if((cpin->pins[mIDX_STH_EST_NTH_WST] & pos) > 0 &&
+                                    step.dir != mSTH_EST && step.dir != mNTH_WST){
+                                break;
+                            }                            
+                            else if((cpin->pins[mIDX_STH_WST_NTH_EST] & pos) > 0 &&
+                                    step.dir != mSTH_WST && step.dir != mNTH_EST){
+                                break;
                             }
                         }
 
-                        if((newpos & (steps + i)->border) > 0){
+                        if((newpos & step.border) > 0){
                             break;
                         }
 
-                        if((steps + i)->rightshift){
-                            newpos = (newpos >> (steps + i)->shiftcnt);
+                        if(step.rightshift){
+                            newpos = (newpos >> step.shiftcnt);
                         }
                         else{
-                            newpos = (newpos << (steps + i)->shiftcnt);
+                            newpos = (newpos << step.shiftcnt);
                         }
 
                         if(is_piece_white(piece) && (field[mIDX_WHITE] & newpos) > 0){
@@ -1159,6 +1156,7 @@
             cout << "outer " << endl;
             prnt_pos(kg_pos);
             prnt_pos(pos);
+            cout << "" << endl;
 
             for(uint8_t i = 0; i < 19; ++i){
                 cStep step = steps[i];
@@ -1183,32 +1181,48 @@
 
                     uint8_t piece = read(newpos);
                     if((field[mIDX_WHITE] & newpos) > 0 && color == mWHITE){
+                        if(step.owner == STEP_OWNER["wpawn"] && piece == mWPW){
+                            if(tst_wpw_move(newpos, pos)){
+                                cout << "defender found" << endl;
+                                cout << reverse_lookup(PIECES, piece) << endl;
+                                prnt_pos(newpos);
+                                prnt_pos(pos);
+                            }
+                            break;
+                        }
                         if((step.owner == STEP_OWNER["rook"] && 
                             (piece == mWRK || piece == mWQU)) ||
                            (step.owner == STEP_OWNER["bishop"] && 
                             (piece == mWBP || piece == mWQU)) ||
-                           (step.owner == STEP_OWNER["king"] && piece == mWKG) ||
-                           (step.owner == STEP_OWNER["knight"] && piece == mWKN) ||
-                           (step.owner == STEP_OWNER["wpawn"] && piece == mWPW)){
+                           (step.owner == STEP_OWNER["knight"] && piece == mWKN)){
                             cout << "defender found" << endl;
                             cout << reverse_lookup(PIECES, piece) << endl;
                             prnt_pos(newpos);
+                            prnt_pos(pos);
+                            break;
                         }
-                        break;
                     }
                     else if((field[mIDX_BLACK] & newpos) > 0 && color == mBLACK){
+                        if(step.owner == STEP_OWNER["bpawn"] && piece == mBPW){
+                            if(tst_bpw_move(newpos, pos)){
+                                cout << "defender found" << endl;
+                                cout << reverse_lookup(PIECES, piece) << endl;
+                                prnt_pos(newpos);
+                                prnt_pos(pos);
+                            }
+                            break;
+                        }
                         if((step.owner == STEP_OWNER["rook"] && 
                             (piece == mBRK || piece == mBQU)) ||
                            (step.owner == STEP_OWNER["bishop"] && 
                             (piece == mBBP || piece == mBQU)) ||
-                           (step.owner == STEP_OWNER["king"] && piece == mBKG) ||
-                           (step.owner == STEP_OWNER["knight"] && piece == mBKN) ||
-                           (step.owner == STEP_OWNER["bpawn"] && piece == mBPW)){
+                           (step.owner == STEP_OWNER["knight"] && piece == mBKN)){
                             cout << "defender found" << endl;
                             cout << reverse_lookup(PIECES, piece) << endl;
                             prnt_pos(newpos);
+                            prnt_pos(pos);
+                            break;
                         }
-                        break;
                     }
                     else{
                         break;
