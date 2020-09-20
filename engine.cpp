@@ -2,6 +2,7 @@
     #include <iostream>
     #include <string>
     #include "./match.hpp"
+    #include "./move.hpp"
     #include "./board.hpp"
     #include "./helper.hpp"
     #include "./values.hpp"
@@ -67,7 +68,11 @@
         
         match.board.prnt();
 
-        match.board.gen_moves(match.minutes);
+        list<cGMove> moves;
+        match.board.gen_moves(match.minutes, moves);
+        for(cGMove move : moves){
+            cout << move.format() << endl;
+        }
 
         return 0;
     }

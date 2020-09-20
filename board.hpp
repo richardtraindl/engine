@@ -64,7 +64,7 @@
 
             cPin();
 
-            bool is_pinned(uint64_t pos);
+            bool is_pinned(uint64_t pos, uint8_t dir);
     };
 
 
@@ -154,7 +154,7 @@
 
             bool compare(cBoard &newboard);
 
-            void gen_moves(list<cMove> &minutes);
+            void gen_moves(list<cMove> &minutes, list<cGMove> &moves);
 
             void prnt();
 
@@ -177,10 +177,11 @@
 
             void determine_checks(uint8_t color, list<cLink *> &attackers);
 
-            void gen_kg_moves(uint8_t color);
+            void gen_kg_moves(uint8_t color, list<cGMove> &moves);
 
-            void gen_kg_support_moves(list <cLink *> attackers);
+            void gen_kg_support_moves(list<cLink *> &attackers, list<cGMove> &moves);
 
+            void gen_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
     };
 
 #endif

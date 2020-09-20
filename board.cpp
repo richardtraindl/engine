@@ -114,20 +114,46 @@
     }
 
 
-    cPin:: cPin(){
+    cPin::cPin(){
     }
 
 
-    bool cPin::is_pinned(uint64_t pos){
-        return (pins[mIDX_PIN] & pos) > 0;
+    bool cPin::is_pinned(uint64_t pos, uint8_t dir){
+        if((pins[mIDX_PIN] & pos) == 0){
+            return false;
+        }
+
+        if((pins[mIDX_WST_EST] & pos) > 0 &&
+           (dir == mEST || dir == mWST)){
+            return true;
+        }
+
+        if((pins[mIDX_STH_NTH] & pos) > 0 &&
+           (dir == mNTH || dir == mSTH)){
+            return true;
+        }
+
+        if((pins[mIDX_STH_WST_NTH_EST] & pos) > 0 &&
+           (dir == mNTH_EST || dir == mSTH_WST)){
+            return true;
+        }
+
+        if((pins[mIDX_STH_EST_NTH_WST] & pos) > 0 &&
+           (dir == mNTH_WST || dir == mSTH_EST)){
+            return true;
+        }
+
+        return false;
     }
 
 
     cBoard::cBoard(){ 
     }
 
+
     cBoard::cBoard(const cBoard &board){
     } // copy constructor
+
 
     const cStep cBoard::rk_steps[] = { 
         cStep(STEP_OWNER["rook"], mEST, true, 1, 7, mEST_BORDER),
@@ -485,11 +511,10 @@
     }
 
 
-    void cBoard::gen_moves(list<cMove> &minutes){
+    void cBoard::gen_moves(list<cMove> &minutes, list<cGMove> &moves){
         uint64_t pos = mPOS_A1;
         uint8_t color;
         const cStep *steps;
-        bool tstmove;
 
         if((minutes.size() % 2) == 0){
             color = mWHITE;
@@ -515,12 +540,12 @@
         cout << "att size " << attackers.size() << endl;
 
         if(attackers.size() > 1){
-            gen_kg_moves(color);
+            gen_kg_moves(color, moves);
             return;
         }
         else if(attackers.size() == 1){
-            gen_kg_moves(color);
-            gen_kg_support_moves(attackers);
+            gen_kg_moves(color, moves);
+            gen_kg_support_moves(attackers, moves);
             return;
         }
 
@@ -546,26 +571,8 @@
                     uint64_t newpos = pos;
 
                     for(int k = 0; k < step.stepcnt; ++k){
-                        if((cpin->pins[mIDX_PIN] & pos) > 0){
-                            if(piece == mWKN || piece == mBKN){
-                                break;
-                            }
-                            else if((cpin->pins[mIDX_WST_EST] & pos) > 0 &&
-                                    step.dir != mWST && step.dir != mEST){
-                                break;
-                            }
-                            else if((cpin->pins[mIDX_STH_NTH] & pos) > 0 &&
-                                    step.dir != mNTH && step.dir != mSTH){
-                                break;
-                            }
-                            else if((cpin->pins[mIDX_STH_EST_NTH_WST] & pos) > 0 &&
-                                    step.dir != mSTH_EST && step.dir != mNTH_WST){
-                                break;
-                            }                            
-                            else if((cpin->pins[mIDX_STH_WST_NTH_EST] & pos) > 0 &&
-                                    step.dir != mSTH_WST && step.dir != mNTH_EST){
-                                break;
-                            }
+                        if(cpin->is_pinned(pos, step.dir)){
+                            break;
                         }
 
                         if((newpos & step.border) > 0){
@@ -589,28 +596,23 @@
                             if(piece == mWPW){
                                 if(tst_wpw_move(pos, newpos) ||
                                    tst_en_passant(pos, newpos, minutes)){
-                                    tstmove = true;
-                                }
-                                else{
-                                    tstmove = false;
+                                    gen_pw_moves(pos, newpos, moves);
                                 }
                             }
                             else if(piece == mBPW){
                                 if(tst_bpw_move(pos, newpos) ||
                                    tst_en_passant(pos, newpos, minutes)){
-                                    tstmove = true;
-                                }
-                                else{
-                                    tstmove = false;
+                                    gen_pw_moves(pos, newpos, moves);
                                 }
                             }
                             else if(piece == mWKG || piece == mBKG){
-                                tstmove = tst_kg_move(pos, newpos, minutes);
+                                if(tst_kg_move(pos, newpos, minutes)){
+                                    moves.push_back(cGMove(pos, newpos, mBLK));
+                                    cout << pos_to_coord(pos) << "-" << pos_to_coord(newpos) << endl;
+                                }
                             }
                             else{
-                                tstmove = true;
-                            }
-                            if(tstmove){
+                                moves.push_back(cGMove(pos, newpos, mBLK));
                                 cout << pos_to_coord(pos) << "-" << pos_to_coord(newpos) << endl;
                             }
                             if((field[mIDX_WHITE] & newpos) > 0 || 
@@ -1064,7 +1066,7 @@
     }
 
 
-    void cBoard::gen_kg_moves(uint8_t color){
+    void cBoard::gen_kg_moves(uint8_t color, list <cGMove> &moves){
         uint64_t kg_pos;
         uint8_t king, tstsquare;
 
@@ -1109,6 +1111,7 @@
                     write(kg_pos, king);
 
                     if(tstsquare){
+                        moves.push_back(cGMove(kg_pos, newpos, mBLK));
                         cout << pos_to_coord(kg_pos) << "-" << pos_to_coord(newpos) << endl;
                     }
                 }
@@ -1117,7 +1120,7 @@
     }
 
 
-    void cBoard::gen_kg_support_moves(list <cLink *> attackers){
+    void cBoard::gen_kg_support_moves(list <cLink *> &attackers, list <cGMove> &moves){
         if(attackers.size() != 1){
             return;
         }
@@ -1140,7 +1143,7 @@
             steps = steps_for_bkg_support_search;
         }
 
-        // cPin *cpin = determine_pins(color);
+        cPin *cpin = determine_pins(color);
 
         uint64_t pos = enemy_pos;
         cStep outerstep;
@@ -1180,13 +1183,18 @@
                     }
 
                     uint8_t piece = read(newpos);
+
                     if((field[mIDX_WHITE] & newpos) > 0 && color == mWHITE){
+                        if(cpin->is_pinned(pos, step.dir)){
+                            break;
+                        }
                         if(step.owner == STEP_OWNER["wpawn"] && piece == mWPW){
                             if(tst_wpw_move(newpos, pos)){
                                 cout << "defender found" << endl;
                                 cout << reverse_lookup(PIECES, piece) << endl;
                                 prnt_pos(newpos);
                                 prnt_pos(pos);
+                                gen_pw_moves(newpos, pos, moves);
                             }
                             break;
                         }
@@ -1199,16 +1207,21 @@
                             cout << reverse_lookup(PIECES, piece) << endl;
                             prnt_pos(newpos);
                             prnt_pos(pos);
+                            moves.push_back(cGMove(newpos, pos, mBLK));
                             break;
                         }
                     }
                     else if((field[mIDX_BLACK] & newpos) > 0 && color == mBLACK){
+                        if(cpin->is_pinned(pos, step.dir)){
+                            break;
+                        }
                         if(step.owner == STEP_OWNER["bpawn"] && piece == mBPW){
                             if(tst_bpw_move(newpos, pos)){
                                 cout << "defender found" << endl;
                                 cout << reverse_lookup(PIECES, piece) << endl;
                                 prnt_pos(newpos);
                                 prnt_pos(pos);
+                                gen_pw_moves(newpos, pos, moves);
                             }
                             break;
                         }
@@ -1221,6 +1234,7 @@
                             cout << reverse_lookup(PIECES, piece) << endl;
                             prnt_pos(newpos);
                             prnt_pos(pos);
+                            moves.push_back(cGMove(newpos, pos, mBLK));
                             break;
                         }
                     }
@@ -1241,30 +1255,25 @@
             }
         }
     }
-                    /*for(int k = 0; k < (steps + i)->stepcnt; ++k){
-                        if((cpin->pins[mIDX_PIN] & pos) > 0){
-                            if(piece == mWKN || piece == mBKN){
-                                break;
-                            }
-                            else if((cpin->pins[mIDX_WST_EST] & pos) > 0){
-                                if((steps + i)->shiftcnt != 1){
-                                    break;
-                                }
-                            }
-                            else if((cpin->pins[mIDX_STH_NTH] & pos) > 0){
-                                if((steps + i)->shiftcnt != 8){
-                                    break;
-                                }
-                            }
-                            else if((cpin->pins[mIDX_STH_WST_NTH_EST] & pos) > 0){
-                                if((steps + i)->shiftcnt != 9){
-                                    break;
-                                }
-                            }
-                            else if((cpin->pins[mIDX_STH_EST_NTH_WST] & pos) > 0){
-                                if((steps + i)->shiftcnt != 7){
-                                    break;
-                                }
-                            }
-                        */
-     
+  
+
+    void cBoard::gen_pw_moves(uint64_t src, uint64_t dst, list <cGMove> &moves){
+        if((dst & 0xFF00000000000000) > 0){
+            uint8_t pieces[] = { mWQU, mWRK, mWBP, mWKN };
+
+            for(uint8_t i = 0; i < 4; ++i){
+                moves.push_back(cGMove(src, dst, pieces[i]));
+            }
+        }
+        else if((dst & 0x00000000000000FF) > 0){
+            uint8_t pieces[] = { mBQU, mBRK, mBBP, mBKN };
+
+            for(uint8_t i = 0; i < 4; ++i){
+                moves.push_back(cGMove(src, dst, pieces[i]));
+            }
+        }
+        else{
+            moves.push_back(cGMove(src, dst, mBLK));
+        }
+    }
+
