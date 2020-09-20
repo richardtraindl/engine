@@ -38,6 +38,82 @@
     }
 
 
+    const cStep cLink::step_for_dir(uint8_t dir){
+        switch(dir){
+            case mEST: return cBoard::rk_steps[0];
+            
+            case mWST: return cBoard::rk_steps[1];
+            
+            case mNTH: return cBoard::rk_steps[2];
+            
+            case mSTH: return cBoard::rk_steps[3];
+            
+            case mNTH_EST: return cBoard::bp_steps[0];
+            
+            case mSTH_WST: return cBoard::bp_steps[1];
+
+            case mNTH_WST: return cBoard::bp_steps[2];
+            
+            case mSTH_EST: return cBoard::bp_steps[3];
+            
+            case mNTH2_EST1: return cBoard::kn_steps[0];
+
+            case mSTH2_WST1: return cBoard::kn_steps[1];
+
+            case mNTH1_EST2: return cBoard::kn_steps[2];
+
+            case mSTH1_WST2: return cBoard::kn_steps[3];
+
+            case mNTH2_WST1: return cBoard::kn_steps[4];
+
+            case mSTH2_EST1: return cBoard::kn_steps[5];
+
+            case mNTH1_WST2: return cBoard::kn_steps[6];
+
+            case mSTH1_EST2: return cBoard::kn_steps[7];
+        }
+        return cStep();
+    }
+
+
+    uint8_t cLink::reverse_dir(uint8_t dir){
+        switch(dir){
+            case mEST: return mWST;
+            
+            case mWST: return mEST;
+            
+            case mNTH: return mSTH;
+            
+            case mSTH: return mNTH;
+            
+            case mNTH_EST: return mSTH_WST;
+            
+            case mSTH_WST: return mNTH_EST;
+
+            case mNTH_WST: return mSTH_EST;
+            
+            case mSTH_EST: return mNTH_WST;
+
+            case mNTH2_EST1: return mSTH2_WST1;
+
+            case mSTH2_WST1: return mNTH2_EST1;
+
+            case mNTH1_EST2: return mSTH1_WST2;
+
+            case mSTH1_WST2: return mNTH1_EST2;
+
+            case mNTH2_WST1: return mSTH2_EST1;
+
+            case mSTH2_EST1: return mNTH2_WST1;
+
+            case mNTH1_WST2: return mSTH1_EST2;
+
+            case mSTH1_EST2: return mNTH1_WST2;
+        }
+        return mUNDEF;
+    }
+
+
     cPin:: cPin(){
     }
 
@@ -52,6 +128,191 @@
 
     cBoard::cBoard(const cBoard &board){
     } // copy constructor
+
+    const cStep cBoard::rk_steps[] = { 
+        cStep(STEP_OWNER["rook"], mEST, true, 1, 7, mEST_BORDER),
+        cStep(STEP_OWNER["rook"], mWST, false, 1, 7, mWST_BORDER),
+        cStep(STEP_OWNER["rook"], mNTH, true, 8, 7, mNTH_BORDER),
+        cStep(STEP_OWNER["rook"], mSTH, false, 8, 7, mSTH_BORDER) 
+    };
+
+
+    const cStep cBoard::bp_steps[] = { 
+        cStep(STEP_OWNER["bishop"], mNTH_EST, true, 9, 7, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["bishop"], mSTH_WST, false, 9, 7, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["bishop"], mNTH_WST, true, 7, 7, mNTH_WST_BORDER),
+        cStep(STEP_OWNER["bishop"], mSTH_EST, false, 7, 7, mSTH_EST_BORDER)
+    };
+
+
+    const cStep cBoard::qu_steps[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3], 
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3] 
+    };
+
+
+    const cStep cBoard::kg_steps_generic[] = { 
+        cStep(STEP_OWNER["king"], mEST, true, 1, 1, mEST_BORDER),
+        cStep(STEP_OWNER["king"], mWST, false, 1, 1, mWST_BORDER),
+        cStep(STEP_OWNER["king"], mNTH, true, 8, 1, mNTH_BORDER),
+        cStep(STEP_OWNER["king"], mSTH, false, 8, 1, mSTH_BORDER), 
+        cStep(STEP_OWNER["king"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["king"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["king"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER),
+        cStep(STEP_OWNER["king"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER) 
+    };
+
+
+    const cStep cBoard::wkg_steps_and_castl[] = { 
+        kg_steps_generic[0], kg_steps_generic[1], 
+        kg_steps_generic[2], kg_steps_generic[3], 
+        kg_steps_generic[4], kg_steps_generic[5], 
+        kg_steps_generic[6], kg_steps_generic[7],
+        cStep(STEP_OWNER["king"], mEST2, true, 2, 1, mWHITE_CASTL_BORDER),
+        cStep(STEP_OWNER["king"], mWST2, false, 2, 1, mWHITE_CASTL_BORDER) 
+    };
+
+    const cStep cBoard::bkg_steps_and_castl[] = { 
+        kg_steps_generic[0], kg_steps_generic[1], 
+        kg_steps_generic[2], kg_steps_generic[3], 
+        kg_steps_generic[4], kg_steps_generic[5], 
+        kg_steps_generic[6], kg_steps_generic[7],
+        cStep(STEP_OWNER["king"], mEST2, true, 2, 1, mBLACK_CASTL_BORDER),
+        cStep(STEP_OWNER["king"], mWST2, false, 2, 1, mBLACK_CASTL_BORDER) 
+    };
+
+
+    const cStep cBoard::kn_steps[] = { 
+        cStep(STEP_OWNER["knight"], mNTH2_EST1, true, 17, 1, mNTH2_EST1_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH2_WST1, false, 17, 1, mSTH2_WST1_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH1_EST2, true, 10, 1, mNTH1_EST2_BORDER), 
+        cStep(STEP_OWNER["knight"], mSTH1_WST2, false, 10, 1, mSTH1_WST2_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH2_WST1, true, 15, 1, mNTH2_WST1_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH2_EST1, false, 15, 1, mSTH2_EST1_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH1_WST2, true, 6, 1, mNTH1_WST2_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH1_EST2, false, 6, 1, mSTH1_EST2_BORDER)
+    };
+
+
+    const cStep cBoard::wpw_steps_attack[] = { 
+        cStep(STEP_OWNER["wpawn"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["wpawn"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER) 
+    };
+
+
+    const cStep cBoard::wpw_steps_attack_search[] = { 
+        cStep(STEP_OWNER["wpawn"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["wpawn"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER) 
+    };
+
+
+    const cStep cBoard::wpw_steps_support_search[] = { 
+        wpw_steps_attack_search[0],
+        wpw_steps_attack_search[1],
+        cStep(STEP_OWNER["wpawn"], mSTH, false, 8, 2, mSTH_BORDER) 
+    };
+
+
+    const cStep cBoard::wpw_steps[] = { 
+        cStep(wpw_steps_attack[0]),
+        cStep(wpw_steps_attack[1]),
+        cStep(STEP_OWNER["wpawn"], mNTH, true, 8, 2, mNTH_BORDER) 
+    };
+
+
+    const cStep cBoard::bpw_steps_attack[] = {
+        cStep(STEP_OWNER["bpawn"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["bpawn"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER) 
+    };
+
+
+    const cStep cBoard::bpw_steps_attack_search[] = {
+        cStep(STEP_OWNER["bpawn"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["bpawn"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER) 
+    };
+
+
+    const cStep cBoard::bpw_steps_support_search[] = { 
+        bpw_steps_attack_search[0],
+        bpw_steps_attack_search[1],
+        cStep(STEP_OWNER["bpawn"], mNTH, true, 8, 2, mNTH_BORDER) 
+    };
+
+
+    const cStep cBoard::bpw_steps[] = { 
+        cStep(bpw_steps_attack[0]),
+        cStep(bpw_steps_attack[1]),
+        cStep(STEP_OWNER["bpawn"], mSTH, false, 8, 2, mSTH_BORDER) 
+    };
+
+
+    const cStep cBoard::steps_for_pin_search[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3]
+    };
+
+
+    const cStep cBoard::steps_for_white_enemies_search[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+        kg_steps_generic[0], kg_steps_generic[1],
+        kg_steps_generic[2], kg_steps_generic[3],
+        kg_steps_generic[4], kg_steps_generic[5],
+        kg_steps_generic[6], kg_steps_generic[7],
+        kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+        kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+        wpw_steps_attack_search[0], wpw_steps_attack_search[1]
+    };
+
+
+    const cStep cBoard::steps_for_black_enemies_search[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+        kg_steps_generic[0], kg_steps_generic[1],
+        kg_steps_generic[2], kg_steps_generic[3],
+        kg_steps_generic[4], kg_steps_generic[5],
+        kg_steps_generic[6], kg_steps_generic[7],
+        kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+        kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+        bpw_steps_attack_search[0], bpw_steps_attack_search[1]
+    };
+
+
+    const cStep cBoard::steps_for_white_checks_search[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+        kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+        kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+        wpw_steps_attack_search[0], wpw_steps_attack_search[1]
+    };
+
+
+    const cStep cBoard::steps_for_black_checks_search[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+        kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+        kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+        bpw_steps_attack_search[0], bpw_steps_attack_search[1]
+    };
+
+
+    const cStep cBoard::steps_for_wkg_support_search[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+        kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+        kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+        wpw_steps_support_search[0], wpw_steps_support_search[1], 
+        wpw_steps_support_search[2]
+    };
+
+    const cStep cBoard::steps_for_bkg_support_search[] = { 
+        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+        bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
+        kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
+        kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
+        bpw_steps_support_search[0], bpw_steps_support_search[1], 
+        bpw_steps_support_search[2]
+    };
 
 
     uint8_t cBoard::read(uint64_t pos){
@@ -181,7 +442,7 @@
             if((wkg_pos & step.border) > 0){
                 continue;
             }
-            if(step.shiftright){
+            if(step.rightshift){
                 if((wkg_pos >> step.shiftcnt) == bkg_pos){
                     return false;
                 }
@@ -251,13 +512,15 @@
             prnt_pos(attacker->dirAB);
         }
 
+        cout << "att size " << attackers.size() << endl;
+
         if(attackers.size() > 1){
-            gen_kg_moves(minutes);
+            gen_kg_moves(color);
             return;
         }
         else if(attackers.size() == 1){
-            gen_kg_moves(minutes);
-            gen_kg_support_moves(minutes);
+            gen_kg_moves(color);
+            gen_kg_support_moves(attackers);
             return;
         }
 
@@ -327,10 +590,22 @@
                         }
                         else{
                             if(piece == mWPW){
-                                tstmove = tst_wpw_move(pos, newpos, minutes);
+                                if(tst_wpw_move(pos, newpos) ||
+                                   tst_en_passant(pos, newpos, minutes)){
+                                    tstmove = true;
+                                }
+                                else{
+                                    tstmove = false;
+                                }
                             }
                             else if(piece == mBPW){
-                                tstmove = tst_bpw_move(pos, newpos, minutes);
+                                if(tst_bpw_move(pos, newpos) ||
+                                   tst_en_passant(pos, newpos, minutes)){
+                                    tstmove = true;
+                                }
+                                else{
+                                    tstmove = false;
+                                }
                             }
                             else if(piece == mWKG || piece == mBKG){
                                 tstmove = tst_kg_move(pos, newpos, minutes);
@@ -412,7 +687,7 @@
             steps = steps_for_white_enemies_search;
         }
 
-        for(uint8_t i = 0; i < 27; ++i){
+        for(uint8_t i = 0; i < 26; ++i){
             cStep step = steps[i];
 
             uint64_t newpos = pos;
@@ -494,7 +769,7 @@
     }
 
 
-    bool cBoard::tst_wpw_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+    bool cBoard::tst_wpw_move(uint64_t pos, uint64_t newpos){
         // check, if field after one step forward is blank
         if((pos >> 8) == newpos){
             return (field[mIDX_WHITE] & newpos) == 0 && 
@@ -511,12 +786,12 @@
             return (field[mIDX_BLACK] & newpos) > 0;
         }
         else{
-            return tst_en_passant(pos, newpos, minutes);
+            return false;
         }
     }
 
 
-    bool cBoard::tst_bpw_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+    bool cBoard::tst_bpw_move(uint64_t pos, uint64_t newpos){
         // check, if field after one step forward is blank
         if((pos << 8) == newpos){
             return (field[mIDX_WHITE] & newpos) == 0 && 
@@ -533,7 +808,7 @@
             return (field[mIDX_WHITE] & newpos) > 0;
         }
         else{
-            return tst_en_passant(pos, newpos, minutes);
+            return false;
         }
     }
 
@@ -701,21 +976,22 @@
 
     void cBoard::determine_checks(uint8_t color, list<cLink *> &attackers){
         const cStep *steps;
-        uint8_t kg_pos;
-        uint8_t enemy;
-        uint8_t enemycolor;
+        uint64_t kg_pos;
+        uint8_t king, enemycolor;
+
         if(color == mWHITE){
             kg_pos = read_wkg_pos();
             enemycolor = mBLACK;
-            steps = steps_for_search_black_checks;
+            steps = steps_for_black_checks_search;
         }
         else{
             kg_pos = read_bkg_pos();
             enemycolor = mWHITE;
-            steps = steps_for_search_white_checks;
+            steps = steps_for_white_checks_search;
         }
- 
-        for(uint8_t i = 0; i < 19; ++i){
+        king = read(kg_pos);
+
+        for(uint8_t i = 0; i < 18; ++i){
             cStep step = steps[i];
 
             uint64_t newpos = kg_pos;
@@ -724,6 +1000,8 @@
                 if((newpos & step.border) > 0){
                     break;
                 }
+
+                uint64_t prevpos = newpos;
 
                 if(step.rightshift){
                     newpos = (newpos >> step.shiftcnt);
@@ -736,15 +1014,22 @@
                     continue;
                 }
 
-                enemy = read(newpos);
-                if((field[mIDX_WHITE] & newpos) > 0 && enemycolor == mWHITE){
+                uint8_t enemy = read(newpos);
+                if(is_piece_white(enemy) && enemycolor == mWHITE){
+                    if(step.owner == STEP_OWNER["wpawn"] && enemy == mWPW){
+                        if(tst_wpw_move(newpos, prevpos)){
+                            attackers.push_back(new cLink(kg_pos, king, newpos, enemy, step.dir));
+                            continue;
+                        }
+                        else{
+                            break;
+                        }
+                    }
                     if((step.owner == STEP_OWNER["rook"] && 
                         (enemy == mWRK || enemy == mWQU)) ||
                        (step.owner == STEP_OWNER["bishop"] && 
                         (enemy == mWBP || enemy == mWQU)) ||
-                       (step.owner == STEP_OWNER["knight"] && enemy == mWKN) ||
-                       (step.owner == STEP_OWNER["wpawn"] && enemy == mWPW)){
-                        uint8_t king = read(kg_pos);
+                       (step.owner == STEP_OWNER["knight"] && enemy == mWKN)){
                         attackers.push_back(new cLink(kg_pos, king, newpos, enemy, step.dir));
                         continue;
                     }
@@ -752,14 +1037,21 @@
                         break;
                     }
                 }
-                else if((field[mIDX_BLACK] & newpos) > 0 && enemycolor == mBLACK){
+                else if(is_piece_black(enemy) && enemycolor == mBLACK){
+                    if(step.owner == STEP_OWNER["bpawn"] && enemy == mBPW){
+                        if(tst_bpw_move(newpos, prevpos)){
+                            attackers.push_back(new cLink(kg_pos, king, newpos, enemy, step.dir));
+                            continue;
+                        }
+                        else{
+                            break;
+                        }
+                    }
                     if((step.owner == STEP_OWNER["rook"] && 
                         (enemy == mBRK || enemy == mBQU)) ||
                        (step.owner == STEP_OWNER["bishop"] && 
                         (enemy == mBBP || enemy == mBQU)) ||
-                       (step.owner == STEP_OWNER["knight"] && enemy == mBKN) ||
-                       (step.owner == STEP_OWNER["bpawn"] && enemy == mBPW)){
-                        uint8_t king = read(kg_pos);
+                       (step.owner == STEP_OWNER["knight"] && enemy == mBKN)){
                         attackers.push_back(new cLink(kg_pos, king, newpos, enemy, step.dir));
                         continue;
                     }
@@ -775,11 +1067,11 @@
     }
 
 
-    void cBoard::gen_kg_moves(list<cMove> &minutes){
+    void cBoard::gen_kg_moves(uint8_t color){
         uint64_t kg_pos;
         uint8_t king, tstsquare;
 
-        if((minutes.size() % 2) == 0){
+        if(color == mWHITE){
             kg_pos = read_wkg_pos();
             king = read(kg_pos);
         }
@@ -828,6 +1120,137 @@
     }
 
 
-    void cBoard::gen_kg_support_moves(list<cMove> &minutes){
-    }
+    void cBoard::gen_kg_support_moves(list <cLink *> attackers){
+        if(attackers.size() != 1){
+            return;
+        }
 
+        uint64_t kg_pos, enemy_pos;
+        uint8_t king, color;
+
+        cLink *clink = attackers.front();
+        kg_pos = clink->posA;
+        king = clink->pieceA;
+        enemy_pos = clink->posB;
+        const cStep *steps;
+
+        if(is_piece_white(king)){
+            color = mWHITE;
+            steps = steps_for_wkg_support_search;
+        }
+        else{
+            color = mBLACK;
+            steps = steps_for_bkg_support_search;
+        }
+
+        // cPin *cpin = determine_pins(color);
+
+        uint64_t pos = enemy_pos;
+        cStep outerstep;
+        if(clink->pieceA == mWKG || clink->pieceA == mBKG){
+            uint8_t reversed_dir = clink->reverse_dir(clink->dirAB);
+            outerstep = clink->step_for_dir(reversed_dir);
+        }
+        else{
+            outerstep = clink->step_for_dir(clink->dirAB);
+        }
+
+        while(pos != kg_pos){
+            cout << "outer " << endl;
+            prnt_pos(kg_pos);
+            prnt_pos(pos);
+
+            for(uint8_t i = 0; i < 19; ++i){
+                cStep step = steps[i];
+
+                uint64_t newpos = pos;
+
+                for(int k = 0; k < step.stepcnt; ++k){
+                    if((newpos & step.border) > 0){
+                        break;
+                    }
+
+                    if(step.rightshift){
+                        newpos = (newpos >> step.shiftcnt);
+                    }
+                    else{
+                        newpos = (newpos << step.shiftcnt);
+                    }
+
+                    if(is_square_blank(newpos)){
+                        continue;
+                    }
+
+                    uint8_t piece = read(newpos);
+                    if((field[mIDX_WHITE] & newpos) > 0 && color == mWHITE){
+                        if((step.owner == STEP_OWNER["rook"] && 
+                            (piece == mWRK || piece == mWQU)) ||
+                           (step.owner == STEP_OWNER["bishop"] && 
+                            (piece == mWBP || piece == mWQU)) ||
+                           (step.owner == STEP_OWNER["king"] && piece == mWKG) ||
+                           (step.owner == STEP_OWNER["knight"] && piece == mWKN) ||
+                           (step.owner == STEP_OWNER["wpawn"] && piece == mWPW)){
+                            cout << "defender found" << endl;
+                            cout << reverse_lookup(PIECES, piece) << endl;
+                            prnt_pos(newpos);
+                        }
+                        break;
+                    }
+                    else if((field[mIDX_BLACK] & newpos) > 0 && color == mBLACK){
+                        if((step.owner == STEP_OWNER["rook"] && 
+                            (piece == mBRK || piece == mBQU)) ||
+                           (step.owner == STEP_OWNER["bishop"] && 
+                            (piece == mBBP || piece == mBQU)) ||
+                           (step.owner == STEP_OWNER["king"] && piece == mBKG) ||
+                           (step.owner == STEP_OWNER["knight"] && piece == mBKN) ||
+                           (step.owner == STEP_OWNER["bpawn"] && piece == mBPW)){
+                            cout << "defender found" << endl;
+                            cout << reverse_lookup(PIECES, piece) << endl;
+                            prnt_pos(newpos);
+                        }
+                        break;
+                    }
+                    else{
+                        break;
+                    }
+                }
+            }
+            if((outerstep.border & pos) > 0){
+                return;
+            }
+
+            if(outerstep.rightshift){
+                pos = (pos >> outerstep.shiftcnt);
+            }
+            else{
+                pos = (pos << outerstep.shiftcnt);
+            }
+        }
+    }
+                    /*for(int k = 0; k < (steps + i)->stepcnt; ++k){
+                        if((cpin->pins[mIDX_PIN] & pos) > 0){
+                            if(piece == mWKN || piece == mBKN){
+                                break;
+                            }
+                            else if((cpin->pins[mIDX_WST_EST] & pos) > 0){
+                                if((steps + i)->shiftcnt != 1){
+                                    break;
+                                }
+                            }
+                            else if((cpin->pins[mIDX_STH_NTH] & pos) > 0){
+                                if((steps + i)->shiftcnt != 8){
+                                    break;
+                                }
+                            }
+                            else if((cpin->pins[mIDX_STH_WST_NTH_EST] & pos) > 0){
+                                if((steps + i)->shiftcnt != 9){
+                                    break;
+                                }
+                            }
+                            else if((cpin->pins[mIDX_STH_EST_NTH_WST] & pos) > 0){
+                                if((steps + i)->shiftcnt != 7){
+                                    break;
+                                }
+                            }
+                        */
+     

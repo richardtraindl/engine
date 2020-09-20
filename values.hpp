@@ -74,48 +74,80 @@
 
 
     // directions
+    #if !defined(mUNDEF)
+        #define mUNDEF              0
+    #endif
+
     #if !defined(mEST)
-        #define mEST                0
+        #define mEST                1
     #endif
 
     #if !defined(mWST)
-        #define mWST                1
+        #define mWST                2
     #endif
 
     #if !defined(mNTH)
-        #define mNTH                2
+        #define mNTH                3
     #endif
 
     #if !defined(mSTH)
-        #define mSTH                3
+        #define mSTH                4
     #endif
 
     #if !defined(mNTH_EST)
-        #define mNTH_EST            4
+        #define mNTH_EST            5
     #endif
 
     #if !defined(mNTH_WST)
-        #define mNTH_WST            5
+        #define mNTH_WST            6
     #endif
 
     #if !defined(mSTH_EST)
-        #define mSTH_EST            6
+        #define mSTH_EST            7
     #endif
 
     #if !defined(mSTH_WST)
-        #define mSTH_WST            7
+        #define mSTH_WST            8
     #endif
 
-    #if !defined(m2EST)
-        #define m2EST               8
+    #if !defined(mEST2)
+        #define mEST2               9
     #endif
 
-    #if !defined(m2WST)
-        #define m2WST               9
+    #if !defined(mWST2)
+        #define mWST2               10
     #endif
 
-    #if !defined(mKNIGHT_DIRS)
-        #define mKNIGHT_DIRS        10
+    #if !defined(mNTH2_EST1)
+        #define mNTH2_EST1          11
+    #endif
+
+    #if !defined(mSTH2_WST1)
+        #define mSTH2_WST1          12
+    #endif
+
+    #if !defined(mNTH1_EST2)
+        #define mNTH1_EST2          13
+    #endif
+
+    #if !defined(mSTH1_WST2)
+        #define mSTH1_WST2          14
+    #endif
+
+    #if !defined(mNTH2_WST1)
+        #define mNTH2_WST1          15
+    #endif
+
+    #if !defined(mSTH2_EST1)
+        #define mSTH2_EST1          16
+    #endif
+
+    #if !defined(mNTH1_WST2)
+        #define mNTH1_WST2          17
+    #endif
+
+    #if !defined(mSTH1_EST2)
+        #define mSTH1_EST2          18
     #endif
 
 
