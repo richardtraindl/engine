@@ -76,44 +76,6 @@
     }
 
 
-    uint8_t cLink::reverse_dir(uint8_t dir){
-        switch(dir){
-            case mEST: return mWST;
-            
-            case mWST: return mEST;
-            
-            case mNTH: return mSTH;
-            
-            case mSTH: return mNTH;
-            
-            case mNTH_EST: return mSTH_WST;
-            
-            case mSTH_WST: return mNTH_EST;
-
-            case mNTH_WST: return mSTH_EST;
-            
-            case mSTH_EST: return mNTH_WST;
-
-            case mNTH2_EST1: return mSTH2_WST1;
-
-            case mSTH2_WST1: return mNTH2_EST1;
-
-            case mNTH1_EST2: return mSTH1_WST2;
-
-            case mSTH1_WST2: return mNTH1_EST2;
-
-            case mNTH2_WST1: return mSTH2_EST1;
-
-            case mSTH2_EST1: return mNTH2_WST1;
-
-            case mNTH1_WST2: return mSTH1_EST2;
-
-            case mSTH1_EST2: return mNTH1_WST2;
-        }
-        return mUNDEF;
-    }
-
-
     cPin::cPin(){
     }
 
@@ -508,6 +470,44 @@
             }
         }
         return true;
+    }
+
+
+    uint8_t cBoard::reverse_dir(uint8_t dir){
+        switch(dir){
+            case mEST: return mWST;
+            
+            case mWST: return mEST;
+            
+            case mNTH: return mSTH;
+            
+            case mSTH: return mNTH;
+            
+            case mNTH_EST: return mSTH_WST;
+            
+            case mSTH_WST: return mNTH_EST;
+
+            case mNTH_WST: return mSTH_EST;
+            
+            case mSTH_EST: return mNTH_WST;
+
+            case mNTH2_EST1: return mSTH2_WST1;
+
+            case mSTH2_WST1: return mNTH2_EST1;
+
+            case mNTH1_EST2: return mSTH1_WST2;
+
+            case mSTH1_WST2: return mNTH1_EST2;
+
+            case mNTH2_WST1: return mSTH2_EST1;
+
+            case mSTH2_EST1: return mNTH2_WST1;
+
+            case mNTH1_WST2: return mSTH1_EST2;
+
+            case mSTH1_EST2: return mNTH1_WST2;
+        }
+        return mUNDEF;
     }
 
 
