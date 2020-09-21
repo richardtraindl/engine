@@ -2,14 +2,18 @@
 #ifndef MATCH_HPP
     #define MATCH_HPP
 
+    #include <ctime>
+    #include <iostream>
     #include <list> 
     #include <map>
     #include <string>
-    #include <ctime>
+    #include "./helper.hpp"
     #include "./board.hpp"
     #include "./move.hpp"
+    #include "./values.hpp"
 
     using namespace std;
+
 
     class cMatch{
         public:

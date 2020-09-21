@@ -1,7 +1,4 @@
 
-    #include <sstream>
-    #include <iostream>
-    #include <iomanip>
     #include "./helper.hpp"
 
 
@@ -62,3 +59,8 @@
         cout << setw(2) << setfill('0') << sec << endl;
     }
 
+
+    void prnt_16hex(uint64_t pos){
+        cout << "0x" << hex << setfill('0') << setw(16);
+        cout << pos << endl;
+    }

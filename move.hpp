@@ -2,9 +2,10 @@
 #ifndef MOVE_HPP
     #define MOVE_HPP
 
-    //#include "./board.hpp"
     #include <cstdint>
     #include <string>
+    #include "./helper.hpp"
+    #include "./values.hpp"
 
     using namespace std;
 

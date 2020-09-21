@@ -1,7 +1,5 @@
 
     #include "./move.hpp"
-    #include "./helper.hpp"
-    #include "./values.hpp"
 
 
     cGMove::cGMove(uint64_t newsrc, uint64_t newdst, uint8_t newprompiece){ 

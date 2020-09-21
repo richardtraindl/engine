@@ -1,10 +1,5 @@
 
-    #include <iostream>
     #include "./match.hpp"
-    //#include "./pieces/piece.hpp"
-    //#include "./pieces/searchforpiece.hpp"
-    #include "./helper.hpp"
-    #include "./values.hpp"
 
 
     cMatch::cMatch(){ 
@@ -87,6 +82,7 @@
         board.eval_count_of_officers(wofficers, bofficers);
         return wofficers < 3 && bofficers < 3;
     }
+
 
     // 100 Züge davor kein Bauernzug und keine Figur geschlagen
     bool cMatch::is_fifty_moves_rule(){

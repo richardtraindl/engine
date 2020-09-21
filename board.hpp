@@ -2,14 +2,13 @@
 #ifndef BOARD_HPP
     #define BOARD_HPP
 
+    #include <cstdint>
+    #include <iostream>
+    #include <list> 
     #include <map>
     #include <string>
-    #include <cstdint>
-    #include <list> 
-    #include <iostream>
-    #include  <iomanip>
-    #include "./move.hpp"
     #include "./helper.hpp"
+    #include "./move.hpp"
     #include "./values.hpp"
 
 
@@ -151,34 +150,24 @@
 
             static const uint8_t reverse_dir(uint8_t dir);
 
-            void gen_moves(list<cMove> &minutes, list<cGMove> &moves);
-
             void prnt();
 
-            void prnt_16hex(uint64_t pos);
- 
-        private:
-            bool is_square_enemy_touched(uint64_t pos);
-
-            bool tst_wpw_move(uint64_t pos, uint64_t newpos);
-
-            bool tst_bpw_move(uint64_t pos, uint64_t newpos);
-
-            bool tst_en_passant(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
-
-            bool tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
-
-            bool tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+            bool is_square_enemy_touched(uint8_t enemycolor, uint64_t pos);
 
             cPin *determine_pins(uint8_t color);
 
             void determine_checks(uint8_t color, list<cLink *> &attackers);
 
-            void gen_kg_moves(uint8_t color, list<cGMove> &moves);
+            bool tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
-            void gen_kg_support_moves(list<cLink *> &attackers, list<cGMove> &moves);
+            bool tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
-            void add_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
+            bool tst_wpw_move(uint64_t pos, uint64_t newpos);
+
+            bool tst_bpw_move(uint64_t pos, uint64_t newpos);
+
+            bool tst_en_passant_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
     };
 
 #endif

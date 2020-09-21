@@ -1,15 +1,14 @@
 
     #include <iostream>
     #include <string>
+    #include "./generator.hpp"
+    #include "./helper.hpp"
     #include "./match.hpp"
     #include "./move.hpp"
-    #include "./board.hpp"
-    #include "./helper.hpp"
     #include "./values.hpp"
-    //#include "./compute/calc.hpp"
-    //#include "./ui/play.hpp"
 
     using namespace std;
+
 
     int main(void){
         cMatch match;
@@ -52,24 +51,11 @@
         match.do_move(coord_to_pos("f2"), coord_to_pos("d3"), mBLK);
         //match.do_move(coord_to_pos("d7"), coord_to_pos("e7"), mBLK);
         
-        /*
-        bool maximizing;
-        if(match.next_color() == COLORS["white"]){
-            maximizing = true;
-        }
-        else{
-            maximizing = false;
-        }
-        play(match, maximizing);
-        */
-
-        //cBoard board;
-        //board.prnt();
-        
         match.board.prnt();
 
+        cGenerator generator(&match);
         list<cGMove> moves;
-        match.board.gen_moves(match.minutes, moves);
+        generator.gen_moves(moves);
         for(cGMove move : moves){
             cout << move.format() << endl;
         }
