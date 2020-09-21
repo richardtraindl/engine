@@ -1154,10 +1154,8 @@
                             }
                             break;
                         }
-                        if((step.owner == STEP_OWNER["rook"] && 
-                            (piece == mWRK || piece == mWQU)) ||
-                           (step.owner == STEP_OWNER["bishop"] && 
-                            (piece == mWBP || piece == mWQU)) ||
+                        if((step.owner == STEP_OWNER["rook"] && (piece == mWRK || piece == mWQU)) ||
+                           (step.owner == STEP_OWNER["bishop"] && (piece == mWBP || piece == mWQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mWKN)){
                             moves.push_back(cGMove(newpos, pos, mBLK));
                             break;
@@ -1173,10 +1171,8 @@
                             }
                             break;
                         }
-                        if((step.owner == STEP_OWNER["rook"] && 
-                            (piece == mBRK || piece == mBQU)) ||
-                           (step.owner == STEP_OWNER["bishop"] && 
-                            (piece == mBBP || piece == mBQU)) ||
+                        if((step.owner == STEP_OWNER["rook"] && (piece == mBRK || piece == mBQU)) ||
+                           (step.owner == STEP_OWNER["bishop"] && (piece == mBBP || piece == mBQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mBKN)){
                             moves.push_back(cGMove(newpos, pos, mBLK));
                             break;
