@@ -53,8 +53,6 @@
             cLink();
 
             const cStep step_for_dir(uint8_t dir);
-
-            uint8_t reverse_dir(uint8_t dir);
     };
 
 
@@ -150,6 +148,8 @@
             void eval_count_of_officers(int &wofficers, int &bofficers);
 
             bool compare(cBoard &newboard);
+
+            static const uint8_t reverse_dir(uint8_t dir);
 
             void gen_moves(list<cMove> &minutes, list<cGMove> &moves);
 
