@@ -1157,8 +1157,8 @@
 
         while(pos != kg_pos){
             cout << "outer " << endl;
-            prnt_pos(kg_pos);
-            prnt_pos(pos);
+            prnt_16hex(kg_pos);
+            prnt_16hex(pos);
             cout << "" << endl;
 
             for(uint8_t i = 0; i < 19; ++i){
@@ -1190,11 +1190,7 @@
                         }
                         if(step.owner == STEP_OWNER["wpawn"] && piece == mWPW){
                             if(tst_wpw_move(newpos, pos)){
-                                cout << "defender found" << endl;
-                                cout << reverse_lookup(PIECES, piece) << endl;
-                                prnt_pos(newpos);
-                                prnt_pos(pos);
-                                gen_pw_moves(newpos, pos, moves);
+                                add_pw_moves(newpos, pos, moves);
                             }
                             break;
                         }
@@ -1203,10 +1199,6 @@
                            (step.owner == STEP_OWNER["bishop"] && 
                             (piece == mWBP || piece == mWQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mWKN)){
-                            cout << "defender found" << endl;
-                            cout << reverse_lookup(PIECES, piece) << endl;
-                            prnt_pos(newpos);
-                            prnt_pos(pos);
                             moves.push_back(cGMove(newpos, pos, mBLK));
                             break;
                         }
@@ -1217,11 +1209,7 @@
                         }
                         if(step.owner == STEP_OWNER["bpawn"] && piece == mBPW){
                             if(tst_bpw_move(newpos, pos)){
-                                cout << "defender found" << endl;
-                                cout << reverse_lookup(PIECES, piece) << endl;
-                                prnt_pos(newpos);
-                                prnt_pos(pos);
-                                gen_pw_moves(newpos, pos, moves);
+                                add_pw_moves(newpos, pos, moves);
                             }
                             break;
                         }
@@ -1230,10 +1218,6 @@
                            (step.owner == STEP_OWNER["bishop"] && 
                             (piece == mBBP || piece == mBQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mBKN)){
-                            cout << "defender found" << endl;
-                            cout << reverse_lookup(PIECES, piece) << endl;
-                            prnt_pos(newpos);
-                            prnt_pos(pos);
                             moves.push_back(cGMove(newpos, pos, mBLK));
                             break;
                         }
