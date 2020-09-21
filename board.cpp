@@ -530,11 +530,11 @@
         cout << "determine_checks: " << endl;
         for(cLink *attacker : attackers){
             cout << "1" << endl;
-            prnt_pos(attacker->posA);
+            prnt_16hex(attacker->posA);
             cout << "2" << endl;
-            prnt_pos(attacker->posB);
+            prnt_16hex(attacker->posB);
             cout << "3" << endl;
-            prnt_pos(attacker->dirAB);
+            prnt_16hex(attacker->dirAB);
         }
 
         cout << "att size " << attackers.size() << endl;
@@ -666,7 +666,7 @@
     }
 
 
-    void cBoard::prnt_pos(uint64_t pos){
+    void cBoard::prnt_16hex(uint64_t pos){
         cout << "0x" << hex << setfill('0') << setw(16);
         cout << pos << endl;
     }
