@@ -473,7 +473,7 @@
     }
 
 
-    uint8_t cBoard::reverse_dir(uint8_t dir){
+    const uint8_t cBoard::reverse_dir(uint8_t dir){
         switch(dir){
             case mEST: return mWST;
             
@@ -1113,7 +1113,7 @@
         uint64_t pos = enemy_pos;
         cStep outerstep;
         if(clink->pieceA == mWKG || clink->pieceA == mBKG){
-            uint8_t reversed_dir = clink->reverse_dir(clink->dirAB);
+            uint8_t reversed_dir = cBoard::reverse_dir(clink->dirAB);
             outerstep = clink->step_for_dir(reversed_dir);
         }
         else{
