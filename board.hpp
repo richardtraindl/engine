@@ -125,9 +125,6 @@
 
             cBoard();
 
-            cBoard(const cBoard &board);
-            // copy constructor
-
             uint8_t read(uint64_t pos);
 
             void write(uint64_t pos, uint8_t piece);
@@ -158,20 +155,20 @@
 
             void prnt();
 
-            void prnt_pos(uint64_t pos);
+            void prnt_16hex(uint64_t pos);
  
         private:
             bool is_square_enemy_touched(uint64_t pos);
-
-            bool tst_en_passant(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
             bool tst_wpw_move(uint64_t pos, uint64_t newpos);
 
             bool tst_bpw_move(uint64_t pos, uint64_t newpos);
 
-            bool tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+            bool tst_en_passant(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
             bool tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
+
+            bool tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
             cPin *determine_pins(uint8_t color);
 
@@ -181,7 +178,7 @@
 
             void gen_kg_support_moves(list<cLink *> &attackers, list<cGMove> &moves);
 
-            void gen_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
+            void add_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
     };
 
 #endif
