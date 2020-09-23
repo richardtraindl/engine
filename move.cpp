@@ -6,10 +6,20 @@
         src = newsrc;
         dst = newdst;
         prompiece = newprompiece;
+        presort = PRESORT_MEDIUM;
     }
+
 
     cGMove::cGMove(){
     }
+
+
+    const uint8_t cGMove::PRESORT_STORMY = 30;
+    const uint8_t cGMove::PRESORT_VERY_HIGH = 60;
+    const uint8_t cGMove::PRESORT_HIGH = 90;
+    const uint8_t cGMove::PRESORT_MEDIUM = 120;
+    const uint8_t cGMove::PRESORT_LOW = 150;
+    const uint8_t cGMove::PRESORT_VERY_LOW = 180;
 
 
     string cGMove::format(){
@@ -20,7 +30,7 @@
             trailing = ", " + reverse_lookup(PIECES, prompiece);
         }
 
-        return pos_to_coord(src) + hyphen + pos_to_coord(dst) + trailing;
+        return pos_to_coord(src) + hyphen + pos_to_coord(dst) + " presort: " + to_string(presort) + trailing;
     }
 
 

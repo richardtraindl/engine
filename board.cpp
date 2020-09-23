@@ -38,44 +38,6 @@
     }
 
 
-    const cStep cLink::step_for_dir(uint8_t dir){
-        switch(dir){
-            case mEST: return cBoard::rk_steps[0];
-            
-            case mWST: return cBoard::rk_steps[1];
-            
-            case mNTH: return cBoard::rk_steps[2];
-            
-            case mSTH: return cBoard::rk_steps[3];
-            
-            case mNTH_EST: return cBoard::bp_steps[0];
-            
-            case mSTH_WST: return cBoard::bp_steps[1];
-
-            case mNTH_WST: return cBoard::bp_steps[2];
-            
-            case mSTH_EST: return cBoard::bp_steps[3];
-            
-            case mNTH2_EST1: return cBoard::kn_steps[0];
-
-            case mSTH2_WST1: return cBoard::kn_steps[1];
-
-            case mNTH1_EST2: return cBoard::kn_steps[2];
-
-            case mSTH1_WST2: return cBoard::kn_steps[3];
-
-            case mNTH2_WST1: return cBoard::kn_steps[4];
-
-            case mSTH2_EST1: return cBoard::kn_steps[5];
-
-            case mNTH1_WST2: return cBoard::kn_steps[6];
-
-            case mSTH1_EST2: return cBoard::kn_steps[7];
-        }
-        return cStep();
-    }
-
-
     cPin::cPin(){
     }
 
@@ -299,6 +261,82 @@
     };
 
 
+    const cStep cBoard::step_for_dir(uint8_t dir){
+        switch(dir){
+            case mEST: return rk_steps[0];
+            
+            case mWST: return rk_steps[1];
+            
+            case mNTH: return rk_steps[2];
+            
+            case mSTH: return rk_steps[3];
+            
+            case mNTH_EST: return bp_steps[0];
+            
+            case mSTH_WST: return bp_steps[1];
+
+            case mNTH_WST: return bp_steps[2];
+            
+            case mSTH_EST: return bp_steps[3];
+            
+            case mNTH2_EST1: return kn_steps[0];
+
+            case mSTH2_WST1: return kn_steps[1];
+
+            case mNTH1_EST2: return kn_steps[2];
+
+            case mSTH1_WST2: return kn_steps[3];
+
+            case mNTH2_WST1: return kn_steps[4];
+
+            case mSTH2_EST1: return kn_steps[5];
+
+            case mNTH1_WST2: return kn_steps[6];
+
+            case mSTH1_EST2: return kn_steps[7];
+        }
+        return cStep();
+    }
+
+
+    const uint8_t cBoard::reverse_dir(uint8_t dir){
+        switch(dir){
+            case mEST: return mWST;
+            
+            case mWST: return mEST;
+            
+            case mNTH: return mSTH;
+            
+            case mSTH: return mNTH;
+            
+            case mNTH_EST: return mSTH_WST;
+            
+            case mSTH_WST: return mNTH_EST;
+
+            case mNTH_WST: return mSTH_EST;
+            
+            case mSTH_EST: return mNTH_WST;
+
+            case mNTH2_EST1: return mSTH2_WST1;
+
+            case mSTH2_WST1: return mNTH2_EST1;
+
+            case mNTH1_EST2: return mSTH1_WST2;
+
+            case mSTH1_WST2: return mNTH1_EST2;
+
+            case mNTH2_WST1: return mSTH2_EST1;
+
+            case mSTH2_EST1: return mNTH2_WST1;
+
+            case mNTH1_WST2: return mSTH1_EST2;
+
+            case mSTH1_EST2: return mNTH1_WST2;
+        }
+        return mUNDEF;
+    }
+
+
     uint8_t cBoard::read(uint64_t pos){
         uint8_t piece = 0;
         uint8_t test = 0b10000000;
@@ -468,44 +506,6 @@
         return true;
     }
 
-
-    const uint8_t cBoard::reverse_dir(uint8_t dir){
-        switch(dir){
-            case mEST: return mWST;
-            
-            case mWST: return mEST;
-            
-            case mNTH: return mSTH;
-            
-            case mSTH: return mNTH;
-            
-            case mNTH_EST: return mSTH_WST;
-            
-            case mSTH_WST: return mNTH_EST;
-
-            case mNTH_WST: return mSTH_EST;
-            
-            case mSTH_EST: return mNTH_WST;
-
-            case mNTH2_EST1: return mSTH2_WST1;
-
-            case mSTH2_WST1: return mNTH2_EST1;
-
-            case mNTH1_EST2: return mSTH1_WST2;
-
-            case mSTH1_WST2: return mNTH1_EST2;
-
-            case mNTH2_WST1: return mSTH2_EST1;
-
-            case mSTH2_EST1: return mNTH2_WST1;
-
-            case mNTH1_WST2: return mSTH1_EST2;
-
-            case mSTH1_EST2: return mNTH1_WST2;
-        }
-        return mUNDEF;
-    }
-   
 
     void cBoard::prnt(){
         string textcolor, backcolor, strpiece;

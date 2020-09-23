@@ -59,13 +59,13 @@
         {PIECES["wBp"], -34},
         {PIECES["wRk"], -45},
         {PIECES["wQu"], -90},
-        {PIECES["wKg"], -10000},
+        {PIECES["wKg"], -2000},
         {PIECES["bPw"], 10},
         {PIECES["bKn"], 34},
         {PIECES["bBp"], 34},
         {PIECES["bRk"], 45},
         {PIECES["bQu"], 90},
-        {PIECES["bKg"], 10000}
+        {PIECES["bKg"], 2000}
     };
 
 

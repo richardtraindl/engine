@@ -15,7 +15,7 @@
     class cGenerator{
         public:
             cMatch *match;
-
+            
             cGenerator(cMatch *match);
 
             void gen_moves(list<cGMove> &moves);
@@ -26,6 +26,27 @@
             void gen_kg_support_moves(list<cLink *> &attackers, list<cGMove> &moves);
 
             void add_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
+
+            bool is_castling(cGMove &move);
+
+            void score_interesting(cGMove &move);
+
+            void set_score_capture(cGMove &move);
+
+            bool is_forking(cGMove &move);
+
+            bool is_defending_fork(cGMove &move);
+ 
+            bool is_fleeing(cGMove &move);
+
+            bool is_unpin(cGMove &move);
+
+            bool is_blocking(cGMove &move);
+
+            bool is_running_pawn(cGMove &move);
+
+            bool is_tactical_draw(cGMove &move);
+
     };
 
 #endif

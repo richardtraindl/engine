@@ -50,8 +50,6 @@
                   uint8_t newdirAB);
 
             cLink();
-
-            const cStep step_for_dir(uint8_t dir);
     };
 
 
@@ -120,6 +118,10 @@
 
             static const cStep steps_for_bkg_support_search[];
 
+            static const cStep step_for_dir(uint8_t dir);
+
+            static const uint8_t reverse_dir(uint8_t dir);
+
             cBoard();
 
             uint8_t read(uint64_t pos);
@@ -147,8 +149,6 @@
             void eval_count_of_officers(int &wofficers, int &bofficers);
 
             bool compare(cBoard &newboard);
-
-            static const uint8_t reverse_dir(uint8_t dir);
 
             void prnt();
 

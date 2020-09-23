@@ -3,6 +3,7 @@
     #include <string>
     #include "./generator.hpp"
     #include "./helper.hpp"
+    #include "./calc.hpp"
     #include "./match.hpp"
     #include "./move.hpp"
     #include "./values.hpp"
@@ -53,10 +54,19 @@
         
         match.board.prnt();
 
+        /*
         cGenerator generator(&match);
         list<cGMove> moves;
         generator.gen_moves(moves);
-        for(cGMove move : moves){
+        */
+
+        list<cGMove> rcandidates;
+        int16_t score = 0;
+        score = calc_move(match, rcandidates);
+
+        cout << to_string(score) << endl;
+
+        for(cGMove move : rcandidates){
             cout << move.format() << endl;
         }
 
