@@ -2,6 +2,9 @@
     #include "./calc.hpp"
 
 
+    uint64_t calccnt;
+
+
     void prnt_moves(list<cGMove> &moves){
         uint8_t idx = 1;
 
@@ -54,23 +57,26 @@
     }
 
 
-    uint8_t select_movecnt(cMatch &match, list<cGMove> &moves, uint8_t depth, cGMove *last_move){
+    uint8_t select_movecnt(cMatch &match, list<cGMove> &moves, uint8_t depth, uint8_t maxdepth, cGMove *last_move){
         if(moves.size() == 0){
             return 0;
         }
 
-        uint8_t movecnt = 0;
+        if(depth > maxdepth && 
+           (last_move == NULL || 
+            (last_move != NULL && last_move->presort > cGMove::PRESORT_VERY_HIGH))){
+            return 0;
+        }
+
         if(depth <= 3){
             return moves.size();
         }
 
         if(depth <= 5){
-            movecnt = count_up_to_prio(moves, cGMove::PRESORT_HIGH);
-            return movecnt;
+            return count_up_to_prio(moves, cGMove::PRESORT_HIGH);
         }
 
-        movecnt = count_up_to_prio(moves, cGMove::PRESORT_VERY_HIGH);
-        return movecnt;
+        return count_up_to_prio(moves, cGMove::PRESORT_VERY_HIGH);
     }
 
 
@@ -97,15 +103,18 @@
         cGenerator generator(&match);
         generator.gen_moves(moves);
         moves.sort(sortByPresort);
-        uint8_t maxcnt = select_movecnt(match, moves, depth, last_move);
+        uint8_t maxcnt = select_movecnt(match, moves, depth, maxdepth, last_move);
 
-        if(depth == 1){
-            cout << "moves count: " << moves.size() << " maxcnt: " << endl;
+        if(depth == 0){
+            cout << "moves count: " << moves.size() << " maxcnt: " << to_string(maxcnt) << endl;
             prnt_moves(moves);
         }
 
         if(moves.size() == 0 || maxcnt == 0){
-            bestscore = 0; // score_position(match, priomoves.size());
+            bestscore = match.score; // score_position(match, priomoves.size());
+             if(depth == 1){
+                 cout << "match.score from depth 1 : " << to_string(match.score) << endl;
+             }
             //clean_moves(moves);
             return bestscore;
         }
@@ -117,8 +126,12 @@
 
             // ??? tactical draw
 
+            calccnt += 1;
+
             match.do_move(move.src, move.dst, move.prompiece);
+
             newscore = alphabeta(match, depth + 1, maxdepth, alpha, beta, !maximizing, &move, newcandidates);
+
             match.undo_move();
 
             if(maximizing){
@@ -155,15 +168,17 @@
 
     int16_t calc_move(cMatch &match, list<cGMove> &rcandidates){
         time_t time_start = time(0);
-
         bool maximizing = match.next_color() == mWHITE;
         int16_t alpha = SCORES[mWKG] * 10;
         int16_t beta = SCORES[mBKG] * 10;
+        calccnt = 0;
+
         int16_t rscore = alphabeta(match, 1, 5, alpha, beta, maximizing, NULL, rcandidates);
-        
-        cout << "\nresult: " << rscore << " match: " << match.created_at << " ";
+
+        cout << "\nresult: " << to_string(rscore) << endl;
         cout << concat_fmtmoves(rcandidates) << endl;
         prnt_fmttime("\ncalc-time: ", time(0) - time_start);
+        cout << "calccnt: " << to_string(calccnt) << endl;
 
         return rscore;
     }

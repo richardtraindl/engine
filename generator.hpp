@@ -29,7 +29,7 @@
 
             bool is_castling(cGMove &move);
 
-            void score_interesting(cGMove &move);
+            void score_presort(cGMove &move);
 
             void set_score_capture(cGMove &move);
 

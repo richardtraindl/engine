@@ -17,6 +17,7 @@
             uint8_t prompiece;
             uint8_t presort;
 
+            static const uint8_t PRESORT_STEP;
             static const uint8_t PRESORT_STORMY;
             static const uint8_t PRESORT_VERY_HIGH;
             static const uint8_t PRESORT_HIGH;

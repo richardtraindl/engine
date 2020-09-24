@@ -131,91 +131,88 @@
     }
 
 
-    cMove *cMatch::do_move(uint64_t src, uint64_t dst, uint8_t prompiece){
+    void cMatch::do_move(uint64_t src, uint64_t dst, uint8_t prompiece){
         uint8_t srcpiece = board.read(src);
         uint8_t dstpiece = board.read(dst);
 
         if((srcpiece == mWKG || srcpiece == mBKG) &&
            ((src >> 2) == dst || (src << 2) == dst)){
             if((src >> 2) == dst){
+                cMove move(MOVE_TYPE["short-castling"], src, dst, prompiece, board.field);
+                minutes.push_back(move);
                 uint64_t rkpos = (dst >> 1);
                 uint8_t rkpiece = board.read(rkpos);
                 board.write(src, mBLK);
                 board.write(dst, srcpiece);
                 board.write(rkpos, mBLK);
                 board.write((dst << 1), rkpiece);
-                cMove *move = new cMove(MOVE_TYPE["short-castling"], src, dst, prompiece, board.field);
-                minutes.push_back(*move);
-                return move;
+                return;
             }
             else{
+                cMove move(MOVE_TYPE["long-castling"], src, dst, prompiece, board.field);
+                minutes.push_back(move);
                 uint64_t rkpos = (dst << 2);
                 uint8_t rkpiece = board.read(rkpos);
                 board.write(src, mBLK);
                 board.write(dst, srcpiece);
                 board.write(rkpos, mBLK);
                 board.write((dst >> 1), rkpiece);
-                cMove *move = new cMove(MOVE_TYPE["long-castling"], src, dst, prompiece, board.field);
-                minutes.push_back(*move);
-                return move;
+                return;
             }
         }
 
         if(srcpiece == mWPW && dstpiece == mBLK &&
            (src >> 8) != dst && (src >> 16) != dst){
+            cMove move(MOVE_TYPE["en-passant"], src, dst, prompiece, board.field);
+            minutes.push_back(move);
             uint64_t eppos = (dst << 8);
             uint8_t eppiece = board.read(eppos);
             board.write(src, mBLK);
             board.write(dst, srcpiece);
             board.write(eppos, mBLK);
             score += SCORES[eppiece];
-            cMove *move = new cMove(MOVE_TYPE["en-passant"], src, dst, prompiece, board.field);
-            minutes.push_back(*move);
-            return move;
+            return;
         }
 
         if(srcpiece == mBPW && dstpiece == mBLK &&
            (src << 8) != dst && (src << 16) != dst){
+            cMove move(MOVE_TYPE["en-passant"], src, dst, prompiece, board.field);
+            minutes.push_back(move);
             uint64_t eppos = (dst >> 8);
             uint8_t eppiece = board.read(eppos);
             board.write(src, mBLK);
             board.write(dst, srcpiece);
             board.write(eppos, mBLK);
             score += SCORES[eppiece];
-            cMove *move = new cMove(MOVE_TYPE["en-passant"], src, dst, prompiece, board.field);
-            minutes.push_back(*move);
-            return move;
+            return;
         }
 
         if((srcpiece == mWPW || srcpiece == mBPW) && prompiece != mBLK){
+            if(dstpiece == mBLK){
+                cMove move(MOVE_TYPE["standard"], src, dst, prompiece, board.field);
+                minutes.push_back(move);
+            }
+            else{
+                cMove move(MOVE_TYPE["capture"], src, dst, prompiece, board.field);
+                minutes.push_back(move);
+            }
             board.write(src, mBLK);
             board.write(dst, prompiece);
             score += REVERSED_SCORES[prompiece] - REVERSED_SCORES[srcpiece];
-            if(dstpiece == mBLK){
-                cMove *move = new cMove(MOVE_TYPE["standard"], src, dst, prompiece, board.field);
-                minutes.push_back(*move);
-                return move;
-            }
-            else{
-                cMove *move = new cMove(MOVE_TYPE["capture"], src, dst, prompiece, board.field);
-                minutes.push_back(*move);
-                return move;
-            }
+            return;
         }
 
+        if(dstpiece == mBLK){
+            cMove move(MOVE_TYPE["standard"], src, dst, prompiece, board.field);
+            minutes.push_back(move);
+        }
+        else{
+            cMove move(MOVE_TYPE["capture"], src, dst, prompiece, board.field);
+            minutes.push_back(move);
+        }
         board.write(src, mBLK);
         board.write(dst, srcpiece);
         score += SCORES[dstpiece];
-        if(dstpiece == mBLK){
-            cMove *move = new cMove(MOVE_TYPE["standard"], src, dst, prompiece, board.field);
-            minutes.push_back(*move);
-            return move;
-        }
-        else{
-            cMove *move = new cMove(MOVE_TYPE["capture"], src, dst, prompiece, board.field);
-            minutes.push_back(*move);
-            return move;
-        }
      }
 
 
@@ -225,14 +222,16 @@
             move = minutes.back();
         }
         else{
+            cout << "error" << endl;
             return false;
         }
 
-        uint8_t prev_dstpiece = board.read(move.dst);
-
-        for(int i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < 8; ++i){
             board.field[i] = move.prev_field[i];
         }
+
+        // read board after reset to previous
+        uint8_t prev_dstpiece = board.read(move.dst);
 
         uint8_t pawn;
         if(move.prompiece != mBLK){
@@ -244,7 +243,6 @@
             }
             score -= SCORES[prev_dstpiece];
             score += SCORES[move.prompiece] - SCORES[pawn];
-            return true;
         }
         else{
             score -= SCORES[prev_dstpiece];

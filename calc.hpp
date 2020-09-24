@@ -16,6 +16,9 @@
     using namespace std;
 
 
+    extern uint64_t calccnt;
+
+
     void prnt_moves(list<cGMove> &moves);
 
     string concat_fmtmoves(list<cGMove> &moves);
@@ -26,7 +29,7 @@
 
     bool sortByPresort(cGMove &A, cGMove &B);
 
-    uint8_t select_movecnt(cMatch &match, list<cGMove> &moves, uint8_t depth, cGMove *last_move);
+    uint8_t select_movecnt(cMatch &match, list<cGMove> &moves, uint8_t depth, uint8_t maxdepth, cGMove *last_move);
 
     // void clean_moves(list<cGMove> &moves);
 

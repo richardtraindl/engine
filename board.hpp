@@ -154,6 +154,8 @@
 
             bool is_square_enemy_touched(uint8_t enemycolor, uint64_t pos);
 
+            void determine_touches_on_square(uint64_t pos, list<uint64_t> &white_pos, list<uint64_t> &black_pos);
+
             cPin *determine_pins(uint8_t color);
 
             void determine_checks(uint8_t color, list<cLink *> &attackers);

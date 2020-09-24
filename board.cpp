@@ -610,6 +610,71 @@
     }
 
 
+    void cBoard::determine_touches_on_square(uint64_t pos, list<uint64_t> &white_pos, list<uint64_t> &black_pos){
+        const cStep *steps;
+        uint8_t color;
+
+        for(uint8_t idx = 0; idx < 2; ++idx){
+            if(idx == 0){
+                steps = steps_for_white_enemies_search;
+                color = mWHITE;
+            }
+            else{
+                steps = steps_for_black_enemies_search;
+                color = mBLACK;
+            }
+
+            for(uint8_t i = 0; i < 26; ++i){
+                cStep step = steps[i];
+
+                uint64_t newpos = pos;
+
+                for(int k = 0; k < step.stepcnt; ++k){
+                    if((newpos & step.border) > 0){
+                        break;
+                    }
+
+                    if(step.rightshift){
+                        newpos = (newpos >> step.shiftcnt);
+                    }
+                    else{
+                        newpos = (newpos << step.shiftcnt);
+                    }
+
+                    if(is_square_blank(newpos)){
+                        continue;
+                    }
+
+                    uint8_t piece = read(newpos);
+                    if(cBoard::is_piece_white(piece) && color == mWHITE){
+                        if((step.owner == STEP_OWNER["rook"] && (piece == mWRK || piece == mWQU)) ||
+                           (step.owner == STEP_OWNER["bishop"] && (piece == mWBP || piece == mWQU)) ||
+                           (step.owner == STEP_OWNER["king"] && piece == mWKG) ||
+                           (step.owner == STEP_OWNER["knight"] && piece == mWKN) ||
+                           (step.owner == STEP_OWNER["wpawn"] && piece == mWPW)){
+                            white_pos.push_back(newpos);
+                        }
+                        break;
+                    }
+                    else if(cBoard::is_piece_black(piece) && color == mBLACK){
+                        if((step.owner == STEP_OWNER["rook"] && (piece == mBRK || piece == mBQU)) ||
+                           (step.owner == STEP_OWNER["bishop"] && (piece == mBBP || piece == mBQU)) ||
+                           (step.owner == STEP_OWNER["king"] && piece == mBKG) ||
+                           (step.owner == STEP_OWNER["knight"] && piece == mBKN) ||
+                           (step.owner == STEP_OWNER["bpawn"] && piece == mBPW)){
+                            black_pos.push_back(newpos);
+                        }
+                        break;
+                    }
+                    else{
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
     bool cBoard::tst_en_passant_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
         if(minutes.size() > 0){
             cMove move = minutes.back();

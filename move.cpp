@@ -14,12 +14,13 @@
     }
 
 
-    const uint8_t cGMove::PRESORT_STORMY = 30;
-    const uint8_t cGMove::PRESORT_VERY_HIGH = 60;
-    const uint8_t cGMove::PRESORT_HIGH = 90;
-    const uint8_t cGMove::PRESORT_MEDIUM = 120;
-    const uint8_t cGMove::PRESORT_LOW = 150;
-    const uint8_t cGMove::PRESORT_VERY_LOW = 180;
+    const uint8_t cGMove::PRESORT_STEP = 30;
+    const uint8_t cGMove::PRESORT_STORMY = PRESORT_STEP;
+    const uint8_t cGMove::PRESORT_VERY_HIGH = PRESORT_STORMY + PRESORT_STEP;
+    const uint8_t cGMove::PRESORT_HIGH = PRESORT_VERY_HIGH + PRESORT_STEP;
+    const uint8_t cGMove::PRESORT_MEDIUM = PRESORT_HIGH + PRESORT_STEP;
+    const uint8_t cGMove::PRESORT_LOW = PRESORT_MEDIUM + PRESORT_STEP;
+    const uint8_t cGMove::PRESORT_VERY_LOW = PRESORT_LOW + PRESORT_STEP;
 
 
     string cGMove::format(){

@@ -23,8 +23,8 @@
             static map<string, int> RETURN_CODES;
 
             time_t created_at;
-            int score;
-            int level;
+            int16_t score;
+            uint8_t level;
             cBoard board;
             list<cMove> minutes;
 
@@ -45,7 +45,7 @@
 
             bool is_three_times_rep();
 
-            cMove *do_move(uint64_t src, uint64_t dst, uint8_t prompiece);
+            void do_move(uint64_t src, uint64_t dst, uint8_t prompiece);
 
             bool undo_move();
 
