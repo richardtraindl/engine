@@ -54,21 +54,21 @@
         
         match.board.prnt();
 
-        /*
-        cGenerator generator(&match);
-        list<cGMove> moves;
-        generator.gen_moves(moves);
-        */
-
         list<cGMove> rcandidates;
         int16_t score = 0;
         score = calc_move(match, rcandidates);
-
         cout << to_string(score) << endl;
 
         for(cGMove move : rcandidates){
             cout << move.format() << endl;
         }
+
+        match.import("./data/morphy.txt");
+        match.board.prnt();
+
+        rcandidates.clear();
+        score = calc_move(match, rcandidates);
+        cout << to_string(score) << endl;
 
         return 0;
     }

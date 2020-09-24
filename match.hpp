@@ -4,6 +4,7 @@
 
     #include <ctime>
     #include <iostream>
+    #include <fstream>
     #include <list> 
     #include <map>
     #include <string>
@@ -48,11 +49,14 @@
             void do_move(uint64_t src, uint64_t dst, uint8_t prompiece);
 
             bool undo_move();
-
+            
             // int eval_status();
 
             void prnt_minutes();
 
+            void import(string filename);
+
+            /*
             bool tst_wpw_move(uint64_t pos, uint64_t newpos);
 
             bool tst_bpw_move(uint64_t pos, uint64_t newpos);
@@ -61,7 +65,7 @@
 
             bool tst_bkg_move(uint64_t pos, uint64_t newpos);
 
-            void gen_moves(uint8_t color);
+            void gen_moves(uint8_t color); */
     };
 
 #endif

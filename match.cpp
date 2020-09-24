@@ -280,3 +280,37 @@
             cout << move.format() << endl;
         }
     }
+
+
+    void cMatch::import(string filename){
+        score = 0;
+
+        level = LEVELS["blitz"];
+
+        board.field[0] = 0xFFFF000000000000;
+        board.field[1] = 0x000000000000FFFF;
+        board.field[2] = 0x0800000000000008;
+        board.field[3] = 0x1000000000000010;
+        board.field[4] = 0x8100000000000081;
+        board.field[5] = 0x2400000000000024;
+        board.field[6] = 0x4200000000000042;
+        board.field[7] = 0x00FF00000000FF00;
+        
+        minutes.clear();
+
+        string line;
+
+        ifstream myfile(filename);
+        if(myfile.is_open()){
+            uint64_t src, dst;
+            while(getline(myfile, line)){
+                char str_src[2] = { line[0], line[1] };
+                char str_dst[2] = { line[3], line[4] };
+                src = coord_to_pos(str_src);
+                dst = coord_to_pos(str_dst);
+                do_move(src, dst, mBLK);
+            }
+            myfile.close();
+        }
+    }
+
