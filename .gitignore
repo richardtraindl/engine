@@ -1,4 +1,5 @@
 
 *.geany
 *.o
-engine
+instance/
+unused/
