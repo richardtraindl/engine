@@ -1,5 +1,6 @@
 
     #include "./match.hpp"
+    #include "./generator.hpp"
 
 
     cMatch::cMatch(){ 
@@ -26,28 +27,28 @@
     cMatch::~cMatch(){
     }
 
-    map<string, int> cMatch::STATUS = {
+    map<string, uint8_t> cMatch::STATUS = {
         {"open", 10},
         {"draw", 11}, 
         {"winner-white", 12}, 
         {"winner-black", 13}
     };
 
-    map<string, int> cMatch::LEVELS = {
+    map<string, uint8_t> cMatch::LEVELS = {
         {"blitz", 0}, 
         {"low", 1}, 
         {"medium", 2}, 
         {"high", 3}
     };
 
-    map<int, int> cMatch::SECS_PER_MOVE = {
+    map<uint8_t, uint16_t> cMatch::SECS_PER_MOVE = {
         {LEVELS["blitz"], 15}, 
         {LEVELS["low"], 30}, 
         {LEVELS["medium"], 60}, 
         {LEVELS["high"], 90}
     };
 
-    map<string, int> RETURN_CODES = {
+    map<string, uint8_t> RETURN_CODES = {
         {"ok", 10}, 
         {"draw", 11}, 
         {"winner-white", 12}, 
@@ -198,7 +199,9 @@
             }
             board.write(src, mBLK);
             board.write(dst, prompiece);
-            score += REVERSED_SCORES[prompiece] - REVERSED_SCORES[srcpiece];
+            score += SCORES[dstpiece];
+            score += REVERSED_SCORES[prompiece];
+            score += SCORES[srcpiece];
             return;
         }
 
@@ -231,48 +234,67 @@
         }
 
         // read board after reset to previous
+        uint8_t prev_srcpiece = board.read(move.src);
         uint8_t prev_dstpiece = board.read(move.dst);
 
-        uint8_t pawn;
+        // promotion
         if(move.prompiece != mBLK){
             if(cBoard::is_piece_white(move.prompiece)){
-                pawn = mWPW;
+                score += REVERSED_SCORES[prev_dstpiece];
+                score += SCORES[move.prompiece];
+                score += REVERSED_SCORES[prev_srcpiece];
             }
             else{
-                pawn = mBPW;
+                score += REVERSED_SCORES[prev_dstpiece];
+                score += SCORES[move.prompiece];
+                score += REVERSED_SCORES[prev_srcpiece];
             }
-            score -= SCORES[prev_dstpiece];
-            score += SCORES[move.prompiece] - SCORES[pawn];
+        }
+        // en passant white pawn
+        else if(prev_srcpiece == mWPW && prev_dstpiece == mBLK){
+            if((move.src >> 8) != move.dst && (move.src >> 16) != move.dst){
+                score -= SCORES[mBPW];
+            }
+        }
+        // en passant black pawn
+        else if(prev_srcpiece == mBPW && prev_dstpiece == mBLK){
+            if((move.src << 8) != move.dst && (move.src << 16) != move.dst){
+                score -= SCORES[mWPW];
+            }
         }
         else{
             score -= SCORES[prev_dstpiece];
         }
-        
+
         minutes.pop_back();
         return true;
-        // delete move;
     }
 
-    /*int cMatch::eval_status(){
-        if(board.is_move_available(minutes)){
+
+    uint8_t cMatch::eval_status(){
+        list<cGMove> moves;
+        cGenerator generator(this);
+
+        generator.gen_moves(moves);
+        if(moves.size() > 0){
             return STATUS["open"];
         }
         else{
-            if(next_color() == COLORS["black"]){
-                uint64_t bkg = board.field[1] & board.field[2];
-                if(is_field_touched(board, bkg, COLORS["white"], EVAL_MODES["ignore-pins"])){
+            if(next_color() == mBLACK){
+                uint64_t kg_pos = board.read_bkg_pos();
+                if(board.is_square_enemy_touched(mWHITE, kg_pos)){
                     return STATUS["winner-white"];
                 }
             }
             else{
-                uint64_t wkg = board.field[0] & board.field[2];
-                if(is_field_touched(board, wkg, COLORS["black"], EVAL_MODES["ignore-pins"])){
+                uint64_t kg_pos = board.read_wkg_pos();
+                if(board.is_square_enemy_touched(mBLACK, kg_pos)){
                     return STATUS["winner-black"];
                 }
             }
         }
         return STATUS["draw"];
-    }*/
+    }
 
 
     void cMatch::prnt_minutes(){
@@ -299,17 +321,33 @@
         minutes.clear();
 
         string line;
-
         ifstream myfile(filename);
         if(myfile.is_open()){
             uint64_t src, dst;
+            uint8_t prompiece;
+
             while(getline(myfile, line)){
-                char str_src[2] = { line[0], line[1] };
-                char str_dst[2] = { line[3], line[4] };
+                if(line.length() < 5){
+                    break;
+                }
+
+                if(line.length() == 10){
+                    string str_piece = { line[7], line[8], line[9] };
+                    prompiece = PIECES[str_piece];
+                }
+                else{
+                    prompiece = mBLK;
+                }
+
+                string str_src = { line[0], line[1] };
                 src = coord_to_pos(str_src);
+
+                string str_dst = { line[3], line[4] };
                 dst = coord_to_pos(str_dst);
-                do_move(src, dst, mBLK);
+                   
+                do_move(src, dst, prompiece);
             }
+
             myfile.close();
         }
     }

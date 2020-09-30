@@ -24,14 +24,13 @@
 
 
     string cGMove::format(){
-        string hyphen = "-";
         string trailing = "";
 
         if(prompiece != mBLK){
             trailing = ", " + reverse_lookup(PIECES, prompiece);
         }
 
-        return pos_to_coord(src) + hyphen + pos_to_coord(dst) + " presort: " + to_string(presort) + trailing;
+        return pos_to_coord(src) + " " + pos_to_coord(dst) + " presort: " + to_string(presort) + trailing;
     }
 
 

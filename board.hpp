@@ -106,9 +106,9 @@
 
             static const cStep steps_for_pin_search[];
 
-            static const cStep steps_for_white_enemies_search[];
+            static const cStep steps_for_white_pieces_search[];
 
-            static const cStep steps_for_black_enemies_search[];
+            static const cStep steps_for_black_pieces_search[];
  
             static const cStep steps_for_white_checks_search[];
 
@@ -143,6 +143,8 @@
             static bool is_piece_white(uint8_t piece);
 
             static bool is_piece_black(uint8_t piece);
+            
+            static uint8_t color_of_piece(uint8_t piece);
 
             bool verify();
  
@@ -170,6 +172,7 @@
 
             bool tst_en_passant_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes);
 
+            static bool is_move_capture(uint64_t src, uint8_t srcpiece, uint64_t dst, uint8_t dstpiece);
     };
 
 #endif

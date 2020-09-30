@@ -13,62 +13,23 @@
 
     int main(void){
         cMatch match;
-
-        match.do_move(coord_to_pos("e2"),coord_to_pos("e4"), mBLK);
-        match.do_move(coord_to_pos("e7"), coord_to_pos("e5"), mBLK);
-        match.do_move(coord_to_pos("g1"), coord_to_pos("f3"), mBLK);
-        match.do_move(coord_to_pos("d7"), coord_to_pos("d6"), mBLK);
-
-        match.do_move(coord_to_pos("d2"), coord_to_pos("d4"), mBLK);
-        match.do_move(coord_to_pos("c8"), coord_to_pos("g4"), mBLK);
-        match.do_move(coord_to_pos("d4"), coord_to_pos("e5"), mBLK);
-        match.do_move(coord_to_pos("g4"), coord_to_pos("f3"), mBLK);
-
-        match.do_move(coord_to_pos("d1"), coord_to_pos("f3"), mBLK);
-        match.do_move(coord_to_pos("d6"), coord_to_pos("e5"), mBLK);
-        match.do_move(coord_to_pos("f1"), coord_to_pos("c4"), mBLK);
-        match.do_move(coord_to_pos("g8"), coord_to_pos("f6"), mBLK);
-
-        match.do_move(coord_to_pos("f3"), coord_to_pos("b3"), mBLK);
-        match.do_move(coord_to_pos("d8"), coord_to_pos("e7"), mBLK);
-        match.do_move(coord_to_pos("c1"), coord_to_pos("g5"), mBLK);
-        match.do_move(coord_to_pos("c7"), coord_to_pos("c6"), mBLK);
-
-        match.do_move(coord_to_pos("b1"), coord_to_pos("c3"), mBLK);
-        match.do_move(coord_to_pos("b7"), coord_to_pos("b5"), mBLK);
-        match.do_move(coord_to_pos("c3"), coord_to_pos("b5"), mBLK);
-        match.do_move(coord_to_pos("c6"), coord_to_pos("b5"), mBLK);
-
-        match.do_move(coord_to_pos("c4"), coord_to_pos("b5"), mBLK);
         
-        
-        match.do_move(coord_to_pos("b8"), coord_to_pos("d7"), mBLK);
-
-        match.do_move(coord_to_pos("a1"), coord_to_pos("d1"), mBLK);
-        match.do_move(coord_to_pos("f6"), coord_to_pos("g4"), mBLK);
-        match.do_move(coord_to_pos("g5"), coord_to_pos("e7"), mBLK);        
-        match.do_move(coord_to_pos("g4"), coord_to_pos("f2"), mBLK);
-        match.do_move(coord_to_pos("e7"), coord_to_pos("f8"), mBLK);
-        match.do_move(coord_to_pos("f2"), coord_to_pos("d3"), mBLK);
-        //match.do_move(coord_to_pos("d7"), coord_to_pos("e7"), mBLK);
-        
-        match.board.prnt();
+        match.import("./data/morphy1.txt");
 
         list<cGMove> rcandidates;
         int16_t score = 0;
+
         score = calc_move(match, rcandidates);
+
         cout << to_string(score) << endl;
 
-        for(cGMove move : rcandidates){
-            cout << move.format() << endl;
+        int input;
+        for(list<cGMove>::iterator it = rcandidates.begin(); it != rcandidates.end(); ++it){
+            cout << pos_to_coord(it->src) << " " << pos_to_coord(it->dst) << " " << PIECES_STR[it->prompiece] << endl;
+            cin >> input;
+            match.do_move(it->src, it->dst, it->prompiece);
+            match.board.prnt();
         }
-
-        match.import("./data/morphy.txt");
-        match.board.prnt();
-
-        rcandidates.clear();
-        score = calc_move(match, rcandidates);
-        cout << to_string(score) << endl;
 
         return 0;
     }

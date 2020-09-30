@@ -83,7 +83,7 @@
                                 }
                                 else if(match->board.tst_en_passant_move(pos, newpos, match->minutes)){
                                     cGMove move(pos, newpos, mBLK);
-                                    score_presort(move);
+                                    score_move_presort(move);
                                     move.presort -= 5; // score e.p. capture
                                     moves.push_back(move);
                                 }
@@ -94,7 +94,7 @@
                                 }
                                 else if(match->board.tst_en_passant_move(pos, newpos, match->minutes)){
                                     cGMove move(pos, newpos, mBLK);
-                                    score_presort(move);
+                                    score_move_presort(move);
                                     move.presort -= 5; // score e.p. capture
                                     moves.push_back(move);
                                 }
@@ -102,14 +102,14 @@
                             else if(piece == mWKG || piece == mBKG){
                                 if(match->board.tst_kg_move(pos, newpos, match->minutes)){
                                     cGMove move(pos, newpos, mBLK);
-                                    score_presort(move);
-                                    if(is_castling(move)){ move.presort -= 5; }
+                                    score_move_presort(move);
+                                    if(is_move_castling(move)){ move.presort -= 5; }
                                     moves.push_back(move);
                                 }
                             }
                             else{
                                 cGMove move(pos, newpos, mBLK);
-                                score_presort(move);
+                                score_move_presort(move);
                                 moves.push_back(move);
                             }
                             if((match->board.field[mIDX_WHITE] & newpos) > 0 || 
@@ -170,7 +170,7 @@
 
                     if(tstsquare == false){
                         cGMove move(kg_pos, newpos, mBLK);
-                        score_presort(move);
+                        score_move_presort(move);
                         move.presort -= 5; // score for fleeing check
                         moves.push_back(move);
                     }
@@ -253,7 +253,7 @@
                            (step.owner == STEP_OWNER["bishop"] && (piece == mWBP || piece == mWQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mWKN)){
                             cGMove move(newpos, pos, mBLK);
-                            score_presort(move);
+                            score_move_presort(move);
                             move.presort -= 5; // score for defending check
                             moves.push_back(move);
                             break;
@@ -273,7 +273,7 @@
                            (step.owner == STEP_OWNER["bishop"] && (piece == mBBP || piece == mBQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mBKN)){
                             cGMove move(newpos, pos, mBLK);
-                            score_presort(move);
+                            score_move_presort(move);
                             move.presort -= 5; // score for defending check
                             moves.push_back(move);
                             break;
@@ -304,7 +304,7 @@
 
             for(uint8_t i = 0; i < 4; ++i){
                 cGMove move(src, dst, pieces[i]);
-                score_presort(move);
+                score_move_presort(move);
                 move.presort -= 20; // score for promotion
                 moves.push_back(move);
             }
@@ -314,28 +314,55 @@
 
             for(uint8_t i = 0; i < 4; ++i){
                 cGMove move(src, dst, pieces[i]);
-                score_presort(move);
+                score_move_presort(move);
                 move.presort -= 20; // score for promotion
                 moves.push_back(move);
             }
         }
         else{
                 cGMove move(src, dst, mBLK);
-                score_presort(move);
+                score_move_presort(move);
                 moves.push_back(move);
         }
     }
 
 
-    bool cGenerator::is_castling(cGMove &move){
+    bool cGenerator::is_move_castling(cGMove &move){
         return false;
     }
 
 
-    void cGenerator::score_presort(cGMove &move){
-        set_score_capture(move); 
+    void cGenerator::score_move_presort(cGMove &move){
+        list<uint64_t> white_touches, black_touches;
+        match->board.determine_touches_on_square(move.dst, white_touches, black_touches);
 
-        if(is_forking(move)){
+        bool exchange = false;
+        uint8_t cnt = 0;
+        for(list<cMove>::reverse_iterator it = match->minutes.rbegin(); it != match->minutes.rend(); ++it){
+            if(cnt >= 2){ break; }
+            if(it->type == MOVE_TYPE["capture"] || it->type == MOVE_TYPE["en-passant"]){
+                exchange = true;
+                break;
+            }
+        }
+        set_score_capture_move(move, white_touches, black_touches, exchange); 
+
+        if(is_move_weak_supported(move, white_touches, black_touches)){
+            move.presort = max(cGMove::PRESORT_LOW, move.presort);
+            return;
+        }
+        else{
+            if(is_move_strong_supporting_or_attacking(move, exchange)){
+                if(exchange){
+                    move.presort = cGMove::PRESORT_STORMY;
+                }
+                else{
+                    move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                }
+            }
+        }
+
+        if(is_move_forking(move)){
             if(move.presort < cGMove::PRESORT_HIGH){ 
                 move.presort -= 5; 
             }
@@ -344,7 +371,7 @@
             }
         }
 
-        if(is_defending_fork(move)){
+        if(is_move_defending_fork(move)){
             if(move.presort < cGMove::PRESORT_HIGH){ 
                 move.presort -= 5; 
             }
@@ -353,7 +380,7 @@
             }
         }
 
-        if(is_fleeing(move)){ 
+        if(is_move_fleeing(move)){ 
             if(move.presort < cGMove::PRESORT_HIGH){ 
                 move.presort -= 5; 
             }
@@ -362,7 +389,7 @@
             };
         }
 
-        if(is_unpin(move)){ 
+        if(is_move_unpin(move)){ 
             if(move.presort < cGMove::PRESORT_HIGH){ 
                 move.presort -= 5; 
             }
@@ -371,7 +398,7 @@
             }
         }
 
-        if(is_blocking(move)){ 
+        if(is_move_blocking(move)){ 
             if(move.presort < cGMove::PRESORT_HIGH){ 
                 move.presort -= 5; 
             }
@@ -380,7 +407,7 @@
             }
         }
 
-        if(is_running_pawn(move)){ 
+        if(is_move_running_pawn(move)){ 
             if(move.presort < cGMove::PRESORT_HIGH){ 
                 move.presort -= 5; 
             }
@@ -389,7 +416,7 @@
             }
         }
 
-        if(is_tactical_draw(move)){ 
+        if(is_move_tactical_draw(move)){ 
             if(move.presort < cGMove::PRESORT_HIGH){ 
                 move.presort -= 5; 
             }
@@ -400,91 +427,193 @@
     }
 
 
-    void cGenerator::set_score_capture(cGMove &move){
+    void cGenerator::set_score_capture_move(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches, bool exchange){
         uint8_t src_piece = match->board.read(move.src);
         uint8_t dst_piece = match->board.read(move.dst);
-         
+
+        if(cBoard::is_move_capture(move.src, src_piece, move.dst, dst_piece) == false){
+            return;
+        }
+
+        uint8_t adjust = 0;
+        if(exchange){
+            adjust= cGMove::PRESORT_STEP;
+        }
+
         if(dst_piece == mBLK){ 
-            move.presort = cGMove::PRESORT_MEDIUM; 
-            return; 
+            if(move.presort < (cGMove::PRESORT_HIGH - adjust)){
+                return;
+            }
+            else{
+                move.presort = (cGMove::PRESORT_HIGH - adjust);
+            }
         }
 
         uint8_t diff = PIECES_RANKS[PIECES["wBp"]] - PIECES_RANKS[PIECES["wPw"]];
-
-        list<uint64_t> white_pos, black_pos;
-        match->board.determine_touches_on_square(move.dst, white_pos, black_pos);
-
-        if((black_pos.size() == 0 && cBoard::is_piece_white(src_piece)) ||
-           (white_pos.size() == 0 && cBoard::is_piece_black(src_piece))){
+        if((black_touches.size() == 0 && cBoard::is_piece_white(src_piece)) ||
+           (white_touches.size() == 0 && cBoard::is_piece_black(src_piece))){
             move.presort = cGMove::PRESORT_STORMY;
             return;
         }
 
-        if((white_pos.size() > black_pos.size() && cBoard::is_piece_white(src_piece)) ||
-           (black_pos.size() > white_pos.size() && cBoard::is_piece_black(src_piece))){
+        if((white_touches.size() > black_touches.size() && cBoard::is_piece_white(src_piece)) ||
+           (black_touches.size() > white_touches.size() && cBoard::is_piece_black(src_piece))){
             if(PIECES_RANKS[src_piece] <= PIECES_RANKS[dst_piece]){
                 move.presort = cGMove::PRESORT_STORMY;
                 return;
             }
             if(PIECES_RANKS[src_piece] > PIECES_RANKS[dst_piece] + diff){
-                move.presort = cGMove::PRESORT_MEDIUM;
+                move.presort = (cGMove::PRESORT_MEDIUM - adjust);
                 return;
             }
             else{
-                move.presort = cGMove::PRESORT_HIGH;
+                move.presort = (cGMove::PRESORT_HIGH - adjust);
                 return;
             }
         }
 
-        if((white_pos.size() <= black_pos.size() && cBoard::is_piece_white(src_piece)) ||
-           (black_pos.size() <= white_pos.size() && cBoard::is_piece_black(src_piece))){
+        if((white_touches.size() <= black_touches.size() && cBoard::is_piece_white(src_piece)) ||
+           (black_touches.size() <= white_touches.size() && cBoard::is_piece_black(src_piece))){
             if(PIECES_RANKS[src_piece] < PIECES_RANKS[dst_piece]){
                 move.presort = cGMove::PRESORT_STORMY;
                 return;
             }
             if(PIECES_RANKS[src_piece] == PIECES_RANKS[dst_piece]){
-                move.presort = cGMove::PRESORT_MEDIUM;
+                move.presort = (cGMove::PRESORT_MEDIUM - adjust);
                 return;
             }
             else{ // src_piece > dst_piece
-                move.presort = cGMove::PRESORT_LOW;
+                move.presort = (cGMove::PRESORT_LOW - adjust);
                 return;
             }
         }
     }
 
 
-    bool cGenerator::is_forking(cGMove &move){
+    bool cGenerator::is_move_weak_supported(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches){
+        if(match->board.is_square_white_occupied(move.src)){
+            return white_touches.size() < black_touches.size();
+        }
+        else{
+            return black_touches.size() < white_touches.size();
+        }
+    }
+
+
+    bool cGenerator::is_move_strong_supporting_or_attacking(cGMove &move, bool exchange){
+        uint8_t piece = match->board.read(move.src);
+        const cStep *steps;
+        int maxidx;
+
+        if(piece == mWRK || piece == mBRK){ steps = cBoard::rk_steps; maxidx = 4; }
+        else if(piece == mWBP || piece == mBBP){ steps = cBoard::bp_steps; maxidx = 4; }
+        else if(piece == mWQU || piece == mBQU){ steps = cBoard::qu_steps; maxidx = 8; }
+        else if(piece == mWKG || piece == mBKG){ steps = cBoard::kg_steps_generic; maxidx = 8; }
+        else if(piece == mWKN || piece == mBKN){ steps = cBoard::kn_steps; maxidx = 8; }
+        else if(piece == mWPW){ steps = cBoard::wpw_steps_attack; maxidx = 2; }
+        else if(piece == mBPW){ steps = cBoard::bpw_steps_attack; maxidx = 2; }
+        else{ return false; }
+
+        for(uint8_t i = 0; i < maxidx; ++i){
+            cStep step = steps[i];
+            uint64_t newpos = move.dst;
+            list<uint64_t> white_pos, black_pos;
+
+            for(uint8_t k = 0; k < step.stepcnt; ++k){
+                if((newpos & step.border) > 0){
+                    break;
+                }
+
+                if(step.rightshift){
+                    newpos = (newpos >> step.shiftcnt);
+                }
+                else{
+                    newpos = (newpos << step.shiftcnt);
+                }
+                
+                if(newpos == move.src){
+                    break;
+                }
+
+                if(match->board.is_square_blank(newpos)){
+                    continue;
+                }
+
+                uint8_t touched_piece = match->board.read(newpos);
+
+                match->board.determine_touches_on_square(newpos, white_pos, black_pos);
+
+                if(cBoard::is_piece_white(piece)){
+                    if(black_pos.size() == 0){
+                        break;
+                    }
+                    if(white_pos.size() > black_pos.size()){
+                        if(exchange && 
+                           cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
+                            if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
+                                return true;
+                            }
+                        }
+                        else{
+                            return true;
+                        }
+                    }
+                    break;
+                }
+                else{
+                    if(white_pos.size() == 0){
+                        break;
+                    }
+                    if(black_pos.size() > white_pos.size()){
+                        if(exchange && 
+                           cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
+                            if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
+                                return true;
+                            }
+                        }
+                        else{
+                            return true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
         return false;
     }
 
 
-    bool cGenerator::is_defending_fork(cGMove &move){
+    bool cGenerator::is_move_forking(cGMove &move){
         return false;
     }
 
 
-    bool cGenerator::is_fleeing(cGMove &move){
+    bool cGenerator::is_move_defending_fork(cGMove &move){
         return false;
     }
 
 
-    bool cGenerator::is_unpin(cGMove &move){
+    bool cGenerator::is_move_fleeing(cGMove &move){
         return false;
     }
 
 
-    bool cGenerator::is_blocking(cGMove &move){
+    bool cGenerator::is_move_unpin(cGMove &move){
         return false;
     }
 
 
-    bool cGenerator::is_running_pawn(cGMove &move){
+    bool cGenerator::is_move_blocking(cGMove &move){
         return false;
     }
 
 
-    bool cGenerator::is_tactical_draw(cGMove &move){
+    bool cGenerator::is_move_running_pawn(cGMove &move){
+        return false;
+    }
+
+
+    bool cGenerator::is_move_tactical_draw(cGMove &move){
         return false;
     }
 

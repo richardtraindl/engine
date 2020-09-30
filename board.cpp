@@ -198,8 +198,35 @@
     };
 
 
-    const cStep cBoard::steps_for_white_enemies_search[] = { 
-        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+    const cStep cBoard::steps_for_white_pieces_search[] = { 
+        cStep(STEP_OWNER["rook"], mEST, true, 1, 7, mEST_BORDER),
+        cStep(STEP_OWNER["rook"], mWST, false, 1, 7, mWST_BORDER),
+        cStep(STEP_OWNER["rook"], mNTH, true, 8, 7, mNTH_BORDER),
+        cStep(STEP_OWNER["rook"], mSTH, false, 8, 7, mSTH_BORDER),
+        cStep(STEP_OWNER["bishop"], mNTH_EST, true, 9, 7, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["bishop"], mSTH_WST, false, 9, 7, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["bishop"], mNTH_WST, true, 7, 7, mNTH_WST_BORDER),
+        cStep(STEP_OWNER["bishop"], mSTH_EST, false, 7, 7, mSTH_EST_BORDER),
+        cStep(STEP_OWNER["king"], mEST, true, 1, 1, mEST_BORDER),
+        cStep(STEP_OWNER["king"], mWST, false, 1, 1, mWST_BORDER),
+        cStep(STEP_OWNER["king"], mNTH, true, 8, 1, mNTH_BORDER),
+        cStep(STEP_OWNER["king"], mSTH, false, 8, 1, mSTH_BORDER), 
+        cStep(STEP_OWNER["king"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["king"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["king"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER),
+        cStep(STEP_OWNER["king"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH2_EST1, true, 17, 1, mNTH2_EST1_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH2_WST1, false, 17, 1, mSTH2_WST1_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH1_EST2, true, 10, 1, mNTH1_EST2_BORDER), 
+        cStep(STEP_OWNER["knight"], mSTH1_WST2, false, 10, 1, mSTH1_WST2_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH2_WST1, true, 15, 1, mNTH2_WST1_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH2_EST1, false, 15, 1, mSTH2_EST1_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH1_WST2, true, 6, 1, mNTH1_WST2_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH1_EST2, false, 6, 1, mSTH1_EST2_BORDER),
+        cStep(STEP_OWNER["wpawn"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["wpawn"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER) 
+
+        /*rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
         bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
         kg_steps_generic[0], kg_steps_generic[1],
         kg_steps_generic[2], kg_steps_generic[3],
@@ -207,12 +234,39 @@
         kg_steps_generic[6], kg_steps_generic[7],
         kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
         kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
-        wpw_steps_attack_search[0], wpw_steps_attack_search[1]
+        wpw_steps_attack_search[0], wpw_steps_attack_search[1] */
     };
 
 
-    const cStep cBoard::steps_for_black_enemies_search[] = { 
-        rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
+    const cStep cBoard::steps_for_black_pieces_search[] = { 
+        cStep(STEP_OWNER["rook"], mEST, true, 1, 7, mEST_BORDER),
+        cStep(STEP_OWNER["rook"], mWST, false, 1, 7, mWST_BORDER),
+        cStep(STEP_OWNER["rook"], mNTH, true, 8, 7, mNTH_BORDER),
+        cStep(STEP_OWNER["rook"], mSTH, false, 8, 7, mSTH_BORDER),
+        cStep(STEP_OWNER["bishop"], mNTH_EST, true, 9, 7, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["bishop"], mSTH_WST, false, 9, 7, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["bishop"], mNTH_WST, true, 7, 7, mNTH_WST_BORDER),
+        cStep(STEP_OWNER["bishop"], mSTH_EST, false, 7, 7, mSTH_EST_BORDER),
+        cStep(STEP_OWNER["king"], mEST, true, 1, 1, mEST_BORDER),
+        cStep(STEP_OWNER["king"], mWST, false, 1, 1, mWST_BORDER),
+        cStep(STEP_OWNER["king"], mNTH, true, 8, 1, mNTH_BORDER),
+        cStep(STEP_OWNER["king"], mSTH, false, 8, 1, mSTH_BORDER), 
+        cStep(STEP_OWNER["king"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["king"], mSTH_WST, false, 9, 1, mSTH_WST_BORDER),
+        cStep(STEP_OWNER["king"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER),
+        cStep(STEP_OWNER["king"], mSTH_EST, false, 7, 1, mSTH_EST_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH2_EST1, true, 17, 1, mNTH2_EST1_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH2_WST1, false, 17, 1, mSTH2_WST1_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH1_EST2, true, 10, 1, mNTH1_EST2_BORDER), 
+        cStep(STEP_OWNER["knight"], mSTH1_WST2, false, 10, 1, mSTH1_WST2_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH2_WST1, true, 15, 1, mNTH2_WST1_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH2_EST1, false, 15, 1, mSTH2_EST1_BORDER),
+        cStep(STEP_OWNER["knight"], mNTH1_WST2, true, 6, 1, mNTH1_WST2_BORDER),
+        cStep(STEP_OWNER["knight"], mSTH1_EST2, false, 6, 1, mSTH1_EST2_BORDER),
+        cStep(STEP_OWNER["bpawn"], mNTH_EST, true, 9, 1, mNTH_EST_BORDER),
+        cStep(STEP_OWNER["bpawn"], mNTH_WST, true, 7, 1, mNTH_WST_BORDER) 
+
+        /*rk_steps[0], rk_steps[1], rk_steps[2], rk_steps[3],
         bp_steps[0], bp_steps[1], bp_steps[2], bp_steps[3],
         kg_steps_generic[0], kg_steps_generic[1],
         kg_steps_generic[2], kg_steps_generic[3],
@@ -220,7 +274,7 @@
         kg_steps_generic[6], kg_steps_generic[7],
         kn_steps[0], kn_steps[1], kn_steps[2], kn_steps[3],
         kn_steps[4], kn_steps[5], kn_steps[6], kn_steps[7],
-        bpw_steps_attack_search[0], bpw_steps_attack_search[1]
+        bpw_steps_attack_search[0], bpw_steps_attack_search[1]*/
     };
 
 
@@ -403,6 +457,11 @@
     }
 
 
+    uint8_t cBoard::color_of_piece(uint8_t piece){
+        return (piece & (mWHITE | mBLACK));
+    }
+
+
     bool cBoard::verify(){
         int wKg_cnt = 0;
         int bKg_cnt = 0;
@@ -549,10 +608,10 @@
         uint8_t enemy;
 
         if(enemycolor == mBLACK){
-            steps = steps_for_black_enemies_search;
+            steps = steps_for_black_pieces_search;
         }
         else{
-            steps = steps_for_white_enemies_search;
+            steps = steps_for_white_pieces_search;
         }
 
         for(uint8_t i = 0; i < 26; ++i){
@@ -616,20 +675,19 @@
 
         for(uint8_t idx = 0; idx < 2; ++idx){
             if(idx == 0){
-                steps = steps_for_white_enemies_search;
+                steps = steps_for_white_pieces_search;
                 color = mWHITE;
             }
             else{
-                steps = steps_for_black_enemies_search;
+                steps = steps_for_black_pieces_search;
                 color = mBLACK;
             }
 
             for(uint8_t i = 0; i < 26; ++i){
                 cStep step = steps[i];
-
                 uint64_t newpos = pos;
 
-                for(int k = 0; k < step.stepcnt; ++k){
+                for(uint8_t k = 0; k < step.stepcnt; ++k){
                     if((newpos & step.border) > 0){
                         break;
                     }
@@ -671,146 +729,6 @@
                     }
                 }
             }
-        }
-    }
-
-
-    bool cBoard::tst_en_passant_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
-        if(minutes.size() > 0){
-            cMove move = minutes.back();
-
-            if(is_square_white_occupied(pos)){
-                uint64_t opp_pawn_src = (newpos >> 8);
-                uint64_t opp_pawn_dst = (newpos << 8);
-                return (move.src == opp_pawn_src && 
-                        move.dst == opp_pawn_dst &&
-                        read(opp_pawn_dst) == mBPW);
-            }
-            if(is_square_black_occupied(pos)){
-                uint64_t opp_pawn_src = (newpos << 8);
-                uint64_t opp_pawn_dst = (newpos >> 8);
-                return (move.src == opp_pawn_src && 
-                        move.dst == opp_pawn_dst &&
-                        read(opp_pawn_dst) == mWPW);
-            }
-        }
-        return false;
-    }
-
-
-    bool cBoard::tst_wpw_move(uint64_t pos, uint64_t newpos){
-        // check, if field after one step forward is blank
-        if((pos >> 8) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0;
-        }
-        // check, if fields after two step forward are blank
-        else if((pos >> 16) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0 && 
-                   (field[mIDX_WHITE] & (pos >> 8)) == 0 && (field[mIDX_BLACK] & (pos >> 8)) == 0;
-        }
-        else if((pos >> 9) == newpos || (pos >> 7) == newpos){
-            return (field[mIDX_BLACK] & newpos) > 0;
-        }
-        else{
-            return false;
-        }
-    }
-
-
-    bool cBoard::tst_bpw_move(uint64_t pos, uint64_t newpos){
-        // check, if field after one step forward is blank
-        if((pos << 8) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0;
-        }
-        // check, if fields after two step forward are blank
-        else if((pos << 16) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0 && 
-                   (field[mIDX_WHITE] & (pos << 8)) == 0 && (field[mIDX_BLACK] & (pos << 8)) == 0;
-        }
-        else if((pos << 9) == newpos || (pos << 7) == newpos){
-            return (field[mIDX_WHITE] & newpos) > 0;
-        }
-        else{
-            return false;
-        }
-    }
-
-
-    bool cBoard::tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
-        uint64_t mask;
-        uint8_t color_idx;
-        
-        if(is_square_white_occupied(pos)){
-            color_idx = mIDX_WHITE;
-            if((pos >> 2) == newpos){
-                mask = 0x0900000000000000;
-            }
-            else{
-                mask = 0x8800000000000000;
-            }
-        }
-        else{
-            color_idx = mIDX_BLACK;
-            if((pos >> 2) == newpos){
-                mask = 0x0000000000000009;
-            }
-            else{
-                mask = 0x0000000000000088;
-            }
-        }
-
-        for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
-            if((it->prev_field[color_idx] & mask) != mask){
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    bool cBoard::tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
-        uint8_t idx_color, enemycolor;
-
-        if(is_square_white_occupied(pos)){
-            idx_color = mIDX_WHITE;
-            enemycolor = mBLACK;
-        }
-        else{
-            idx_color = mIDX_BLACK;
-            enemycolor = mWHITE;
-        }
-
-        if((pos >> 2) == newpos){
-            if(is_square_blank((pos >> 1)) && is_square_blank((pos >> 2)) &&
-               (field[idx_color] & (pos >> 3)) > 0 && (field[mIDX_ROOK] & (pos >> 3)) > 0){
-                for(int i = 0; i < 3; ++i){
-                    if(is_square_enemy_touched(enemycolor, (pos >> i))){
-                        return false;
-                    }
-                }
-                return tst_castling(pos, newpos, minutes);
-            }
-            else{
-                return false;
-            }
-        }
-        if((pos << 2) == newpos){
-            if(is_square_blank((pos << 1)) && is_square_blank((pos << 2)) &&
-               is_square_blank((pos << 3)) && (field[idx_color] & (pos << 4)) > 0 &&
-               (field[mIDX_ROOK] & (pos << 4)) > 0){
-                for(int i = 0; i < 3; ++i){
-                    if(is_square_enemy_touched(enemycolor, (pos << i))){
-                        return false;
-                    }
-                }
-                return tst_castling(pos, newpos, minutes);
-            }
-            else{
-                return false;
-            }
-        }
-        else{
-            return (is_square_enemy_touched(enemycolor, newpos) == false);
         }
     }
 
@@ -970,3 +888,158 @@
             }
         }
     }
+
+
+    bool cBoard::tst_kg_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        uint8_t idx_color, enemycolor;
+
+        if(is_square_white_occupied(pos)){
+            idx_color = mIDX_WHITE;
+            enemycolor = mBLACK;
+        }
+        else{
+            idx_color = mIDX_BLACK;
+            enemycolor = mWHITE;
+        }
+
+        if((pos >> 2) == newpos){
+            if(is_square_blank((pos >> 1)) && is_square_blank((pos >> 2)) &&
+               (field[idx_color] & (pos >> 3)) > 0 && (field[mIDX_ROOK] & (pos >> 3)) > 0){
+                for(int i = 0; i < 3; ++i){
+                    if(is_square_enemy_touched(enemycolor, (pos >> i))){
+                        return false;
+                    }
+                }
+                return tst_castling(pos, newpos, minutes);
+            }
+            else{
+                return false;
+            }
+        }
+        if((pos << 2) == newpos){
+            if(is_square_blank((pos << 1)) && is_square_blank((pos << 2)) &&
+               is_square_blank((pos << 3)) && (field[idx_color] & (pos << 4)) > 0 &&
+               (field[mIDX_ROOK] & (pos << 4)) > 0){
+                for(int i = 0; i < 3; ++i){
+                    if(is_square_enemy_touched(enemycolor, (pos << i))){
+                        return false;
+                    }
+                }
+                return tst_castling(pos, newpos, minutes);
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            return (is_square_enemy_touched(enemycolor, newpos) == false);
+        }
+    }
+
+
+    bool cBoard::tst_castling(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        uint64_t mask;
+        uint8_t color_idx;
+        
+        if(is_square_white_occupied(pos)){
+            color_idx = mIDX_WHITE;
+            if((pos >> 2) == newpos){
+                mask = 0x0900000000000000;
+            }
+            else{
+                mask = 0x8800000000000000;
+            }
+        }
+        else{
+            color_idx = mIDX_BLACK;
+            if((pos >> 2) == newpos){
+                mask = 0x0000000000000009;
+            }
+            else{
+                mask = 0x0000000000000088;
+            }
+        }
+
+        for(list<cMove>::reverse_iterator it = minutes.rbegin(); it != minutes.rend(); ++it){
+            if((it->prev_field[color_idx] & mask) != mask){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    bool cBoard::tst_wpw_move(uint64_t pos, uint64_t newpos){
+        // check, if field after one step forward is blank
+        if((pos >> 8) == newpos){
+            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0;
+        }
+        // check, if fields after two step forward are blank
+        else if((pos >> 16) == newpos){
+            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0 && 
+                   (field[mIDX_WHITE] & (pos >> 8)) == 0 && (field[mIDX_BLACK] & (pos >> 8)) == 0;
+        }
+        else if((pos >> 9) == newpos || (pos >> 7) == newpos){
+            return (field[mIDX_BLACK] & newpos) > 0;
+        }
+        else{
+            return false;
+        }
+    }
+
+
+    bool cBoard::tst_bpw_move(uint64_t pos, uint64_t newpos){
+        // check, if field after one step forward is blank
+        if((pos << 8) == newpos){
+            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0;
+        }
+        // check, if fields after two step forward are blank
+        else if((pos << 16) == newpos){
+            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0 && 
+                   (field[mIDX_WHITE] & (pos << 8)) == 0 && (field[mIDX_BLACK] & (pos << 8)) == 0;
+        }
+        else if((pos << 9) == newpos || (pos << 7) == newpos){
+            return (field[mIDX_WHITE] & newpos) > 0;
+        }
+        else{
+            return false;
+        }
+    }
+
+
+    bool cBoard::tst_en_passant_move(uint64_t pos, uint64_t newpos, list<cMove> &minutes){
+        if(minutes.size() > 0){
+            cMove move = minutes.back();
+
+            if(is_square_white_occupied(pos)){
+                uint64_t opp_pawn_src = (newpos >> 8);
+                uint64_t opp_pawn_dst = (newpos << 8);
+                return (move.src == opp_pawn_src && 
+                        move.dst == opp_pawn_dst &&
+                        read(opp_pawn_dst) == mBPW);
+            }
+            if(is_square_black_occupied(pos)){
+                uint64_t opp_pawn_src = (newpos << 8);
+                uint64_t opp_pawn_dst = (newpos >> 8);
+                return (move.src == opp_pawn_src && 
+                        move.dst == opp_pawn_dst &&
+                        read(opp_pawn_dst) == mWPW);
+            }
+        }
+        return false;
+    }
+
+
+    bool cBoard::is_move_capture(uint64_t src, uint8_t srcpiece, uint64_t dst, uint8_t dstpiece){
+        if(dstpiece != mBLK){
+            return true;
+        }
+        else if((srcpiece == mWPW && (src >> 8) != dst && (src >> 16) != dst) ||
+                (srcpiece == mBPW && (src << 8) != dst && (src << 16) != dst)){
+                return true;
+        }
+        else{
+            return false;
+        }
+    }
+

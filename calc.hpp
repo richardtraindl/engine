@@ -25,15 +25,13 @@
 
     void append_newmove(cGMove &move, list<cGMove> &newcandidates, list<cGMove> &rcandidates);
 
-    uint8_t count_up_to_prio(list<cGMove> &moves, int limit);
+    uint8_t count_up_to_limit(list<cGMove> &moves, uint8_t limit);
 
     bool sortByPresort(cGMove &A, cGMove &B);
 
-    uint8_t select_movecnt(cMatch &match, list<cGMove> &moves, uint8_t depth, uint8_t maxdepth, cGMove *last_move);
+    uint8_t determine_movecnt(cMatch &match, list<cGMove> &moves, uint8_t depth, uint8_t maxdepth);
 
-    // void clean_moves(list<cGMove> &moves);
-
-    int16_t alphabeta(cMatch &match, uint8_t depth, uint8_t maxdepth, int16_t alpha, int16_t beta, bool maximizing, cGMove *last_move, list<cGMove> &rcandidates);
+    int16_t alphabeta(cMatch &match, uint8_t depth, uint8_t maxdepth, int16_t alpha, int16_t beta, bool maximizing, list<cGMove> &rcandidates);
 
     int16_t calc_move(cMatch &match, list<cGMove> &rcandidates);
 

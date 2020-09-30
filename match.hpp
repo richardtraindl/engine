@@ -18,10 +18,10 @@
 
     class cMatch{
         public:
-            static map<string, int> STATUS;
-            static map<string, int> LEVELS;
-            static map<int, int> SECS_PER_MOVE;
-            static map<string, int> RETURN_CODES;
+            static map<string, uint8_t> STATUS;
+            static map<string, uint8_t> LEVELS;
+            static map<uint8_t, uint16_t> SECS_PER_MOVE;
+            static map<string, uint8_t> RETURN_CODES;
 
             time_t created_at;
             int16_t score;
@@ -50,22 +50,11 @@
 
             bool undo_move();
             
-            // int eval_status();
+            uint8_t eval_status();
 
             void prnt_minutes();
 
             void import(string filename);
-
-            /*
-            bool tst_wpw_move(uint64_t pos, uint64_t newpos);
-
-            bool tst_bpw_move(uint64_t pos, uint64_t newpos);
-
-            bool tst_wkg_move(uint64_t pos, uint64_t newpos);
-
-            bool tst_bkg_move(uint64_t pos, uint64_t newpos);
-
-            void gen_moves(uint8_t color); */
     };
 
 #endif

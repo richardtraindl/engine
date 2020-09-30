@@ -27,26 +27,29 @@
 
             void add_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
 
-            bool is_castling(cGMove &move);
+            bool is_move_castling(cGMove &move);
 
-            void score_presort(cGMove &move);
+            void score_move_presort(cGMove &move);
 
-            void set_score_capture(cGMove &move);
+            void set_score_capture_move(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches, bool exchange);
 
-            bool is_forking(cGMove &move);
+            bool is_move_weak_supported(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches);
 
-            bool is_defending_fork(cGMove &move);
+            bool is_move_strong_supporting_or_attacking(cGMove &move, bool exchange);
+
+            bool is_move_forking(cGMove &move);
+
+            bool is_move_defending_fork(cGMove &move);
  
-            bool is_fleeing(cGMove &move);
+            bool is_move_fleeing(cGMove &move);
 
-            bool is_unpin(cGMove &move);
+            bool is_move_unpin(cGMove &move);
 
-            bool is_blocking(cGMove &move);
+            bool is_move_blocking(cGMove &move);
 
-            bool is_running_pawn(cGMove &move);
+            bool is_move_running_pawn(cGMove &move);
 
-            bool is_tactical_draw(cGMove &move);
-
+            bool is_move_tactical_draw(cGMove &move);
     };
 
 #endif
