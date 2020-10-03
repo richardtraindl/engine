@@ -6,7 +6,7 @@
         src = newsrc;
         dst = newdst;
         prompiece = newprompiece;
-        presort = PRESORT_MEDIUM;
+        presort = PRESORT_LOW;
     }
 
 
@@ -16,11 +16,9 @@
 
     const uint8_t cGMove::PRESORT_STEP = 30;
     const uint8_t cGMove::PRESORT_STORMY = PRESORT_STEP;
-    const uint8_t cGMove::PRESORT_VERY_HIGH = PRESORT_STORMY + PRESORT_STEP;
-    const uint8_t cGMove::PRESORT_HIGH = PRESORT_VERY_HIGH + PRESORT_STEP;
+    const uint8_t cGMove::PRESORT_HIGH = PRESORT_STORMY + PRESORT_STEP;
     const uint8_t cGMove::PRESORT_MEDIUM = PRESORT_HIGH + PRESORT_STEP;
     const uint8_t cGMove::PRESORT_LOW = PRESORT_MEDIUM + PRESORT_STEP;
-    const uint8_t cGMove::PRESORT_VERY_LOW = PRESORT_LOW + PRESORT_STEP;
 
 
     string cGMove::format(){

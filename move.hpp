@@ -19,11 +19,9 @@
 
             static const uint8_t PRESORT_STEP;
             static const uint8_t PRESORT_STORMY;
-            static const uint8_t PRESORT_VERY_HIGH;
             static const uint8_t PRESORT_HIGH;
             static const uint8_t PRESORT_MEDIUM;
             static const uint8_t PRESORT_LOW;
-            static const uint8_t PRESORT_VERY_LOW;
 
             cGMove(uint64_t src, uint64_t dst, uint8_t prompiece);
             cGMove();

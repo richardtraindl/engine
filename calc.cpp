@@ -67,7 +67,7 @@
         }
 
         if(depth <= 4){
-            uint8_t count = count_up_to_limit(moves, cGMove::PRESORT_VERY_HIGH);
+            uint8_t count = count_up_to_limit(moves, cGMove::PRESORT_HIGH);
             uint8_t mincnt = min(3, (int)moves.size());
 
             if(count > 0){ 

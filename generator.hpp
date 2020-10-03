@@ -33,11 +33,13 @@
 
             void score_move_presort(cGMove &move);
 
-            void set_score_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
+            void set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
 
-            bool is_move_weak_supported(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches);
+            void set_score_for_supporting_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att);
 
-            bool is_move_strong_supporting_or_attacking(cGMove &move, bool exchange);
+            void set_score_for_attacking_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att);
+
+            bool is_move_strong_supporting_or_attacking(cGMove &move);
 
             bool is_move_forking(cGMove &move);
 

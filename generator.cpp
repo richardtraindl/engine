@@ -380,22 +380,11 @@
                 break;
             }
         }
-        set_score_capture_move(move, dst_support, exchange); 
+        set_score_for_capture_move(move, dst_support, exchange);
 
-        if(is_move_weak_supported(move, white_touches_on_dst, black_touches_on_dst)){
-            move.presort = max(cGMove::PRESORT_LOW, move.presort);
-            return;
-        }
-        else{
-            if(is_move_strong_supporting_or_attacking(move, exchange)){
-                if(exchange){
-                    move.presort = cGMove::PRESORT_STORMY;
-                }
-                else{
-                    move.presort = min(cGMove::PRESORT_HIGH, move.presort);
-                }
-            }
-        }
+        bool strong_supp_or_att = is_move_strong_supporting_or_attacking(move);
+        set_score_for_supporting_move(move, dst_support, strong_supp_or_att);
+        set_score_for_attacking_move(move, dst_support, strong_supp_or_att);
 
         if(is_move_forking(move)){
             if(move.presort < cGMove::PRESORT_HIGH){ 
@@ -462,7 +451,7 @@
     }
 
 
-    void cGenerator::set_score_capture_move(cGMove &move, uint8_t dst_support, bool exchange){
+    void cGenerator::set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange){
         uint8_t src_piece = match->board.read(move.src);
         uint8_t dst_piece = match->board.read(move.dst);
 
@@ -476,55 +465,81 @@
         }
 
         if(dst_piece == mBLK){ 
-            move.presort = cGMove::PRESORT_HIGH + adjust;
+            move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
             return;
         }
 
         uint8_t diff = PIECES_RANKS[PIECES["wBp"]] - PIECES_RANKS[PIECES["wPw"]];
         
         if(dst_support == SUPPORT["none"]){
-            move.presort = cGMove::PRESORT_HIGH + adjust;
+            move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
             return;
         }
 
         if(PIECES_RANKS[src_piece] < PIECES_RANKS[dst_piece]){
-            move.presort = cGMove::PRESORT_HIGH + adjust;
+            move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
             return;
         }
         else if(PIECES_RANKS[src_piece] == PIECES_RANKS[dst_piece]){
             if(dst_support == SUPPORT["good"]){
-                move.presort = cGMove::PRESORT_HIGH + adjust;
+                move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
                 return;
             }
             else{
-                move.presort = cGMove::PRESORT_MEDIUM + adjust;
+                move.presort = min((int)move.presort, cGMove::PRESORT_MEDIUM + adjust);
                 return;
             }
         }
         else{
             if(PIECES_RANKS[src_piece] > PIECES_RANKS[dst_piece] + diff){
-                move.presort = cGMove::PRESORT_HIGH + adjust + 5;
+                move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust + 5);
                 return;
             }
             else{
-                move.presort = cGMove::PRESORT_HIGH + adjust;
+                move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
                 return;
             }
         }
     }
 
 
-    bool cGenerator::is_move_weak_supported(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches){
-        if(match->board.is_square_white_occupied(move.src)){
-            return white_touches.size() < black_touches.size();
+    void cGenerator::set_score_for_supporting_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att){
+        if(dst_support == SUPPORT["weak"]){
+            move.presort = min(move.presort, cGMove::PRESORT_LOW);
+            return;
         }
         else{
-            return black_touches.size() < white_touches.size();
+            if(strong_supp_or_att){
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
+                return;
+            }
+            else{
+                move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
+                return;
+            }
         }
     }
 
 
-    bool cGenerator::is_move_strong_supporting_or_attacking(cGMove &move, bool exchange){
+    void cGenerator::set_score_for_attacking_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att){
+        if(dst_support == SUPPORT["weak"]){
+            move.presort = min(move.presort, cGMove::PRESORT_LOW);
+            return;
+        }
+        else{
+            if(strong_supp_or_att){
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
+                return;
+            }
+            else{
+                move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
+                return;
+            }
+        }
+    }
+
+
+    bool cGenerator::is_move_strong_supporting_or_attacking(cGMove &move){
         uint8_t piece = match->board.read(move.src);
         const cStep *steps;
         int maxidx;
@@ -565,41 +580,51 @@
 
                 uint8_t touched_piece = match->board.read(newpos);
 
+                match->board.write(move.src, mBLK);
                 match->board.determine_touches_on_square(newpos, white_pos, black_pos);
+                match->board.write(move.src, piece);
 
                 if(cBoard::is_piece_white(piece)){
-                    if(black_pos.size() == 0){
-                        break;
-                    }
-                    if(white_pos.size() > black_pos.size()){
-                        if(exchange && 
-                           cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
-                            if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
-                                return true;
-                            }
-                        }
-                        else{
+                    if(cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
+                        if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
                             return true;
                         }
+                        else if(white_pos.size() + 1 > black_pos.size()){
+                            return true;
+                        }
+                        else{
+                            break;
+                        }
                     }
-                    break;
+                    else{
+                        if(white_pos.size() < black_pos.size()){
+                            return true;
+                        }
+                        else{
+                            break;
+                        }
+                    }
                 }
                 else{
-                    if(white_pos.size() == 0){
-                        break;
-                    }
-                    if(black_pos.size() > white_pos.size()){
-                        if(exchange && 
-                           cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
-                            if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
-                                return true;
-                            }
-                        }
-                        else{
+                    if(cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
+                        if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
                             return true;
                         }
+                        else if(black_pos.size() + 1 > white_pos.size()){
+                            return true;
+                        }
+                        else{
+                            break;
+                        }
                     }
-                    break;
+                    else{
+                        if(black_pos.size() < white_pos.size()){
+                            return true;
+                        }
+                        else{
+                            break;
+                        }
+                    }
                 }
             }
         }
