@@ -7,6 +7,14 @@
     }
 
 
+    map<string, uint8_t> cGenerator::SUPPORT = {
+        {"none", 1},
+        {"weak", 2}, 
+        {"equal", 3}, 
+        {"good", 4}
+    };
+
+
     void cGenerator::gen_moves(list<cGMove> &moves){
         uint64_t pos = mPOS_A1;
         uint8_t color;
@@ -333,8 +341,35 @@
 
 
     void cGenerator::score_move_presort(cGMove &move){
-        list<uint64_t> white_touches, black_touches;
-        match->board.determine_touches_on_square(move.dst, white_touches, black_touches);
+        list<uint64_t> white_touches_on_dst, black_touches_on_dst;
+        match->board.determine_touches_on_square(move.dst, white_touches_on_dst, black_touches_on_dst);
+
+        uint8_t piece = match->board.read(move.src);
+        uint8_t dst_support;
+        if(white_touches_on_dst.size() < black_touches_on_dst.size()){
+            if(cBoard::is_piece_white(piece)){
+                dst_support = SUPPORT["weak"];
+            }
+            else{
+                dst_support = SUPPORT["good"];
+            }
+        }
+        else if(white_touches_on_dst.size() > black_touches_on_dst.size()){
+            if(cBoard::is_piece_white(piece)){
+                dst_support = SUPPORT["good"];
+            }
+            else{
+                dst_support = SUPPORT["weak"];
+            }
+        }
+        else{
+            if(white_touches_on_dst.size() == 0){
+                dst_support = SUPPORT["none"];
+            }
+            else{
+                dst_support = SUPPORT["equal"];
+            }
+        }
 
         bool exchange = false;
         uint8_t cnt = 0;
@@ -345,9 +380,9 @@
                 break;
             }
         }
-        set_score_capture_move(move, white_touches, black_touches, exchange); 
+        set_score_capture_move(move, dst_support, exchange); 
 
-        if(is_move_weak_supported(move, white_touches, black_touches)){
+        if(is_move_weak_supported(move, white_touches_on_dst, black_touches_on_dst)){
             move.presort = max(cGMove::PRESORT_LOW, move.presort);
             return;
         }
@@ -427,7 +462,7 @@
     }
 
 
-    void cGenerator::set_score_capture_move(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches, bool exchange){
+    void cGenerator::set_score_capture_move(cGMove &move, uint8_t dst_support, bool exchange){
         uint8_t src_piece = match->board.read(move.src);
         uint8_t dst_piece = match->board.read(move.dst);
 
@@ -435,55 +470,44 @@
             return;
         }
 
-        uint8_t adjust = 0;
+        int8_t adjust = 0;
         if(exchange){
-            adjust= cGMove::PRESORT_STEP;
+            adjust = -10;
         }
 
         if(dst_piece == mBLK){ 
-            if(move.presort < (cGMove::PRESORT_HIGH - adjust)){
-                return;
-            }
-            else{
-                move.presort = (cGMove::PRESORT_HIGH - adjust);
-            }
-        }
-
-        uint8_t diff = PIECES_RANKS[PIECES["wBp"]] - PIECES_RANKS[PIECES["wPw"]];
-        if((black_touches.size() == 0 && cBoard::is_piece_white(src_piece)) ||
-           (white_touches.size() == 0 && cBoard::is_piece_black(src_piece))){
-            move.presort = cGMove::PRESORT_STORMY;
+            move.presort = cGMove::PRESORT_HIGH + adjust;
             return;
         }
 
-        if((white_touches.size() > black_touches.size() && cBoard::is_piece_white(src_piece)) ||
-           (black_touches.size() > white_touches.size() && cBoard::is_piece_black(src_piece))){
-            if(PIECES_RANKS[src_piece] <= PIECES_RANKS[dst_piece]){
-                move.presort = cGMove::PRESORT_STORMY;
-                return;
-            }
-            if(PIECES_RANKS[src_piece] > PIECES_RANKS[dst_piece] + diff){
-                move.presort = (cGMove::PRESORT_MEDIUM - adjust);
+        uint8_t diff = PIECES_RANKS[PIECES["wBp"]] - PIECES_RANKS[PIECES["wPw"]];
+        
+        if(dst_support == SUPPORT["none"]){
+            move.presort = cGMove::PRESORT_HIGH + adjust;
+            return;
+        }
+
+        if(PIECES_RANKS[src_piece] < PIECES_RANKS[dst_piece]){
+            move.presort = cGMove::PRESORT_HIGH + adjust;
+            return;
+        }
+        else if(PIECES_RANKS[src_piece] == PIECES_RANKS[dst_piece]){
+            if(dst_support == SUPPORT["good"]){
+                move.presort = cGMove::PRESORT_HIGH + adjust;
                 return;
             }
             else{
-                move.presort = (cGMove::PRESORT_HIGH - adjust);
+                move.presort = cGMove::PRESORT_MEDIUM + adjust;
                 return;
             }
         }
-
-        if((white_touches.size() <= black_touches.size() && cBoard::is_piece_white(src_piece)) ||
-           (black_touches.size() <= white_touches.size() && cBoard::is_piece_black(src_piece))){
-            if(PIECES_RANKS[src_piece] < PIECES_RANKS[dst_piece]){
-                move.presort = cGMove::PRESORT_STORMY;
+        else{
+            if(PIECES_RANKS[src_piece] > PIECES_RANKS[dst_piece] + diff){
+                move.presort = cGMove::PRESORT_HIGH + adjust + 5;
                 return;
             }
-            if(PIECES_RANKS[src_piece] == PIECES_RANKS[dst_piece]){
-                move.presort = (cGMove::PRESORT_MEDIUM - adjust);
-                return;
-            }
-            else{ // src_piece > dst_piece
-                move.presort = (cGMove::PRESORT_LOW - adjust);
+            else{
+                move.presort = cGMove::PRESORT_HIGH + adjust;
                 return;
             }
         }

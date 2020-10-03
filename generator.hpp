@@ -17,6 +17,8 @@
             cMatch *match;
             
             cGenerator(cMatch *match);
+            
+            static map<string, uint8_t> SUPPORT;
 
             void gen_moves(list<cGMove> &moves);
 
@@ -31,7 +33,7 @@
 
             void score_move_presort(cGMove &move);
 
-            void set_score_capture_move(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches, bool exchange);
+            void set_score_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
 
             bool is_move_weak_supported(cGMove &move, list<uint64_t> &white_touches, list<uint64_t> &black_touches);
 
