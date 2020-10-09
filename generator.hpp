@@ -29,17 +29,23 @@
 
             void add_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
 
-            bool is_move_castling(cGMove &move);
-
             void score_move_presort(cGMove &move);
 
             void set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
 
-            void set_score_for_supporting_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att);
+            void set_score_for_supporting_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att);
 
-            void set_score_for_attacking_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att);
+            void set_score_for_attacking_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att);
 
-            bool is_move_strong_supporting_or_attacking(cGMove &move);
+            bool is_move_castling(cGMove &move);
+
+            uint8_t determine_level_for_move_supportings_or_attackings(cGMove &move);
+
+            uint8_t search_lowest(list<uint64_t> &touches);
+
+            uint8_t determine_level_for_move_dstfield(cGMove &move, list<uint64_t> &white_touches_on_dst, list<uint64_t> &black_touches_on_dst);
+
+            bool does_move_clear_for_supply(cGMove &move);
 
             bool is_move_forking(cGMove &move);
 

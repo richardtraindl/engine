@@ -43,12 +43,12 @@
         {PIECES["bKn"], 3}, 
         {PIECES["wBp"], 3}, 
         {PIECES["bBp"], 3}, 
-        {PIECES["wRk"], 5}, 
-        {PIECES["bRk"], 5}, 
+        {PIECES["wRk"], 4}, 
+        {PIECES["bRk"], 4}, 
         {PIECES["wQu"], 9}, 
         {PIECES["bQu"], 9}, 
-        {PIECES["wKg"], 20}, 
-        {PIECES["bKg"], 20}
+        {PIECES["wKg"], 200}, 
+        {PIECES["bKg"], 200}
     };
 
 

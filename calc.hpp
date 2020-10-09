@@ -25,7 +25,7 @@
 
     void append_newmove(cGMove &move, list<cGMove> &newcandidates, list<cGMove> &rcandidates);
 
-    uint8_t count_up_to_limit(list<cGMove> &moves, uint8_t limit);
+    void count_limits(list<cGMove> &moves, uint8_t &badcnt, uint8_t &mediumcnt, uint8_t &highcnt, uint8_t &stormycnt);
 
     bool sortByPresort(cGMove &A, cGMove &B);
 

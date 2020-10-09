@@ -42,32 +42,37 @@
     }
 
 
-    bool cPin::is_pinned(uint64_t pos, uint8_t dir){
+    bool cPin::is_dir_pinned(uint64_t pos, uint8_t dir){
         if((pins[mIDX_PIN] & pos) == 0){
             return false;
         }
 
         if((pins[mIDX_WST_EST] & pos) > 0 &&
            (dir == mEST || dir == mWST)){
-            return true;
+            return false;
         }
 
         if((pins[mIDX_STH_NTH] & pos) > 0 &&
            (dir == mNTH || dir == mSTH)){
-            return true;
+            return false;
         }
 
         if((pins[mIDX_STH_WST_NTH_EST] & pos) > 0 &&
            (dir == mNTH_EST || dir == mSTH_WST)){
-            return true;
+            return false;
         }
 
         if((pins[mIDX_STH_EST_NTH_WST] & pos) > 0 &&
            (dir == mNTH_WST || dir == mSTH_EST)){
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
+    }
+
+
+    bool cPin::is_pinned(uint64_t pos){
+        return (pins[mIDX_PIN] & pos) > 0;
     }
 
 
@@ -801,7 +806,7 @@
                         cpin->pins[mIDX_STH_WST_NTH_EST] = (cpin->pins[mIDX_STH_WST_NTH_EST] | friend_pos);
                     }
                     else{
-                       cpin->pins[mIDX_STH_EST_NTH_WST] = (cpin->pins[mIDX_STH_EST_NTH_WST] | friend_pos);
+                        cpin->pins[mIDX_STH_EST_NTH_WST] = (cpin->pins[mIDX_STH_EST_NTH_WST] | friend_pos);
                     }
                 }
                 break;

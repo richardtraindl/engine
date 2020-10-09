@@ -37,18 +37,30 @@
     }
 
 
-    uint8_t count_up_to_limit(list<cGMove> &moves, uint8_t limit){
-        uint8_t count = 0;
+    void count_limits(list<cGMove> &moves, uint8_t &badcnt, uint8_t &mediumcnt, uint8_t &highcnt, uint8_t &stormycnt){
+        badcnt = 0;
+        mediumcnt = 0;
+        highcnt = 0;
+        stormycnt = 0;
 
         for(cGMove move : moves){
-            if(move.presort <= limit){
-                count++;
+            if(move.presort <= cGMove::PRESORT_STORMY){
+                stormycnt++;
+                continue;
+            }
+            else if(move.presort <= cGMove::PRESORT_HIGH){
+                highcnt++;
+                continue;
+            }
+            else if(move.presort <= cGMove::PRESORT_MEDIUM){
+                mediumcnt++;
+                continue;
             }
             else{
-                break;
+                badcnt++;
+                continue;
             }
         }
-        return count;
     }
 
 
@@ -62,40 +74,39 @@
             return 0;
         }
 
-        if(depth <= 2){
+        if(depth == 1){
             return moves.size();
         }
+        else{ 
+            uint8_t badcnt, mediumcnt, highcnt, stormycnt;
 
-        if(depth <= 4){
-            uint8_t count = count_up_to_limit(moves, cGMove::PRESORT_HIGH);
-            uint8_t mincnt = min(3, (int)moves.size());
+            count_limits(moves, badcnt, mediumcnt, highcnt, stormycnt);
 
-            if(count > 0){ 
-                return max(mincnt, count);
+            if(depth <= 4){
+                return min(12, (mediumcnt + highcnt + stormycnt));
             }
-            else{
-                return mincnt;
-            }
-        }
+            //else if(depth <= 6){
+            //    return highcnt + stormycnt;
+            //}
+            else if(depth <= 7){
+                uint8_t silentcnt = 0;
 
-        if(depth <= 7){
-            uint8_t silentcnt = 1;
-
-            if(moves.size() >= 1){ 
-                cMove move = match.minutes.back();
-                if(move.type != MOVE_TYPE["capture"] && move.type != MOVE_TYPE["en-passant"]){
-                    silentcnt = 0;
+                if(moves.size() >= 1){ 
+                    cMove move = match.minutes.back();
+                    if(move.type == MOVE_TYPE["capture"] || move.type == MOVE_TYPE["en-passant"]){
+                        silentcnt = 1;
+                    }
                 }
-            }
 
-            uint8_t count = count_up_to_limit(moves, cGMove::PRESORT_STORMY);
-            if(count > 0){
-                if((count + silentcnt) <= (uint8_t)moves.size()){
-                    return count + silentcnt;
+                if(stormycnt + silentcnt <= (uint8_t)moves.size()){
+                    return min(4, (stormycnt + silentcnt));
                 }
                 else{
-                    return count;
+                    return min(4, (int)stormycnt);
                 }
+            }
+            else{
+                return 0;
             }
         }
 

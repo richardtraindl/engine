@@ -63,7 +63,7 @@
                     uint64_t newpos = pos;
 
                     for(int k = 0; k < step.stepcnt; ++k){
-                        if(cpin->is_pinned(pos, step.dir)){
+                        if(cpin->is_dir_pinned(pos, step.dir)){
                             break;
                         }
 
@@ -92,7 +92,6 @@
                                 else if(match->board.tst_en_passant_move(pos, newpos, match->minutes)){
                                     cGMove move(pos, newpos, mBLK);
                                     score_move_presort(move);
-                                    move.presort -= 5; // score e.p. capture
                                     moves.push_back(move);
                                 }
                             }
@@ -111,7 +110,7 @@
                                 if(match->board.tst_kg_move(pos, newpos, match->minutes)){
                                     cGMove move(pos, newpos, mBLK);
                                     score_move_presort(move);
-                                    if(is_move_castling(move)){ move.presort -= 5; }
+                                    if(is_move_castling(move)){ move.presort -= 10; }
                                     moves.push_back(move);
                                 }
                             }
@@ -248,7 +247,7 @@
                     uint8_t piece = match->board.read(newpos);
 
                     if((match->board.field[mIDX_WHITE] & newpos) > 0 && color == mWHITE){
-                        if(cpin->is_pinned(pos, step.dir)){
+                        if(cpin->is_dir_pinned(pos, step.dir)){
                             break;
                         }
                         if(step.owner == STEP_OWNER["wpawn"] && piece == mWPW){
@@ -268,7 +267,7 @@
                         }
                     }
                     else if((match->board.field[mIDX_BLACK] & newpos) > 0 && color == mBLACK){
-                        if(cpin->is_pinned(pos, step.dir)){
+                        if(cpin->is_dir_pinned(pos, step.dir)){
                             break;
                         }
                         if(step.owner == STEP_OWNER["bpawn"] && piece == mBPW){
@@ -335,41 +334,9 @@
     }
 
 
-    bool cGenerator::is_move_castling(cGMove &move){
-        return false;
-    }
-
-
     void cGenerator::score_move_presort(cGMove &move){
         list<uint64_t> white_touches_on_dst, black_touches_on_dst;
-        match->board.determine_touches_on_square(move.dst, white_touches_on_dst, black_touches_on_dst);
-
-        uint8_t piece = match->board.read(move.src);
-        uint8_t dst_support;
-        if(white_touches_on_dst.size() < black_touches_on_dst.size()){
-            if(cBoard::is_piece_white(piece)){
-                dst_support = SUPPORT["weak"];
-            }
-            else{
-                dst_support = SUPPORT["good"];
-            }
-        }
-        else if(white_touches_on_dst.size() > black_touches_on_dst.size()){
-            if(cBoard::is_piece_white(piece)){
-                dst_support = SUPPORT["good"];
-            }
-            else{
-                dst_support = SUPPORT["weak"];
-            }
-        }
-        else{
-            if(white_touches_on_dst.size() == 0){
-                dst_support = SUPPORT["none"];
-            }
-            else{
-                dst_support = SUPPORT["equal"];
-            }
-        }
+        uint8_t dst_support = determine_level_for_move_dstfield(move, white_touches_on_dst, black_touches_on_dst);
 
         bool exchange = false;
         uint8_t cnt = 0;
@@ -382,9 +349,18 @@
         }
         set_score_for_capture_move(move, dst_support, exchange);
 
-        bool strong_supp_or_att = is_move_strong_supporting_or_attacking(move);
-        set_score_for_supporting_move(move, dst_support, strong_supp_or_att);
-        set_score_for_attacking_move(move, dst_support, strong_supp_or_att);
+        uint8_t level_for_supp_att = determine_level_for_move_supportings_or_attackings(move);
+        set_score_for_supporting_move(move, dst_support, level_for_supp_att);
+        set_score_for_attacking_move(move, dst_support, level_for_supp_att);
+
+        if(does_move_clear_for_supply(move)){
+            if(move.presort < cGMove::PRESORT_HIGH){ 
+                move.presort -= 5; 
+            }
+            else{
+                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+            }
+        }
 
         if(is_move_forking(move)){
             if(move.presort < cGMove::PRESORT_HIGH){ 
@@ -464,56 +440,67 @@
             adjust = -10;
         }
 
+        // en passant
         if(dst_piece == mBLK){ 
             move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
             return;
         }
 
-        uint8_t diff = PIECES_RANKS[PIECES["wBp"]] - PIECES_RANKS[PIECES["wPw"]];
-        
-        if(dst_support == SUPPORT["none"]){
-            move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
-            return;
-        }
-
         if(PIECES_RANKS[src_piece] < PIECES_RANKS[dst_piece]){
-            move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
+            move.presort = min((int)move.presort, cGMove::PRESORT_STORMY + adjust);
             return;
         }
         else if(PIECES_RANKS[src_piece] == PIECES_RANKS[dst_piece]){
-            if(dst_support == SUPPORT["good"]){
-                move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
+            if(dst_support == SUPPORT["none"] || dst_support == SUPPORT["good"]){
+                move.presort = min((int)move.presort, cGMove::PRESORT_STORMY + adjust);
                 return;
             }
-            else{
+            else if(dst_support == SUPPORT["equal"]){
                 move.presort = min((int)move.presort, cGMove::PRESORT_MEDIUM + adjust);
                 return;
             }
-        }
-        else{
-            if(PIECES_RANKS[src_piece] > PIECES_RANKS[dst_piece] + diff){
-                move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust + 5);
+            else{
+                // dst_support is weak
+                move.presort = min((int)move.presort, cGMove::PRESORT_LOW + adjust);
                 return;
             }
+        }
+        else{
+            if(dst_support == SUPPORT["none"]){
+                move.presort = min((int)move.presort, cGMove::PRESORT_STORMY + adjust);
+                    return;
+            }
+            else if(dst_support == SUPPORT["good"]){
+                uint8_t diff = PIECES_RANKS[PIECES["wBp"]] - PIECES_RANKS[PIECES["wPw"]];
+
+                if(PIECES_RANKS[src_piece] > PIECES_RANKS[dst_piece] + diff){
+                    move.presort = min((int)move.presort, cGMove::PRESORT_MEDIUM + adjust + 5);
+                    return;
+                }
+                else{
+                    move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
+                    return;
+                }
+            } // dst_support is weak or equal
             else{
-                move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
+                move.presort = min((int)move.presort, cGMove::PRESORT_LOW + adjust);
                 return;
             }
         }
     }
 
 
-    void cGenerator::set_score_for_supporting_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att){
+    void cGenerator::set_score_for_supporting_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att){
         if(dst_support == SUPPORT["weak"]){
             move.presort = min(move.presort, cGMove::PRESORT_LOW);
             return;
         }
         else{
-            if(strong_supp_or_att){
+            if(level_for_supp_att == 3){
                 move.presort = min(move.presort, cGMove::PRESORT_HIGH);
                 return;
             }
-            else{
+            else if(level_for_supp_att == 2){
                 move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
                 return;
             }
@@ -521,17 +508,17 @@
     }
 
 
-    void cGenerator::set_score_for_attacking_move(cGMove &move, uint8_t dst_support, bool strong_supp_or_att){
+    void cGenerator::set_score_for_attacking_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att){
         if(dst_support == SUPPORT["weak"]){
             move.presort = min(move.presort, cGMove::PRESORT_LOW);
             return;
         }
         else{
-            if(strong_supp_or_att){
+            if(level_for_supp_att == 3){
                 move.presort = min(move.presort, cGMove::PRESORT_HIGH);
                 return;
             }
-            else{
+            else if(level_for_supp_att == 2){
                 move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
                 return;
             }
@@ -539,10 +526,74 @@
     }
 
 
-    bool cGenerator::is_move_strong_supporting_or_attacking(cGMove &move){
+    bool cGenerator::is_move_castling(cGMove &move){
+        return ((move.src >> 2) == move.dst) || ((move.src << 2) == move.dst);
+    }
+
+
+    uint8_t cGenerator::search_lowest(list<uint64_t> &touches){
+        uint8_t lowest = mWKG;
+
+        for(uint64_t pos : touches){
+            uint8_t piece = match->board.read(pos);
+            if(PIECES_RANKS[piece] < PIECES_RANKS[lowest]){
+                lowest = piece;
+            }
+        }
+        return lowest;
+    }
+
+    uint8_t cGenerator::determine_level_for_move_dstfield(cGMove &move, list<uint64_t> &white_touches_on_dst, list<uint64_t> &black_touches_on_dst){
+        uint8_t piece = match->board.read(move.src);
+
+        match->board.write(move.src, mBLK);
+        match->board.determine_touches_on_square(move.dst, white_touches_on_dst, black_touches_on_dst);
+        match->board.write(move.src, piece);
+
+        uint8_t lowest;
+        if(cBoard::color_of_piece(piece) == mWHITE){
+            lowest = search_lowest(black_touches_on_dst);
+        }
+        else{
+            lowest = search_lowest(white_touches_on_dst);
+        }
+        if(PIECES_RANKS[piece] > PIECES_RANKS[lowest]){
+            return SUPPORT["weak"];
+        }
+
+        if(white_touches_on_dst.size() < black_touches_on_dst.size()){
+            if(cBoard::is_piece_white(piece)){
+                return SUPPORT["weak"];
+            }
+            else{
+                return SUPPORT["good"];
+            }
+        }
+        else if(white_touches_on_dst.size() > black_touches_on_dst.size()){
+            if(cBoard::is_piece_white(piece)){
+                return SUPPORT["good"];
+            }
+            else{
+                return SUPPORT["weak"];
+            }
+        }
+        else{
+            if((white_touches_on_dst.size() == 0 && cBoard::is_piece_white(piece)) ||
+               (black_touches_on_dst.size() == 0 && cBoard::is_piece_black(piece))){
+                return SUPPORT["none"];
+            }
+            else{
+                return SUPPORT["equal"];
+            }
+        }
+    }
+
+
+    uint8_t cGenerator::determine_level_for_move_supportings_or_attackings(cGMove &move){
         uint8_t piece = match->board.read(move.src);
         const cStep *steps;
-        int maxidx;
+        uint8_t maxidx;
+        uint8_t level = 0; // none == 0, bad == 1, medium == 2, good == 3
 
         if(piece == mWRK || piece == mBRK){ steps = cBoard::rk_steps; maxidx = 4; }
         else if(piece == mWBP || piece == mBBP){ steps = cBoard::bp_steps; maxidx = 4; }
@@ -555,7 +606,9 @@
 
         for(uint8_t i = 0; i < maxidx; ++i){
             cStep step = steps[i];
+            
             uint64_t newpos = move.dst;
+
             list<uint64_t> white_pos, black_pos;
 
             for(uint8_t k = 0; k < step.stepcnt; ++k){
@@ -584,85 +637,177 @@
                 match->board.determine_touches_on_square(newpos, white_pos, black_pos);
                 match->board.write(move.src, piece);
 
+                cPin *cpin = match->board.determine_pins(cBoard::color_of_piece(touched_piece));
+                if(cpin->is_pinned(newpos) > 0){
+                    return 3;
+                }
+
                 if(cBoard::is_piece_white(piece)){
-                    if(cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
-                        if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
-                            return true;
+                    if(cBoard::color_of_piece(touched_piece) != mWHITE){
+                        if(PIECES_RANKS[piece] <= PIECES_RANKS[touched_piece] + 1){
+                            return 3;
                         }
-                        else if(white_pos.size() + 1 > black_pos.size()){
-                            return true;
+                        else if(white_pos.size() >= black_pos.size()){
+                            level = max((int)level, 2);
+                            break;
                         }
                         else{
+                            level = max((int)level, 1);
                             break;
                         }
                     }
                     else{
-                        if(white_pos.size() < black_pos.size()){
-                            return true;
+                        if(piece == mWKG || piece == mBKG){
+                            break;
+                        }
+                        else if(white_pos.size() < black_pos.size()){
+                            return 3;
                         }
                         else{
+                            level = max((int)level, 2);
                             break;
                         }
                     }
                 }
                 else{
-                    if(cBoard::color_of_piece(piece) != cBoard::color_of_piece(touched_piece)){
-                        if(PIECES_RANKS[piece] < PIECES_RANKS[touched_piece]){
-                            return true;
+                    if(cBoard::color_of_piece(touched_piece) != mBLACK){
+                        if(PIECES_RANKS[piece] <= PIECES_RANKS[touched_piece] + 1){
+                            return 3;
                         }
-                        else if(black_pos.size() + 1 > white_pos.size()){
-                            return true;
+                        else if(black_pos.size() >= white_pos.size()){
+                            level = max((int)level, 2);
+                            break;
                         }
                         else{
+                            level = max((int)level, 1);
                             break;
                         }
                     }
                     else{
-                        if(black_pos.size() < white_pos.size()){
-                            return true;
+                        if(piece == mWKG || piece == mBKG){
+                            break;
+                        }
+                        else if(black_pos.size() < white_pos.size()){
+                            return 3;
                         }
                         else{
+                            level = max((int)level, 2);
                             break;
                         }
                     }
                 }
             }
         }
+        if(piece != mWKG && piece != mBKG){
+            return level;
+        }
+
+        if((move.src >> 2) == move.dst){
+            cGMove rkmove((move.dst >> 1), (move.dst << 1), mBLK);
+            return determine_level_for_move_supportings_or_attackings(rkmove);
+        }
+
+        if((move.src << 2) == move.dst){
+            cGMove rkmove((move.dst << 2), (move.dst >> 1), mBLK);
+            return determine_level_for_move_supportings_or_attackings(rkmove);
+        }
+
+        return level;
+    }
+
+
+    bool cGenerator::does_move_clear_for_supply(cGMove &move){
+        if(match->board.read(move.dst) != mBLK){
+            uint8_t srcpiece = match->board.read(move.src);
+
+            if(srcpiece == mWPW || srcpiece == mBPW ||
+               srcpiece == mWKG || srcpiece == mBKG ||
+               srcpiece == mWKN || srcpiece == mBKN){ 
+                return false; 
+            }
+
+            for(uint8_t i = 0; i < 8; ++i){
+                cStep step = cBoard::qu_steps[i];
+
+                uint64_t newpos = move.src;
+
+                for(uint8_t k = 0; k < step.stepcnt; ++k){
+                    if((newpos & step.border) > 0){
+                        break;
+                    }
+
+                    if(step.rightshift){
+                        newpos = (newpos >> step.shiftcnt);
+                    }
+                    else{
+                        newpos = (newpos << step.shiftcnt);
+                    }
+
+                    if(newpos == move.dst){
+                        break;
+                    }
+
+                    if(match->board.is_square_blank(newpos)){
+                        continue;
+                    }
+
+                    uint8_t found_piece = match->board.read(newpos);
+                    if(srcpiece == found_piece){
+                        return true;
+                    }
+                    else if(cBoard::color_of_piece(srcpiece) == cBoard::color_of_piece(found_piece) &&
+                            (found_piece == mWQU || found_piece == mBQU)){
+                        return true;
+                    }
+                    else{
+                        break;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
 
     bool cGenerator::is_move_forking(cGMove &move){
+        // ???
         return false;
     }
 
 
     bool cGenerator::is_move_defending_fork(cGMove &move){
+        // ???
         return false;
     }
 
 
     bool cGenerator::is_move_fleeing(cGMove &move){
+        // ???
         return false;
     }
 
 
     bool cGenerator::is_move_unpin(cGMove &move){
+        // ???
         return false;
     }
 
 
     bool cGenerator::is_move_blocking(cGMove &move){
+        // ???
         return false;
     }
 
 
     bool cGenerator::is_move_running_pawn(cGMove &move){
+        // ???
         return false;
     }
 
 
     bool cGenerator::is_move_tactical_draw(cGMove &move){
+        // ???
         return false;
     }
 

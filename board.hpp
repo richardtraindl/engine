@@ -59,7 +59,9 @@
 
             cPin();
 
-            bool is_pinned(uint64_t pos, uint8_t dir);
+            bool is_dir_pinned(uint64_t pos, uint8_t dir);
+
+            bool is_pinned(uint64_t pos);
     };
 
 
