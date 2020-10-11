@@ -23,13 +23,13 @@
         list<cGMove *> rcandidates;
         calc_move(match, rcandidates);
 
-        /*int input;
-        for(list<cGMove>::iterator it = rcandidates.begin(); it != rcandidates.end(); ++it){
-            cout << pos_to_coord(it->src) << " " << pos_to_coord(it->dst) << " " << PIECES_STR[it->prompiece] << endl;
+        int input;
+        for(list<cGMove *>::iterator it = rcandidates.begin(); it != rcandidates.end(); ++it){
+            cout << pos_to_coord((*it)->src) << " " << pos_to_coord((*it)->dst) << " " << PIECES_STR[(*it)->prompiece] << endl;
             cin >> input;
-            match.do_move(it->src, it->dst, it->prompiece);
+            match.do_move((*it)->src, (*it)->dst, (*it)->prompiece);
             match.board.prnt();
-        }*/
+        }
 
         return 0;
     }

@@ -94,7 +94,7 @@
             else if(depth <= 5){
                 return min(6, (highcnt + stormycnt));
             }
-            else if(depth <= 7){
+            else if(depth <= 9){
                 if(moves.size() >= 1){ 
                     cMove move = match.minutes.back();
                     if(move.type == MOVE_TYPE["capture"] || move.type == MOVE_TYPE["en-passant"]){
