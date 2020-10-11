@@ -272,7 +272,7 @@
 
 
     uint8_t cMatch::eval_status(){
-        list<cGMove> moves;
+        list<cGMove *> moves;
         cGenerator generator(this);
 
         generator.gen_moves(moves);

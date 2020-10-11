@@ -122,6 +122,8 @@
 
             static const cStep step_for_dir(uint8_t dir);
 
+            static uint8_t dir_for_move(uint64_t src, uint64_t dst);
+
             static const uint8_t reverse_dir(uint8_t dir);
 
             cBoard();

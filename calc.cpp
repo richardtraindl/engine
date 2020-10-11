@@ -5,54 +5,61 @@
     uint64_t calccnt;
 
 
-    void prnt_moves(list<cGMove> &moves){
+    void prnt_moves(list<cGMove *> &moves){
         uint8_t idx = 1;
 
         cout << "-------------------------------------------" << endl;
 
-        for(cGMove move : moves){
+        for(cGMove *move : moves){
             cout << "\n" << dec << to_string(idx) << ". ";
-            cout << move.format() << endl;
+            cout << move->format() << endl;
             idx++;
         }
         cout << "-------------------------------------------" << endl;
     }
 
 
-    string concat_fmtmoves(list<cGMove> &moves){
+    string concat_fmtmoves(list<cGMove *> &moves){
         string str_moves = "";
-        for(cGMove move : moves){
-            str_moves += " [" + move.format() + "] ";
+        for(cGMove *move : moves){
+            str_moves += " [" + move->format() + "] ";
         }
         return str_moves;
     }
 
 
-    void append_newmove(cGMove &move, list<cGMove> &newcandidates, list<cGMove> &rcandidates){
+    void append_newmove(cGMove *move, list<cGMove *> &newcandidates, list<cGMove *> &rcandidates){
         rcandidates.clear();
-        rcandidates.push_back(move);
-        for(cGMove newmove : newcandidates){
-            rcandidates.push_back(newmove);
+        rcandidates.push_back(new cGMove(move->src, move->dst, move->prompiece));
+        for(cGMove *newmove : newcandidates){
+            rcandidates.push_back(new cGMove(newmove->src, newmove->dst, newmove->prompiece));
         }
     }
 
 
-    void count_limits(list<cGMove> &moves, uint8_t &badcnt, uint8_t &mediumcnt, uint8_t &highcnt, uint8_t &stormycnt){
+    void clean_moves(list<cGMove *> &moves){
+        for(cGMove *move : moves){
+            delete move;
+        }
+    }
+
+
+    void count_limits(list<cGMove *> &moves, uint8_t &badcnt, uint8_t &mediumcnt, uint8_t &highcnt, uint8_t &stormycnt){
         badcnt = 0;
         mediumcnt = 0;
         highcnt = 0;
         stormycnt = 0;
 
-        for(cGMove move : moves){
-            if(move.presort <= cGMove::PRESORT_STORMY){
+        for(cGMove *move : moves){
+            if(move->presort <= cGMove::PRESORT_STORMY){
                 stormycnt++;
                 continue;
             }
-            else if(move.presort <= cGMove::PRESORT_HIGH){
+            else if(move->presort <= cGMove::PRESORT_HIGH){
                 highcnt++;
                 continue;
             }
-            else if(move.presort <= cGMove::PRESORT_MEDIUM){
+            else if(move->presort <= cGMove::PRESORT_MEDIUM){
                 mediumcnt++;
                 continue;
             }
@@ -64,17 +71,16 @@
     }
 
 
-    bool sortByPresort(cGMove &A, cGMove &B){
-        return (A.presort < B.presort);
+    bool sortByPresort(cGMove *A, cGMove *B){
+        return (A->presort < B->presort);
     }
 
 
-    uint8_t determine_movecnt(cMatch &match, list<cGMove> &moves, uint8_t depth, uint8_t maxdepth){
+    uint8_t determine_movecnt(cMatch &match, list<cGMove *> &moves, uint8_t depth, uint8_t maxdepth){
         if(moves.size() == 0){
             return 0;
         }
-
-        if(depth == 1){
+        else if(depth == 1){
             return moves.size();
         }
         else{ 
@@ -82,42 +88,33 @@
 
             count_limits(moves, badcnt, mediumcnt, highcnt, stormycnt);
 
-            if(depth <= 4){
+            if(depth <= 2){
                 return min(12, (mediumcnt + highcnt + stormycnt));
             }
-            //else if(depth <= 6){
-            //    return highcnt + stormycnt;
-            //}
+            else if(depth <= 5){
+                return min(6, (highcnt + stormycnt));
+            }
             else if(depth <= 7){
-                uint8_t silentcnt = 0;
-
                 if(moves.size() >= 1){ 
                     cMove move = match.minutes.back();
                     if(move.type == MOVE_TYPE["capture"] || move.type == MOVE_TYPE["en-passant"]){
-                        silentcnt = 1;
+                        return min((stormycnt + 1), (int)moves.size());
                     }
                 }
 
-                if(stormycnt + silentcnt <= (uint8_t)moves.size()){
-                    return min(4, (stormycnt + silentcnt));
-                }
-                else{
-                    return min(4, (int)stormycnt);
-                }
+                return stormycnt;
             }
             else{
                 return 0;
             }
         }
-
-        return 0;
     }
 
 
-    int16_t alphabeta(cMatch &match, uint8_t depth, uint8_t maxdepth, int16_t alpha, int16_t beta, bool maximizing, list<cGMove> &rcandidates){
-        list<cGMove> newcandidates;
+    int16_t alphabeta(cMatch &match, uint8_t depth, uint8_t maxdepth, int16_t alpha, int16_t beta, bool maximizing, list<cGMove *> &rcandidates){
+        list<cGMove *> newcandidates;
         int16_t newscore, bestscore;
-        int count = 0;
+        uint8_t count = 0;
 
         if(maximizing){
             bestscore = SCORES[mWKG] * 10;
@@ -126,7 +123,7 @@
             bestscore = SCORES[mBKG] * 10;
         }
 
-        list<cGMove> moves;
+        list<cGMove *> moves;
         cGenerator generator(&match);
         generator.gen_moves(moves);
         moves.sort(sortByPresort);
@@ -153,43 +150,46 @@
 
             return 0;
         }
-
+        
         if(maxcnt == 0){
+            clean_moves(moves);
             return match.score;
         }
 
-        for(cGMove move : moves){
-            count++;
+        for(cGMove *move : moves){
+            ++count;
 
             newcandidates.clear();
 
             if(depth == 1){ 
-                cout << endl << to_string(count) << ": " << move.format() << endl; 
+                cout << endl << to_string(count) << ": " << move->format() << endl; 
             }
-            /*switch(depth){
-                case 9: cout << "."; break;
-                case 7: cout << "?"; break;
-                case 5: cout << "!"; break;
-                case 1: 
-                    cout << endl << to_string(count) << ": " << move.format() << endl;
-                    break;
+            else if(depth == 2){
+                cout << "2*******************************" << endl;
+            }
+            /*else if(depth == 3){
+                cout << "3..............................." << endl;
+            }
+            else if(depth == 5){
+                cout << "5";
+            }
+            else if(depth == 6){ 
+                cout << "6";
+            }
+            else if(depth == 7){ 
+                cout << "7";
             }*/
 
             // ??? tactical draw
+            // clean_moves(moves);
 
-            calccnt += 1;
+            ++calccnt;
 
-            int16_t tmpscore = match.score;
-            match.do_move(move.src, move.dst, move.prompiece);
+            match.do_move(move->src, move->dst, move->prompiece);
 
             newscore = alphabeta(match, depth + 1, maxdepth, alpha, beta, !maximizing, newcandidates);
 
             match.undo_move();
-            if(tmpscore != match.score){
-                cout << endl << to_string(tmpscore) << " " << to_string(match.score);
-                cout << concat_fmtmoves(rcandidates) << endl;
-            }
-            
 
             if(maximizing){
                 if(newscore > bestscore){
@@ -217,13 +217,18 @@
                     }
                 }
             }
+
+            if(count > maxcnt){
+                break;
+            }
         }
 
+        clean_moves(moves);
         return bestscore;
     }
 
 
-    int16_t calc_move(cMatch &match, list<cGMove> &rcandidates){
+    int16_t calc_move(cMatch &match, list<cGMove *> &rcandidates){
         time_t time_start = time(0);
         bool maximizing = match.next_color() == mWHITE;
         int16_t alpha = SCORES[mWKG] * 10;

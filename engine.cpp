@@ -13,14 +13,14 @@
 
     int main(void){
         cMatch match;
-        
+
         match.import("./data/morphy.txt");
 
         match.board.prnt();
 
         cout << "score: " << to_string(match.score) << endl;
 
-        list<cGMove> rcandidates;
+        list<cGMove *> rcandidates;
         calc_move(match, rcandidates);
 
         /*int input;

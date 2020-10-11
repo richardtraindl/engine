@@ -20,22 +20,22 @@
             
             static map<string, uint8_t> SUPPORT;
 
-            void gen_moves(list<cGMove> &moves);
+            void gen_moves(list<cGMove *> &moves);
 
         private:
-            void gen_kg_moves(uint8_t color, list<cGMove> &moves);
+            void gen_kg_moves(uint8_t color, list<cGMove *> &moves);
 
-            void gen_kg_support_moves(list<cLink *> &attackers, list<cGMove> &moves);
+            void gen_kg_support_moves(list<cLink *> &attackers, list<cGMove *> &moves);
 
-            void add_pw_moves(uint64_t src, uint64_t dst, list<cGMove> &moves);
+            void add_pw_moves(uint64_t src, uint64_t dst, list<cGMove *> &moves);
 
             void score_move_presort(cGMove &move);
 
             void set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
 
-            void set_score_for_supporting_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att);
+            void set_score_for_supporting_move(cGMove &move, uint8_t level_for_supp_att);
 
-            void set_score_for_attacking_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att);
+            void set_score_for_attacking_move(cGMove &move, uint8_t level_for_supp_att);
 
             bool is_move_castling(cGMove &move);
 

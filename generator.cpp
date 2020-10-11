@@ -15,7 +15,7 @@
     };
 
 
-    void cGenerator::gen_moves(list<cGMove> &moves){
+    void cGenerator::gen_moves(list<cGMove *> &moves){
         uint64_t pos = mPOS_A1;
         uint8_t color;
         const cStep *steps;
@@ -90,8 +90,8 @@
                                     add_pw_moves(pos, newpos, moves);
                                 }
                                 else if(match->board.tst_en_passant_move(pos, newpos, match->minutes)){
-                                    cGMove move(pos, newpos, mBLK);
-                                    score_move_presort(move);
+                                    cGMove *move = new cGMove(pos, newpos, mBLK);
+                                    score_move_presort(*move);
                                     moves.push_back(move);
                                 }
                             }
@@ -100,23 +100,23 @@
                                     add_pw_moves(pos, newpos, moves);
                                 }
                                 else if(match->board.tst_en_passant_move(pos, newpos, match->minutes)){
-                                    cGMove move(pos, newpos, mBLK);
-                                    score_move_presort(move);
-                                    move.presort -= 5; // score e.p. capture
+                                    cGMove *move = new cGMove(pos, newpos, mBLK);
+                                    score_move_presort(*move);
+                                    move->presort -= 5; // score e.p. capture
                                     moves.push_back(move);
                                 }
                             }
                             else if(piece == mWKG || piece == mBKG){
                                 if(match->board.tst_kg_move(pos, newpos, match->minutes)){
-                                    cGMove move(pos, newpos, mBLK);
-                                    score_move_presort(move);
-                                    if(is_move_castling(move)){ move.presort -= 10; }
+                                    cGMove *move = new cGMove(pos, newpos, mBLK);
+                                    score_move_presort(*move);
+                                    if(is_move_castling(*move)){ move->presort -= 10; }
                                     moves.push_back(move);
                                 }
                             }
                             else{
-                                cGMove move(pos, newpos, mBLK);
-                                score_move_presort(move);
+                                cGMove *move = new cGMove(pos, newpos, mBLK);
+                                score_move_presort(*move);
                                 moves.push_back(move);
                             }
                             if((match->board.field[mIDX_WHITE] & newpos) > 0 || 
@@ -133,7 +133,7 @@
     }
 
 
-    void cGenerator::gen_kg_moves(uint8_t color, list <cGMove> &moves){
+    void cGenerator::gen_kg_moves(uint8_t color, list <cGMove *> &moves){
         uint64_t kg_pos;
         uint8_t king, enemycolor;
         bool tstsquare;
@@ -176,9 +176,9 @@
                     match->board.write(kg_pos, king);
 
                     if(tstsquare == false){
-                        cGMove move(kg_pos, newpos, mBLK);
-                        score_move_presort(move);
-                        move.presort -= 5; // score for fleeing check
+                        cGMove *move = new cGMove(kg_pos, newpos, mBLK);
+                        score_move_presort(*move);
+                        move->presort -= 5; // score for fleeing check
                         moves.push_back(move);
                     }
                 }
@@ -187,7 +187,7 @@
     }
 
 
-    void cGenerator::gen_kg_support_moves(list <cLink *> &attackers, list <cGMove> &moves){
+    void cGenerator::gen_kg_support_moves(list <cLink *> &attackers, list <cGMove *> &moves){
         if(attackers.size() != 1){
             return;
         }
@@ -259,9 +259,9 @@
                         if((step.owner == STEP_OWNER["rook"] && (piece == mWRK || piece == mWQU)) ||
                            (step.owner == STEP_OWNER["bishop"] && (piece == mWBP || piece == mWQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mWKN)){
-                            cGMove move(newpos, pos, mBLK);
-                            score_move_presort(move);
-                            move.presort -= 5; // score for defending check
+                            cGMove *move = new cGMove(newpos, pos, mBLK);
+                            score_move_presort(*move);
+                            move->presort -= 5; // score for defending check
                             moves.push_back(move);
                             break;
                         }
@@ -279,9 +279,9 @@
                         if((step.owner == STEP_OWNER["rook"] && (piece == mBRK || piece == mBQU)) ||
                            (step.owner == STEP_OWNER["bishop"] && (piece == mBBP || piece == mBQU)) ||
                            (step.owner == STEP_OWNER["knight"] && piece == mBKN)){
-                            cGMove move(newpos, pos, mBLK);
-                            score_move_presort(move);
-                            move.presort -= 5; // score for defending check
+                            cGMove *move = new cGMove(newpos, pos, mBLK);
+                            score_move_presort(*move);
+                            move->presort -= 5; // score for defending check
                             moves.push_back(move);
                             break;
                         }
@@ -305,14 +305,14 @@
     }
   
 
-    void cGenerator::add_pw_moves(uint64_t src, uint64_t dst, list <cGMove> &moves){
+    void cGenerator::add_pw_moves(uint64_t src, uint64_t dst, list <cGMove *> &moves){
         if((dst & 0xFF00000000000000) > 0){
             uint8_t pieces[] = { mWQU, mWRK, mWBP, mWKN };
 
             for(uint8_t i = 0; i < 4; ++i){
-                cGMove move(src, dst, pieces[i]);
-                score_move_presort(move);
-                move.presort -= 20; // score for promotion
+                cGMove *move = new cGMove(src, dst, pieces[i]);
+                score_move_presort(*move);
+                move->presort -= 20; // score for promotion
                 moves.push_back(move);
             }
         }
@@ -320,15 +320,15 @@
             uint8_t pieces[] = { mBQU, mBRK, mBBP, mBKN };
 
             for(uint8_t i = 0; i < 4; ++i){
-                cGMove move(src, dst, pieces[i]);
-                score_move_presort(move);
-                move.presort -= 20; // score for promotion
+                cGMove *move = new cGMove(src, dst, pieces[i]);
+                score_move_presort(*move);
+                move->presort -= 20; // score for promotion
                 moves.push_back(move);
             }
         }
         else{
-                cGMove move(src, dst, mBLK);
-                score_move_presort(move);
+                cGMove *move = new cGMove(src, dst, mBLK);
+                score_move_presort(*move);
                 moves.push_back(move);
         }
     }
@@ -349,9 +349,14 @@
         }
         set_score_for_capture_move(move, dst_support, exchange);
 
-        uint8_t level_for_supp_att = determine_level_for_move_supportings_or_attackings(move);
-        set_score_for_supporting_move(move, dst_support, level_for_supp_att);
-        set_score_for_attacking_move(move, dst_support, level_for_supp_att);
+        if(dst_support == SUPPORT["weak"]){
+            move.presort = min(move.presort, cGMove::PRESORT_LOW);
+        }
+        else{
+            uint8_t level_for_supp_att = determine_level_for_move_supportings_or_attackings(move);
+            set_score_for_supporting_move(move, level_for_supp_att);
+            set_score_for_attacking_move(move, level_for_supp_att);
+        }
 
         if(does_move_clear_for_supply(move)){
             if(move.presort < cGMove::PRESORT_HIGH){ 
@@ -490,38 +495,26 @@
     }
 
 
-    void cGenerator::set_score_for_supporting_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att){
-        if(dst_support == SUPPORT["weak"]){
-            move.presort = min(move.presort, cGMove::PRESORT_LOW);
+    void cGenerator::set_score_for_supporting_move(cGMove &move, uint8_t level_for_supp_att){
+        if(level_for_supp_att == 3){
+            move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             return;
         }
-        else{
-            if(level_for_supp_att == 3){
-                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
-                return;
-            }
-            else if(level_for_supp_att == 2){
-                move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
-                return;
-            }
+        else if(level_for_supp_att == 2){
+            move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
+            return;
         }
     }
 
 
-    void cGenerator::set_score_for_attacking_move(cGMove &move, uint8_t dst_support, uint8_t level_for_supp_att){
-        if(dst_support == SUPPORT["weak"]){
-            move.presort = min(move.presort, cGMove::PRESORT_LOW);
+    void cGenerator::set_score_for_attacking_move(cGMove &move, uint8_t level_for_supp_att){
+        if(level_for_supp_att == 3){
+            move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             return;
         }
-        else{
-            if(level_for_supp_att == 3){
-                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
-                return;
-            }
-            else if(level_for_supp_att == 2){
-                move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
-                return;
-            }
+        else if(level_for_supp_att == 2){
+            move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
+            return;
         }
     }
 
@@ -591,13 +584,27 @@
 
     uint8_t cGenerator::determine_level_for_move_supportings_or_attackings(cGMove &move){
         uint8_t piece = match->board.read(move.src);
+        uint8_t dstpiece = match->board.read(move.dst);
         const cStep *steps;
         uint8_t maxidx;
+        uint8_t mvdir = mUNDEF;
         uint8_t level = 0; // none == 0, bad == 1, medium == 2, good == 3
 
-        if(piece == mWRK || piece == mBRK){ steps = cBoard::rk_steps; maxidx = 4; }
-        else if(piece == mWBP || piece == mBBP){ steps = cBoard::bp_steps; maxidx = 4; }
-        else if(piece == mWQU || piece == mBQU){ steps = cBoard::qu_steps; maxidx = 8; }
+        if(piece == mWRK || piece == mBRK){ 
+            steps = cBoard::rk_steps; 
+            maxidx = 4; 
+            if(dstpiece == mBLK){ mvdir = cBoard::dir_for_move(move.src, move.dst); }
+        }
+        else if(piece == mWBP || piece == mBBP){ 
+            steps = cBoard::bp_steps; 
+            maxidx = 4; 
+            if(dstpiece == mBLK){ mvdir = cBoard::dir_for_move(move.src, move.dst); }
+        }
+        else if(piece == mWQU || piece == mBQU){ 
+            steps = cBoard::qu_steps; 
+            maxidx = 8; 
+            if(dstpiece == mBLK){ mvdir = cBoard::dir_for_move(move.src, move.dst); }
+        }
         else if(piece == mWKG || piece == mBKG){ steps = cBoard::kg_steps_generic; maxidx = 8; }
         else if(piece == mWKN || piece == mBKN){ steps = cBoard::kn_steps; maxidx = 8; }
         else if(piece == mWPW){ steps = cBoard::wpw_steps_attack; maxidx = 2; }
@@ -607,6 +614,10 @@
         for(uint8_t i = 0; i < maxidx; ++i){
             cStep step = steps[i];
             
+            if(step.dir == mvdir || step.dir == cBoard::reverse_dir(mvdir)){
+                continue;
+            }
+
             uint64_t newpos = move.dst;
 
             list<uint64_t> white_pos, black_pos;
@@ -643,7 +654,7 @@
                 }
 
                 if(cBoard::is_piece_white(piece)){
-                    if(cBoard::color_of_piece(touched_piece) != mWHITE){
+                    if(cBoard::color_of_piece(touched_piece) == mBLACK){
                         if(PIECES_RANKS[piece] <= PIECES_RANKS[touched_piece] + 1){
                             return 3;
                         }
@@ -663,14 +674,17 @@
                         else if(white_pos.size() < black_pos.size()){
                             return 3;
                         }
+                        else if(black_pos.size() > 0){
+                            return 2;
+                        }
                         else{
-                            level = max((int)level, 2);
+                            level = max((int)level, 1);
                             break;
                         }
                     }
                 }
                 else{
-                    if(cBoard::color_of_piece(touched_piece) != mBLACK){
+                    if(cBoard::color_of_piece(touched_piece) == mWHITE){
                         if(PIECES_RANKS[piece] <= PIECES_RANKS[touched_piece] + 1){
                             return 3;
                         }
@@ -690,8 +704,11 @@
                         else if(black_pos.size() < white_pos.size()){
                             return 3;
                         }
+                        else if(white_pos.size() > 0){
+                            return 2;
+                        }
                         else{
-                            level = max((int)level, 2);
+                            level = max((int)level, 1);
                             break;
                         }
                     }
