@@ -31,6 +31,8 @@
 
             void score_move_presort(cGMove &move);
 
+            bool does_capture_eliminate_attacker(cGMove &move);
+
             void set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
 
             void set_score_for_supporting_attacking_move(cGMove &move, uint8_t level_for_supp_att);

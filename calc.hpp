@@ -15,9 +15,7 @@
 
     using namespace std;
 
-
     extern uint64_t calccnt;
-
 
     void prnt_moves(list<cGMove *> &moves);
 
