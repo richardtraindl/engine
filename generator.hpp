@@ -33,9 +33,7 @@
 
             void set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
 
-            void set_score_for_supporting_move(cGMove &move, uint8_t level_for_supp_att);
-
-            void set_score_for_attacking_move(cGMove &move, uint8_t level_for_supp_att);
+            void set_score_for_supporting_attacking_move(cGMove &move, uint8_t level_for_supp_att);
 
             bool is_move_castling(cGMove &move);
 
@@ -44,6 +42,8 @@
             uint8_t search_lowest(list<uint64_t> &touches);
 
             uint8_t determine_level_for_move_dstfield(cGMove &move, list<uint64_t> &white_touches_on_dst, list<uint64_t> &black_touches_on_dst);
+
+            bool has_piece_double_attack_in_dir(uint64_t pos, uint8_t dir);
 
             bool does_move_clear_for_supply(cGMove &move);
 
