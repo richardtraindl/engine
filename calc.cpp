@@ -12,7 +12,7 @@
 
         for(cGMove *move : moves){
             cout << "\n" << dec << to_string(idx) << ". ";
-            cout << move->format() << endl;
+            cout << move->format(false) << endl;
             idx++;
         }
         cout << "-------------------------------------------" << endl;
@@ -22,7 +22,7 @@
     string concat_fmtmoves(list<cGMove *> &moves){
         string str_moves = "";
         for(cGMove *move : moves){
-            str_moves += " [" + move->format() + "] ";
+            str_moves += " [" + move->format(true) + "] ";
         }
         return str_moves;
     }
@@ -51,15 +51,15 @@
         stormycnt = 0;
 
         for(cGMove *move : moves){
-            if(move->presort <= cGMove::PRESORT_STORMY){
+            if(move->presort < cGMove::PRESORT_HIGH){
                 stormycnt++;
                 continue;
             }
-            else if(move->presort <= cGMove::PRESORT_HIGH){
+            else if(move->presort < cGMove::PRESORT_MEDIUM){
                 highcnt++;
                 continue;
             }
-            else if(move->presort <= cGMove::PRESORT_MEDIUM){
+            else if(move->presort < cGMove::PRESORT_LOW){
                 mediumcnt++;
                 continue;
             }
@@ -88,22 +88,45 @@
 
             count_limits(moves, badcnt, mediumcnt, highcnt, stormycnt);
 
-            if(depth <= 2){
-                return min(12, (mediumcnt + highcnt + stormycnt));
+            if(depth <= 3){
+                if((highcnt + stormycnt) > 12){
+                    return (highcnt + stormycnt);
+                }
+                else{
+                    return min(12, (mediumcnt + highcnt + stormycnt));
+                }
             }
-            else if(depth <= 5){
-                return min(6, (highcnt + stormycnt));
+            else if(depth <= 12){
+                bool exchange = false;
+                uint8_t idx = 0;
+                for(list<cMove>::reverse_iterator it = match.minutes.rbegin(); it != match.minutes.rend(); ++it){
+                    if(it->type == MOVE_TYPE["capture"] || it->type == MOVE_TYPE["en-passant"]){
+                        exchange = true;
+                        break;
+                    }
+                    ++idx;
+                    if(idx >= 2){
+                        break;
+                    }
+                }
+
+                if(exchange){
+                    return min(6, (highcnt + stormycnt));
+                }
+                else{
+                    return 0;
+                }
             }
-            else if(depth <= 9){
+            /*else if(depth <= 12){
                 if(moves.size() >= 1){ 
                     cMove move = match.minutes.back();
                     if(move.type == MOVE_TYPE["capture"] || move.type == MOVE_TYPE["en-passant"]){
-                        return min((stormycnt + 1), (int)moves.size());
+                        return min((stormycnt + 2), (int)moves.size());
                     }
                 }
 
                 return stormycnt;
-            }
+            }*/
             else{
                 return 0;
             }
@@ -162,7 +185,7 @@
             newcandidates.clear();
 
             if(depth == 1){ 
-                cout << endl << to_string(count) << ": " << move->format() << endl; 
+                cout << endl << to_string(count) << ": " << move->format(false) << endl; 
             }
             else if(depth == 2){
                 cout << "2*******************************" << endl;

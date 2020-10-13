@@ -21,14 +21,19 @@
     const uint8_t cGMove::PRESORT_LOW = PRESORT_MEDIUM + PRESORT_STEP;
 
 
-    string cGMove::format(){
+    string cGMove::format(bool core){
         string trailing = "";
 
         if(prompiece != mBLK){
             trailing = ", " + reverse_lookup(PIECES, prompiece);
         }
 
-        return pos_to_coord(src) + " " + pos_to_coord(dst) + " presort: " + to_string(presort) + trailing;
+        if(core){
+            return pos_to_coord(src) + " " + pos_to_coord(dst) + trailing;
+        }
+        else{
+            return pos_to_coord(src) + " " + pos_to_coord(dst) + " presort: " + to_string(presort) + trailing;
+        }
     }
 
 

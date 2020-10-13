@@ -26,7 +26,7 @@
             cGMove(uint64_t src, uint64_t dst, uint8_t prompiece);
             cGMove();
 
-            string format();
+            string format(bool core);
     };
 
 

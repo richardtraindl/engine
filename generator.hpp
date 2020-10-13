@@ -31,9 +31,9 @@
 
             void score_move_presort(cGMove &move);
 
-            bool does_capture_eliminate_attacker(cGMove &move);
+            bool does_capture_eliminate_supporter_attacker(cGMove &move);
 
-            void set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange);
+            void set_score_for_capture_move(cGMove &move, uint8_t dst_support);
 
             void set_score_for_supporting_attacking_move(cGMove &move, uint8_t level_for_supp_att);
 
@@ -62,6 +62,9 @@
             bool is_move_running_pawn(cGMove &move);
 
             bool is_move_tactical_draw(cGMove &move);
+
+            bool leads_move_to_forced_mate(cGMove &move);
+
     };
 
 #endif

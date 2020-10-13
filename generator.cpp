@@ -342,16 +342,7 @@
         list<uint64_t> white_touches_on_dst, black_touches_on_dst;
         uint8_t dst_support = determine_level_for_move_dstfield(move, white_touches_on_dst, black_touches_on_dst);
 
-        bool exchange = false;
-        uint8_t cnt = 0;
-        for(list<cMove>::reverse_iterator it = match->minutes.rbegin(); it != match->minutes.rend(); ++it){
-            if(cnt >= 2){ break; }
-            if(it->type == MOVE_TYPE["capture"] || it->type == MOVE_TYPE["en-passant"]){
-                exchange = true;
-                break;
-            }
-        }
-        set_score_for_capture_move(move, dst_support, exchange);
+        set_score_for_capture_move(move, dst_support);
 
         if(dst_support == SUPPORT["weak"]){
             move.presort = min(move.presort, cGMove::PRESORT_LOW);
@@ -363,11 +354,16 @@
 
         if(does_move_clear_for_supply(move)){
             if(move.presort < cGMove::PRESORT_HIGH){ 
-                move.presort -= 5; 
+                move.presort -= 15; // -5 for double -10 for supply
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_HIGH - 10));
             }
+        }
+
+        if(leads_move_to_forced_mate(move)){
+            move.presort = (cGMove::PRESORT_STORMY - 20);
+            return;
         }
 
         if(is_move_forking(move)){
@@ -375,7 +371,7 @@
                 move.presort -= 5; 
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             }
         }
 
@@ -384,7 +380,7 @@
                 move.presort -= 5; 
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             }
         }
 
@@ -393,7 +389,7 @@
                 move.presort -= 5; 
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             };
         }
 
@@ -402,7 +398,7 @@
                 move.presort -= 5; 
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             }
         }
 
@@ -411,7 +407,7 @@
                 move.presort -= 5; 
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             }
         }
 
@@ -420,7 +416,7 @@
                 move.presort -= 5; 
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             }
         }
 
@@ -429,25 +425,25 @@
                 move.presort -= 5; 
             }
             else{
-                move.presort = min(cGMove::PRESORT_HIGH, move.presort);
+                move.presort = min(move.presort, cGMove::PRESORT_HIGH);
             }
         }
     }
 
 
-    bool cGenerator::does_capture_eliminate_attacker(cGMove &move){
-        uint8_t srcpiece = match->board.read(move.src);
+    bool cGenerator::does_capture_eliminate_supporter_attacker(cGMove &move){
+        //uint8_t srcpiece = match->board.read(move.src);
         uint8_t dstpiece = match->board.read(move.dst);
         const cStep *steps;
         uint8_t maxidx;
 
-        if(srcpiece == mWRK || srcpiece == mBRK){ steps = cBoard::rk_steps; maxidx = 4; }
-        else if(srcpiece == mWBP || srcpiece == mBBP){ steps = cBoard::bp_steps; maxidx = 4; }
-        else if(srcpiece == mWQU || srcpiece == mBQU){ steps = cBoard::qu_steps; maxidx = 8; }
-        else if(srcpiece == mWKG || srcpiece == mBKG){ steps = cBoard::kg_steps_generic; maxidx = 8; }
-        else if(srcpiece == mWKN || srcpiece == mBKN){ steps = cBoard::kn_steps; maxidx = 8; }
-        else if(srcpiece == mWPW){ steps = cBoard::wpw_steps_attack; maxidx = 2; }
-        else if(srcpiece == mBPW){ steps = cBoard::bpw_steps_attack; maxidx = 2; }
+        if(dstpiece == mWRK || dstpiece == mBRK){ steps = cBoard::rk_steps; maxidx = 4; }
+        else if(dstpiece == mWBP || dstpiece == mBBP){ steps = cBoard::bp_steps; maxidx = 4; }
+        else if(dstpiece == mWQU || dstpiece == mBQU){ steps = cBoard::qu_steps; maxidx = 8; }
+        else if(dstpiece == mWKG || dstpiece == mBKG){ steps = cBoard::kg_steps_generic; maxidx = 8; }
+        else if(dstpiece == mWKN || dstpiece == mBKN){ steps = cBoard::kn_steps; maxidx = 8; }
+        else if(dstpiece == mWPW){ steps = cBoard::wpw_steps_attack; maxidx = 2; }
+        else if(dstpiece == mBPW){ steps = cBoard::bpw_steps_attack; maxidx = 2; }
         else{ return false; }
 
         for(uint8_t i = 0; i < maxidx; ++i){
@@ -479,30 +475,46 @@
 
                 uint8_t touched_piece = match->board.read(newpos);
 
-                if(cBoard::color_of_piece(dstpiece) == cBoard::color_of_piece(touched_piece)){
-                    break;
-                }
-
                 cPin *cpin = match->board.determine_pins(cBoard::color_of_piece(touched_piece));
                 if(cpin->is_pinned(newpos) > 0){
                     return true;
                 }
 
-                if(PIECES_RANKS[dstpiece] < PIECES_RANKS[touched_piece]){
-                    return true;
-                }
-
                 match->board.determine_touches_on_square(newpos, white_pos, black_pos);
 
-                if(cBoard::is_piece_white(touched_piece)){
-                    if(white_pos.size() <= black_pos.size()){
-                        return true;
+                if(cBoard::color_of_piece(dstpiece) == cBoard::color_of_piece(touched_piece)){
+                    if(touched_piece == mWKG || touched_piece == mBKG){
+                        break;
                     }
+                    if(cBoard::is_piece_white(touched_piece)){
+                        if(black_pos.size() > 0 &&
+                           white_pos.size() >= black_pos.size()){
+                            return true;
+                        }
+                    }
+                    else{
+                        if(white_pos.size() > 0 && 
+                           black_pos.size() >= white_pos.size()){
+                            return true;
+                        }
+                    }
+                    break;
                 }
                 else{
-                    if(black_pos.size() <= white_pos.size()){
+                    if(PIECES_RANKS[dstpiece] < PIECES_RANKS[touched_piece]){
                         return true;
                     }
+                    if(cBoard::is_piece_white(touched_piece)){
+                        if(white_pos.size() <= black_pos.size()){
+                            return true;
+                        }
+                    }
+                    else{
+                        if(black_pos.size() <= white_pos.size()){
+                            return true;
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -511,7 +523,7 @@
     }
 
 
-    void cGenerator::set_score_for_capture_move(cGMove &move, uint8_t dst_support, bool exchange){
+    void cGenerator::set_score_for_capture_move(cGMove &move, uint8_t dst_support){
         uint8_t src_piece = match->board.read(move.src);
         uint8_t dst_piece = match->board.read(move.dst);
 
@@ -519,50 +531,69 @@
             return;
         }
 
+        bool exchange = false;
+        uint64_t captured_pos = 0;
+        uint8_t cnt = 0;
+        for(list<cMove>::reverse_iterator it = match->minutes.rbegin(); it != match->minutes.rend(); ++it){
+            if(it->type == MOVE_TYPE["capture"] || it->type == MOVE_TYPE["en-passant"]){
+                if(cnt == 0){
+                    captured_pos = it->dst;
+                }
+                exchange = true;
+                break;
+            }
+            ++cnt;
+            if(cnt >= 2){ break; }
+        }
+
         int8_t adjust = 0;
         if(exchange){
-            adjust = -10;
+            if(captured_pos == move.dst){
+                move.presort = min((int)move.presort, (int)cGMove::PRESORT_STORMY);
+                return;
+            }
+            adjust = cGMove::PRESORT_STEP;
         }
 
         // en passant
         if(dst_piece == mBLK){ 
-            move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
+            move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_HIGH - adjust));
             return;
         }
 
         // capture of higher peace is always fine!
         if(PIECES_RANKS[src_piece] < PIECES_RANKS[dst_piece]){
-            move.presort = min((int)move.presort, cGMove::PRESORT_STORMY + adjust);
+            move.presort = min(move.presort, cGMove::PRESORT_STORMY);
             return;
         }
         
-        if(does_capture_eliminate_attacker(move)){
-            move.presort = min((int)move.presort, cGMove::PRESORT_STORMY + adjust);
+        if(does_capture_eliminate_supporter_attacker(move)){
+            move.presort = min(move.presort, cGMove::PRESORT_STORMY);
             return;
         }
 
         if(PIECES_RANKS[src_piece] == PIECES_RANKS[dst_piece]){
             if(dst_support == SUPPORT["good"] || dst_support == SUPPORT["none"]){
-                move.presort = min((int)move.presort, cGMove::PRESORT_STORMY + adjust);
+                move.presort = min(move.presort, cGMove::PRESORT_STORMY);
                 return;
             }
             else if(dst_support == SUPPORT["equal"]){
-                move.presort = min((int)move.presort, cGMove::PRESORT_HIGH + adjust);
+                move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_HIGH - adjust));
                 return;
             }
             else{ // dst_support == SUPPORT["low"]
-                move.presort = min((int)move.presort, cGMove::PRESORT_MEDIUM + adjust);
+                move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_MEDIUM - adjust));
                 return;
             }
         }
         else{ // PIECES_RANKS[src_piece] > PIECES_RANKS[dst_piece]
             if(PIECES_RANKS[src_piece] <= PIECES_RANKS[dst_piece] + PIECES_RANKS[PIECES["wPw"]] &&
                (dst_support == SUPPORT["good"] || dst_support == SUPPORT["none"])){
-                move.presort = min((int)move.presort, cGMove::PRESORT_MEDIUM + adjust);
+                move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_MEDIUM - adjust));
                 return;
             }
             else{
-                move.presort = min((int)move.presort, cGMove::PRESORT_LOW + adjust + 5);
+                move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_LOW - adjust));
                 return;
             }
         }
@@ -571,11 +602,11 @@
 
     void cGenerator::set_score_for_supporting_attacking_move(cGMove &move, uint8_t level_for_supp_att){
         if(level_for_supp_att == 3){
-            move.presort = min(move.presort, cGMove::PRESORT_HIGH);
+            move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_HIGH - 10));
             return;
         }
         else if(level_for_supp_att == 2){
-            move.presort = min(move.presort, cGMove::PRESORT_MEDIUM);
+            move.presort = min(move.presort, (uint8_t)(cGMove::PRESORT_MEDIUM - 10));
             return;
         }
     }
@@ -942,3 +973,8 @@
         return false;
     }
 
+
+    bool cGenerator::leads_move_to_forced_mate(cGMove &move){
+        // ???
+        return false;
+    }

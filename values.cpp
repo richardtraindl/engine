@@ -55,15 +55,15 @@
     map<uint8_t, int16_t> SCORES = {
         {PIECES["blk"], 0},
         {PIECES["wPw"], -10},
-        {PIECES["wKn"], -34},
-        {PIECES["wBp"], -34},
-        {PIECES["wRk"], -45},
+        {PIECES["wKn"], -32},
+        {PIECES["wBp"], -32},
+        {PIECES["wRk"], -43},
         {PIECES["wQu"], -90},
         {PIECES["wKg"], -2000},
         {PIECES["bPw"], 10},
-        {PIECES["bKn"], 34},
-        {PIECES["bBp"], 34},
-        {PIECES["bRk"], 45},
+        {PIECES["bKn"], 32},
+        {PIECES["bBp"], 32},
+        {PIECES["bRk"], 43},
         {PIECES["bQu"], 90},
         {PIECES["bKg"], 2000}
     };
