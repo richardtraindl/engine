@@ -354,4 +354,7 @@
     extern map<string, uint8_t> STEP_OWNER;
 
     extern map<string, uint8_t> MOVE_TYPE;
+
+    extern map<string, uint8_t> SUPPORT_LEVELS;
+
 #endif

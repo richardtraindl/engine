@@ -71,18 +71,18 @@
 
     map<uint8_t, int16_t> REVERSED_SCORES = {
         {PIECES["blk"], 0},
-        {PIECES["wPw"], 10},
-        {PIECES["wKn"], 34},
-        {PIECES["wBp"], 34},
-        {PIECES["wRk"], 45},
-        {PIECES["wQu"], 90},
-        {PIECES["wKg"], 2000},
-        {PIECES["bPw"], -10},
-        {PIECES["bKn"], -34},
-        {PIECES["bBp"], -34},
-        {PIECES["bRk"], -45},
-        {PIECES["bQu"], -90},
-        {PIECES["bKg"], -2000}
+        {PIECES["wPw"], SCORES[PIECES["bPw"]]},
+        {PIECES["wKn"], SCORES[PIECES["bKn"]]},
+        {PIECES["wBp"], SCORES[PIECES["bBp"]]},
+        {PIECES["wRk"], SCORES[PIECES["bRk"]]},
+        {PIECES["wQu"], SCORES[PIECES["bQu"]]},
+        {PIECES["wKg"], SCORES[PIECES["bKg"]]},
+        {PIECES["bPw"], SCORES[PIECES["wPw"]]},
+        {PIECES["bKn"], SCORES[PIECES["wKn"]]},
+        {PIECES["bBp"], SCORES[PIECES["wBp"]]},
+        {PIECES["bRk"], SCORES[PIECES["wRk"]]},
+        {PIECES["bQu"], SCORES[PIECES["wQu"]]},
+        {PIECES["bKg"], SCORES[PIECES["wKg"]]}
     };
 
 
@@ -102,5 +102,13 @@
         {"en-passant", 3},
         {"short-castling", 4}, 
         {"long-castling", 5}
+    };
+
+
+    map<string, uint8_t> SUPPORT_LEVELS = {
+        {"none", 1},
+        {"weak", 2}, 
+        {"equal", 3}, 
+        {"good", 4}
     };
 

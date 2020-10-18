@@ -858,7 +858,6 @@
 
                 // enemy found because of checks above
                 uint8_t enemy = read(newpos);
-
                 if(step.owner == STEP_OWNER["rook"] &&
                    (enemy == mWRK || enemy == mBRK || enemy == mWQU || enemy == mBQU) && 
                    friend_pos > 0){
@@ -1051,15 +1050,14 @@
     bool cBoard::tst_wpw_move(uint64_t pos, uint64_t newpos){
         // check, if field after one step forward is blank
         if((pos >> 8) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0;
+            return is_square_blank(newpos);
         }
         // check, if fields after two step forward are blank
-        else if((pos >> 16) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0 && 
-                   (field[mIDX_WHITE] & (pos >> 8)) == 0 && (field[mIDX_BLACK] & (pos >> 8)) == 0;
+        else if((pos & 0x00FF000000000000) > 0 && (pos >> 16) == newpos){
+            return is_square_blank(newpos) && is_square_blank((pos >> 8));
         }
         else if((pos >> 9) == newpos || (pos >> 7) == newpos){
-            return (field[mIDX_BLACK] & newpos) > 0;
+            return is_square_black_occupied(newpos);
         }
         else{
             return false;
@@ -1070,15 +1068,14 @@
     bool cBoard::tst_bpw_move(uint64_t pos, uint64_t newpos){
         // check, if field after one step forward is blank
         if((pos << 8) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0;
+            return is_square_blank(newpos);
         }
         // check, if fields after two step forward are blank
-        else if((pos << 16) == newpos){
-            return (field[mIDX_WHITE] & newpos) == 0 && (field[mIDX_BLACK] & newpos) == 0 && 
-                   (field[mIDX_WHITE] & (pos << 8)) == 0 && (field[mIDX_BLACK] & (pos << 8)) == 0;
+        else if((pos & 0x000000000000FF00) > 0 && (pos << 16) == newpos){
+            return is_square_blank(newpos) && is_square_blank((pos << 8));
         }
         else if((pos << 9) == newpos || (pos << 7) == newpos){
-            return (field[mIDX_WHITE] & newpos) > 0;
+            return is_square_white_occupied(newpos);
         }
         else{
             return false;

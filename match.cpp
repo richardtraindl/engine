@@ -19,8 +19,8 @@
         }
 
         for(cMove move : match.minutes){
-            minutes.push_back(move); 
-            //(*new cMove(move.prevfields, move.src, move.dst, move.prompiece)));
+            cMove newmove = cMove(move.type, move.src, move.dst, move.prompiece, move.prev_field);
+            minutes.push_back(newmove);
         }
     } // copy constructor
 
@@ -63,7 +63,7 @@
     };
 
 
-    int cMatch::next_color(){
+    uint8_t cMatch::next_color(){
         if(minutes.size() % 2 == 0){
             return mWHITE;
         }
@@ -273,9 +273,9 @@
 
     uint8_t cMatch::eval_status(){
         list<cGMove *> moves;
-        cGenerator generator(this);
 
-        generator.gen_moves(moves);
+        gen_moves(*this, moves);
+
         if(moves.size() > 0){
             return STATUS["open"];
         }
@@ -294,6 +294,24 @@
             }
         }
         return STATUS["draw"];
+    }
+
+
+    bool cMatch::is_check(){
+        if(next_color() == mWHITE){
+            uint64_t kg_pos = board.read_wkg_pos();
+            if(board.is_square_enemy_touched(mBLACK, kg_pos)){
+                return true;
+            }
+        }
+        else{
+            uint64_t kg_pos = board.read_bkg_pos();
+            if(board.is_square_enemy_touched(mWHITE, kg_pos)){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

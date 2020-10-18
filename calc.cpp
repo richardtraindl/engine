@@ -114,23 +114,84 @@
                     return min(6, (highcnt + stormycnt));
                 }
                 else{
-                    return 0;
+                    return min((uint8_t)3, stormycnt);
                 }
             }
-            /*else if(depth <= 12){
-                if(moves.size() >= 1){ 
-                    cMove move = match.minutes.back();
-                    if(move.type == MOVE_TYPE["capture"] || move.type == MOVE_TYPE["en-passant"]){
-                        return min((stormycnt + 2), (int)moves.size());
-                    }
-                }
-
-                return stormycnt;
-            }*/
             else{
                 return 0;
             }
         }
+    }
+
+
+    uint8_t search_for_checkmate(cMatch &match, list<cGMove *> &moves){
+        for(cGMove *move : moves){
+            match.do_move(move->src, move->dst, move->prompiece);
+
+            bool check = match.is_check();
+
+            //cMatch *newmatch = new cMatch(match);
+
+            uint8_t color = _search_for_checkmate(match, check, 1, 3);
+
+            //delete newmatch;
+
+            match.undo_move();
+
+            if(color != mBLK){
+                return color;
+            }
+        }
+
+        return mBLK;
+    }
+
+
+    uint8_t _search_for_checkmate(cMatch &match, bool prev_check, uint8_t count, uint8_t maxcnt){
+        list<cGMove *> moves;
+        gen_moves(match, moves);
+
+        if(moves.size() == 0){
+            if(match.is_check()){
+                return match.next_color();
+            }
+            else{
+                return mBLK;
+            }
+        }
+
+        if(count >= maxcnt){
+            for(cGMove *move : moves){
+                delete move;
+            }
+            return mBLK;
+        }
+
+        for(cGMove *move : moves){
+            match.do_move(move->src, move->dst, move->prompiece);
+
+            bool check = match.is_check();
+
+            uint8_t color = mBLK;
+
+            if(prev_check == true || check == true){
+                color = _search_for_checkmate(match, check, count + 1, maxcnt);
+            }
+
+            match.undo_move();
+
+            if(color != mBLK){ 
+                for(cGMove *move : moves){
+                    delete move;
+                }
+                return color; 
+            }
+        }
+
+        for(cGMove *move : moves){
+            delete move;
+        }
+        return mBLK;
     }
 
 
@@ -147,8 +208,7 @@
         }
 
         list<cGMove *> moves;
-        cGenerator generator(&match);
-        generator.gen_moves(moves);
+        gen_moves(match, moves);
         moves.sort(sortByPresort);
         uint8_t maxcnt = determine_movecnt(match, moves, depth, maxdepth);
 
@@ -173,10 +233,26 @@
 
             return 0;
         }
-        
+
         if(maxcnt == 0){
-            clean_moves(moves);
-            return match.score;
+            if(depth <= 12){
+                uint8_t color = search_for_checkmate(match, moves);
+
+                clean_moves(moves);
+
+                if(color == mBLK){ 
+                    return match.score;
+                }
+                else if(color == mWHITE){ 
+                    return SCORES[mWKG] * 3;
+                }
+                else{
+                    return SCORES[mBKG] * 3;
+                }
+            }
+            else{
+                return match.score;
+            }
         }
 
         for(cGMove *move : moves){
@@ -190,30 +266,18 @@
             else if(depth == 2){
                 cout << "2*******************************" << endl;
             }
-            /*else if(depth == 3){
-                cout << "3..............................." << endl;
-            }
-            else if(depth == 5){
-                cout << "5";
-            }
-            else if(depth == 6){ 
-                cout << "6";
-            }
-            else if(depth == 7){ 
-                cout << "7";
-            }*/
 
             // ??? tactical draw
             // clean_moves(moves);
 
             ++calccnt;
-
+            
             match.do_move(move->src, move->dst, move->prompiece);
 
             newscore = alphabeta(match, depth + 1, maxdepth, alpha, beta, !maximizing, newcandidates);
 
             match.undo_move();
-
+            
             if(maximizing){
                 if(newscore > bestscore){
                     bestscore = newscore;

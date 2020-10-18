@@ -36,7 +36,7 @@
             
             ~cMatch();
 
-            int next_color();
+            uint8_t next_color();
 
             bool is_opening();
 
@@ -51,6 +51,8 @@
             bool undo_move();
             
             uint8_t eval_status();
+
+            bool is_check();
 
             void prnt_minutes();
 

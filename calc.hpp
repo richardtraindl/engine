@@ -31,6 +31,10 @@
 
     uint8_t determine_movecnt(cMatch &match, list<cGMove *> &moves, uint8_t depth, uint8_t maxdepth);
 
+    uint8_t search_for_checkmate(cMatch &match, list<cGMove *> &moves);
+
+    uint8_t _search_for_checkmate(cMatch &match, bool prev_check, uint8_t count, uint8_t maxcnt);
+
     int16_t alphabeta(cMatch &match, uint8_t depth, uint8_t maxdepth, int16_t alpha, int16_t beta, bool maximizing, list<cGMove *> &rcandidates);
 
     int16_t calc_move(cMatch &match, list<cGMove *> &rcandidates);
