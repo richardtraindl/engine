@@ -235,7 +235,7 @@
         }
 
         if(maxcnt == 0){
-            if(depth <= 12){
+            /*if(depth <= 12){
                 uint8_t color = search_for_checkmate(match, moves);
 
                 clean_moves(moves);
@@ -250,9 +250,9 @@
                     return SCORES[mBKG] * 3;
                 }
             }
-            else{
+            else{*/
                 return match.score;
-            }
+            //}
         }
 
         for(cGMove *move : moves){
