@@ -7,12 +7,25 @@
     #include "./match.hpp"
     #include "./move.hpp"
     #include "./values.hpp"
+    #include "./bitmaps/mates.hpp"
 
     using namespace std;
 
 
     int main(void){
         cMatch match;
+        
+        for(uint8_t i = 0; i < 8; ++i){
+            match.board.fields[i] = white_backrank_mates[i];
+        }
+        match.board.prnt();
+
+        for(uint8_t i = 0; i < 8; ++i){
+            match.board.fields[i] = black_backrank_mates[i];
+        }
+        match.board.prnt();
+
+        cout << "********************************" << endl;
 
         match.import("./data/morphy.txt");
 
