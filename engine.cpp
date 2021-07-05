@@ -44,14 +44,17 @@
                 uint8_t status = match.eval_status();
                     
                 if(status == match.STATUS_WINNER_WHITE){
+                    match.prnt_minutes();
                     cout << "winner white" << " --- good bye!\n" << endl;
                     return;
                 }
                 else if(status == match.STATUS_WINNER_BLACK){
+                    match.prnt_minutes();
                     cout << "winner black" << " --- good bye!\n" << endl;
                     return;
                 }
                 else if(status == match.STATUS_DRAW){
+                    match.prnt_minutes();
                     cout << "draw" << " --- good bye!\n" << endl;
                     return;
                 }
@@ -66,16 +69,26 @@
                 }
 
                 if(input == "u" || input == "U"){
-                    match.undo_move(); // undo last engine move
-                    match.undo_move(); // undo last human move
+                    if(engine_color == mWHITE || engine_color == mBLACK){
+                        match.undo_move(); // undo last engine move
+                        match.undo_move(); // undo last human move
+                    }
+                    else{
+                        match.undo_move(); // undo last human move
+                    }
                     match.board.prnt();
                     continue;
                 }
-                
+
+                if(input == "p" || input == "P"){
+                    match.prnt_minutes();
+                    continue;
+                }
+
                 if(input == "r" || input == "R"){
                     match.reset();
 
-                    ifstream file("game001.txt");
+                    ifstream file("game004.txt");
                     string content;
 
                     while(file >> content) {
@@ -168,7 +181,7 @@
 
         uint8_t maxdepth = 5;
 
-        uint8_t engine_color = mWHITE;
+        uint8_t engine_color = mBLACK;
 
         bool with_threads = true;
 

@@ -176,7 +176,7 @@
         uint8_t depth = 1;
 
         if(with_threads){
-            const uint8_t maxthreads = 4;
+            const uint8_t maxthreads = 8;
 
             array<vector<cMove>, maxthreads> candidates;
 
@@ -1339,7 +1339,7 @@
             bool skip = false;
 
             if(depth == 1){
-                if(threadid != 0 && (count % 4) + 1 != threadid){ 
+                if(threadid != 0 && (count % 8) + 1 != threadid){ 
                     continue;
                 }
 
@@ -1463,7 +1463,7 @@
 
         // opening - check pawns
         if(minutes.size() <= 20){
-            
+
             // penalty for move repetition
             if(minutes.size() >= 2){
                 uint8_t prev_prev_pos = minutes.size() - 2;
@@ -1535,12 +1535,26 @@
             for(cPiece wpiece : wpieces){
                 if(wpiece.piece == mWPW){
                     rscore += SCORES[mWPLUS];
+                    if(wpiece.src_y == 3){
+                        rscore += SCORES[mWPLUS]; // addition plus for 4th rank
+                    }
                 }
             }
             for(cPiece bpiece : bpieces){
                 if(bpiece.piece == mBPW){
                     rscore += SCORES[mBPLUS];
+                    if(bpiece.src_y == 4){
+                        rscore += SCORES[mBPLUS]; // addition plus for 5th rank
+                    }
                 }
+            }
+            
+            // penalty for f2 / f7 moved pawns
+            if(board.getfield(5, 1) == mBLK){
+                rscore += SCORES[mBPLUS] * 3; // penalty
+            }
+            else if(board.getfield(5, 6) == mBLK){
+                rscore += SCORES[mWPLUS] * 3; // penalty
             }
 
         }
