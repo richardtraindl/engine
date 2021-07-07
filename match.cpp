@@ -4,7 +4,10 @@
 
 
     // debug
-    //bool bug = false;
+    //bool debug = false;
+
+
+    const uint8_t MAXTHREADS = 4;
 
 
     cMatch::cMatch(){ 
@@ -163,7 +166,7 @@
     }
 
 
-    void cMatch::calc_move(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth, bool with_threads){
+    void cMatch::calc_move(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth){
 
         time_t time_start = time(0);
 
@@ -175,24 +178,22 @@
 
         uint8_t depth = 1;
 
-        if(with_threads){
-            const uint8_t maxthreads = 8;
+        if(MAXTHREADS > 1){
+            array<vector<cMove>, MAXTHREADS> candidates;
 
-            array<vector<cMove>, maxthreads> candidates;
+            array<cMatch*, MAXTHREADS> matches;
 
-            array<cMatch*, maxthreads> matches;
+            thread threads[MAXTHREADS];
 
-            thread threads[maxthreads];
+            int32_t scores[MAXTHREADS];
 
-            int32_t scores[maxthreads];
-
-            for(uint8_t idx = 0; idx < maxthreads; ++idx){
+            for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
                 cMatch *match = new cMatch(*this);
                 matches[idx] = match; //new cMatch(*this);
                 threads[idx] = thread(&cMatch::alphabeta, match, ref(scores[idx]), ref(candidates[idx]), depth, maxdepth, alpha, beta, maximizing, idx + 1);
             }
 
-            for(uint8_t idx = 0; idx < maxthreads; ++idx){
+            for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
                 threads[idx].join();
                 cout << "\nthread #" << (idx + 1) << " joined ";
                 cout << scores[idx] << " " << fmt_moves(candidates[idx]) << endl;
@@ -201,7 +202,7 @@
 
             calc_score = scores[0];
             moves.assign(candidates[0].begin(), candidates[0].end());
-            for(uint8_t idx = 1; idx < maxthreads; ++idx){
+            for(uint8_t idx = 1; idx < MAXTHREADS; ++idx){
                 if(maximizing){
                     if(scores[idx] > calc_score){
                         calc_score = scores[idx];
@@ -221,6 +222,31 @@
         else{
             alphabeta(calc_score, moves, depth, maxdepth, alpha, beta, maximizing, 0);
         }
+
+        cout << "\nmatch score: " << score;
+
+        cout << "\nresult: " << calc_score;
+
+        cout << "\n" << fmt_moves(moves) << endl;
+
+        prnt_fmttime("\ncalc-time: ", time(0) - time_start);
+
+    }
+
+
+    void cMatch::calc_move_v2(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth){
+
+        time_t time_start = time(0);
+
+        bool maximizing = (next_color() == mWHITE);
+
+        int32_t alpha = SCORES[mWKG] * 10;
+
+        int32_t beta = SCORES[mBKG] * 10;
+
+        uint8_t depth = 1;
+
+        alphabeta_v2(calc_score, moves, depth, maxdepth, alpha, beta, maximizing, 0);
 
         cout << "\nmatch score: " << score;
 
@@ -1313,7 +1339,7 @@
         u_int8_t count = 0;
 
         // debug
-        //if(bug == true){
+        //if(debug == true){
         //    calc_score = 0;
         //    return;
         //}
@@ -1339,11 +1365,12 @@
             bool skip = false;
 
             if(depth == 1){
-                if(threadid != 0 && (count % 8) + 1 != threadid){ 
+                if(threadid != 0 && (count % MAXTHREADS) + 1 != threadid){ 
+                    this_thread::sleep_for(chrono::milliseconds(100));
                     continue;
                 }
 
-                cout << "\n(" << to_string(moves.size()) << ") " << to_string(count) << " CURRENT SEARCH from thread #" << to_string(threadid) << ": [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
+                cout << "\n" << to_string(count) << "(" + to_string(moves.size()) + ") CURRENT SEARCH from thread #" << to_string(threadid) << ": [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
             }
 
             if(depth > maxdepth){
@@ -1374,7 +1401,7 @@
                 alphabeta(newscore, newcandidates, depth + 1, maxdepth, alpha, beta, !maximizing, threadid);
 
                 // debug
-                //if(bug == true){
+                //if(debug == true){
                 //    calc_score = 0;
                 //    return;
                 //}
@@ -1387,7 +1414,174 @@
                 //cout << "bug found: " << move->format() << endl;
                 //board.prnt();
                 //prnt_minutes();
-                //bug = true;
+                //debug = true;
+                //return 0;
+            //}
+
+            if(maximizing){
+                if(newscore > bestscore){
+                    bestscore = newscore;
+                    alpha = max(bestscore, alpha);
+                    append_newmove(rcandidates, newcandidates, move);
+                    if(depth == 1){
+                        cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
+                    }
+                    if(alpha >= beta){
+                        break;
+                    }
+                }
+            }
+            else{
+                if(newscore < bestscore){
+                    bestscore = newscore;
+                    beta = min(bestscore, beta);
+                    append_newmove(rcandidates, newcandidates, move);
+                    if(depth == 1){
+                        cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
+                    }
+                    if(beta <= alpha){
+                        break;
+                    }
+                }
+            }
+        }
+
+        moves.clear();
+
+        calc_score = bestscore;
+
+    }
+
+
+    void cMatch::alphabeta_v2(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid){
+
+        vector<cMove> newcandidates;
+        int32_t newscore, bestscore;
+        u_int8_t count = 0;
+
+        // debug
+        //if(debug == true){
+        //    calc_score = 0;
+        //    return;
+        //}
+
+        if(maximizing){
+            bestscore = SCORES[mWKG] * 10;
+        }
+        else{
+            bestscore = SCORES[mBKG] * 10;
+        }
+
+        vector<cMove> moves;
+        gen_moves(moves, next_color());
+
+        if(is_calc_term(calc_score, moves, depth)){
+            moves.clear();
+            return;
+        }
+
+        for(cMove move : moves){
+            count++;
+            newcandidates.clear();
+            bool skip = false;
+
+            
+            if(depth == 1){
+                cout << "\n" << to_string(count) << "(" + to_string(moves.size()) + ") CURRENT SEARCH from thread #" << to_string(threadid) << ": [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
+            }
+
+            if(depth == 5){
+                if(threadid != 0 && (count % MAXTHREADS) + 1 != threadid){ 
+                    continue;
+                }
+            }
+
+            if(depth > maxdepth){
+                // skip move if filter says move is not worth to search deeper...
+                if(filter(move, depth) == false){
+                    newscore = score + eval_board(move);
+                    skip = true;
+                }
+            }
+
+            //if(depth > 5 && depth <= 15){ 
+            //    cout << ". "; 
+            //}
+            //else if(depth > 15 && depth <= 20){ 
+            //    cout << ": "; 
+            //}
+            //else if(depth > 20){ 
+            //    cout << "_ ";
+            //}
+
+            if(skip == false){
+                // debug
+                //uint8_t newfields[8][8];
+                //board.debug_copy_fields(newfields);
+
+                do_move(move);
+
+                if(depth == 4 && MAXTHREADS > 1){
+
+                    array<vector<cMove>, MAXTHREADS> candidates;
+
+                    array<cMatch*, MAXTHREADS> matches;
+
+                    thread threads[MAXTHREADS];
+
+                    int32_t scores[MAXTHREADS];
+
+                    for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
+                        cMatch *match = new cMatch(*this);
+                        matches[idx] = match; //new cMatch(*this);
+                        threads[idx] = thread(&cMatch::alphabeta, match, ref(scores[idx]), ref(candidates[idx]), depth + 1, maxdepth, alpha, beta, maximizing, idx + 1);
+                    }
+
+                    for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
+                        threads[idx].join();
+                        //cout << "\nthread #" << (idx + 1) << " joined ";
+                        //cout << scores[idx] << " " << fmt_moves(candidates[idx]) << endl;
+                        delete matches[idx];
+                    }
+
+                    newscore = scores[0];
+                    newcandidates.assign(candidates[0].begin(), candidates[0].end());
+                    for(uint8_t idx = 1; idx < MAXTHREADS; ++idx){
+                        if(maximizing){
+                            if(scores[idx] > newscore){
+                                newscore = scores[idx];
+                                newcandidates.clear();
+                                newcandidates.assign(candidates[idx].begin(), candidates[idx].end());
+                            }
+                        }
+                        else{
+                            if(scores[idx] < newscore){
+                                newscore = scores[idx];
+                                newcandidates.clear();
+                                newcandidates.assign(candidates[idx].begin(), candidates[idx].end());
+                            }
+                        }
+                    }
+                }
+                else{
+                    alphabeta(newscore, newcandidates, depth + 1, maxdepth, alpha, beta, !maximizing, threadid);
+                }
+
+                // debug
+                //if(debug == true){
+                //    calc_score = 0;
+                //    return;
+                //}
+
+                undo_move();
+            }
+
+            // debug
+            //if(board.debug_check_flags() == false || board.debug_compare_fields(newfields) == false){
+                //cout << "bug found: " << move->format() << endl;
+                //board.prnt();
+                //prnt_minutes();
+                //debug = true;
                 //return 0;
             //}
 
@@ -1461,7 +1655,7 @@
 
         int32_t rscore = 0;
 
-        // opening - check pawns
+        // opening
         if(minutes.size() <= 20){
 
             // penalty for move repetition
@@ -1555,6 +1749,95 @@
             }
             else if(board.getfield(5, 6) == mBLK){
                 rscore += SCORES[mWPLUS] * 3; // penalty
+            }
+
+        }
+        
+        // opening and middlegame
+        if(minutes.size() <= 32){
+            
+            int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
+
+            //weak white king?
+            for(uint8_t i = 0; i < 8; ++i){
+                vector <cPiece> wpieces, bpieces;
+
+                board.setfield(board.wKg_x, board.wKg_y, mBLK);
+
+                if(board.is_inbounds(board.wKg_x + steps[i][0], board.wKg_y + steps[i][1])){
+                    board.search_for_all_touching_pieces(wpieces, bpieces, board.wKg_x + steps[i][0], board.wKg_y + steps[i][1]);
+
+                    if(wpieces.size() < bpieces.size()){
+                        rscore += SCORES[mBPLUS] * 3; // penalty
+                        board.setfield(board.wKg_x, board.wKg_y, mWKG);
+                        break;
+                    }
+                }
+                board.setfield(board.wKg_x, board.wKg_y, mWKG);
+            }
+
+            vector<cPiece> wpieces;
+            board.search_dir_for_pieces(wpieces, board.wKg_x, board.wKg_y, 0, 1);
+
+            if(wpieces.size() == 2){
+                cPiece second = wpieces.at(1);
+                if(second.piece == mBRK || second.piece == mBQU){
+                    rscore += SCORES[mBPLUS] * 3; // penalty
+                }
+            }
+            else if(wpieces.size() > 2){
+                cPiece first = wpieces.at(0);
+                cPiece second = wpieces.at(1);
+                cPiece third = wpieces.at(2);
+                if(second.piece == mBRK || second.piece == mBQU){
+                    rscore += SCORES[mBPLUS] * 3; // penalty
+                }
+                else if((third.piece == mBRK || third.piece == mBQU)){
+                    if((first.piece != mWPW && first.piece != mBPW) || (second.piece != mWPW && second.piece != mBPW)){
+                        rscore += SCORES[mBPLUS] * 3; // penalty
+                    }
+                }
+            }
+
+            //weak black king?
+            for(uint8_t i = 0; i < 8; ++i){
+                vector <cPiece> wpieces, bpieces;
+
+                board.setfield(board.bKg_x, board.bKg_y, mBLK);
+
+                if(board.is_inbounds(board.bKg_x + steps[i][0], board.bKg_y + steps[i][1])){
+                    board.search_for_all_touching_pieces(wpieces, bpieces, board.bKg_x + steps[i][0], board.bKg_y + steps[i][1]);
+
+                    if(bpieces.size() < wpieces.size()){
+                        rscore += SCORES[mWPLUS] * 3; // penalty
+                        board.setfield(board.bKg_x, board.bKg_y, mBKG);
+                        break;
+                    }
+                }
+                board.setfield(board.bKg_x, board.bKg_y, mBKG);
+            }
+
+            vector<cPiece> bpieces;
+            board.search_dir_for_pieces(bpieces, board.bKg_x, board.bKg_y, 0, -1);
+
+            if(bpieces.size() == 2){
+                cPiece second = bpieces.at(1);
+                if(second.piece == mWRK || second.piece == mWQU){
+                    rscore += SCORES[mWPLUS] * 3; // penalty
+                }
+            }
+            else if(bpieces.size() > 2){
+                cPiece first = bpieces.at(0);
+                cPiece second = bpieces.at(1);
+                cPiece third = bpieces.at(2);
+                if(second.piece == mWRK || second.piece == mWQU){
+                    rscore += SCORES[mWPLUS] * 3; // penalty
+                }
+                else if((third.piece == mWRK || third.piece == mWQU)){
+                    if((first.piece != mBPW && first.piece != mWPW) || (second.piece != mBPW && second.piece != mWPW)){
+                        rscore += SCORES[mWPLUS] * 3; // penalty
+                    }
+                }
             }
 
         }

@@ -3,6 +3,7 @@
     #include <iostream>
     #include <fstream>
     #include <string>
+    #include <algorithm>
     #include "./match.hpp"
     #include "./move.hpp"
 
@@ -10,7 +11,23 @@
     using namespace std;
 
 
-    void play(cMatch &match, uint8_t maxdepth, uint8_t engine_color, bool with_threads){
+    void prnt_status(cMatch &match, uint8_t status){
+        if(status == cMatch::STATUS_WINNER_WHITE){
+            match.prnt_minutes();
+            cout << "winner white" << " --- good bye!\n" << endl;
+        }
+        else if(status == cMatch::STATUS_WINNER_BLACK){
+            match.prnt_minutes();
+            cout << "winner black" << " --- good bye!\n" << endl;
+        }
+        else if(status == cMatch::STATUS_DRAW){
+            match.prnt_minutes();
+            cout << "draw" << " --- good bye!\n" << endl;
+        }
+    }
+
+
+    void play(cMatch &match, uint8_t maxdepth, uint8_t engine_color){
 
         char buffer[6];
         int length = 7;
@@ -27,7 +44,7 @@
                    cout << "start calc..." << endl;
                    vector<cMove> candidates;
                    int32_t calc_score;
-                   match.calc_move(calc_score, candidates, maxdepth, with_threads);
+                   match.calc_move(calc_score, candidates, maxdepth);
 
                    if(candidates.size() > 0){
                        cMove move = candidates.front();
@@ -36,30 +53,20 @@
                        match.board.prnt();
                    }
                    else{
+                        uint8_t status = match.eval_status();
+                        prnt_status(match, status);
                         cout << "game over - congratulation!" << endl;
                         return;
                    }
             }
             else{
                 uint8_t status = match.eval_status();
-                    
-                if(status == match.STATUS_WINNER_WHITE){
-                    match.prnt_minutes();
-                    cout << "winner white" << " --- good bye!\n" << endl;
-                    return;
-                }
-                else if(status == match.STATUS_WINNER_BLACK){
-                    match.prnt_minutes();
-                    cout << "winner black" << " --- good bye!\n" << endl;
-                    return;
-                }
-                else if(status == match.STATUS_DRAW){
-                    match.prnt_minutes();
-                    cout << "draw" << " --- good bye!\n" << endl;
+                if(status != cMatch::STATUS_OPEN){
+                    prnt_status(match, status);
                     return;
                 }
 
-                cout << "\nyour input please... q(uit) | u(ndo) r(ead) | e2e4 | e7e8q | 0-0: ";
+                cout << "\nyour input please... q(uit) | u(ndo) | l(oad) | s(witch engine color) | e2e4 | e7e8q | 0-0: ";
                 cin.getline(buffer, length);
                 string input(buffer);
 
@@ -85,10 +92,17 @@
                     continue;
                 }
 
-                if(input == "r" || input == "R"){
+                if(input.substr(0, 1) == "l" || input.substr(0, 1) == "L"){
                     match.reset();
 
-                    ifstream file("game004.txt");
+                    if(input.length() < 5){
+                        cout << "format for loading a game: 'l 001'" << endl;
+                        continue;
+                    }
+
+                    string substr = input.substr(1);
+                    substr.erase(remove(substr.begin(), substr.end(), ' '), substr.end());
+                    ifstream file("./matches/game" + substr + ".txt");
                     string content;
 
                     while(file >> content) {
@@ -104,6 +118,16 @@
                     }
                     match.prnt_minutes();
                     match.board.prnt();
+                    continue;
+                }
+
+                if(input == "s" || input == "S"){
+                    if(engine_color == mWHITE){
+                        engine_color = mBLACK;
+                    }
+                    else if(engine_color == mBLACK){
+                        engine_color = mWHITE;
+                    }
                     continue;
                 }
 
@@ -166,26 +190,14 @@
 
     int main(void){
         cMatch match;
-        
-        /*uint8_t src_x, src_y, dst_x, dst_y;
-
-        cMove::coord_to_indices(src_x, src_y, "c2");
-        cMove::coord_to_indices(dst_x, dst_y, "c4");
-        match.do_usr_move(src_x, src_y, dst_x, dst_y, mBLK);
-
-        cMove::coord_to_indices(src_x, src_y, "c7");
-        cMove::coord_to_indices(dst_x, dst_y, "c5");
-        match.do_usr_move(src_x, src_y, dst_x, dst_y, mBLK);
-
-        cout << "eval_board: " << to_string(match.eval_board()) << endl; */
 
         uint8_t maxdepth = 5;
 
-        uint8_t engine_color = mBLACK;
+        uint8_t engine_color = mWHITE;
 
-        bool with_threads = true;
+        //bool with_threads = true;
 
-        play(match, maxdepth, engine_color, with_threads); 
+        play(match, maxdepth, engine_color);
 
         return 0;
     }

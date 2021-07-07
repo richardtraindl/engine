@@ -57,6 +57,22 @@
     }
 
 
+    void cBoard::search_dir_for_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y){
+
+        uint8_t dst_x = src_x;
+        uint8_t dst_y = src_y;
+        while(is_inbounds(dst_x + step_x, dst_y + step_y)){
+            uint8_t piece = getfield(dst_x, dst_y);
+            if(piece != mBLK){
+                pieces.push_back(cPiece(piece, dst_x, dst_y));
+            }
+            dst_x += step_x;
+            dst_y += step_y;
+        }
+
+    }
+
+
     bool cBoard::search_for_touching_piece(uint8_t src_x, uint8_t src_y, uint8_t color){
 
         uint8_t piece, dst_x, dst_y;
@@ -242,6 +258,97 @@
                     }
                 }
             }
+        }
+
+    }
+
+
+    void cBoard::search_for_all_touching_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t src_x, uint8_t src_y){
+
+        uint8_t piece, dst_x, dst_y;
+
+        // qu, rk and bp
+        int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
+
+        for(uint8_t i = 0; i < 8; ++i){
+            piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 7);
+
+            if(piece == mBLK){
+                continue;
+            }
+
+            if(piece == mWQU){
+                wpieces.push_back(cPiece(piece, dst_x, dst_y));
+                continue;
+            }
+            else if(piece == mBQU){
+                bpieces.push_back(cPiece(piece, dst_x, dst_y));
+                continue;
+            }
+            else if(i < 4 && piece == mWRK){
+                wpieces.push_back(cPiece(piece, dst_x, dst_y));
+                continue;
+            }
+            else if(i < 4 && piece == mBRK){
+                bpieces.push_back(cPiece(piece, dst_x, dst_y));
+                continue;
+            }
+            else if(i >= 4 && piece == mWBP){
+                wpieces.push_back(cPiece(piece, dst_x, dst_y));
+                continue;
+            }
+            else if(i >= 4 && piece == mBBP){
+                bpieces.push_back(cPiece(piece, dst_x, dst_y));
+                continue;
+            }
+        }
+        
+        // kg
+        for(uint8_t i = 0; i < 8; ++i){
+            piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 1);
+
+            if(piece == mWKG){
+                wpieces.push_back(cPiece(piece, dst_x, dst_y));
+            }
+            else if(piece == mBKG){
+                bpieces.push_back(cPiece(piece, dst_x, dst_y));
+            }
+        }
+
+        // kn
+        int8_t kn_steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
+
+        for(uint8_t i = 0; i < 8; ++i){
+             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, kn_steps[i][0], kn_steps[i][1], 1);
+
+            if(piece == mWKN){
+                wpieces.push_back(cPiece(piece, dst_x, dst_y));
+            }
+            else if(piece == mBKN){
+                bpieces.push_back(cPiece(piece, dst_x, dst_y));
+            }
+        }
+
+        // white pawn attacks
+        piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, -1, -1, 1);
+        if(piece == mWPW){
+            wpieces.push_back(cPiece(piece, dst_x, dst_y));
+        }
+
+        piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, 1, -1, 1);
+        if(piece == mWPW){
+            wpieces.push_back(cPiece(piece, dst_x, dst_y));
+        }
+
+        // black pawn attacks
+        piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, 1, 1, 1);
+        if(piece == mBPW){
+            bpieces.push_back(cPiece(piece, dst_x, dst_y));
+        }
+
+        piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, -1, 1, 1);
+        if(piece == mBPW){
+            bpieces.push_back(cPiece(piece, dst_x, dst_y));
         }
 
     }

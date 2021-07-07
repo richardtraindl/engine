@@ -20,10 +20,10 @@
             cBoard board;
             vector<cMove> minutes;
             
-            const uint8_t STATUS_OPEN = 0;
-            const uint8_t STATUS_WINNER_WHITE = 1;
-            const uint8_t STATUS_WINNER_BLACK = 2;
-            const uint8_t STATUS_DRAW = 3;
+            static const uint8_t STATUS_OPEN = 0;
+            static const uint8_t STATUS_WINNER_WHITE = 1;
+            static const uint8_t STATUS_WINNER_BLACK = 2;
+            static const uint8_t STATUS_DRAW = 3;
 
             cMatch();
 
@@ -57,9 +57,13 @@
             void prnt_minutes();
 
             // calculation
-            void calc_move(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth, bool with_threads);
+            void calc_move(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth);
+
+            void calc_move_v2(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth);
 
             void alphabeta(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid);
+
+            void alphabeta_v2(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid);
 
             bool is_piece_soft_pinned(uint8_t piece, uint8_t piece_x, uint8_t piece_y);
 
