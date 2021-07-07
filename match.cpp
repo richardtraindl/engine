@@ -1754,7 +1754,7 @@
         }
         
         // opening and middlegame
-        if(minutes.size() <= 32){
+        if(minutes.size() <= 50){
             
             int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
@@ -1840,6 +1840,106 @@
                 }
             }
 
+            //wrook on open file
+            bool isopen = false;
+            bool isinfiltrated = false;
+            uint8_t rk_x, rk_y;
+
+            rk_y = 0;
+
+            for(uint8_t i = 0; i < 8; ++i){
+                rk_x = i;
+
+                if(board.getfield(rk_x, rk_y) == mWRK){
+                    vector<cPiece> pieces; 
+
+                    board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, 1);
+
+                    isopen = true;
+                    for(cPiece piece : pieces){
+                        if(piece.piece == mWPW){
+                            isopen = false;
+                        }
+                    }
+
+                    if(isopen){
+                        break;
+                    }
+                }
+            }
+
+            if(isopen == false){
+                rk_y = 6;
+
+                for(uint8_t i = 0; i < 8; ++i){
+                    rk_x = i;
+
+                    if(board.getfield(rk_x, rk_y) == mWRK){
+                        isinfiltrated = true;
+                        break;
+                    }
+                }
+            }
+
+            if(isopen || isinfiltrated){
+                vector<cPiece> wpieces, bpieces; 
+
+                board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
+
+                if(wpieces.size() >= bpieces.size()){
+                    rscore += SCORES[mWPLUS] * 2;
+                }
+            }
+                    
+            //brook on open file
+            isopen = false;
+            isinfiltrated = false;
+
+            rk_y = 7;
+
+            for(uint8_t i = 0; i < 8; ++i){
+                rk_x = i;
+
+                if(board.getfield(rk_x, rk_y) == mBRK){
+                    vector<cPiece> pieces; 
+
+                    board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, -1);
+
+                    isopen = true;
+                    for(cPiece piece : pieces){
+                        if(piece.piece == mBPW){
+                            isopen = false;
+                        }
+                    }
+
+                    if(isopen){
+                        break;
+                    }
+                }
+            }
+
+            if(isopen == false){
+                rk_y = 1;
+
+                for(uint8_t i = 0; i < 8; ++i){
+                    rk_x = i;
+
+                    if(board.getfield(rk_x, rk_y) == mBRK){
+                        isinfiltrated = true;
+                        break;
+                    }
+                }
+            }
+
+            if(isopen || isinfiltrated){
+                vector<cPiece> wpieces, bpieces; 
+
+                board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
+
+                if(bpieces.size() >= wpieces.size()){
+                    rscore += SCORES[mBPLUS] * 2;
+                }
+            }
         }
 
         // endgame - check pawns
