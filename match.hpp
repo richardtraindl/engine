@@ -5,6 +5,7 @@
     #include <ctime>
     #include <iomanip>  
     #include <vector>
+    #include <algorithm> 
     #include <thread>
     #include "./values.hpp"
     #include "./board.hpp"
@@ -60,6 +61,8 @@
             void calc_move(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth);
 
             void calc_move_v2(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth);
+
+            static bool sortByPresort(cMove &A, cMove &B);
 
             void alphabeta(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid);
 

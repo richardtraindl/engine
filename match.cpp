@@ -659,6 +659,10 @@
 
 
     bool cMatch::filter(cMove &move, uint8_t depth){
+        
+        if(depth > 22){
+            return false;
+        }
 
         // take en passant moves
         if(move.is_en_passant()){ 
@@ -1331,7 +1335,12 @@
 
     }
 
-
+ 
+    bool cMatch::sortByPresort(cMove &A, cMove &B){
+        return (PIECES_RANKS[B.dstpiece] + PIECES_RANKS[B.prompiece]) < (PIECES_RANKS[A.dstpiece] + PIECES_RANKS[A.prompiece]);
+    }
+ 
+ 
     void cMatch::alphabeta(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid){
 
         vector<cMove> newcandidates;
@@ -1353,6 +1362,7 @@
 
         vector<cMove> moves;
         gen_moves(moves, next_color());
+        sort(moves.begin(), moves.end(), sortByPresort);
 
         if(is_calc_term(calc_score, moves, depth)){
             moves.clear();
@@ -1366,11 +1376,11 @@
 
             if(depth == 1){
                 if(threadid != 0 && (count % MAXTHREADS) + 1 != threadid){ 
-                    this_thread::sleep_for(chrono::milliseconds(100));
+                    //this_thread::sleep_for(chrono::milliseconds(100));
                     continue;
                 }
 
-                cout << "\n" << to_string(count) << "(" + to_string(moves.size()) + ") CURRENT SEARCH from thread #" << to_string(threadid) << ": [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
+                cout << "\nthread #" << to_string(threadid) + " " << to_string(count) << "(" + to_string(moves.size()) + ") current search: [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
             }
 
             if(depth > maxdepth){
