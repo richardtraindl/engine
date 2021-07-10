@@ -14,15 +14,15 @@
     void prnt_status(cMatch &match, uint8_t status){
         if(status == cMatch::STATUS_WINNER_WHITE){
             match.prnt_minutes();
-            cout << "winner white" << " --- good bye!\n" << endl;
+            cout << "winner white!" << endl;
         }
         else if(status == cMatch::STATUS_WINNER_BLACK){
             match.prnt_minutes();
-            cout << "winner black" << " --- good bye!\n" << endl;
+            cout << "winner black!" << endl;
         }
         else if(status == cMatch::STATUS_DRAW){
             match.prnt_minutes();
-            cout << "draw" << " --- good bye!\n" << endl;
+            cout << "draw!" << endl;
         }
     }
 
@@ -56,14 +56,14 @@
                         uint8_t status = match.eval_status();
                         prnt_status(match, status);
                         cout << "game over - congratulation!" << endl;
-                        return;
+                        //return;
                    }
             }
             else{
                 uint8_t status = match.eval_status();
                 if(status != cMatch::STATUS_OPEN){
                     prnt_status(match, status);
-                    return;
+                    //return;
                 }
 
                 cout << "\nyour input please... q(uit) | u(ndo) | l(oad) | s(witch engine color) | e2e4 | e7e8q | 0-0: ";
@@ -194,8 +194,6 @@
         uint8_t maxdepth = 5;
 
         uint8_t engine_color = mBLACK;
-
-        //bool with_threads = true;
 
         play(match, maxdepth, engine_color);
 

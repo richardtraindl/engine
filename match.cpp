@@ -195,14 +195,16 @@
 
             for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
                 threads[idx].join();
-                cout << "\nthread #" << (idx + 1) << " joined ";
-                cout << scores[idx] << " " << fmt_moves(candidates[idx]) << endl;
+                cout << "\nthread #" << (idx + 1) << " joined " << endl;
+                //cout << scores[idx] << " " << fmt_moves(candidates[idx]) << endl;
                 delete matches[idx];
             }
 
             calc_score = scores[0];
             moves.assign(candidates[0].begin(), candidates[0].end());
+            cout << "\nthread #1: " << to_string(scores[0]) << " " << fmt_moves(candidates[0]) << endl;
             for(uint8_t idx = 1; idx < MAXTHREADS; ++idx){
+                cout << "\nthread #" + to_string(idx) + ": " << to_string(scores[idx]) << " " << fmt_moves(candidates[idx]) << endl;
                 if(maximizing){
                     if(scores[idx] > calc_score){
                         calc_score = scores[idx];
@@ -1380,7 +1382,7 @@
                     continue;
                 }
 
-                cout << "\nthread #" << to_string(threadid) + " " << to_string(count) << "(" + to_string(moves.size()) + ") current search: [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
+                //cout << "\nthread #" << to_string(threadid) + " " << to_string(count) << "(" + to_string(moves.size()) + ") current search: [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
             }
 
             if(depth > maxdepth){
@@ -1433,9 +1435,9 @@
                     bestscore = newscore;
                     alpha = max(bestscore, alpha);
                     append_newmove(rcandidates, newcandidates, move);
-                    if(depth == 1){
+                    /*if(depth == 1){
                         cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
-                    }
+                    }*/
                     if(alpha >= beta){
                         break;
                     }
@@ -1446,9 +1448,9 @@
                     bestscore = newscore;
                     beta = min(bestscore, beta);
                     append_newmove(rcandidates, newcandidates, move);
-                    if(depth == 1){
+                    /*if(depth == 1){
                         cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
-                    }
+                    }*/
                     if(beta <= alpha){
                         break;
                     }
