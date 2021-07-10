@@ -7,7 +7,7 @@
     //bool debug = false;
 
 
-    const uint8_t MAXTHREADS = 4;
+    const uint8_t MAXTHREADS = 16; //4;
 
 
     cMatch::cMatch(){ 
@@ -1384,7 +1384,7 @@
             }
 
             if(depth > maxdepth){
-                // skip move if filter says move is not worth to search deeper...
+                // skip move if filter says move is not worth to search deeper
                 if(filter(move, depth) == false){
                     newscore = score + eval_board(move);
                     skip = true;
@@ -1692,7 +1692,7 @@
                 }
             }
             if(wcnt > 2){
-                rscore += SCORES[mBPLUS]; // penalty
+                rscore += SCORES[mBPLUS] * 2; // penalty
             }
 
             cPiece black_pieces[4] = { cPiece(mBKN, 1, 7), cPiece(mBKN, 6, 7), cPiece(mBBP, 2, 7), cPiece(mBBP, 5, 7) };
@@ -1703,7 +1703,7 @@
                 }
             }
             if(bcnt > 2){
-                rscore += SCORES[mWPLUS]; // penalty
+                rscore += SCORES[mWPLUS] * 2; // penalty
             }
             
             wcnt = 0;

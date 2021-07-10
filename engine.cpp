@@ -193,7 +193,7 @@
 
         uint8_t maxdepth = 5;
 
-        uint8_t engine_color = mWHITE;
+        uint8_t engine_color = mBLACK;
 
         //bool with_threads = true;
 

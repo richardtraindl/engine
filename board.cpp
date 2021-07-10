@@ -520,19 +520,23 @@
 
         for(int8_t y = 7; y >=0; --y){
             for(uint8_t x = 0; x < 8; ++x){
-                int piece = getfield(x, (uint8_t)y);
+
+                uint8_t piece = getfield(x, (uint8_t)y);
+
                 if(piece == mBLK){
-                    strpiece = "  ";
+                    strpiece = "    ";
                 }
                 else{
-                    strpiece = reverse_lookup(PIECES, piece).substr (1,2);
+                    strpiece = " " + reverse_lookup(PIECES, piece).substr (1,2) + " ";
                 }
+
                 if(PIECES_COLORS[piece] == mWHITE){
                     textcolor = (const string)"\033[97m" + (const string)"\033[1m";
                 }
                 else{
                     textcolor = (const string)"\033[30m" + (const string)"\033[1m";
                 }
+
                 if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
                     backcolor = (const string)"\033[104m";
                 }
@@ -543,6 +547,17 @@
                 cout << backcolor + textcolor + strpiece + (const string)"\033[0m"; 
             }
             cout << endl;
+            
+            for(uint8_t x = 0; x < 8; ++x){
+                if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
+                    cout << "\033[104m" + textcolor + "    " + (const string)"\033[0m"; 
+                }
+                else{
+                    cout << "\033[42m" + textcolor + "    " + (const string)"\033[0m"; 
+                }
+            }
+            cout << endl;
+
         }
 
     }
