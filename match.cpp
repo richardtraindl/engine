@@ -1,43 +1,40 @@
 
 
     #include "./match.hpp"
-
-
-    // debug
-    //bool debug = false;
-
-
-    const uint8_t MAXTHREADS = 16; //4;
+    #include "./threading.hpp"
 
 
     cMatch::cMatch(){ 
-        cBoard board;
+
+        cBoard m_board;
+
     }
 
 
     // copy constructor
     cMatch::cMatch(const cMatch &match){
 
-        score = match.score;
+        m_score = match.m_score;
 
         for(int y = 0; y < 8; ++y){
             for(int x = 0; x < 8; ++x){
-                board.fields[y][x] = match.board.fields[y][x];
+                m_board.m_fields[y][x] = match.m_board.m_fields[y][x];
             }
         }
-        board.wKg_x = match.board.wKg_x;
-        board.wKg_y = match.board.wKg_y;
-        board.bKg_x = match.board.bKg_x;
-        board.bKg_y = match.board.bKg_y;
-        board.wKg_has_moved_at = match.board.wKg_has_moved_at;
-        board.bKg_has_moved_at = match.board.bKg_has_moved_at;
-        board.wRkA_has_moved_at = match.board.wRkA_has_moved_at;
-        board.wRkH_has_moved_at = match.board.wRkH_has_moved_at;
-        board.bRkA_has_moved_at = match.board.bRkA_has_moved_at;
-        board.bRkH_has_moved_at = match.board.bRkH_has_moved_at;
 
-        for(cMove move : match.minutes){
-            minutes.push_back(move);
+        m_board.m_wKg_x = match.m_board.m_wKg_x;
+        m_board.m_wKg_y = match.m_board.m_wKg_y;
+        m_board.m_bKg_x = match.m_board.m_bKg_x;
+        m_board.m_bKg_y = match.m_board.m_bKg_y;
+        m_board.m_wKg_has_moved_at = match.m_board.m_wKg_has_moved_at;
+        m_board.m_bKg_has_moved_at = match.m_board.m_bKg_has_moved_at;
+        m_board.m_wRkA_has_moved_at = match.m_board.m_wRkA_has_moved_at;
+        m_board.m_wRkH_has_moved_at = match.m_board.m_wRkH_has_moved_at;
+        m_board.m_bRkA_has_moved_at = match.m_board.m_bRkA_has_moved_at;
+        m_board.m_bRkH_has_moved_at = match.m_board.m_bRkH_has_moved_at;
+
+        for(cMove move : match.m_minutes){
+            m_minutes.push_back(move);
         }
 
     }
@@ -48,59 +45,59 @@
 
 
     void cMatch::reset(){
-        score = 0;
+        m_score = 0;
 
-        minutes.clear();
+        m_minutes.clear();
         
-        board.fields[0][0] = mWRK;
-        board.fields[0][1] = mWKN;
-        board.fields[0][2] = mWBP; 
-        board.fields[0][3] = mWQU; 
-        board.fields[0][4] = mWKG; 
-        board.fields[0][5] = mWBP;
-        board.fields[0][6] = mWKN; 
-        board.fields[0][7] = mWRK;
+        m_board.m_fields[0][0] = mWRK;
+        m_board.m_fields[0][1] = mWKN;
+        m_board.m_fields[0][2] = mWBP; 
+        m_board.m_fields[0][3] = mWQU; 
+        m_board.m_fields[0][4] = mWKG; 
+        m_board.m_fields[0][5] = mWBP;
+        m_board.m_fields[0][6] = mWKN; 
+        m_board.m_fields[0][7] = mWRK;
 
         for(uint8_t i = 0; i < 8; ++i){
-            board.fields[1][i] = mWPW;
+            m_board.m_fields[1][i] = mWPW;
         }
-        
+
         for(uint8_t j = 2; j < 6; ++j){
             for(uint8_t i = 0; i < 8; ++i){
-                board.fields[j][i] = mBLK;
+                m_board.m_fields[j][i] = mBLK;
             }
         }
 
         for(uint8_t i = 0; i < 8; ++i){
-            board.fields[6][i] = mBPW;
+            m_board.m_fields[6][i] = mBPW;
         }
 
-        board.fields[7][0] = mBRK;
-        board.fields[7][1] = mBKN;
-        board.fields[7][2] = mBBP; 
-        board.fields[7][3] = mBQU; 
-        board.fields[7][4] = mBKG; 
-        board.fields[7][5] = mBBP;
-        board.fields[7][6] = mBKN; 
-        board.fields[7][7] = mBRK;
+        m_board.m_fields[7][0] = mBRK;
+        m_board.m_fields[7][1] = mBKN;
+        m_board.m_fields[7][2] = mBBP; 
+        m_board.m_fields[7][3] = mBQU; 
+        m_board.m_fields[7][4] = mBKG; 
+        m_board.m_fields[7][5] = mBBP;
+        m_board.m_fields[7][6] = mBKN; 
+        m_board.m_fields[7][7] = mBRK;
 
-        board.wKg_x = 4;
-        board.wKg_y = 0;
-        board.bKg_x = 4;
-        board.bKg_y = 7;
-        board.wKg_has_moved_at = 0;
-        board.bKg_has_moved_at = 0;
-        board.wRkA_has_moved_at = 0;
-        board.wRkH_has_moved_at = 0;
-        board.bRkA_has_moved_at = 0;
-        board.bRkH_has_moved_at = 0;
+        m_board.m_wKg_x = 4;
+        m_board.m_wKg_y = 0;
+        m_board.m_bKg_x = 4;
+        m_board.m_bKg_y = 7;
+        m_board.m_wKg_has_moved_at = 0;
+        m_board.m_bKg_has_moved_at = 0;
+        m_board.m_wRkA_has_moved_at = 0;
+        m_board.m_wRkH_has_moved_at = 0;
+        m_board.m_bRkA_has_moved_at = 0;
+        m_board.m_bRkH_has_moved_at = 0;
 
     }
 
 
     uint8_t cMatch::next_color(){
 
-        if(minutes.size() % 2 == 0){
+        if(m_minutes.size() % 2 == 0){
             return mWHITE;
         }
         else{
@@ -112,7 +109,7 @@
 
     void cMatch::prnt_minutes(){
 
-        for(cMove move : minutes){
+        for(cMove move : m_minutes){
             cout << move.format() << endl;
         }
 
@@ -124,10 +121,6 @@
         string str_moves = "";
 
         for(cMove move : moves){
-            //str_moves += to_string(move->src_x) + " ";
-            //str_moves += to_string(move->src_y) + " ";
-            //str_moves += to_string(move->dst_x) + " ";
-            //str_moves += to_string(move->dst_y) + " ";
             str_moves += " [" + move.format() + "] ";
         }
         return str_moves;
@@ -166,11 +159,9 @@
     }
 
 
-    void cMatch::calc_move(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth){
+    void cMatch::calc_move(int32_t &rscore, vector<cMove> &rmoves, uint8_t maxdepth){
 
         time_t time_start = time(0);
-
-        bool maximizing = (next_color() == mWHITE);
 
         int32_t alpha = SCORES[mWKG] * 10;
 
@@ -178,83 +169,13 @@
 
         uint8_t depth = 1;
 
-        if(MAXTHREADS > 1){
-            array<vector<cMove>, MAXTHREADS> candidates;
+        calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta);
 
-            array<cMatch*, MAXTHREADS> matches;
+        cout << "\nmatch m_score: " << m_score;
 
-            thread threads[MAXTHREADS];
+        cout << "\nresult: " << rscore;
 
-            int32_t scores[MAXTHREADS];
-
-            for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
-                cMatch *match = new cMatch(*this);
-                matches[idx] = match; //new cMatch(*this);
-                threads[idx] = thread(&cMatch::alphabeta, match, ref(scores[idx]), ref(candidates[idx]), depth, maxdepth, alpha, beta, maximizing, idx + 1);
-            }
-
-            for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
-                threads[idx].join();
-                cout << "\nthread #" << (idx + 1) << " joined " << endl;
-                //cout << scores[idx] << " " << fmt_moves(candidates[idx]) << endl;
-                delete matches[idx];
-            }
-
-            calc_score = scores[0];
-            moves.assign(candidates[0].begin(), candidates[0].end());
-            cout << "\nthread #1: " << to_string(scores[0]) << " " << fmt_moves(candidates[0]) << endl;
-            for(uint8_t idx = 1; idx < MAXTHREADS; ++idx){
-                cout << "\nthread #" + to_string(idx) + ": " << to_string(scores[idx]) << " " << fmt_moves(candidates[idx]) << endl;
-                if(maximizing){
-                    if(scores[idx] > calc_score){
-                        calc_score = scores[idx];
-                        moves.clear();
-                        moves.assign(candidates[idx].begin(), candidates[idx].end());
-                    }
-                }
-                else{
-                    if(scores[idx] < calc_score){
-                        calc_score = scores[idx];
-                        moves.clear();
-                        moves.assign(candidates[idx].begin(), candidates[idx].end());
-                    }
-                }
-            }
-        }
-        else{
-            alphabeta(calc_score, moves, depth, maxdepth, alpha, beta, maximizing, 0);
-        }
-
-        cout << "\nmatch score: " << score;
-
-        cout << "\nresult: " << calc_score;
-
-        cout << "\n" << fmt_moves(moves) << endl;
-
-        prnt_fmttime("\ncalc-time: ", time(0) - time_start);
-
-    }
-
-
-    void cMatch::calc_move_v2(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth){
-
-        time_t time_start = time(0);
-
-        bool maximizing = (next_color() == mWHITE);
-
-        int32_t alpha = SCORES[mWKG] * 10;
-
-        int32_t beta = SCORES[mBKG] * 10;
-
-        uint8_t depth = 1;
-
-        alphabeta_v2(calc_score, moves, depth, maxdepth, alpha, beta, maximizing, 0);
-
-        cout << "\nmatch score: " << score;
-
-        cout << "\nresult: " << calc_score;
-
-        cout << "\n" << fmt_moves(moves) << endl;
+        cout << "\n" << cMatch::fmt_moves(rmoves) << endl;
 
         prnt_fmttime("\ncalc-time: ", time(0) - time_start);
 
@@ -264,10 +185,10 @@
     bool cMatch::is_king_attacked(uint8_t attacker_color){
 
         if(attacker_color == mWHITE){
-            return board.search_for_touching_piece(board.bKg_x, board.bKg_y, mWHITE);
+            return m_board.search_for_touching_piece(m_board.m_bKg_x, m_board.m_bKg_y, mWHITE);
         }
         else{
-            return board.search_for_touching_piece(board.wKg_x, board.wKg_y, mBLACK);
+            return m_board.search_for_touching_piece(m_board.m_wKg_x, m_board.m_wKg_y, mBLACK);
         }
 
     }
@@ -278,7 +199,7 @@
         vector <cMove> moves;
         vector <cPiece> pieces;
         uint8_t king, kg_x, kg_y, enmycolor;
-        uint8_t piece = board.getfield(src_x, src_y);
+        uint8_t piece = m_board.getfield(src_x, src_y);
         uint8_t color = PIECES_COLORS[piece];
         
         if(color != next_color()){
@@ -287,18 +208,18 @@
 
         if(color == mWHITE){
             king = mWKG;
-            kg_x = board.wKg_x;
-            kg_y = board.wKg_y;
+            kg_x = m_board.m_wKg_x;
+            kg_y = m_board.m_wKg_y;
             enmycolor = mBLACK;
         }
         else{
             king = mBKG;
-            kg_x = board.bKg_x;
-            kg_y = board.bKg_y;
+            kg_x = m_board.m_bKg_x;
+            kg_y = m_board.m_bKg_y;
             enmycolor = mWHITE;
         }
 
-        board.search_for_touching_pieces(pieces, kg_x, kg_y, enmycolor, true);
+        m_board.search_for_touching_pieces(pieces, kg_x, kg_y, enmycolor, true);
 
         if(pieces.size() >= 2){
             gen_kg_moves(moves, kg_x, kg_y, king);
@@ -349,8 +270,8 @@
         //}
 
         for(cMove move : moves){
-            if(move.src_x == src_x && move.src_y == src_y &&
-            move.dst_x == dst_x && move.dst_y == dst_y){
+            if(move.m_src_x == src_x && move.m_src_y == src_y &&
+            move.m_dst_x == dst_x && move.m_dst_y == dst_y){
                 found = true;
                 break;
             }
@@ -394,11 +315,11 @@
 
     void cMatch::do_usr_move(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece){
 
-        uint8_t srcpiece = board.getfield(src_x, src_y);
+        uint8_t srcpiece = m_board.getfield(src_x, src_y);
 
-        uint8_t dstpiece = board.getfield(dst_x, dst_y);
+        uint8_t dstpiece = m_board.getfield(dst_x, dst_y);
         
-        cMove move(src_x, src_y, dst_x, dst_y, srcpiece, dstpiece, prompiece);
+        cMove move(src_x, src_y, dst_x, dst_y, srcpiece, dstpiece, prompiece, 100);
 
         do_move(move);
 
@@ -409,261 +330,234 @@
 
         // promotion
         if(move.is_promotion()){
-            board.setfield(move.src_x, move.src_y, mBLK);
-            board.setfield(move.dst_x, move.dst_y, move.prompiece);
+            m_board.setfield(move.m_src_x, move.m_src_y, mBLK);
+            m_board.setfield(move.m_dst_x, move.m_dst_y, move.m_prompiece);
 
-            score += SCORES[move.dstpiece];
-            if(PIECES_COLORS[move.srcpiece] == mWHITE){
-                score += REVERSED_SCORES[move.prompiece] - REVERSED_SCORES[mWPW];
+            m_score += SCORES[move.m_dstpiece];
+            if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+                m_score += REVERSED_SCORES[move.m_prompiece] - REVERSED_SCORES[mWPW];
             }
             else{
-                score += REVERSED_SCORES[move.prompiece] - REVERSED_SCORES[mBPW];
+                m_score += REVERSED_SCORES[move.m_prompiece] - REVERSED_SCORES[mBPW];
             }
             
-            minutes.push_back(move);
+            m_minutes.push_back(move);
             return;
         }
 
         // standard move
-        board.setfield(move.src_x, move.src_y, mBLK);
-        board.setfield(move.dst_x, move.dst_y, move.srcpiece);
+        m_board.setfield(move.m_src_x, move.m_src_y, mBLK);
+        m_board.setfield(move.m_dst_x, move.m_dst_y, move.m_srcpiece);
 
-        score += SCORES[move.dstpiece];
+        m_score += SCORES[move.m_dstpiece];
 
         // add on for en passant
         if(move.is_en_passant()){
-            uint8_t enpiece = board.getfield(move.dst_x, move.src_y);
-            board.setfield(move.dst_x, move.src_y, mBLK);
+            uint8_t enpiece = m_board.getfield(move.m_dst_x, move.m_src_y);
+            m_board.setfield(move.m_dst_x, move.m_src_y, mBLK);
 
-            score += SCORES[enpiece];
+            m_score += SCORES[enpiece];
 
-            minutes.push_back(move);
+            m_minutes.push_back(move);
             return;
         }
 
-        if(move.srcpiece == mWKG || move.srcpiece == mBKG){
+        if(move.m_srcpiece == mWKG || move.m_srcpiece == mBKG){
             // castlings
             if(move.is_short_castling()){
-                uint8_t rook = board.getfield(7, move.dst_y); // h == 7
-                board.setfield(7, move.dst_y, mBLK);
-                board.setfield(5, move.dst_y, rook); // f == 5
+                uint8_t rook = m_board.getfield(7, move.m_dst_y); // h == 7
+                m_board.setfield(7, move.m_dst_y, mBLK);
+                m_board.setfield(5, move.m_dst_y, rook); // f == 5
             }
             else if(move.is_long_castling()){
-                uint8_t rook = board.getfield(0, move.dst_y); // a == 0
-                board.setfield(0, move.dst_y, mBLK);
-                board.setfield(3, move.dst_y, rook); // c == 3
+                uint8_t rook = m_board.getfield(0, move.m_dst_y); // a == 0
+                m_board.setfield(0, move.m_dst_y, mBLK);
+                m_board.setfield(3, move.m_dst_y, rook); // c == 3
             }
 
             // update flags in board
-            if(move.srcpiece == mWKG){
-                if(board.wKg_has_moved_at == 0){
-                    board.wKg_has_moved_at = minutes.size() + 1;
+            if(move.m_srcpiece == mWKG){
+                if(m_board.m_wKg_has_moved_at == 0){
+                    m_board.m_wKg_has_moved_at = m_minutes.size() + 1;
                 }
-                board.wKg_x = move.dst_x;
-                board.wKg_y = move.dst_y;
+                m_board.m_wKg_x = move.m_dst_x;
+                m_board.m_wKg_y = move.m_dst_y;
             }
             else{
-                if(board.bKg_has_moved_at == 0){
-                    board.bKg_has_moved_at = minutes.size() + 1;
+                if(m_board.m_bKg_has_moved_at == 0){
+                    m_board.m_bKg_has_moved_at = m_minutes.size() + 1;
                 }
-                board.bKg_x = move.dst_x;
-                board.bKg_y = move.dst_y;
+                m_board.m_bKg_x = move.m_dst_x;
+                m_board.m_bKg_y = move.m_dst_y;
             }
         }
-        else if(move.srcpiece == mWRK){
+        else if(move.m_srcpiece == mWRK){
             // update flags in board
-            if(move.src_x == 0 && move.src_y == 0 && 
-               board.wRkA_has_moved_at == 0){
-                board.wRkA_has_moved_at = minutes.size() + 1;
+            if(move.m_src_x == 0 && move.m_src_y == 0 && 
+               m_board.m_wRkA_has_moved_at == 0){
+                m_board.m_wRkA_has_moved_at = m_minutes.size() + 1;
             }
-            if(move.src_x == 7 && move.src_y == 0 && 
-                board.wRkH_has_moved_at == 0){
-                board.wRkH_has_moved_at = minutes.size() + 1;
+            if(move.m_src_x == 7 && move.m_src_y == 0 && 
+                m_board.m_wRkH_has_moved_at == 0){
+                m_board.m_wRkH_has_moved_at = m_minutes.size() + 1;
             }
         }
-        else if(move.srcpiece == mBRK){
+        else if(move.m_srcpiece == mBRK){
             // update flags in board
-            if(move.src_x == 0 && move.src_y == 7 && 
-               board.bRkA_has_moved_at == 0){
-                board.bRkA_has_moved_at = minutes.size() + 1;
+            if(move.m_src_x == 0 && move.m_src_y == 7 && 
+               m_board.m_bRkA_has_moved_at == 0){
+                m_board.m_bRkA_has_moved_at = m_minutes.size() + 1;
             }
-            if(move.src_x == 7 && move.src_y == 7 && 
-                 board.bRkH_has_moved_at == 0){
-                board.bRkH_has_moved_at = minutes.size() + 1;
+            if(move.m_src_x == 7 && move.m_src_y == 7 && 
+                 m_board.m_bRkH_has_moved_at == 0){
+                m_board.m_bRkH_has_moved_at = m_minutes.size() + 1;
             }
         }
 
-        minutes.push_back(move);
+        m_minutes.push_back(move);
     }
 
 
     bool cMatch::undo_move(){
 
-        cMove move;
-        if(minutes.size() > 0){
-            move = minutes.back();
-        }
-        else{
+        if(m_minutes.size() == 0){
             return false;
         }
 
+        cMove move = m_minutes.back();
+
         // undo promotion
-        if(move.is_promotion() && PIECES_COLORS[move.srcpiece] == mWHITE){
-            board.setfield(move.src_x, move.src_y, mWPW);
-            board.setfield(move.dst_x, move.dst_y, move.dstpiece);
+        if(move.is_promotion() && PIECES_COLORS[move.m_srcpiece] == mWHITE){
+            m_board.setfield(move.m_src_x, move.m_src_y, mWPW);
+            m_board.setfield(move.m_dst_x, move.m_dst_y, move.m_dstpiece);
         
-            score -= SCORES[move.dstpiece];
-            score += SCORES[move.prompiece] - SCORES[mWPW];
+            m_score -= SCORES[move.m_dstpiece];
+            m_score += SCORES[move.m_prompiece] - SCORES[mWPW];
         
-            minutes.pop_back();
+            m_minutes.pop_back();
             return true;
         }
-        else if(move.is_promotion() && PIECES_COLORS[move.srcpiece] == mBLACK){
-            board.setfield(move.src_x, move.src_y, mBPW);
-            board.setfield(move.dst_x, move.dst_y, move.dstpiece);
+        else if(move.is_promotion() && PIECES_COLORS[move.m_srcpiece] == mBLACK){
+            m_board.setfield(move.m_src_x, move.m_src_y, mBPW);
+            m_board.setfield(move.m_dst_x, move.m_dst_y, move.m_dstpiece);
 
-            score -= SCORES[move.dstpiece];
-            score += SCORES[move.prompiece] - SCORES[mBPW];
+            m_score -= SCORES[move.m_dstpiece];
+            m_score += SCORES[move.m_prompiece] - SCORES[mBPW];
 
-            minutes.pop_back();
+            m_minutes.pop_back();
             return true;
         }
         else{
             // undo standard move
-            board.setfield(move.src_x, move.src_y, move.srcpiece);
-            board.setfield(move.dst_x, move.dst_y, move.dstpiece);
+            m_board.setfield(move.m_src_x, move.m_src_y, move.m_srcpiece);
+            m_board.setfield(move.m_dst_x, move.m_dst_y, move.m_dstpiece);
 
-            score -= SCORES[move.dstpiece];
+            m_score -= SCORES[move.m_dstpiece];
         }
 
         // undo en passant
-        if(move.srcpiece == mWPW && move.is_en_passant()){
-            board.setfield(move.dst_x, move.src_y, mBPW);
+        if(move.m_srcpiece == mWPW && move.is_en_passant()){
+            m_board.setfield(move.m_dst_x, move.m_src_y, mBPW);
 
-            score -= SCORES[mBPW];
+            m_score -= SCORES[mBPW];
 
-            minutes.pop_back();
+            m_minutes.pop_back();
             return true;
         }
-        else if(move.srcpiece == mBPW && move.is_en_passant()){
-            board.setfield(move.dst_x, move.src_y, mWPW);
+        else if(move.m_srcpiece == mBPW && move.is_en_passant()){
+            m_board.setfield(move.m_dst_x, move.m_src_y, mWPW);
 
-            score -= SCORES[mWPW];
+            m_score -= SCORES[mWPW];
 
-            minutes.pop_back();
+            m_minutes.pop_back();
             return true;
         }
 
         // undo castling
-        if(move.srcpiece == mWKG || move.srcpiece == mBKG){
+        if(move.m_srcpiece == mWKG || move.m_srcpiece == mBKG){
             if(move.is_short_castling()){
-                uint8_t rook = board.getfield(5, move.src_y); // f == 5
-                board.setfield(5, move.src_y, mBLK);
-                board.setfield(7, move.src_y, rook); // h == 7
+                uint8_t rook = m_board.getfield(5, move.m_src_y); // f == 5
+                m_board.setfield(5, move.m_src_y, mBLK);
+                m_board.setfield(7, move.m_src_y, rook); // h == 7
             }
             else if(move.is_long_castling()){
-                uint8_t rook = board.getfield(3, move.src_y); // c == 3
-                board.setfield(3, move.src_y, mBLK);
-                board.setfield(0, move.src_y, rook); // a == 0
+                uint8_t rook = m_board.getfield(3, move.m_src_y); // c == 3
+                m_board.setfield(3, move.m_src_y, mBLK);
+                m_board.setfield(0, move.m_src_y, rook); // a == 0
             }
 
             // update flags in board
-            if(move.srcpiece == mWKG){
-                if(board.wKg_has_moved_at != 0 && board.wKg_has_moved_at == minutes.size()){
-                    board.wKg_has_moved_at = 0;
+            if(move.m_srcpiece == mWKG){
+                if(m_board.m_wKg_has_moved_at != 0 && m_board.m_wKg_has_moved_at == m_minutes.size()){
+                    m_board.m_wKg_has_moved_at = 0;
                 }
-                board.wKg_x = move.src_x;
-                board.wKg_y = move.src_y;
+                m_board.m_wKg_x = move.m_src_x;
+                m_board.m_wKg_y = move.m_src_y;
             }
             else{
-                if(board.bKg_has_moved_at != 0 && board.bKg_has_moved_at == minutes.size()){
-                    board.bKg_has_moved_at = 0;
+                if(m_board.m_bKg_has_moved_at != 0 && m_board.m_bKg_has_moved_at == m_minutes.size()){
+                    m_board.m_bKg_has_moved_at = 0;
                 }
-                board.bKg_x = move.src_x;
-                board.bKg_y = move.src_y;
+                m_board.m_bKg_x = move.m_src_x;
+                m_board.m_bKg_y = move.m_src_y;
             }
         }
-        else if(move.srcpiece == mWRK){
+        else if(move.m_srcpiece == mWRK){
             // update flags in board
-            if(board.wRkA_has_moved_at != 0 && board.wRkA_has_moved_at == minutes.size()){
-                board.wRkA_has_moved_at = 0;
+            if(m_board.m_wRkA_has_moved_at != 0 && m_board.m_wRkA_has_moved_at == m_minutes.size()){
+                m_board.m_wRkA_has_moved_at = 0;
             }
-            if(board.wRkH_has_moved_at != 0 && board.wRkH_has_moved_at == minutes.size()){
-                board.wRkH_has_moved_at = 0;
+            if(m_board.m_wRkH_has_moved_at != 0 && m_board.m_wRkH_has_moved_at == m_minutes.size()){
+                m_board.m_wRkH_has_moved_at = 0;
             }
         }
-        else if(move.srcpiece == mBRK){
+        else if(move.m_srcpiece == mBRK){
             // update flags in board
-            if(board.bRkA_has_moved_at != 0 && board.bRkA_has_moved_at == minutes.size()){
-                board.bRkA_has_moved_at = 0;
+            if(m_board.m_bRkA_has_moved_at != 0 && m_board.m_bRkA_has_moved_at == m_minutes.size()){
+                m_board.m_bRkA_has_moved_at = 0;
             }
-            if(board.bRkH_has_moved_at != 0 && board.bRkH_has_moved_at == minutes.size()){
-                board.bRkH_has_moved_at = 0;
+            if(m_board.m_bRkH_has_moved_at != 0 && m_board.m_bRkH_has_moved_at == m_minutes.size()){
+                m_board.m_bRkH_has_moved_at = 0;
             }
         }
 
-        minutes.pop_back();
+        m_minutes.pop_back();
         return true;
 
     }
 
 
     //calculation
-    bool cMatch::is_piece_soft_pinned(uint8_t piece, uint8_t piece_x, uint8_t piece_y){
-        return false;
-        uint8_t piece1, piece1_x, piece1_y, piece2, piece2_x, piece2_y;
+    bool cMatch::does_move_attack_pinned_piece(cMove &move){
+        vector<cPiece> touched_pieces;
 
-        int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
+        uint8_t excl_dir = cBoard::eval_dir(move.m_src_x, move.m_src_y, move.m_dst_x, move.m_dst_y);
 
-        uint8_t idx = 0;
-        while(idx < 8){
-            piece1 = board.search_dir_for_piece(piece1_x, piece1_y, piece_x, piece_y, steps[idx][0], steps[idx][1], 6);
-            if(piece1 == mBLK){ idx += 2; continue; }
+        m_board.search_from_piece_for_touched_pieces(touched_pieces, move.m_srcpiece, move.m_dst_x, move.m_dst_y, REVERSED_COLORS[PIECES_COLORS[move.m_srcpiece]], excl_dir);
 
-            piece2 = board.search_dir_for_piece(piece2_x, piece2_y, piece_x, piece_y, steps[idx + 1][0], steps[idx + 1][1], 6);
-            if(piece2 == mBLK){ idx += 2; continue; }
-
-            if((PIECES_COLORS[piece1] == PIECES_COLORS[piece2])){
-                idx += 2; continue;
+        for(cPiece touched_piece : touched_pieces){
+            if(m_board.is_piece_soft_pinned(touched_piece.piece, touched_piece.src_x, touched_piece.src_y)){
+                touched_pieces.clear();
+                return true;
             }
-
-            if(PIECES_COLORS[piece1] == PIECES_COLORS[piece]){
-                if((idx < 4) && (piece2 == mWRK || piece2 == mBRK || piece2 == mWQU || piece2 == mBQU)){
-                    if(PIECES_RANKS[piece1] > PIECES_RANKS[piece] && PIECES_RANKS[piece2] < PIECES_RANKS[piece1]){
-                        return true;
-                    }
-                }
-                if((idx >= 4) && (piece2 == mWBP || piece2 == mBBP || piece2 == mWQU || piece2 == mBQU)){
-                    if(PIECES_RANKS[piece1] > PIECES_RANKS[piece] && PIECES_RANKS[piece2] < PIECES_RANKS[piece1]){
-                        return true;
-                    }
-                }
-            }
-            else if(PIECES_COLORS[piece2] == PIECES_COLORS[piece]){
-                if((idx < 4) && (piece1 == mWRK || piece1 == mBRK || piece1 == mWQU || piece1 == mBQU)){
-                    if(PIECES_RANKS[piece2] > PIECES_RANKS[piece] && PIECES_RANKS[piece1] < PIECES_RANKS[piece2]){
-                        return true;
-                    }
-                }
-                if((idx >= 4) && (piece1 == mWBP || piece1 == mBBP || piece1 == mWQU || piece1 == mBQU)){
-                    if(PIECES_RANKS[piece2] > PIECES_RANKS[piece] && PIECES_RANKS[piece1] < PIECES_RANKS[piece2]){
-                        return true;
-                    }
-                }
-            }
-
-            idx += 2; 
         }
+
+        touched_pieces.clear();
 
         return false;
 
     }
 
 
-    bool cMatch::filter(cMove &move, uint8_t depth){
+    bool cMatch::filter(cMove &move, uint8_t depth, uint8_t maxdepth){
         
-        if(depth > 22){
+        if(depth > 12){
             return false;
+        }
+
+        // for endgame increase maxdepth with 2
+        if(m_minutes.size() >= 32 && depth <= maxdepth + 2){
+            return true;
         }
 
         // take en passant moves
@@ -672,19 +566,19 @@
         }
 
         // take promotion moves
-        if(move.prompiece != mBLK){ 
+        if(move.m_prompiece != mBLK){ 
             return true; 
         }
 
         // take good capture moves
-        if(move.dstpiece != mBLK){ 
+        if(move.m_dstpiece != mBLK){ 
             // piece must be lower than captured piece
-            if(PIECES_RANKS[move.srcpiece] < PIECES_RANKS[move.dstpiece]){
+            if(PIECES_RANKS[move.m_srcpiece] < PIECES_RANKS[move.m_dstpiece]){
                 return true;
             }
 
             vector<cPiece> supporting_pieces;
-            board.search_for_touching_pieces(supporting_pieces, move.dst_x, move.dst_y, REVERSED_COLORS[PIECES_COLORS[move.srcpiece]], true);
+            m_board.search_for_touching_pieces(supporting_pieces, move.m_dst_x, move.m_dst_y, PIECES_COLORS[move.m_dstpiece], true);
 
             // move is good because captured piece is not supported
             if(supporting_pieces.size() == 0){
@@ -692,7 +586,7 @@
             }
 
             vector<cPiece> attacking_pieces;
-            board.search_for_touching_pieces(attacking_pieces, move.dst_x, move.dst_y, PIECES_COLORS[move.srcpiece], true);
+            m_board.search_for_touching_pieces(attacking_pieces, move.m_dst_x, move.m_dst_y, PIECES_COLORS[move.m_srcpiece], true);
             
             // move is good because captured piece is more attacked than supported 
             if(attacking_pieces.size() > supporting_pieces.size()){
@@ -726,30 +620,17 @@
 
         //if(depth > 6){ return false; } // 8
 
-        if(move.srcpiece == mWPW && move.dst_y >= 6){
+        if(move.m_srcpiece == mWPW && move.m_dst_y >= 6){
             return true;
         }
 
-        if(move.srcpiece == mBPW && move.dst_y <= 2){
+        if(move.m_srcpiece == mBPW && move.m_dst_y <= 2){
             return true;
         }
 
-        vector<cPiece> touched_pieces;
+        //return does_move_attack_pinned_piece(move);
 
-        uint8_t excl_dir = cBoard::eval_dir(move.src_x, move.src_y, move.dst_x, move.dst_y);
-
-        board.piece_search_for_touched_pieces(touched_pieces, move.srcpiece, move.dst_x, move.dst_y, PIECES_COLORS[PIECES_COLORS[move.srcpiece]], excl_dir);
-
-        bool pinned = false;
-        for(cPiece touched_piece : touched_pieces){
-            if(is_piece_soft_pinned(touched_piece.piece, touched_piece.src_x, touched_piece.src_y)){
-                pinned = true;
-                break;
-            }
-        }
-        touched_pieces.clear();
-
-        return pinned;
+        return false; 
 
     }
 
@@ -767,48 +648,25 @@
     }
 
 
-    bool cMatch::is_calc_term(int32_t &score, const vector<cMove> &moves, uint8_t depth){
-
-        if(moves.size() == 0){
-            if(is_king_attacked(REVERSED_COLORS[next_color()])){
-                if(next_color() == mWHITE){
-                    score = (SCORES[mWKG] * 9) + depth;
-                }
-                else{
-                    score = (SCORES[mBKG] * 9) - depth;
-                }
-            }
-            else{
-                score = 0; // draw
-            }
-
-            return true;
-        }
-
-        return false; 
-
-    }
-
-
     void cMatch::gen_moves(vector<cMove> &moves, uint8_t color){
 
         uint8_t king, kg_x, kg_y, enmycolor;
 
         if(color == mWHITE){
             king = mWKG;
-            kg_x = board.wKg_x;
-            kg_y = board.wKg_y;
+            kg_x = m_board.m_wKg_x;
+            kg_y = m_board.m_wKg_y;
             enmycolor = mBLACK;
         }
         else{
             king = mBKG;
-            kg_x = board.bKg_x;
-            kg_y = board.bKg_y;
+            kg_x = m_board.m_bKg_x;
+            kg_y = m_board.m_bKg_y;
             enmycolor = mWHITE;
         }
 
         vector<cPiece> attacking_pieces;
-        board.search_for_touching_pieces(attacking_pieces, kg_x, kg_y, enmycolor, true);
+        m_board.search_for_touching_pieces(attacking_pieces, kg_x, kg_y, enmycolor, true);
 
         if(attacking_pieces.size() >= 2){
             gen_kg_moves(moves, kg_x, kg_y, king);
@@ -822,7 +680,7 @@
         else{
             for(uint8_t y = 0; y < 8; ++y){
                 for(uint8_t x = 0; x < 8; ++x){
-                    uint8_t piece = board.getfield(x, y);
+                    uint8_t piece = m_board.getfield(x, y);
                     if(PIECES_COLORS[piece] == color){
                         if(piece == mWPW){ 
                             gen_wpw_moves(moves, x, y); 
@@ -878,67 +736,76 @@
     void cMatch::add_wpw_moves(vector<cMove> &moves, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t dstpiece){
 
         if(src_y == 6 && dst_y == 7){
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWQU));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWQU, 10));
             
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWRK));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWRK, 11));
             
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWBP));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWBP, 12));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWKN));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWKN, 13));
         }
         else{
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mBLK));
+            cMove move(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mBLK, 100);
+
+            if(dstpiece != mBLK){ 
+                move.m_prio = 50; 
+            }
+            else if(does_move_attack_pinned_piece(move)){
+                move.m_prio = 45; 
+            }
+
+            moves.push_back(move);
         }
     }
 
 
     void cMatch::gen_wpw_moves(vector<cMove> &moves, uint8_t x, uint8_t y){
 
-        uint8_t pindir = board.eval_pindir(x, y, mWHITE);
+        uint8_t pindir = m_board.eval_pindir(x, y, mWHITE);
 
         if((pindir == mNO_DIR || pindir == mSTHWST_NTHEST) && cBoard::is_inbounds(x + 1, y + 1)){
-            uint8_t dstpiece = board.getfield(x + 1, y + 1);
+            uint8_t dstpiece = m_board.getfield(x + 1, y + 1);
 
             if(PIECES_COLORS[dstpiece] == mBLACK){
                 add_wpw_moves(moves, x, y, x + 1, y + 1, dstpiece);
             }
             else if(dstpiece == mBLK && y == 4){ // en passant
-                cMove prevmove = minutes.back();
-                uint8_t enpiece = board.getfield(prevmove.dst_x, prevmove.dst_y);
-                if(enpiece == mBPW && prevmove.src_y == 6 && prevmove.dst_y == 4 && prevmove.src_x == prevmove.dst_x && x + 1 == prevmove.src_x){
-                    moves.push_back(cMove(x, y, x + 1, y + 1, mWPW, dstpiece, mBLK));
+                cMove prevmove = m_minutes.back();
+                uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
+                if(enpiece == mBPW && prevmove.m_src_y == 6 && prevmove.m_dst_y == 4 && prevmove.m_src_x == prevmove.m_dst_x && x + 1 == prevmove.m_src_x){
+                    moves.push_back(cMove(x, y, x + 1, y + 1, mWPW, dstpiece, mBLK, 20));
                 }
             }
         }
 
         if((pindir == mNO_DIR || pindir == mSTHEST_NTHWST) && cBoard::is_inbounds(x - 1, y + 1)){
 
-            uint8_t dstpiece = board.getfield(x - 1, y + 1);
+            uint8_t dstpiece = m_board.getfield(x - 1, y + 1);
 
             if(PIECES_COLORS[dstpiece] == mBLACK){
                 add_wpw_moves(moves, x, y, x - 1, y + 1, dstpiece);
             }
             else if(dstpiece == mBLK && y == 4){ // en passant
-                cMove prevmove = minutes.back();
-                uint8_t enpiece = board.getfield(prevmove.dst_x, prevmove.dst_y);
-                if(enpiece == mBPW && prevmove.src_y == 6 && prevmove.dst_y == 4 && prevmove.src_x == prevmove.dst_x && x - 1 == prevmove.src_x){
-                    moves.push_back(cMove(x, y, x - 1, y + 1, mWPW, dstpiece, mBLK));
+                cMove prevmove = m_minutes.back();
+                uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
+                if(enpiece == mBPW && prevmove.m_src_y == 6 && prevmove.m_dst_y == 4 && prevmove.m_src_x == prevmove.m_dst_x && x - 1 == prevmove.m_src_x){
+                    moves.push_back(cMove(x, y, x - 1, y + 1, mWPW, dstpiece, mBLK, 20));
                 }
             }
         }
 
         if(pindir == mNO_DIR || pindir == mSTH_NTH){
             if(cBoard::is_inbounds(x, y + 1)){
-                uint8_t dstpiece = board.getfield(x, y + 1);
+                uint8_t dstpiece = m_board.getfield(x, y + 1);
                 if(dstpiece == mBLK){
                     add_wpw_moves(moves, x, y, x, y + 1, dstpiece);
                 }
             }
             if(cBoard::is_inbounds(x, y + 2)){
-                uint8_t dstpiece = board.getfield(x, y + 2);
-                uint8_t midpiece = board.getfield(x, y + 1);
+                uint8_t dstpiece = m_board.getfield(x, y + 2);
+                uint8_t midpiece = m_board.getfield(x, y + 1);
                 if(midpiece == mBLK && dstpiece == mBLK && y == 1){
-                  moves.push_back(cMove(x, y, x, y + 2, mWPW, dstpiece, mBLK));
+                    add_wpw_moves(moves, x, y, x, y + 2, dstpiece);
                 }
             }
         }
@@ -949,16 +816,25 @@
     void cMatch::add_bpw_moves(vector<cMove> &moves, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t dstpiece){
 
         if(src_y == 1 && dst_y == 0){
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBQU));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBQU, 10));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBRK));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBRK, 11));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBBP));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBBP, 12));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBKN));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBKN, 13));
         }
         else{
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBLK));
+            cMove move(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBLK, 100);
+
+            if(dstpiece != mBLK){ 
+                move.m_prio = 50; 
+            }
+            else if(does_move_attack_pinned_piece(move)){
+                move.m_prio = 45; 
+            }
+
+            moves.push_back(move);
         }
 
     }
@@ -966,50 +842,50 @@
 
     void cMatch::gen_bpw_moves(vector<cMove> &moves, uint8_t x, uint8_t y){
 
-        uint8_t pindir = board.eval_pindir(x, y, mBLACK);
+        uint8_t pindir = m_board.eval_pindir(x, y, mBLACK);
 
         if((pindir == mNO_DIR || pindir == mSTHEST_NTHWST) && cBoard::is_inbounds(x + 1, y - 1)){
             
-            uint8_t dstpiece = board.getfield(x + 1, y - 1);
+            uint8_t dstpiece = m_board.getfield(x + 1, y - 1);
             if(PIECES_COLORS[dstpiece] == mWHITE){
                 add_bpw_moves(moves, x, y, x + 1, y - 1, dstpiece);
             }
             else if(dstpiece == mBLK && y == 3){ // en passant
-                cMove prevmove = minutes.back();
-                uint8_t enpiece = board.getfield(prevmove.dst_x, prevmove.dst_y);
-                if(enpiece == mWPW && prevmove.src_y == 1 && prevmove.dst_y == 3 && prevmove.src_x == prevmove.dst_x && x + 1 == prevmove.src_x){
-                    moves.push_back(cMove(x, y, x + 1, y - 1, mBPW, dstpiece, mBLK));
+                cMove prevmove = m_minutes.back();
+                uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
+                if(enpiece == mWPW && prevmove.m_src_y == 1 && prevmove.m_dst_y == 3 && prevmove.m_src_x == prevmove.m_dst_x && x + 1 == prevmove.m_src_x){
+                    moves.push_back(cMove(x, y, x + 1, y - 1, mBPW, dstpiece, mBLK, 20));
                 }
             }
         }
 
         if((pindir == mNO_DIR || pindir == mSTHWST_NTHEST) && cBoard::is_inbounds(x - 1, y - 1)){
-            uint8_t dstpiece = board.getfield(x - 1, y - 1);
+            uint8_t dstpiece = m_board.getfield(x - 1, y - 1);
             if(PIECES_COLORS[dstpiece] == mWHITE){
                 add_bpw_moves(moves, x, y, x - 1, y - 1, dstpiece);
             }
             else if(dstpiece == mBLK && y == 3){ // en passant
-                cMove prevmove = minutes.back();
-                uint8_t enpiece = board.getfield(prevmove.dst_x, prevmove.dst_y);
-                if(enpiece == mWPW && prevmove.src_y == 1 && prevmove.dst_y == 3 && prevmove.src_x == prevmove.dst_x && x - 1 == prevmove.src_x){
-                    moves.push_back(cMove(x, y, x - 1, y - 1, mBPW, dstpiece, mBLK));
+                cMove prevmove = m_minutes.back();
+                uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
+                if(enpiece == mWPW && prevmove.m_src_y == 1 && prevmove.m_dst_y == 3 && prevmove.m_src_x == prevmove.m_dst_x && x - 1 == prevmove.m_src_x){
+                    moves.push_back(cMove(x, y, x - 1, y - 1, mBPW, dstpiece, mBLK, 20));
                 }
             }
         }
 
         if(pindir == mNO_DIR || pindir == mSTH_NTH){
             if(cBoard::is_inbounds(x, y - 1)){
-                uint8_t dstpiece = board.getfield(x, y - 1);
+                uint8_t dstpiece = m_board.getfield(x, y - 1);
                 if(dstpiece == mBLK){
                     add_bpw_moves(moves, x, y, x, y - 1, dstpiece);
                 }
             }
 
             if(cBoard::is_inbounds(x, y - 2)){
-                uint8_t dstpiece = board.getfield(x, y - 2);
-                uint8_t midpiece = board.getfield(x, y - 1);
+                uint8_t dstpiece = m_board.getfield(x, y - 2);
+                uint8_t midpiece = m_board.getfield(x, y - 1);
                 if(midpiece == mBLK && dstpiece == mBLK && y == 6){
-                    moves.push_back(cMove(x, y, x, y - 2, mBPW, dstpiece, mBLK));
+                    add_bpw_moves(moves, x, y, x, y - 2, dstpiece);
                 }
             }
         }
@@ -1019,7 +895,7 @@
 
     void cMatch::gen_kn_moves(vector<cMove> &moves, uint8_t x, uint8_t y, uint8_t knight){
 
-        uint8_t pindir = board.eval_pindir(x, y, PIECES_COLORS[knight]);
+        uint8_t pindir = m_board.eval_pindir(x, y, PIECES_COLORS[knight]);
         if(pindir != mNO_DIR){ 
             return; 
         }
@@ -1031,10 +907,25 @@
                 uint8_t dst_x = x + steps[i][0];
                 uint8_t dst_y = y + steps[i][1];
 
-                uint8_t dstpiece = board.getfield(dst_x, dst_y);
+                uint8_t dstpiece = m_board.getfield(dst_x, dst_y);
 
                 if(PIECES_COLORS[dstpiece] != PIECES_COLORS[knight]){
-                    moves.push_back(cMove(x, y, dst_x, dst_y, knight, dstpiece, mBLK));
+                    cMove move(x, y, dst_x, dst_y, knight, dstpiece, mBLK, 100);
+
+                    if(dstpiece != mBLK){ 
+                        if(PIECES_RANKS[knight] <= PIECES_RANKS[dstpiece]){ 
+                            move.m_prio = 50; 
+                        }
+                        else{
+                            move.m_prio = 60; 
+                        }
+                    }
+
+                    if(does_move_attack_pinned_piece(move)){
+                        move.m_prio = min(move.m_prio, (uint8_t)45); 
+                    }
+
+                    moves.push_back(move);
                 }
             }
         }
@@ -1044,7 +935,7 @@
 
     void cMatch::gen_qrb_moves(vector<cMove> &moves, uint8_t x, uint8_t y, uint8_t piece, char _switch){
 
-        uint8_t pindir = board.eval_pindir(x, y, PIECES_COLORS[piece]);
+        uint8_t pindir = m_board.eval_pindir(x, y, PIECES_COLORS[piece]);
         
         int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
@@ -1073,13 +964,28 @@
                     }
                 }
 
-                uint8_t dstpiece = board.getfield(dst_x, dst_y);
+                uint8_t dstpiece = m_board.getfield(dst_x, dst_y);
 
                 if(PIECES_COLORS[dstpiece] == PIECES_COLORS[piece]){
                     break;
                 }
 
-                moves.push_back(cMove(x, y, dst_x, dst_y, piece, dstpiece, mBLK));
+                cMove move(x, y, dst_x, dst_y, piece, dstpiece, mBLK, 100);
+
+                if(dstpiece != mBLK){ 
+                    if(PIECES_RANKS[piece] <= PIECES_RANKS[dstpiece]){ 
+                        move.m_prio = 50; 
+                    }
+                    else{
+                        move.m_prio = 60; 
+                    }
+                }
+
+                if(does_move_attack_pinned_piece(move)){
+                    move.m_prio = 45; //min(move.m_prio, (uint8_t)45); 
+                }
+
+                moves.push_back(move);
 
                 if(dstpiece != mBLK){
                     break;
@@ -1104,7 +1010,7 @@
                 dst_x += steps[idx][0];
                 dst_y += steps[idx][1];
 
-                uint8_t dstpiece = board.getfield(dst_x, dst_y);
+                uint8_t dstpiece = m_board.getfield(dst_x, dst_y);
 
                 if(PIECES_COLORS[dstpiece] == PIECES_COLORS[king]){
                     break;
@@ -1112,24 +1018,33 @@
 
                 bool is_clear = false;
                 if(PIECES_COLORS[king] == mWHITE){
-                    board.setfield(board.wKg_x, board.wKg_y, mBLK);
-                    if(board.search_for_touching_piece(dst_x, dst_y, mBLACK) == mBLK){
+                    m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
+                    if(m_board.search_for_touching_piece(dst_x, dst_y, mBLACK) == mBLK){
                         is_clear = true;
                     }
-                    board.setfield(board.wKg_x, board.wKg_y, mWKG);
+                    m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
                 }
                 else{
-                    board.setfield(board.bKg_x, board.bKg_y, mBLK);
-                    if(board.search_for_touching_piece(dst_x, dst_y, mWHITE) == mBLK){
+                    m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
+                    if(m_board.search_for_touching_piece(dst_x, dst_y, mWHITE) == mBLK){
                         is_clear = true;
                     }
-                    board.setfield(board.bKg_x, board.bKg_y, mBKG);
+                    m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
                 }
                 if(is_clear == false){ 
                     break; 
                 }
 
-                moves.push_back(cMove(x, y, dst_x, dst_y, king, dstpiece, mBLK));
+                cMove move(x, y, dst_x, dst_y, king, dstpiece, mBLK, 100);
+
+                if(dstpiece != mBLK){ 
+                    move.m_prio = 50; 
+                }
+                else if(does_move_attack_pinned_piece(move)){
+                    move.m_prio = 45; 
+                }
+
+                moves.push_back(move);
             }
         }
 
@@ -1139,37 +1054,49 @@
     void cMatch::gen_wkg_castling_moves(vector<cMove> &moves,  uint8_t x, uint8_t y){
 
         // short white castling
-        if(board.wKg_has_moved_at == 0 && board.wRkH_has_moved_at == 0 && cBoard::is_inbounds(x + 3, y)){
-            if(y == 0 && board.getfield(x + 1, y) == mBLK && board.getfield(x + 2, y) == mBLK && board.getfield(x + 3, y) == mWRK){
-                board.setfield(board.wKg_x, board.wKg_y, mBLK);
+        if(m_board.m_wKg_has_moved_at == 0 && m_board.m_wRkH_has_moved_at == 0 && cBoard::is_inbounds(x + 3, y)){
+            if(y == 0 && m_board.getfield(x + 1, y) == mBLK && m_board.getfield(x + 2, y) == mBLK && m_board.getfield(x + 3, y) == mWRK){
+                m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
                 bool is_clear = true;
                 for(uint8_t i = 0; i < 3; ++i){
-                    if(board.search_for_touching_piece(x + i, y, mBLACK) != mBLK){
+                    if(m_board.search_for_touching_piece(x + i, y, mBLACK) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
-                board.setfield(board.wKg_x, board.wKg_y, mWKG);
+                m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
                 if(is_clear){
-                    moves.push_back(cMove(x, y, x + 2, y, mWKG, mBLK, mBLK));
+                    cMove move(x, y, x + 2, y, mWKG, mBLK, mBLK, 70);
+
+                    if(does_move_attack_pinned_piece(move)){
+                        move.m_prio = 45; 
+                    }
+
+                    moves.push_back(move);
                 }
             }
         }
 
         // long white castling
-        if(board.wKg_has_moved_at == 0 && board.wRkA_has_moved_at == 0 && cBoard::is_inbounds(x - 4, y)){
-            if(y == 0 && board.getfield(x - 1, y) == mBLK && board.getfield(x - 2, y) == mBLK && board.getfield(x - 3, y) == mBLK && board.getfield(x - 4, y) == mWRK){
-                board.setfield(board.wKg_x, board.wKg_y, mBLK);
+        if(m_board.m_wKg_has_moved_at == 0 && m_board.m_wRkA_has_moved_at == 0 && cBoard::is_inbounds(x - 4, y)){
+            if(y == 0 && m_board.getfield(x - 1, y) == mBLK && m_board.getfield(x - 2, y) == mBLK && m_board.getfield(x - 3, y) == mBLK && m_board.getfield(x - 4, y) == mWRK){
+                m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
                 bool is_clear = true;
                 for(uint8_t i = 0; i < 3; ++i){
-                    if(board.search_for_touching_piece(x - i, y, mBLACK) != mBLK){
+                    if(m_board.search_for_touching_piece(x - i, y, mBLACK) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
-                board.setfield(board.wKg_x, board.wKg_y, mWKG);
+                m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
                 if(is_clear){
-                    moves.push_back(cMove(x, y, x - 2, y, mWKG, mBLK, mBLK));
+                    cMove move(x, y, x - 2, y, mWKG, mBLK, mBLK, 70);
+
+                    if(does_move_attack_pinned_piece(move)){
+                        move.m_prio = 45; 
+                    }
+
+                    moves.push_back(move);
                 }
             }
         }
@@ -1180,37 +1107,49 @@
     void cMatch::gen_bkg_castling_moves(vector<cMove> &moves, uint8_t x, uint8_t y){
 
         // short black castling
-        if(board.bKg_has_moved_at == 0 && board.bRkH_has_moved_at == 0 && cBoard::is_inbounds(x + 3, y)){
-            if(y == 7 && board.getfield(x + 1, y) == mBLK && board.getfield(x + 2, y) == mBLK && board.getfield(x + 3, y) == mBRK){
-                board.setfield(board.bKg_x, board.bKg_y, mBLK);
+        if(m_board.m_bKg_has_moved_at == 0 && m_board.m_bRkH_has_moved_at == 0 && cBoard::is_inbounds(x + 3, y)){
+            if(y == 7 && m_board.getfield(x + 1, y) == mBLK && m_board.getfield(x + 2, y) == mBLK && m_board.getfield(x + 3, y) == mBRK){
+                m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
                 bool is_clear = true;
                 for(uint8_t i = 0; i < 3; ++i){
-                    if(board.search_for_touching_piece(x + i, y, mWHITE) != mBLK){
+                    if(m_board.search_for_touching_piece(x + i, y, mWHITE) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
-                board.setfield(board.bKg_x, board.bKg_y, mBKG);
+                m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
                 if(is_clear){
-                    moves.push_back(cMove(x, y, x + 2, y, mBKG, mBLK, mBLK));
+                    cMove move(x, y, x + 2, y, mBKG, mBLK, mBLK, 70);
+
+                    if(does_move_attack_pinned_piece(move)){
+                        move.m_prio = 45; 
+                    }
+
+                    moves.push_back(move);
                 }
             }
         }
 
         // long black castling
-        if(board.bKg_has_moved_at == 0 && board.bRkA_has_moved_at == 0 && cBoard::is_inbounds(x - 4, y)){
-            if(y == 7 && board.getfield(x - 1, y) == mBLK && board.getfield(x - 2, y) == mBLK && board.getfield(x - 3, y) == mBLK && board.getfield(x - 4, y) == mBRK){
-                board.setfield(board.bKg_x, board.bKg_y, mBLK);
+        if(m_board.m_bKg_has_moved_at == 0 && m_board.m_bRkA_has_moved_at == 0 && cBoard::is_inbounds(x - 4, y)){
+            if(y == 7 && m_board.getfield(x - 1, y) == mBLK && m_board.getfield(x - 2, y) == mBLK && m_board.getfield(x - 3, y) == mBLK && m_board.getfield(x - 4, y) == mBRK){
+                m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
                 bool is_clear = true;
                 for(uint8_t i = 0; i < 3; ++i){
-                    if(board.search_for_touching_piece(x - i, y, mWHITE) != mBLK){
+                    if(m_board.search_for_touching_piece(x - i, y, mWHITE) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
-                board.setfield(board.bKg_x, board.bKg_y, mBKG);
+                m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
                 if(is_clear){
-                    moves.push_back(cMove(x, y, x - 2, y, mBKG, mBLK, mBLK));
+                    cMove move(x, y, x - 2, y, mBKG, mBLK, mBLK, 70);
+
+                    if(does_move_attack_pinned_piece(move)){
+                        move.m_prio = 45; 
+                    }
+
+                    moves.push_back(move);
                 }
             }
         }
@@ -1222,14 +1161,14 @@
         
         vector<cPiece> defending_pieces;        
 
-        board.search_for_touching_pieces(defending_pieces, attacking_x, attacking_y, color, true);
+        m_board.search_for_touching_pieces(defending_pieces, attacking_x, attacking_y, color, true);
 
         for(cPiece defending_piece : defending_pieces){
             if(defending_piece.piece == mWKG || defending_piece.piece == mBKG){
                 continue;
             }
 
-            uint8_t pindir = board.eval_pindir(defending_piece.src_x, defending_piece.src_y, PIECES_COLORS[defending_piece.piece]);
+            uint8_t pindir = m_board.eval_pindir(defending_piece.src_x, defending_piece.src_y, PIECES_COLORS[defending_piece.piece]);
 
             uint8_t dir = cBoard::eval_dir(defending_piece.src_x, defending_piece.src_y, attacking_x, attacking_y);
 
@@ -1244,7 +1183,7 @@
                 add_bpw_moves(moves, defending_piece.src_x, defending_piece.src_y, attacking_x, attacking_y, attacking_piece);
             }
             else{
-                moves.push_back(cMove(defending_piece.src_x, defending_piece.src_y, attacking_x, attacking_y, defending_piece.piece, attacking_piece, mBLK));
+                moves.push_back(cMove(defending_piece.src_x, defending_piece.src_y, attacking_x, attacking_y, defending_piece.piece, attacking_piece, mBLK, 40));
             }
         }
         defending_pieces.clear();
@@ -1304,13 +1243,13 @@
             dst_x += step_x;
             dst_y += step_y;
             while(!(dst_x == kg_x && dst_y == kg_y)){
-                board.search_for_touching_pieces(defending_pieces, dst_x, dst_y, color, false);
+                m_board.search_for_touching_pieces(defending_pieces, dst_x, dst_y, color, false);
                   for(cPiece defending_piece : defending_pieces){
                     if(defending_piece.piece == mWKG || defending_piece.piece == mBKG){
                         continue;
                     }
 
-                    uint8_t pindir = board.eval_pindir(defending_piece.src_x, defending_piece.src_y, PIECES_COLORS[defending_piece.piece]);
+                    uint8_t pindir = m_board.eval_pindir(defending_piece.src_x, defending_piece.src_y, PIECES_COLORS[defending_piece.piece]);
                     uint8_t dir = cBoard::eval_dir(defending_piece.src_x, defending_piece.src_y, dst_x, dst_y);
 
                     if(pindir != mNO_DIR && pindir != dir){
@@ -1324,7 +1263,7 @@
                         add_bpw_moves(moves, defending_piece.src_x, defending_piece.src_y, dst_x, dst_y, mBLK);
                     }
                     else{
-                        moves.push_back(cMove(defending_piece.src_x, defending_piece.src_y, dst_x, dst_y, defending_piece.piece, mBLK, mBLK));
+                        moves.push_back(cMove(defending_piece.src_x, defending_piece.src_y, dst_x, dst_y, defending_piece.piece, mBLK, mBLK, 45));
                     }
                 }
 
@@ -1337,120 +1276,102 @@
 
     }
 
- 
-    bool cMatch::sortByPresort(cMove &A, cMove &B){
-        return (PIECES_RANKS[B.dstpiece] + PIECES_RANKS[B.prompiece]) < (PIECES_RANKS[A.dstpiece] + PIECES_RANKS[A.prompiece]);
-    }
- 
- 
-    void cMatch::alphabeta(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid){
 
-        vector<cMove> newcandidates;
-        int32_t newscore, bestscore;
+    bool cMatch::sortByPrio(const cMove &a, const cMove &b){
+        return a.m_prio < b.m_prio;
+    }
+
+
+    void cMatch::calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta){
+
+        vector<cMove> newmoves;
+
+        int32_t newscore;
+
         u_int8_t count = 0;
 
-        // debug
-        //if(debug == true){
-        //    calc_score = 0;
-        //    return;
-        //}
+        bool maximizing = (next_color() == mWHITE);
 
         if(maximizing){
-            bestscore = SCORES[mWKG] * 10;
+            rscore = SCORES[mWKG] * 10;
         }
         else{
-            bestscore = SCORES[mBKG] * 10;
+            rscore = SCORES[mBKG] * 10;
         }
 
         vector<cMove> moves;
         gen_moves(moves, next_color());
-        sort(moves.begin(), moves.end(), sortByPresort);
+ 
+        if(moves.size() == 0){
+            rscore = eval_term(depth);
+            return;
+        }
+        else{
+            sort(moves.begin(), moves.end(), sortByPrio);
+        }
 
-        if(is_calc_term(calc_score, moves, depth)){
-            moves.clear();
+        if(depth == 1){
+            calc_alphabeta_v3(newscore, newmoves, depth, maxdepth, alpha, beta);
+
+            rscore = newscore;
+
+            for(cMove nmove : newmoves){
+                rmoves.push_back(nmove);
+            }
+
             return;
         }
 
         for(cMove move : moves){
             count++;
-            newcandidates.clear();
+
+            newmoves.clear();
+
             bool skip = false;
-
-            if(depth == 1){
-                if(threadid != 0 && (count % MAXTHREADS) + 1 != threadid){ 
-                    //this_thread::sleep_for(chrono::milliseconds(100));
-                    continue;
-                }
-
-                //cout << "\nthread #" << to_string(threadid) + " " << to_string(count) << "(" + to_string(moves.size()) + ") current search: [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
-            }
 
             if(depth > maxdepth){
                 // skip move if filter says move is not worth to search deeper
-                if(filter(move, depth) == false){
-                    newscore = score + eval_board(move);
+                if(filter(move, depth, maxdepth) == false){
+                    newscore = m_score + eval_move(move, maxdepth) + eval_board(move);
                     skip = true;
                 }
             }
 
-            //if(depth > 5 && depth <= 15){ 
-            //    cout << ". "; 
-            //}
-            //else if(depth > 15 && depth <= 20){ 
-            //    cout << ": "; 
-            //}
-            //else if(depth > 20){ 
-            //    cout << "_ ";
-            //}
-
             if(skip == false){
-                // debug
-                //uint8_t newfields[8][8];
-                //board.debug_copy_fields(newfields);
+                //int32_t rscore = eval_move(move, maxdepth);
 
                 do_move(move);
 
-                alphabeta(newscore, newcandidates, depth + 1, maxdepth, alpha, beta, !maximizing, threadid);
-
-                // debug
-                //if(debug == true){
-                //    calc_score = 0;
-                //    return;
-                //}
+                //score += rscore;
+                
+                calc_alphabeta(newscore, newmoves, depth + 1, maxdepth, alpha, beta);
 
                 undo_move();
+
+                //score -= rscore;
             }
 
-            // debug
-            //if(board.debug_check_flags() == false || board.debug_compare_fields(newfields) == false){
-                //cout << "bug found: " << move->format() << endl;
-                //board.prnt();
-                //prnt_minutes();
-                //debug = true;
-                //return 0;
-            //}
-
             if(maximizing){
-                if(newscore > bestscore){
-                    bestscore = newscore;
-                    alpha = max(bestscore, alpha);
-                    append_newmove(rcandidates, newcandidates, move);
-                    /*if(depth == 1){
-                        cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
-                    }*/
+                if(newscore > rscore){
+                    rscore = newscore;
+                    
+                    alpha = max(rscore, alpha);
+
+                    append_newmove(rmoves, newmoves, move);
+
                     if(alpha >= beta){
                         break;
                     }
                 }
             }
             else{
-                if(newscore < bestscore){
-                    bestscore = newscore;
-                    beta = min(bestscore, beta);
-                    append_newmove(rcandidates, newcandidates, move);
-                    /*if(depth == 1){
-                        cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
-                    }*/
+                if(newscore < rscore){
+                    rscore = newscore;
+
+                    beta = min(rscore, beta);
+
+                    append_newmove(rmoves, newmoves, move);
+
                     if(beta <= alpha){
                         break;
                     }
@@ -1459,175 +1380,42 @@
         }
 
         moves.clear();
-
-        calc_score = bestscore;
 
     }
 
 
-    void cMatch::alphabeta_v2(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid){
-
-        vector<cMove> newcandidates;
-        int32_t newscore, bestscore;
-        u_int8_t count = 0;
-
-        // debug
-        //if(debug == true){
-        //    calc_score = 0;
-        //    return;
-        //}
-
-        if(maximizing){
-            bestscore = SCORES[mWKG] * 10;
-        }
-        else{
-            bestscore = SCORES[mBKG] * 10;
-        }
+    void cMatch::calc_alphabeta_v3(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta){
 
         vector<cMove> moves;
         gen_moves(moves, next_color());
-
-        if(is_calc_term(calc_score, moves, depth)){
-            moves.clear();
+ 
+        if(moves.size() == 0){
+            rscore = eval_term(depth);
             return;
         }
-
-        for(cMove move : moves){
-            count++;
-            newcandidates.clear();
-            bool skip = false;
-
-            
-            if(depth == 1){
-                cout << "\n" << to_string(count) << "(" + to_string(moves.size()) + ") CURRENT SEARCH from thread #" << to_string(threadid) << ": [" + move.format() + "] " << fmt_moves(newcandidates) << endl;
-            }
-
-            if(depth == 5){
-                if(threadid != 0 && (count % MAXTHREADS) + 1 != threadid){ 
-                    continue;
-                }
-            }
-
-            if(depth > maxdepth){
-                // skip move if filter says move is not worth to search deeper...
-                if(filter(move, depth) == false){
-                    newscore = score + eval_board(move);
-                    skip = true;
-                }
-            }
-
-            //if(depth > 5 && depth <= 15){ 
-            //    cout << ". "; 
-            //}
-            //else if(depth > 15 && depth <= 20){ 
-            //    cout << ": "; 
-            //}
-            //else if(depth > 20){ 
-            //    cout << "_ ";
-            //}
-
-            if(skip == false){
-                // debug
-                //uint8_t newfields[8][8];
-                //board.debug_copy_fields(newfields);
-
-                do_move(move);
-
-                if(depth == 4 && MAXTHREADS > 1){
-
-                    array<vector<cMove>, MAXTHREADS> candidates;
-
-                    array<cMatch*, MAXTHREADS> matches;
-
-                    thread threads[MAXTHREADS];
-
-                    int32_t scores[MAXTHREADS];
-
-                    for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
-                        cMatch *match = new cMatch(*this);
-                        matches[idx] = match; //new cMatch(*this);
-                        threads[idx] = thread(&cMatch::alphabeta, match, ref(scores[idx]), ref(candidates[idx]), depth + 1, maxdepth, alpha, beta, maximizing, idx + 1);
-                    }
-
-                    for(uint8_t idx = 0; idx < MAXTHREADS; ++idx){
-                        threads[idx].join();
-                        //cout << "\nthread #" << (idx + 1) << " joined ";
-                        //cout << scores[idx] << " " << fmt_moves(candidates[idx]) << endl;
-                        delete matches[idx];
-                    }
-
-                    newscore = scores[0];
-                    newcandidates.assign(candidates[0].begin(), candidates[0].end());
-                    for(uint8_t idx = 1; idx < MAXTHREADS; ++idx){
-                        if(maximizing){
-                            if(scores[idx] > newscore){
-                                newscore = scores[idx];
-                                newcandidates.clear();
-                                newcandidates.assign(candidates[idx].begin(), candidates[idx].end());
-                            }
-                        }
-                        else{
-                            if(scores[idx] < newscore){
-                                newscore = scores[idx];
-                                newcandidates.clear();
-                                newcandidates.assign(candidates[idx].begin(), candidates[idx].end());
-                            }
-                        }
-                    }
-                }
-                else{
-                    alphabeta(newscore, newcandidates, depth + 1, maxdepth, alpha, beta, !maximizing, threadid);
-                }
-
-                // debug
-                //if(debug == true){
-                //    calc_score = 0;
-                //    return;
-                //}
-
-                undo_move();
-            }
-
-            // debug
-            //if(board.debug_check_flags() == false || board.debug_compare_fields(newfields) == false){
-                //cout << "bug found: " << move->format() << endl;
-                //board.prnt();
-                //prnt_minutes();
-                //debug = true;
-                //return 0;
-            //}
-
-            if(maximizing){
-                if(newscore > bestscore){
-                    bestscore = newscore;
-                    alpha = max(bestscore, alpha);
-                    append_newmove(rcandidates, newcandidates, move);
-                    if(depth == 1){
-                        cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
-                    }
-                    if(alpha >= beta){
-                        break;
-                    }
-                }
-            }
-            else{
-                if(newscore < bestscore){
-                    bestscore = newscore;
-                    beta = min(bestscore, beta);
-                    append_newmove(rcandidates, newcandidates, move);
-                    if(depth == 1){
-                        cout << "\n!!!CANDIDATE from thread #" << to_string(threadid) << ": " << dec << bestscore << fmt_moves(rcandidates) << endl;
-                    }
-                    if(beta <= alpha){
-                        break;
-                    }
-                }
-            }
+        else{
+            sort(moves.begin(), moves.end(), sortByPrio);
         }
 
-        moves.clear();
+        cThreading threading(this, moves);
 
-        calc_score = bestscore;
+        while(threading.has_finished() == false){
+
+            threading.start_calc(depth, maxdepth, alpha, beta);
+
+            sleep(1);
+
+            if(threading.update_candidates(alpha, beta)){
+                break;
+            }
+
+        }
+
+        threading.update_candidates(alpha, beta);
+
+        threading.fetch_candidates(rscore, rmoves);
+
+        moves.clear();
 
     }
 
@@ -1644,14 +1432,14 @@
 
             if(PIECES_COLORS[piece] == mWHITE){
                 for(uint8_t y = src_y; y < 7; ++y){
-                    if(board.getfield(src_x + xsteps[i], y) == mBPW){
+                    if(m_board.getfield(src_x + xsteps[i], y) == mBPW){
                         return false;
                     }
                 }
             }
             else{
                 for(uint8_t y = src_y; y > 0; --y){
-                    if(board.getfield(src_x + xsteps[i], y) == mWPW){
+                    if(m_board.getfield(src_x + xsteps[i], y) == mWPW){
                         return false;
                     }
                 }
@@ -1663,20 +1451,93 @@
     }
 
 
+    int32_t cMatch::eval_term(uint8_t depth){
+
+            if(is_king_attacked(REVERSED_COLORS[next_color()])){
+                if(next_color() == mWHITE){
+                    return (SCORES[mWKG] * 9) + depth;
+                }
+                else{
+                    return (SCORES[mBKG] * 9) - depth;
+                }
+            }
+            else{
+                return 0; // draw
+            }
+
+    }
+
+
+    int32_t cMatch::eval_move(cMove &move, uint8_t depth){
+        int32_t rscore = 0;
+
+        if(depth == 1){
+            if(move.is_short_castling() || move.is_long_castling()){
+                if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+                        rscore += SCORES[mWPLUS] * 2;
+                    }
+                    else{
+                        rscore += SCORES[mBPLUS] * 2;
+                    }
+            }
+        }
+
+        return rscore;
+
+        /*int32_t rscore = 0;
+
+        // mate with bp + kn *********************************
+        int32_t bkscoresA8H1[8][8] = { 
+            { mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 5, mWPLUS * 5, mWPLUS * 5, mWPLUS * 5 },
+            { mWPLUS * 4, mWPLUS * 3, mWPLUS * 3, mWPLUS * 3, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 5 },
+            { mWPLUS * 4, mWPLUS * 3, mWPLUS * 2, mWPLUS * 2, mWPLUS * 3, mWPLUS * 3, mWPLUS * 4, mWPLUS * 5 },
+            { mWPLUS * 4, mWPLUS * 3, mWPLUS * 2, mWPLUS * 1, mWPLUS * 1, mWPLUS * 3, mWPLUS * 4, mWPLUS * 5 },
+            { mWPLUS * 5, mWPLUS * 4, mWPLUS * 3, mWPLUS * 1, mWPLUS * 1, mWPLUS * 2, mWPLUS * 3, mWPLUS * 4 },
+            { mWPLUS * 5, mWPLUS * 4, mWPLUS * 3, mWPLUS * 3, mWPLUS * 2, mWPLUS * 2, mWPLUS * 3, mWPLUS * 4 },
+            { mWPLUS * 5, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 3, mWPLUS * 3, mWPLUS * 3, mWPLUS * 4 },
+            { mWPLUS * 5, mWPLUS * 5, mWPLUS * 5, mWPLUS * 5, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4 } };
+
+        uint8_t addjA1H8[8][8] = { 
+            { 10, 9, 8, 7, 6, 5, 4, 3  },
+            {  9, 3, 3, 3, 3, 3, 3, 4  },
+            {  8, 3, 1, 1, 1, 1, 3, 5  },
+            {  7, 3, 1, 0, 0, 1, 3, 6  },
+            {  6, 3, 1, 0, 0, 1, 3, 7  },
+            {  5, 3, 1, 1, 1, 1, 3, 8  },
+            {  4, 3, 3, 3, 3, 3, 3, 9  },
+            {  3, 4, 5, 6, 7, 8, 9, 10 } };
+
+        rscore += SCORES[mWPLUS] * addjA1H8[board.bKg_x][board.bKg_y];
+
+        uint8_t diffx = abs(board.wKg_x - board.bKg_x);
+        uint8_t diffy = abs(board.wKg_y - board.bKg_y);
+
+        if(PIECES_COLORS[move.srcpiece] == mWHITE){
+            rscore += (7 - max(diffx, diffy) * SCORES[mWPLUS]) - depth;
+        }
+        else{
+            rscore += max(diffx, diffy) * SCORES[mBPLUS] + depth;
+        }
+
+        return rscore; */
+
+    }
+
+
     int32_t cMatch::eval_board(cMove &move){
 
         int32_t rscore = 0;
 
         // opening
-        if(minutes.size() <= 20){
+        if(m_minutes.size() <= 20){
 
             // penalty for move repetition
-            if(minutes.size() >= 2){
-                uint8_t prev_prev_pos = minutes.size() - 2;
-                cMove pre_prev_move = minutes.at(prev_prev_pos);
+            if(m_minutes.size() >= 2){
+                uint8_t prev_prev_pos = m_minutes.size() - 2;
+                cMove pre_prev_move = m_minutes.at(prev_prev_pos);
 
-                if(move.dst_x == pre_prev_move.src_x && move.dst_y ==  pre_prev_move.src_y && move.src_x == pre_prev_move.dst_x &&  move.src_y == pre_prev_move.dst_y){
-                    if(PIECES_COLORS[move.srcpiece] == mWHITE){
+                if(move.m_dst_x == pre_prev_move.m_src_x && move.m_dst_y ==  pre_prev_move.m_src_y && move.m_src_x == pre_prev_move.m_dst_x &&  move.m_src_y == pre_prev_move.m_dst_y){
+                    if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
                         rscore += SCORES[mBPLUS] * 4;
                     }
                     else{
@@ -1689,7 +1550,7 @@
             cPiece white_pieces[4] = { cPiece(mWKN, 1, 0), cPiece(mWKN, 6, 0), cPiece(mWBP, 2, 0), cPiece(mWBP, 5, 0) };
             uint8_t wcnt = 0;
             for(cPiece wpiece : white_pieces){
-                if(board.getfield(wpiece.src_x, wpiece.src_y) == wpiece.piece){
+                if(m_board.getfield(wpiece.src_x, wpiece.src_y) == wpiece.piece){
                     wcnt++;
                 }
             }
@@ -1700,7 +1561,7 @@
             cPiece black_pieces[4] = { cPiece(mBKN, 1, 7), cPiece(mBKN, 6, 7), cPiece(mBBP, 2, 7), cPiece(mBBP, 5, 7) };
             uint8_t bcnt = 0;
             for(cPiece bpiece : black_pieces){
-                if(board.getfield(bpiece.src_x, bpiece.src_y) == bpiece.piece){
+                if(m_board.getfield(bpiece.src_x, bpiece.src_y) == bpiece.piece){
                     bcnt++;
                 }
             }
@@ -1710,7 +1571,7 @@
             
             wcnt = 0;
             for(uint8_t x = 0; x <= 7; ++x){
-                if(board.getfield(x, 1) == mWPW){
+                if(m_board.getfield(x, 1) == mWPW){
                     wcnt++;
                 }
             }
@@ -1720,7 +1581,7 @@
 
             bcnt = 0;
             for(uint8_t x = 0; x <= 7; ++x){
-                if(board.getfield(x, 6) == mBPW){
+                if(m_board.getfield(x, 6) == mBPW){
                     bcnt++;
                 }
             }
@@ -1733,9 +1594,9 @@
             vector<cPiece> bpieces;
             for(uint8_t y = 3; y <= 4; ++y){
                 for(uint8_t x = 3; x <= 4; ++x){
-                    board.search_for_touching_pieces(wpieces, x, y, mWHITE, true);
+                    m_board.search_for_touching_pieces(wpieces, x, y, mWHITE, true);
 
-                    board.search_for_touching_pieces(bpieces, x, y, mBLACK, true);
+                    m_board.search_for_touching_pieces(bpieces, x, y, mBLACK, true);
                 }
             }
             for(cPiece wpiece : wpieces){
@@ -1756,17 +1617,17 @@
             }
             
             // penalty for f2 / f7 moved pawns
-            if(board.getfield(5, 1) == mBLK){
+            if(m_board.getfield(5, 1) == mBLK){
                 rscore += SCORES[mBPLUS] * 3; // penalty
             }
-            else if(board.getfield(5, 6) == mBLK){
+            else if(m_board.getfield(5, 6) == mBLK){
                 rscore += SCORES[mWPLUS] * 3; // penalty
             }
 
         }
         
         // opening and middlegame
-        if(minutes.size() <= 50){
+        if(m_minutes.size() <= 50){
             
             int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
@@ -1774,22 +1635,22 @@
             for(uint8_t i = 0; i < 8; ++i){
                 vector <cPiece> wpieces, bpieces;
 
-                board.setfield(board.wKg_x, board.wKg_y, mBLK);
+                m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
 
-                if(board.is_inbounds(board.wKg_x + steps[i][0], board.wKg_y + steps[i][1])){
-                    board.search_for_all_touching_pieces(wpieces, bpieces, board.wKg_x + steps[i][0], board.wKg_y + steps[i][1]);
+                if(m_board.is_inbounds(m_board.m_wKg_x + steps[i][0], m_board.m_wKg_y + steps[i][1])){
+                    m_board.search_for_all_touching_pieces(wpieces, bpieces, m_board.m_wKg_x + steps[i][0], m_board.m_wKg_y + steps[i][1]);
 
                     if(wpieces.size() < bpieces.size()){
                         rscore += SCORES[mBPLUS] * 3; // penalty
-                        board.setfield(board.wKg_x, board.wKg_y, mWKG);
+                        m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
                         break;
                     }
                 }
-                board.setfield(board.wKg_x, board.wKg_y, mWKG);
+                m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
             }
 
             vector<cPiece> wpieces;
-            board.search_dir_for_pieces(wpieces, board.wKg_x, board.wKg_y, 0, 1);
+            m_board.search_dir_for_pieces(wpieces, m_board.m_wKg_x, m_board.m_wKg_y, 0, 1);
 
             if(wpieces.size() == 2){
                 cPiece second = wpieces.at(1);
@@ -1815,22 +1676,22 @@
             for(uint8_t i = 0; i < 8; ++i){
                 vector <cPiece> wpieces, bpieces;
 
-                board.setfield(board.bKg_x, board.bKg_y, mBLK);
+                m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
 
-                if(board.is_inbounds(board.bKg_x + steps[i][0], board.bKg_y + steps[i][1])){
-                    board.search_for_all_touching_pieces(wpieces, bpieces, board.bKg_x + steps[i][0], board.bKg_y + steps[i][1]);
+                if(m_board.is_inbounds(m_board.m_bKg_x + steps[i][0], m_board.m_bKg_y + steps[i][1])){
+                    m_board.search_for_all_touching_pieces(wpieces, bpieces, m_board.m_bKg_x + steps[i][0], m_board.m_bKg_y + steps[i][1]);
 
                     if(bpieces.size() < wpieces.size()){
                         rscore += SCORES[mWPLUS] * 3; // penalty
-                        board.setfield(board.bKg_x, board.bKg_y, mBKG);
+                        m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
                         break;
                     }
                 }
-                board.setfield(board.bKg_x, board.bKg_y, mBKG);
+                m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
             }
 
             vector<cPiece> bpieces;
-            board.search_dir_for_pieces(bpieces, board.bKg_x, board.bKg_y, 0, -1);
+            m_board.search_dir_for_pieces(bpieces, m_board.m_bKg_x, m_board.m_bKg_y, 0, -1);
 
             if(bpieces.size() == 2){
                 cPiece second = bpieces.at(1);
@@ -1862,10 +1723,10 @@
             for(uint8_t i = 0; i < 8; ++i){
                 rk_x = i;
 
-                if(board.getfield(rk_x, rk_y) == mWRK){
+                if(m_board.getfield(rk_x, rk_y) == mWRK){
                     vector<cPiece> pieces; 
 
-                    board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, 1);
+                    m_board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, 1);
 
                     isopen = true;
                     for(cPiece piece : pieces){
@@ -1886,7 +1747,7 @@
                 for(uint8_t i = 0; i < 8; ++i){
                     rk_x = i;
 
-                    if(board.getfield(rk_x, rk_y) == mWRK){
+                    if(m_board.getfield(rk_x, rk_y) == mWRK){
                         isinfiltrated = true;
                         break;
                     }
@@ -1896,7 +1757,7 @@
             if(isopen || isinfiltrated){
                 vector<cPiece> wpieces, bpieces; 
 
-                board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
+                m_board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
 
                 if(wpieces.size() >= bpieces.size()){
                     rscore += SCORES[mWPLUS] * 2;
@@ -1912,10 +1773,10 @@
             for(uint8_t i = 0; i < 8; ++i){
                 rk_x = i;
 
-                if(board.getfield(rk_x, rk_y) == mBRK){
+                if(m_board.getfield(rk_x, rk_y) == mBRK){
                     vector<cPiece> pieces; 
 
-                    board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, -1);
+                    m_board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, -1);
 
                     isopen = true;
                     for(cPiece piece : pieces){
@@ -1936,7 +1797,7 @@
                 for(uint8_t i = 0; i < 8; ++i){
                     rk_x = i;
 
-                    if(board.getfield(rk_x, rk_y) == mBRK){
+                    if(m_board.getfield(rk_x, rk_y) == mBRK){
                         isinfiltrated = true;
                         break;
                     }
@@ -1946,7 +1807,7 @@
             if(isopen || isinfiltrated){
                 vector<cPiece> wpieces, bpieces; 
 
-                board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
+                m_board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
 
                 if(bpieces.size() >= wpieces.size()){
                     rscore += SCORES[mBPLUS] * 2;
@@ -1955,10 +1816,10 @@
         }
 
         // endgame - check pawns
-        if(minutes.size() >= 32){
+        if(m_minutes.size() >= 32){
             for(uint8_t y = 1; y < 7; ++y){
                 for(uint8_t x = 0; x < 7; ++x){
-                    uint8_t pawn = board.getfield(x, y);
+                    uint8_t pawn = m_board.getfield(x, y);
                     if(pawn == mWPW){
                         if(is_running_pawn(pawn, x, y)){
                             rscore += SCORES[mWPLUS] * y;

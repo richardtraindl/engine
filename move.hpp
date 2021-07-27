@@ -13,15 +13,16 @@
 
     class cMove{
         public:
-            uint8_t src_x;
-            uint8_t src_y;
-            uint8_t dst_x;
-            uint8_t dst_y;
-            uint8_t srcpiece;
-            uint8_t dstpiece;
-            uint8_t prompiece;
+            uint8_t m_src_x;
+            uint8_t m_src_y;
+            uint8_t m_dst_x;
+            uint8_t m_dst_y;
+            uint8_t m_srcpiece;
+            uint8_t m_dstpiece;
+            uint8_t m_prompiece;
+            uint8_t m_prio;
 
-            cMove(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t srcpiece, uint8_t dstpiece, uint8_t prompiece);
+            cMove(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t srcpiece, uint8_t dstpiece, uint8_t prompiece, uint8_t prio);
 
             cMove();
 

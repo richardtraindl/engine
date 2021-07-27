@@ -74,8 +74,8 @@
 
 
     // colors
-    #if !defined(mUNDEF)
-        #define mUNDEF  0x0
+    #if !defined(mBLANK)
+        #define mBLANK  0x0
     #endif
 
     #if !defined(mWHITE)

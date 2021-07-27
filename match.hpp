@@ -2,11 +2,11 @@
     #define MATCH_HPP
 
     #include <cstdint>
+    #include <unistd.h>
     #include <ctime>
     #include <iomanip>  
     #include <vector>
     #include <algorithm> 
-    #include <thread>
     #include "./values.hpp"
     #include "./board.hpp"
     #include "./move.hpp"
@@ -17,9 +17,11 @@
 
     class cMatch{
         public:
-            int32_t score = 0;
-            cBoard board;
-            vector<cMove> minutes;
+            int32_t m_score = 0;
+
+            cBoard m_board;
+
+            vector<cMove> m_minutes;
             
             static const uint8_t STATUS_OPEN = 0;
             static const uint8_t STATUS_WINNER_WHITE = 1;
@@ -38,7 +40,7 @@
             uint8_t next_color();
 
             bool is_king_attacked(uint8_t attacker_color);
-            
+
             bool is_move_valid(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece);
 
             uint8_t eval_status();
@@ -49,7 +51,7 @@
 
             bool undo_move();
 
-            string fmt_moves(vector<cMove> &moves);
+            static string fmt_moves(vector<cMove> &moves);
 
             void prnt_moves(vector<cMove> &moves);
 
@@ -58,23 +60,19 @@
             void prnt_minutes();
 
             // calculation
-            void calc_move(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth);
+            void calc_move(int32_t &rscore, vector<cMove> &rmoves, uint8_t maxdepth);
 
-            void calc_move_v2(int32_t &calc_score, vector<cMove> &moves, uint8_t maxdepth);
+            void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
 
-            static bool sortByPresort(cMove &A, cMove &B);
+            void calc_alphabeta_v3(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
 
-            void alphabeta(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid);
+            static bool sortByPrio(const cMove &a, const cMove &b);
 
-            void alphabeta_v2(int32_t &calc_score, vector<cMove> &rcandidates, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, bool maximizing, uint8_t threadid);
+            bool does_move_attack_pinned_piece(cMove &move);
 
-            bool is_piece_soft_pinned(uint8_t piece, uint8_t piece_x, uint8_t piece_y);
-
-            bool filter(cMove &move, uint8_t depth);
+            bool filter(cMove &move, uint8_t depth, uint8_t maxdepth);
 
             void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, cMove &move);
-
-            bool is_calc_term(int32_t &score, const vector<cMove> &moves, uint8_t depth);
 
             void gen_moves(vector<cMove> &moves, uint8_t color);
 
@@ -99,6 +97,10 @@
             void gen_kg_supporting_moves(vector<cMove> &moves, uint8_t kg_x, uint8_t kg_y, uint8_t attacking_piece, uint8_t attacking_x, uint8_t attacking_y, uint8_t color);
 
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
+
+            int32_t eval_term(uint8_t depth);
+
+            int32_t eval_move(cMove &move, uint8_t depth);
 
             int32_t eval_board(cMove &move);
 

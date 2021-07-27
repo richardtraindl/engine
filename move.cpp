@@ -3,14 +3,15 @@
     #include "./move.hpp"
 
 
-    cMove::cMove(uint8_t newsrc_x, uint8_t newsrc_y, uint8_t newdst_x, uint8_t newdst_y, uint8_t newsrcpiece, uint8_t newdstpiece, uint8_t newprompiece){ 
-        src_x = newsrc_x;
-        src_y = newsrc_y;
-        dst_x = newdst_x;
-        dst_y = newdst_y;
-        srcpiece = newsrcpiece;
-        dstpiece = newdstpiece;
-        prompiece = newprompiece;
+    cMove::cMove(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t srcpiece, uint8_t dstpiece, uint8_t prompiece, uint8_t prio){ 
+        m_src_x = src_x;
+        m_src_y = src_y;
+        m_dst_x = dst_x;
+        m_dst_y = dst_y;
+        m_srcpiece = srcpiece;
+        m_dstpiece = dstpiece;
+        m_prompiece = prompiece;
+        m_prio = prio;
     }
 
 
@@ -18,28 +19,29 @@
     }
 
     cMove::cMove(const cMove &move){
-        src_x = move.src_x;
-        src_y = move.src_y;
-        dst_x = move.dst_x;
-        dst_y = move.dst_y;
-        srcpiece = move.srcpiece;
-        dstpiece = move.dstpiece;
-        prompiece = move.prompiece;  
+        m_src_x = move.m_src_x;
+        m_src_y = move.m_src_y;
+        m_dst_x = move.m_dst_x;
+        m_dst_y = move.m_dst_y;
+        m_srcpiece = move.m_srcpiece;
+        m_dstpiece = move.m_dstpiece;
+        m_prompiece = move.m_prompiece;  
+        m_prio = move.m_prio; 
     }
 
 
     bool cMove::is_en_passant(){
 
-        if(srcpiece == mWPW){
-            if(dstpiece == mBLK && src_y == 4 && dst_y == 5){
-                if((src_x + 1 <= 7 && src_x + 1 == dst_x) || (src_x - 1 >= 0 && src_x - 1 == dst_x)){
+        if(m_srcpiece == mWPW){
+            if(m_dstpiece == mBLK && m_src_y == 4 && m_dst_y == 5){
+                if((m_src_x + 1 <= 7 && m_src_x + 1 == m_dst_x) || (m_src_x - 1 >= 0 && m_src_x - 1 == m_dst_x)){
                     return true;
                 }
             }
         }
-        else if(srcpiece == mBPW){
-            if(dstpiece == mBLK && src_y == 3 && dst_y == 2){
-                if((src_x + 1 <= 7 && src_x + 1 == dst_x) || (src_x - 1 >= 0 && src_x - 1 == dst_x)){
+        else if(m_srcpiece == mBPW){
+            if(m_dstpiece == mBLK && m_src_y == 3 && m_dst_y == 2){
+                if((m_src_x + 1 <= 7 && m_src_x + 1 == m_dst_x) || (m_src_x - 1 >= 0 && m_src_x - 1 == m_dst_x)){
                     return true;
                 }
             }
@@ -52,13 +54,13 @@
 
     bool cMove::is_promotion(){
 
-        if(srcpiece == mWPW){
-            if(prompiece != mBLK && src_y == 6 && dst_y == 7){
+        if(m_srcpiece == mWPW){
+            if(m_prompiece != mBLK && m_src_y == 6 && m_dst_y == 7){
                 return true;
             }
         }
-        else if(srcpiece == mBPW){
-            if(prompiece != mBLK && src_y == 1 && dst_y == 0){
+        else if(m_srcpiece == mBPW){
+            if(m_prompiece != mBLK && m_src_y == 1 && m_dst_y == 0){
                 return true;
             }
         }
@@ -70,13 +72,13 @@
 
    bool cMove::is_short_castling(){
 
-        if(srcpiece == mWKG){
-            if(src_y == 0 && dst_y == 0 && src_x == 4 && dst_x == 6){
+        if(m_srcpiece == mWKG){
+            if(m_src_y == 0 && m_dst_y == 0 && m_src_x == 4 && m_dst_x == 6){
                 return true;
             }
         }
-        else if(srcpiece == mBKG){
-            if(src_y == 7 && dst_y == 7 && src_x == 4 && dst_x == 6){
+        else if(m_srcpiece == mBKG){
+            if(m_src_y == 7 && m_dst_y == 7 && m_src_x == 4 && m_dst_x == 6){
                 return true;
             }
         }
@@ -88,13 +90,13 @@
 
     bool cMove::is_long_castling(){
 
-        if(srcpiece == mWKG){
-            if(src_y == 0 && dst_y == 0 && src_x == 4 && dst_x == 2){
+        if(m_srcpiece == mWKG){
+            if(m_src_y == 0 && m_dst_y == 0 && m_src_x == 4 && m_dst_x == 2){
                 return true;
             }
         }
-        else if(srcpiece == mBKG){
-            if(src_y == 7 && dst_y == 7 && src_x == 4 && dst_x == 2){
+        else if(m_srcpiece == mBKG){
+            if(m_src_y == 7 && m_dst_y == 7 && m_src_x == 4 && m_dst_x == 2){
                 return true;
             }
         }
@@ -110,16 +112,16 @@
         string trailing = "";
 
         if(is_en_passant()){
-            return indices_to_coord(src_x, src_y) + "x" + indices_to_coord(dst_x, dst_y) + ", e.p.";
+            return indices_to_coord(m_src_x, m_src_y) + "x" + indices_to_coord(m_dst_x, m_dst_y) + ", e.p.";
         }
 
-        (dstpiece == mBLK)? hyphen = "-" : hyphen = "x";
+        (m_dstpiece == mBLK)? hyphen = "-" : hyphen = "x";
 
-        if(prompiece != mBLK){ 
-            trailing = ", " + reverse_lookup(PIECES, prompiece); 
+        if(m_prompiece != mBLK){ 
+            trailing = ", " + reverse_lookup(PIECES, m_prompiece); 
         }
 
-        return indices_to_coord(src_x, src_y) + hyphen + indices_to_coord(dst_x, dst_y) + trailing;
+        return indices_to_coord(m_src_x, m_src_y) + hyphen + indices_to_coord(m_dst_x, m_dst_y) + trailing;
 
     }
 

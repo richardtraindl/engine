@@ -1,12 +1,15 @@
 CC = g++
 
-all: ./values.o ./piece.o ./move.o ./board.o ./match.o ./engine.o \
+all: ./values.o ./piece.o ./move.o ./board.o ./match.o ./threading.o ./engine.o \
 
 	$(CC) -Wall --std=c++17 -lpthread -O3 \
-	./values.o ./piece.o ./move.o ./board.o ./match.o ./engine.o -o ./engine
+	./values.o ./piece.o ./move.o ./board.o ./match.o ./threading.o ./engine.o -o ./engine
 
-chess.o: ./engine.cpp
+engine.o: ./engine.cpp
 	$(CC) -Wall --std=c++17 -O3 -c ./engine.cpp -o ./engine.o
+
+threading.o: ./threading.cpp ./threading.hpp
+	$(CC) -Wall --std=c++17 -O3 -c ./threading.cpp -o ./threading.o
 
 match.o: ./match.cpp ./match.hpp
 	$(CC) -Wall --std=c++17 -O3 -c ./match.cpp -o ./match.o

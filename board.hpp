@@ -13,7 +13,7 @@
 
     class cBoard{
         public:
-            uint8_t fields[8][8] = { { mWRK, mWKN, mWBP, mWQU, mWKG, mWBP, mWKN, mWRK },
+            uint8_t m_fields[8][8] = { { mWRK, mWKN, mWBP, mWQU, mWKG, mWBP, mWKN, mWRK },
                                      { mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW, mWPW },
                                      { mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK },
                                      { mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK },
@@ -21,16 +21,16 @@
                                      { mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK, mBLK },
                                      { mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, mBPW, mBPW }, 
                                      { mBRK, mBKN, mBBP, mBQU, mBKG, mBBP, mBKN, mBRK } };
-            uint8_t wKg_x;
-            uint8_t wKg_y;
-            uint8_t bKg_x;
-            uint8_t bKg_y;
-            uint8_t wKg_has_moved_at;
-            uint8_t bKg_has_moved_at;
-            uint8_t wRkA_has_moved_at;
-            uint8_t wRkH_has_moved_at;
-            uint8_t bRkA_has_moved_at;
-            uint8_t bRkH_has_moved_at;
+            uint8_t m_wKg_x;
+            uint8_t m_wKg_y;
+            uint8_t m_bKg_x;
+            uint8_t m_bKg_y;
+            uint8_t m_wKg_has_moved_at;
+            uint8_t m_bKg_has_moved_at;
+            uint8_t m_wRkA_has_moved_at;
+            uint8_t m_wRkH_has_moved_at;
+            uint8_t m_bRkA_has_moved_at;
+            uint8_t m_bRkH_has_moved_at;
 
             cBoard();
 
@@ -53,11 +53,13 @@
 
             void search_for_all_touching_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t src_x, uint8_t src_y);
 
-            void piece_search_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir);
+            void search_from_piece_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir);
 
             static uint8_t eval_dir(uint8_t src_x1, uint8_t src_y1, uint8_t src_x2, uint8_t src_y2);
             
             uint8_t eval_pindir(uint8_t src_x, uint8_t src_y, uint8_t color);
+
+            bool is_piece_soft_pinned(uint8_t piece, uint8_t piece_x, uint8_t piece_y);
 
             void prnt();
 

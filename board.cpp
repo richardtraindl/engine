@@ -4,16 +4,16 @@
 
 
     cBoard::cBoard(){ 
-        wKg_x = 4;
-        wKg_y = 0;
-        bKg_x = 4;
-        bKg_y = 7;
-        wKg_has_moved_at = 0;
-        bKg_has_moved_at = 0;
-        wRkA_has_moved_at = 0;
-        wRkH_has_moved_at = 0;
-        bRkA_has_moved_at = 0;
-        bRkH_has_moved_at = 0;
+        m_wKg_x = 4;
+        m_wKg_y = 0;
+        m_bKg_x = 4;
+        m_bKg_y = 7;
+        m_wKg_has_moved_at = 0;
+        m_bKg_has_moved_at = 0;
+        m_wRkA_has_moved_at = 0;
+        m_wRkH_has_moved_at = 0;
+        m_bRkA_has_moved_at = 0;
+        m_bRkH_has_moved_at = 0;
     }
 
 
@@ -22,12 +22,12 @@
 
 
     uint8_t cBoard::getfield(uint8_t x, uint8_t y){
-        return fields[y][x];
+        return m_fields[y][x];
     }
 
     
     void cBoard::setfield(uint8_t x, uint8_t y, uint8_t value){
-        fields[y][x] = (uint8_t)value;
+        m_fields[y][x] = (uint8_t)value;
     }
 
 
@@ -354,7 +354,7 @@
     }
 
 
-    void cBoard::piece_search_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir){
+    void cBoard::search_from_piece_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir){
 
         uint8_t dstpiece, dst_x, dst_y;
 
@@ -400,6 +400,16 @@
         }
 
         for(; idx < maxidx; ++idx){
+            /*
+            if(is_inbounds((piece_x + steps[idx][0]), (piece_y + steps[idx][1]))){
+                uint8_t dir = cBoard::eval_dir(piece_x, piece_y, (piece_x + steps[idx][0]), (piece_y + steps[idx][1]));
+
+                if(dir == excl_dir){
+                    continue;
+                }
+            }
+            */
+
             dstpiece = search_dir_for_piece(dst_x, dst_y, piece_x, piece_y, steps[idx][0], steps[idx][1], cnt);
 
             if(PIECES_COLORS[dstpiece] == color){
@@ -427,14 +437,14 @@
 
         if(color == mWHITE){
             king = mWKG;
-            kg_x = wKg_x;
-            kg_y = wKg_y;
+            kg_x = m_wKg_x;
+            kg_y = m_wKg_y;
             enmycolor = mBLACK;
         }
         else{
             king = mBKG;
-            kg_x = bKg_x;
-            kg_y = bKg_y;
+            kg_x = m_bKg_x;
+            kg_y = m_bKg_y;
             enmycolor = mWHITE;
         }
 
@@ -514,6 +524,58 @@
     }
 
 
+    bool cBoard::is_piece_soft_pinned(uint8_t piece, uint8_t piece_x, uint8_t piece_y){
+        
+        uint8_t piece1, dst1_x, dst1_y, piece2, dst2_x, dst2_y;
+
+        int8_t steps1[][2] = { { 1, 0 }, { 0, 1 }, { 1, 1 }, { -1, 1 } };
+
+        int8_t steps2[][2] = { { -1, 0 }, { 0, -1 }, { -1, -1 }, { 1, -1 } };
+
+        for(uint8_t i = 0; i < 4; ++i){
+            piece1 = search_dir_for_piece(dst1_x, dst1_y, piece_x, piece_y, steps1[i][0], steps1[i][1], 6);
+
+            piece2 = search_dir_for_piece(dst2_x, dst2_y, piece_x, piece_y, steps2[i][0], steps2[i][1], 6);
+
+            if(piece1 != mBLK && piece2 != mBLK && PIECES_COLORS[piece1] != PIECES_COLORS[piece2]){
+                if(PIECES_COLORS[piece1] == PIECES_COLORS[piece]){
+                    if(PIECES_RANKS[piece1] > PIECES_RANKS[piece]){
+                        if(piece2 == mWQU || piece2 == mBQU){
+                            return true;
+                        }
+
+                        if(i < 2 && (piece2 == mWRK || piece2 == mBRK)){
+                            return true;
+                        }
+
+                        if(i >= 2 && (piece2 == mWBP || piece2 == mBBP)){
+                            return true;
+                        }
+                    }
+                }
+                else{
+                    if(PIECES_RANKS[piece2] > PIECES_RANKS[piece]){
+                        if(piece1 == mWQU || piece1 == mBQU){
+                            return true;
+                        }
+
+                        if(i < 2 && (piece1 == mWRK || piece1 == mBRK)){
+                            return true;
+                        }
+
+                        if(i >= 2 && (piece1 == mWBP || piece1 == mBBP)){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+
     void cBoard::prnt(){
 
         string textcolor, backcolor, strpiece;
@@ -563,22 +625,22 @@
     }
 
 
-    void cBoard::debug_copy_fields(uint8_t newfields[8][8]){
+    void cBoard::debug_copy_fields(uint8_t fields[8][8]){
 
         for(uint8_t y = 0; y < 8; ++y){
             for(uint8_t x = 0; x < 8; ++x){
-                newfields[y][x] = fields[y][x];
+                fields[y][x] = m_fields[y][x];
             }
         }
 
     }
 
 
-    bool cBoard::debug_compare_fields(uint8_t newfields[8][8]){
+    bool cBoard::debug_compare_fields(uint8_t fields[8][8]){
 
         for(uint8_t y = 0; y < 8; ++y){
             for(uint8_t x = 0; x < 8; ++x){
-                if(fields[y][x] != newfields[y][x]){
+                if(m_fields[y][x] != fields[y][x]){
                     return false;
                 }
             }
@@ -591,21 +653,21 @@
 
     bool cBoard::debug_check_flags(){
 
-        if(getfield(wKg_x, wKg_y) != mWKG){ return false; }
+        if(getfield(m_wKg_x, m_wKg_y) != mWKG){ return false; }
 
-        if(getfield(bKg_x, bKg_y) != mBKG){ return false; }
+        if(getfield(m_bKg_x, m_bKg_y) != mBKG){ return false; }
 
         for(uint8_t y = 0; y < 8; ++y){
             for(uint8_t x = 0; x < 8; ++x){
-                if(fields[y][x] == mWKG && (x != wKg_x || y != wKg_y)){
+                if(m_fields[y][x] == mWKG && (x != m_wKg_x || y != m_wKg_y)){
                     return false;
                 }
-                if(fields[y][x] == mBKG && (x != bKg_x || y != bKg_y)){
+                if(m_fields[y][x] == mBKG && (x != m_bKg_x || y != m_bKg_y)){
                     return false;
                 }
             }
         }
-        
+
         return true;
 
     }

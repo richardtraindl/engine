@@ -21,21 +21,21 @@
 
 
     map<string, uint8_t> COLORS = {
-        {"undef", mUNDEF},
+        {"blank", mBLANK},
         {"white", mWHITE},
         {"black", mBLACK}
     };
 
 
     map<uint8_t, uint8_t> REVERSED_COLORS = {
-        {mUNDEF, mUNDEF},
+        {mBLANK, mBLANK},
         {mWHITE, mBLACK},
         {mBLACK, mWHITE} 
     };
 
 
     map<uint8_t, uint8_t> PIECES_COLORS = {
-        {mBLK, mUNDEF},
+        {mBLK, mBLANK},
         {mWPW, mWHITE},
         {mWKN, mWHITE},
         {mWBP, mWHITE},

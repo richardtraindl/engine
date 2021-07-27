@@ -29,35 +29,39 @@
 
     void play(cMatch &match, uint8_t maxdepth, uint8_t engine_color){
 
-        char buffer[6];
-        int length = 7;
+        char buffer[12];
+        int length = 13;
 
         uint8_t src_x, src_y, dst_x, dst_y;
         uint8_t prompiece = mBLK;
 
-        cout << " movecnt: " << match.minutes.size() << endl;
-        match.board.prnt();
+        cout << " movecnt: " << match.m_minutes.size() << endl;
+        match.m_board.prnt();
 
         while(true){
             if((match.next_color() == mWHITE && engine_color == mWHITE) || 
                (match.next_color() == mBLACK && engine_color == mBLACK)){
-                   cout << "start calc..." << endl;
-                   vector<cMove> candidates;
-                   int32_t calc_score;
-                   match.calc_move(calc_score, candidates, maxdepth);
 
-                   if(candidates.size() > 0){
-                       cMove move = candidates.front();
-                       match.do_move(move);
-                       cout << move.format() << endl;
-                       match.board.prnt();
-                   }
-                   else{
-                        uint8_t status = match.eval_status();
-                        prnt_status(match, status);
-                        cout << "game over - congratulation!" << endl;
-                        //return;
-                   }
+                cout << "start calc..." << endl;
+
+                vector<cMove> rmoves;
+
+                int32_t rscore;
+
+                match.calc_move(rscore, rmoves, maxdepth);
+
+                if(rmoves.size() > 0){
+                   cMove move = rmoves.front();
+                   match.do_move(move);
+                   cout << move.format() << endl;
+                   match.m_board.prnt();
+                }
+                else{
+                    uint8_t status = match.eval_status();
+                    prnt_status(match, status);
+                    cout << "game over - congratulation!" << endl;
+                    return;
+                }
             }
             else{
                 uint8_t status = match.eval_status();
@@ -66,9 +70,16 @@
                     //return;
                 }
 
-                cout << "\nyour input please... q(uit) | u(ndo) | l(oad) | s(witch engine color) | e2e4 | e7e8q | 0-0: ";
+                cout << "\n>";
                 cin.getline(buffer, length);
                 string input(buffer);
+                input.erase(remove(input.begin(), input.end(), ' '), input.end());
+
+                if(input == "h" || input == "H"){ 
+                    cout << "\nmove formats: e2e4 | e7e8q | 0-0 | 0-0-0";
+                    cout << "\ncommands: q(uit) | u(ndo) | w(hite engine) | b(lack engine) | pb(print board) | pm(print minutes) | im(import moves) | ib(import board)";
+                    continue;
+                }
 
                 if(input == "q" || input == "Q"){ 
                     cout << "good bye!" << endl; 
@@ -83,51 +94,148 @@
                     else{
                         match.undo_move(); // undo last human move
                     }
-                    match.board.prnt();
+                    match.m_board.prnt();
                     continue;
                 }
 
-                if(input == "p" || input == "P"){
+                if(input == "pb" || input == "PB"){
+                    match.m_board.prnt();
+                    continue;
+                }
+
+                if(input == "pm" || input == "PM"){
                     match.prnt_minutes();
                     continue;
                 }
 
-                if(input.substr(0, 1) == "l" || input.substr(0, 1) == "L"){
-                    match.reset();
-
+                if(input.substr(0, 2) == "im" || input.substr(0, 2) == "IM"){
                     if(input.length() < 5){
-                        cout << "format for loading a game: 'l 001'" << endl;
+                        cout << "format for import moves: 'im 001'" << endl;
                         continue;
                     }
 
-                    string substr = input.substr(1);
-                    substr.erase(remove(substr.begin(), substr.end(), ' '), substr.end());
+                    match.reset();
+
+                    string substr = input.substr(2);
                     ifstream file("./matches/game" + substr + ".txt");
                     string content;
 
                     while(file >> content) {
-                        cout << content << ' ';
+                        //cout << content << " ";
                         cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
                         cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
                         if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
                             match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
                         }
                         else{
-                            cout << "wrong import move!" << endl;
+                            cout << "import error!" << endl;
+                            continue;
                         }
                     }
+                    cout << endl;
+
                     match.prnt_minutes();
-                    match.board.prnt();
+                    match.m_board.prnt();
                     continue;
                 }
 
-                if(input == "s" || input == "S"){
-                    if(engine_color == mWHITE){
-                        engine_color = mBLACK;
+                if(input == "w" || input == "W"){
+                    engine_color = mWHITE;
+                    continue;
+                }
+
+                if(input == "b" || input == "B"){
+                    engine_color = mBLACK;
+                    continue;
+                }
+
+                if(input.substr(0, 2) == "ib" || input.substr(0, 2) == "IB"){
+                    if(input.length() < 5){
+                        cout << "format for import board: 'ib 001'" << endl;
+                        continue;
                     }
-                    else if(engine_color == mBLACK){
-                        engine_color = mWHITE;
+
+                    match.reset();
+
+                    string substr = input.substr(2);
+                    ifstream file("./matches/board" + substr + ".txt");
+                    string content;
+                    uint8_t y = 7;
+
+                    while(file >> content) {
+                        //cout << content << " ";
+                        if(content.length() == 32){
+
+                            for(uint8_t x = 0; x < 8; ++x){
+                                uint8_t piece = PIECES[content.substr((x * 4), 3)];
+                                
+                                match.m_board.setfield(x, y, piece);
+                            }
+                            --y;
+                        }
+                        else{
+                            cout << "import error!" << endl;
+                            continue;
+                        }
                     }
+                    cout << endl;
+
+                    bool wkg = false;
+                    bool bkg = false;
+                    for(uint8_t y = 0; y < 8; ++y){
+                        for(uint8_t x = 0; x < 8; ++x){
+                            uint8_t piece = match.m_board.getfield(x, y);
+                            if(piece == mWKG){
+                                if(wkg){ 
+                                    cout << "import error: wkg!" << endl;
+                                    continue;
+                                }
+                                else{
+                                    wkg = true;
+                                    match.m_board.m_wKg_x = x;
+                                    match.m_board.m_wKg_y = y;
+                                }
+                            }
+                            else if(piece == mBKG){
+                                if(bkg){ 
+                                    cout << "import error: bkg!" << endl;
+                                    continue;
+                                }
+                                else{
+                                    bkg = true;
+                                    match.m_board.m_bKg_x = x;
+                                    match.m_board.m_bKg_y = y;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if(wkg && bkg){
+                        match.m_board.m_wKg_has_moved_at = 1;
+                        match.m_board.m_bKg_has_moved_at = 1;
+                        match.m_board.m_wRkA_has_moved_at = 1;
+                        match.m_board.m_wRkH_has_moved_at = 1;
+                        match.m_board.m_bRkA_has_moved_at = 1;
+                        match.m_board.m_bRkH_has_moved_at = 1;
+
+                        //fake first move
+                        //match.minutes.push_back(cMove(match.board.wKg_x, match.board.wKg_y, match.board.wKg_x, match.board.wKg_y, mWKG, mBLK, mBLK));
+
+                        match.m_board.prnt();
+                        continue;
+                    }
+                    else{
+                        cout << "import error: kg!" << endl;
+                        continue;
+                    }
+                }
+
+                if(input.compare("test") == 0){
+                    cout << "test start" << endl;
+                    cMove move(7, 0, 3, 0, mWRK, mBLK, mBLK, 100);
+                    bool flag = match.does_move_attack_pinned_piece(move);
+                    cout << flag << endl;
+                    cout << "test end" << endl;
                     continue;
                 }
 
@@ -175,13 +283,15 @@
                     }
                 }
                 else{
-                    cout << "invalid move: " << input << endl;
-                    continue;
+                    if(input.length() > 0){
+                        cout << "invalid input" << endl;
+                        continue;
+                    }
                 }
 
                 if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
                     match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
-                    match.board.prnt();
+                    match.m_board.prnt();
                 }
             }
         }
@@ -193,7 +303,7 @@
 
         uint8_t maxdepth = 5;
 
-        uint8_t engine_color = mBLACK;
+        uint8_t engine_color = mBLANK;
 
         play(match, maxdepth, engine_color);
 
