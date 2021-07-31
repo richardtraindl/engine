@@ -61,9 +61,9 @@
 
             bool is_piece_soft_pinned(uint8_t piece, uint8_t piece_x, uint8_t piece_y);
 
-            void prnt();
+            bool compare_fields(uint8_t fields[8][8]);
 
-            bool debug_compare_fields(uint8_t fields[8][8]);
+            void prnt();
 
             void debug_copy_fields(uint8_t newfields[8][8]);
 

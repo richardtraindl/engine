@@ -3,8 +3,8 @@
     #include "./piece.hpp"
 
 
-    cPiece::cPiece(uint8_t newpiece, uint8_t newsrc_x, uint8_t newsrc_y){ 
-        piece = newpiece;
-        src_x = newsrc_x;
-        src_y = newsrc_y;
+    cPiece::cPiece(uint8_t piece, uint8_t src_x, uint8_t src_y){ 
+        m_piece = piece;
+        m_src_x = src_x;
+        m_src_y = src_y;
     }

@@ -385,7 +385,8 @@
                 int8_t steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
 
                 for(uint8_t i = 0; i < 8; ++i){
-                    if(excl_dir != mNO_DIR && excl_dir == eval_dir(piece_x, piece_y, steps[i][0], steps[i][1])){
+                    uint8_t dir = eval_dir(piece_x, piece_y, steps[i][0], steps[i][1]);
+                    if(excl_dir != mNO_DIR && excl_dir == dir){
                         continue;
                     }
 
@@ -400,15 +401,13 @@
         }
 
         for(; idx < maxidx; ++idx){
-            /*
             if(is_inbounds((piece_x + steps[idx][0]), (piece_y + steps[idx][1]))){
-                uint8_t dir = cBoard::eval_dir(piece_x, piece_y, (piece_x + steps[idx][0]), (piece_y + steps[idx][1]));
+                uint8_t dir = eval_dir(piece_x, piece_y, (piece_x + steps[idx][0]), (piece_y + steps[idx][1]));
 
-                if(dir == excl_dir){
+                if(excl_dir != mNO_DIR && excl_dir == dir){
                     continue;
                 }
             }
-            */
 
             dstpiece = search_dir_for_piece(dst_x, dst_y, piece_x, piece_y, steps[idx][0], steps[idx][1], cnt);
 
@@ -576,6 +575,21 @@
     }
 
 
+    bool cBoard::compare_fields(uint8_t fields[8][8]){
+
+        for(uint8_t y = 0; y < 8; ++y){
+            for(uint8_t x = 0; x < 8; ++x){
+                if(m_fields[y][x] != fields[y][x]){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+
     void cBoard::prnt(){
 
         string textcolor, backcolor, strpiece;
@@ -632,21 +646,6 @@
                 fields[y][x] = m_fields[y][x];
             }
         }
-
-    }
-
-
-    bool cBoard::debug_compare_fields(uint8_t fields[8][8]){
-
-        for(uint8_t y = 0; y < 8; ++y){
-            for(uint8_t x = 0; x < 8; ++x){
-                if(m_fields[y][x] != fields[y][x]){
-                    return false;
-                }
-            }
-        }
-        
-        return true;
 
     }
 

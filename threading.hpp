@@ -19,7 +19,7 @@
 
             vector<cMove> m_pool_moves;
 
-            uint8_t m_pool_idx;
+            uint8_t m_pool_idx = 0;
 
             thread m_threads[MAXTHREADS];
 
@@ -38,13 +38,15 @@
 
             ~cThreading();
 
-            void start_calc(uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
+            void start(uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
 
             bool fetch_candidates(int32_t &newscore, vector<cMove> &newmoves);
 
             bool update_candidates(int32_t &alpha, int32_t &beta);
 
             bool has_finished();
+
+            void term();
 
     };
 

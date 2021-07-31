@@ -53,7 +53,7 @@
                 if(rmoves.size() > 0){
                    cMove move = rmoves.front();
                    match.do_move(move);
-                   cout << move.format() << endl;
+                   cout << move.format(false) << endl;
                    match.m_board.prnt();
                 }
                 else{
@@ -232,8 +232,8 @@
 
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
-                    cMove move(7, 0, 3, 0, mWRK, mBLK, mBLK, 100);
-                    bool flag = match.does_move_attack_pinned_piece(move);
+                    cMove move(3, 7, 0, 7, mBRK, mBLK, mBLK, 100);
+                    bool flag = match.does_move_touch_weak_piece(move);
                     cout << flag << endl;
                     cout << "test end" << endl;
                     continue;

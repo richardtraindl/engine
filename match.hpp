@@ -22,7 +22,9 @@
             cBoard m_board;
 
             vector<cMove> m_minutes;
-            
+
+            vector<cMove> m_prev_search;
+
             static const uint8_t STATUS_OPEN = 0;
             static const uint8_t STATUS_WINNER_WHITE = 1;
             static const uint8_t STATUS_WINNER_BLACK = 2;
@@ -64,11 +66,13 @@
 
             void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
 
-            void calc_alphabeta_v3(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
+            void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
 
             static bool sortByPrio(const cMove &a, const cMove &b);
 
-            bool does_move_attack_pinned_piece(cMove &move);
+            bool does_move_touch_weak_piece(cMove &move);
+
+            bool is_good_field_for_piece(cPiece piece, uint8_t dst_x, uint8_t dst_y);
 
             bool filter(cMove &move, uint8_t depth, uint8_t maxdepth);
 
@@ -96,9 +100,13 @@
 
             void gen_kg_supporting_moves(vector<cMove> &moves, uint8_t kg_x, uint8_t kg_y, uint8_t attacking_piece, uint8_t attacking_x, uint8_t attacking_y, uint8_t color);
 
+            uint8_t eval_prio(cMove &move);
+
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
 
             int32_t eval_term(uint8_t depth);
+
+            bool is_three_times_repetition(cMove &move);
 
             int32_t eval_move(cMove &move, uint8_t depth);
 

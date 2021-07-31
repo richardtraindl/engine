@@ -14,13 +14,28 @@
     class cMove{
         public:
             uint8_t m_src_x;
+
             uint8_t m_src_y;
+
             uint8_t m_dst_x;
+
             uint8_t m_dst_y;
+
             uint8_t m_srcpiece;
+
             uint8_t m_dstpiece;
+
             uint8_t m_prompiece;
+
             uint8_t m_prio;
+
+            static const uint8_t PRIO_PROMOTION = 10;
+            static const uint8_t PRIO_CAPTURE = 30;
+            static const uint8_t PRIO_URGENT_TOUCH = 40;
+            static const uint8_t PRIO_CASTLING = 70;
+            static const uint8_t PRIO_PRE_CALC = 35;
+            static const uint8_t PRIO_STANDARD = 100;
+            static const uint8_t PRIO_BAD_DSTFIELD = 110;
 
             cMove(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t srcpiece, uint8_t dstpiece, uint8_t prompiece, uint8_t prio);
 
@@ -37,7 +52,9 @@
 
             bool is_long_castling();
 
-            string format();
+            bool compare(const cMove &move);
+
+            string format(bool ext);
 
             static void coord_to_indices(uint8_t &x, uint8_t &y, string coord);
 

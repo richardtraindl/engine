@@ -10,9 +10,9 @@
 
     class cPiece{
         public:
-            uint8_t piece;
-            uint8_t src_x;
-            uint8_t src_y;
+            uint8_t m_piece;
+            uint8_t m_src_x;
+            uint8_t m_src_y;
 
             cPiece(uint8_t piece, uint8_t src_x, uint8_t src_y);
     };

@@ -106,7 +106,14 @@
     }
 
 
-    string cMove::format(){
+    bool cMove::compare(const cMove &move){
+
+        return (m_src_x == move.m_src_x && m_src_y == move.m_src_y && m_dst_x == move.m_dst_x && m_dst_y == move.m_dst_y);
+
+    }
+
+
+    string cMove::format(bool ext){
 
         string hyphen = "";
         string trailing = "";
@@ -121,7 +128,14 @@
             trailing = ", " + reverse_lookup(PIECES, m_prompiece); 
         }
 
-        return indices_to_coord(m_src_x, m_src_y) + hyphen + indices_to_coord(m_dst_x, m_dst_y) + trailing;
+        string out = indices_to_coord(m_src_x, m_src_y) + hyphen + indices_to_coord(m_dst_x, m_dst_y) + trailing;
+
+        if(ext){
+            return out +  + " prio: " + to_string(m_prio);
+        }
+        else{
+            return out;
+        }
 
     }
 

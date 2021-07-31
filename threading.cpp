@@ -10,8 +10,6 @@
 
             m_pool_moves = moves;
 
-            m_pool_idx = 0;
-
             if(m_match->next_color() == mWHITE){
                 m_candidate_score = SCORES[mWKG] * 10;
             }
@@ -26,7 +24,7 @@
     }
 
 
-    void cThreading::start_calc(uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta){
+    void cThreading::start(uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta){
 
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
@@ -38,7 +36,7 @@
 
                 m_pool_idx++;
 
-                cout << "thread started for: " + move.format() << endl;
+                cout << "thread started for: " + move.format(true) << endl;
 
                 m_thmatches[i] = new cMatch(*m_match);
 
@@ -56,12 +54,18 @@
     bool cThreading::fetch_candidates(int32_t &newscore, vector<cMove> &newmoves){
         
         if(has_finished()){
-            
+
+            g_threading_mutex.lock();
+
             newscore = m_candidate_score;
 
             for(cMove move : m_candidate_moves){
                 newmoves.push_back(move);
             }
+
+            g_threading_mutex.unlock();
+
+            cout << "___fetch candidates - score: " << newscore << " " + cMatch::fmt_moves(newmoves) << endl;
 
             return true;
 
@@ -82,11 +86,14 @@
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
             if(m_threads[i].joinable() && m_thmatches[i]->m_minutes.size() - 1 == m_match->m_minutes.size()){
+
                 g_threading_mutex.lock();
 
                 m_threads[i].join();
 
                 cMove move = m_thmatches[i]->m_minutes.back();
+
+                cout << "...............thread finished for: " + move.format(false) << endl;
 
                 if(m_match->next_color() == mWHITE){
                     if(m_thscores[i] > m_candidate_score){
@@ -137,17 +144,52 @@
 
 
     bool cThreading::has_finished(){
+        
+        g_threading_mutex.lock();
 
-        if(m_pool_idx + 1 < (uint8_t)m_pool_moves.size()){
+        if(m_pool_idx == 0 || m_pool_idx + 1 < (uint8_t)m_pool_moves.size()){
+
+            g_threading_mutex.unlock();
+
             return false;
         }
 
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
+
             if(m_threads[i].joinable()){
+
+                g_threading_mutex.unlock();
+
                 return false;
             }
         }
-        
+
+        g_threading_mutex.unlock();
+
         return true;
 
     }
+
+
+    void cThreading::term(){
+
+        terminate();
+
+        //g_threading_mutex.lock();
+
+        for(uint8_t i = 0; i < MAXTHREADS; ++i){
+            //if(m_threads[i].joinable()){
+
+                //m_threads[i].join();
+
+                delete m_thmatches[i];
+
+                m_thmoves[i].clear();
+
+            //}
+        }
+
+        //g_threading_mutex.unlock();
+
+    }
+
