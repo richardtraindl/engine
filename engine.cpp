@@ -81,7 +81,7 @@
                     continue;
                 }
 
-                if(input == "q" || input == "Q"){ 
+                if(input == "quit" || input == "QUIT"){ 
                     cout << "good bye!" << endl; 
                     return; 
                 }
@@ -232,9 +232,10 @@
 
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
-                    cMove move(3, 7, 0, 7, mBRK, mBLK, mBLK, 100);
-                    bool flag = match.does_move_touch_weak_piece(move);
-                    cout << flag << endl;
+                    cMove move(7, 0, 5, 0, mWRK, mBLK, mBLK, 100);
+                    match.eval_prio(move);
+                    //bool flag = match.does_move_touch_weak_piece(move);
+                    cout << to_string(move.m_prio) << endl;
                     cout << "test end" << endl;
                     continue;
                 }

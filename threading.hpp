@@ -15,6 +15,8 @@
 
     class cThreading{
         private:
+            mutex m_threading_mutex;
+
             cMatch *m_match;
 
             vector<cMove> m_pool_moves;
@@ -29,20 +31,26 @@
 
             int32_t m_thscores[MAXTHREADS];
 
+            time_t m_start_time[MAXTHREADS];
+
             int32_t m_candidate_score;
+
+            int32_t m_alpha;
+
+            int32_t m_beta;
 
             vector<cMove> m_candidate_moves;
 
         public:
-            cThreading(cMatch *match, vector<cMove> &moves);
+            cThreading(cMatch *match, vector<cMove> &moves, int32_t alpha, int32_t beta);
 
             ~cThreading();
 
-            void start(uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
+            void start(uint8_t depth, uint8_t maxdepth);
 
             bool fetch_candidates(int32_t &newscore, vector<cMove> &newmoves);
 
-            bool update_candidates(int32_t &alpha, int32_t &beta);
+            void update_candidates();
 
             bool has_finished();
 

@@ -47,6 +47,8 @@
 
             uint8_t eval_status();
 
+            bool is_endgame();
+
             void do_usr_move(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece);
 
             void do_move(cMove &move);
@@ -57,7 +59,7 @@
 
             void prnt_moves(vector<cMove> &moves);
 
-            void prnt_fmttime(string msg, int seconds);
+            static void prnt_fmttime(string msg, int seconds);
 
             void prnt_minutes();
 
@@ -100,7 +102,7 @@
 
             void gen_kg_supporting_moves(vector<cMove> &moves, uint8_t kg_x, uint8_t kg_y, uint8_t attacking_piece, uint8_t attacking_x, uint8_t attacking_y, uint8_t color);
 
-            uint8_t eval_prio(cMove &move);
+            void eval_prio(cMove &move);
 
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
 

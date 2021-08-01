@@ -354,7 +354,7 @@
     }
 
 
-    void cBoard::search_from_piece_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir){
+    void cBoard::search_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir){
 
         uint8_t dstpiece, dst_x, dst_y;
 

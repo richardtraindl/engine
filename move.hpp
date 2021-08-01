@@ -31,9 +31,10 @@
 
             static const uint8_t PRIO_PROMOTION = 10;
             static const uint8_t PRIO_CAPTURE = 30;
+            static const uint8_t PRIO_RUNNING_PAWN = 35;
+            static const uint8_t PRIO_PRE_CALC = 35;
             static const uint8_t PRIO_URGENT_TOUCH = 40;
             static const uint8_t PRIO_CASTLING = 70;
-            static const uint8_t PRIO_PRE_CALC = 35;
             static const uint8_t PRIO_STANDARD = 100;
             static const uint8_t PRIO_BAD_DSTFIELD = 110;
 
