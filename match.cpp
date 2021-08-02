@@ -1664,23 +1664,30 @@
 
     bool cMatch::is_three_times_repetition(cMove &move){
 
-        uint8_t equalcnt = 1;
-
         cMatch *match = new cMatch(*this);
 
-        for(uint8_t cnt = 0; (cnt < (uint8_t)match->m_minutes.size() && cnt <= 8); ++cnt){
+        match->do_move(move);
 
+        uint8_t fields[8][8];
+
+        match->m_board.copy_fields(fields);
+
+        uint8_t equalcnt = 0;
+
+        uint8_t maxcnt = min((uint8_t)5, (uint8_t)(match->m_minutes.size() / 2));
+
+        for(uint8_t i = 0; i < maxcnt; ++i){
+            match->undo_move();
             match->undo_move();
 
-            if(m_board.compare_fields(match->m_board.m_fields)){
+            if(match->m_board.compare_fields(fields)){
                 equalcnt++;
             }
-
         }
 
         delete match;
 
-        return equalcnt >= 3;
+        return equalcnt >= 2;
 
     }
 

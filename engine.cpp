@@ -232,10 +232,11 @@
 
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
-                    cMove move(7, 0, 5, 0, mWRK, mBLK, mBLK, 100);
-                    match.eval_prio(move);
+                    cMove move(5, 7, 2, 4, mBBP, mBLK, mBLK, 100);
+                    //match.eval_prio(move);
+                    bool flag = match.is_three_times_repetition(move);
                     //bool flag = match.does_move_touch_weak_piece(move);
-                    cout << to_string(move.m_prio) << endl;
+                    cout << to_string(flag) << endl;
                     cout << "test end" << endl;
                     continue;
                 }

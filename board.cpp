@@ -639,7 +639,7 @@
     }
 
 
-    void cBoard::debug_copy_fields(uint8_t fields[8][8]){
+    void cBoard::copy_fields(uint8_t fields[8][8]){
 
         for(uint8_t y = 0; y < 8; ++y){
             for(uint8_t x = 0; x < 8; ++x){

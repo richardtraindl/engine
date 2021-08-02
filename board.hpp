@@ -65,7 +65,7 @@
 
             void prnt();
 
-            void debug_copy_fields(uint8_t newfields[8][8]);
+            void copy_fields(uint8_t newfields[8][8]);
 
             bool debug_check_flags();
 
