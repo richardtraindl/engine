@@ -47,13 +47,15 @@
 
             uint8_t eval_status();
 
-            bool is_endgame();
-
             void do_usr_move(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece);
 
             void do_move(cMove &move);
 
             bool undo_move();
+
+            bool is_three_times_repetition(cMove &move);            
+            
+            bool is_fifty_moves_rule();
 
             static string fmt_moves(vector<cMove> &moves);
 
@@ -104,11 +106,11 @@
 
             void eval_prio(cMove &move);
 
+            bool is_endgame();
+
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
 
             int32_t eval_term(uint8_t depth);
-
-            bool is_three_times_repetition(cMove &move);
 
             int32_t eval_move(cMove &move, uint8_t depth);
 

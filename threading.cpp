@@ -6,7 +6,7 @@
             m_match = match;
 
             m_pool_moves = moves;
-
+            
             if(m_match->next_color() == mWHITE){
                 m_candidate_score = SCORES[mWKG] * 10;
             }

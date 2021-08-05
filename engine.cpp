@@ -6,6 +6,7 @@
     #include <algorithm>
     #include "./match.hpp"
     #include "./move.hpp"
+    #include "./bitboard.hpp"
 
 
     using namespace std;
@@ -306,6 +307,48 @@
         uint8_t maxdepth = 5;
 
         uint8_t engine_color = mBLANK;
+        
+        
+        ifstream file("./matches/game001.txt");
+        string content;
+
+        uint8_t src_x, src_y, dst_x, dst_y;
+        uint8_t prompiece = mBLK;
+
+        while(file >> content) {
+            cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
+            cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
+            if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
+                match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
+            }
+            else{
+                cout << "import error!" << endl;
+                continue;
+            }
+        }
+        
+        cBitBoard bitboard;
+        
+        bitboard.import_fields(match.m_board.m_fields);
+        
+        bitboard.prnt();
+        
+        /*cBitBoard bitboard;
+        bitboard.set(1, 1, mWPW);        
+        cout << to_string(bitboard.get(1, 1)) << endl;
+
+        bitboard.set(0, 0, mWKG);
+        cout << to_string(bitboard.get(0, 0)) << endl;
+
+        bitboard.set(0, 0, mBQU);
+        cout << to_string(bitboard.get(0, 0)) << endl;
+
+        cout << hex << bitboard.m_bitfields[0] << endl;
+        cout << hex << bitboard.m_bitfields[1] << endl;
+        cout << hex << bitboard.m_bitfields[2] << endl;
+        cout << hex << bitboard.m_bitfields[3] << endl;
+
+        bitboard.prnt(); */
 
         play(match, maxdepth, engine_color);
 

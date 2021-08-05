@@ -318,21 +318,6 @@
     }
 
 
-    bool cMatch::is_endgame(){
-        
-        for(uint8_t y = 0; y < 8; ++y){
-            for(uint8_t x = 0; x < 8; ++x){
-                if(m_board.getfield(x, y) == mWQU || m_board.getfield(x, y) == mBQU){
-                    return false;
-                }
-            }
-        }
-
-        return m_minutes.size() >= 40;
-
-    }
-
-
     void cMatch::do_usr_move(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece){
 
         uint8_t srcpiece = m_board.getfield(src_x, src_y);
@@ -543,6 +528,77 @@
 
         m_minutes.pop_back();
         return true;
+
+    }
+
+
+    bool cMatch::is_three_times_repetition(cMove &move){
+
+        cMatch *match = new cMatch(*this);
+
+        match->do_move(move);
+
+        uint8_t fields[8][8];
+
+        match->m_board.copy_fields(fields);
+
+        uint8_t equalcnt = 0;
+
+        uint8_t maxcnt = min((uint8_t)5, (uint8_t)(match->m_minutes.size() / 2));
+
+        for(uint8_t i = 0; i < maxcnt; ++i){
+            match->undo_move();
+            match->undo_move();
+
+            if(match->m_board.compare_fields(fields)){
+                equalcnt++;
+            }
+        }
+
+        delete match;
+
+        return equalcnt >= 2;
+
+    }
+
+
+    // 100 Züge davor kein Bauernzug und keine Figur geschlagen
+    bool cMatch::is_fifty_moves_rule(){
+
+        if(m_minutes.size() < 100){
+            return false;
+        }
+
+        int rulecnt = 0;
+
+        int cnt = 0;
+
+        cMatch *match = new cMatch(*this);
+
+        for(vector<cMove>::reverse_iterator it = match->m_minutes.rbegin(); it != match->m_minutes.rend(); ++it){
+            cnt++;
+
+            if(cnt > 101){
+                return false;
+            }
+
+            match->undo_move();
+
+            if(it->m_dstpiece != mBLK || it->m_srcpiece == mWPW || it->m_srcpiece == mBPW){
+                rulecnt = 0;
+                continue;
+            }
+
+            rulecnt++;
+            if(rulecnt >= 100){
+                delete match;
+                return true;
+            }
+        }
+
+        delete match;
+
+        return false;
 
     }
 
@@ -1614,6 +1670,21 @@
     }
 
 
+    bool cMatch::is_endgame(){
+        
+        for(uint8_t y = 0; y < 8; ++y){
+            for(uint8_t x = 0; x < 8; ++x){
+                if(m_board.getfield(x, y) == mWQU || m_board.getfield(x, y) == mBQU){
+                    return false;
+                }
+            }
+        }
+
+        return m_minutes.size() >= 40;
+
+    }
+
+
     bool cMatch::is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y){
 
         int8_t xsteps[3] = { 1, 0, -1 };
@@ -1662,36 +1733,6 @@
     }
 
 
-    bool cMatch::is_three_times_repetition(cMove &move){
-
-        cMatch *match = new cMatch(*this);
-
-        match->do_move(move);
-
-        uint8_t fields[8][8];
-
-        match->m_board.copy_fields(fields);
-
-        uint8_t equalcnt = 0;
-
-        uint8_t maxcnt = min((uint8_t)5, (uint8_t)(match->m_minutes.size() / 2));
-
-        for(uint8_t i = 0; i < maxcnt; ++i){
-            match->undo_move();
-            match->undo_move();
-
-            if(match->m_board.compare_fields(fields)){
-                equalcnt++;
-            }
-        }
-
-        delete match;
-
-        return equalcnt >= 2;
-
-    }
-
-
     int32_t cMatch::eval_move(cMove &move, uint8_t depth){
 
         int32_t rscore = 0;
@@ -1709,42 +1750,7 @@
 
         return rscore;
 
-        /*int32_t rscore = 0;
-
-        // mate with bp + kn *********************************
-        int32_t bkscoresA8H1[8][8] = { 
-            { mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 5, mWPLUS * 5, mWPLUS * 5, mWPLUS * 5 },
-            { mWPLUS * 4, mWPLUS * 3, mWPLUS * 3, mWPLUS * 3, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 5 },
-            { mWPLUS * 4, mWPLUS * 3, mWPLUS * 2, mWPLUS * 2, mWPLUS * 3, mWPLUS * 3, mWPLUS * 4, mWPLUS * 5 },
-            { mWPLUS * 4, mWPLUS * 3, mWPLUS * 2, mWPLUS * 1, mWPLUS * 1, mWPLUS * 3, mWPLUS * 4, mWPLUS * 5 },
-            { mWPLUS * 5, mWPLUS * 4, mWPLUS * 3, mWPLUS * 1, mWPLUS * 1, mWPLUS * 2, mWPLUS * 3, mWPLUS * 4 },
-            { mWPLUS * 5, mWPLUS * 4, mWPLUS * 3, mWPLUS * 3, mWPLUS * 2, mWPLUS * 2, mWPLUS * 3, mWPLUS * 4 },
-            { mWPLUS * 5, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 3, mWPLUS * 3, mWPLUS * 3, mWPLUS * 4 },
-            { mWPLUS * 5, mWPLUS * 5, mWPLUS * 5, mWPLUS * 5, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4, mWPLUS * 4 } };
-
-        uint8_t addjA1H8[8][8] = { 
-            { 10, 9, 8, 7, 6, 5, 4, 3  },
-            {  9, 3, 3, 3, 3, 3, 3, 4  },
-            {  8, 3, 1, 1, 1, 1, 3, 5  },
-            {  7, 3, 1, 0, 0, 1, 3, 6  },
-            {  6, 3, 1, 0, 0, 1, 3, 7  },
-            {  5, 3, 1, 1, 1, 1, 3, 8  },
-            {  4, 3, 3, 3, 3, 3, 3, 9  },
-            {  3, 4, 5, 6, 7, 8, 9, 10 } };
-
-        rscore += SCORES[mWPLUS] * addjA1H8[board.bKg_x][board.bKg_y];
-
-        uint8_t diffx = abs(board.wKg_x - board.bKg_x);
-        uint8_t diffy = abs(board.wKg_y - board.bKg_y);
-
-        if(PIECES_COLORS[move.srcpiece] == mWHITE){
-            rscore += (7 - max(diffx, diffy) * SCORES[mWPLUS]) - depth;
-        }
-        else{
-            rscore += max(diffx, diffy) * SCORES[mBPLUS] + depth;
-        }
-
-        return rscore; */
+        // ToDo mate with bp + kn
 
     }
 
@@ -2039,6 +2045,7 @@
                 }
             }
         }
+
 
         // endgame - check pawns
         if(is_endgame()){
