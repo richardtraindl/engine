@@ -751,12 +751,13 @@
 
     bool cMatch::filter(cMove &move, uint8_t depth, uint8_t maxdepth){
         
-        if(depth > 12){
+        if(depth > 12){ // && move.m_dstpiece == mBLK && move.is_en_passant() == false){
             return false;
         }
 
         // for endgame increase maxdepth with 2
-        if(is_endgame() && depth <= maxdepth + 2){
+        uint8_t status;
+        if(is_endgame(status) && depth <= maxdepth + 2){
             return true;
         }
 
@@ -1471,12 +1472,12 @@
         gen_moves(moves, next_color());
  
         if(moves.size() == 0){
-            rscore = eval_term(depth);
+            rscore = eval_terminate(depth);
             return;
         }
         else if(moves.size() == 1 && depth == 1){
             cMove move = moves.back();
-            rscore = m_score + eval_move(move, maxdepth) + eval_board(move);
+            rscore = m_score + eval_move(move) + eval_board(move);
             rmoves.push_back(move);
             return;
         }
@@ -1504,8 +1505,6 @@
         }
 
         if(depth == 1){
-            cout << "moves.size: " << moves.size() << " " << moves.back().format(false) << endl;
-
             start_alphabeta_threads(newscore, newmoves, moves, depth, maxdepth, alpha, beta);
 
             rscore = newscore;
@@ -1532,7 +1531,7 @@
                         newscore = 0;
                     }
                     else{
-                        newscore = m_score + eval_move(move, maxdepth) + eval_board(move);
+                        newscore = m_score + eval_move(move) + eval_board(move);
                     }
 
                     skip = true;
@@ -1540,7 +1539,7 @@
             }
 
             if(skip == false){
-                //int32_t rscore = eval_move(move, maxdepth);
+                //int32_t rscore = eval_move(move);
 
                 do_move(move);
 
@@ -1556,27 +1555,28 @@
             if(maximizing){
                 if(newscore > rscore){
                     rscore = newscore;
-                    
-                    alpha = max(rscore, alpha);
 
                     append_newmove(rmoves, newmoves, move);
+                }
 
-                    if(alpha >= beta){
-                        break;
-                    }
+                alpha = max(rscore, alpha);
+
+                if(alpha >= beta){
+                    break;
                 }
             }
             else{
                 if(newscore < rscore){
                     rscore = newscore;
 
-                    beta = min(rscore, beta);
-
                     append_newmove(rmoves, newmoves, move);
 
-                    if(beta <= alpha){
-                        break;
-                    }
+                }
+
+                beta = min(rscore, beta);
+
+                if(beta <= alpha){
+                    break;
                 }
             }
         }
@@ -1594,7 +1594,7 @@
 
             threading.start(depth, maxdepth);
 
-            sleep(0.5);
+            sleep(0.6);
 
             threading.update_candidates();
 
@@ -1632,7 +1632,7 @@
                 move.m_prio = min(move.m_prio, (uint8_t)(cMove::PRIO_CAPTURE + adjust + 10));
             }
         }
-        else{
+        //else{
             if(is_good_dstfield){
 
                 if(does_move_touch_weak_piece(move)){
@@ -1665,22 +1665,118 @@
                     move.m_prio = min(move.m_prio, (uint8_t)(cMove::PRIO_RUNNING_PAWN + adjust));
                 }
             }
-        }
+            else{
+                // bad dstfield
+                if(move.m_prio == 100){
+                    move.m_prio = 120;
+                }
+            }
+        //}
 
     }
 
 
-    bool cMatch::is_endgame(){
-        
+    bool cMatch::is_opening(){
+
+        return (m_minutes.size() <= 20);
+
+    }
+
+
+    bool cMatch::is_endgame(uint8_t &status){
+
+        status = 0;
+
+        uint8_t wpwcnt = 0;
+
+        uint8_t bpwcnt = 0;
+
+        vector<uint8_t> wofficers;
+
+        vector<uint8_t> bofficers;
+
         for(uint8_t y = 0; y < 8; ++y){
+
             for(uint8_t x = 0; x < 8; ++x){
-                if(m_board.getfield(x, y) == mWQU || m_board.getfield(x, y) == mBQU){
-                    return false;
+
+                uint8_t piece = m_board.getfield(x, y);
+
+                if(piece == mBLK){
+                    continue;
                 }
+                else if(piece == mWPW){
+                    wpwcnt++;
+                }
+                else if(piece == mBPW){
+                    bpwcnt++;
+                }
+                else if(PIECES_COLORS[piece] == mWHITE){
+                    wofficers.push_back(piece);
+                }
+                else{
+                    bofficers.push_back(piece);
+                }
+            }
+
+        }
+
+        if(wpwcnt == 0 && bpwcnt == 0){
+
+            if(wofficers.size() == 3 && bofficers.size() == 1){
+
+                uint8_t kncnt = 0;
+
+                uint8_t bpcnt = 0;
+
+                uint8_t elsecnt = 0;
+
+                for(uint8_t piece : wofficers){
+                    if(piece == mWKN){
+                        kncnt++;
+                    }
+                    else if(piece == mWBP){
+                        bpcnt++;
+                    }
+                    else{
+                        elsecnt++;
+                    }
+                }
+                if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
+                    status = 100;
+                }
+
+                return true;
+
+            }
+            else if(bofficers.size() == 3 && wofficers.size() == 1){
+
+                uint8_t kncnt = 0;
+
+                uint8_t bpcnt = 0;
+
+                uint8_t elsecnt = 0;
+
+                for(uint8_t piece : bofficers){
+                    if(piece == mBKN){
+                        kncnt++;
+                    }
+                    else if(piece == mBBP){
+                        bpcnt++;
+                    }
+                    else{
+                        elsecnt++;
+                    }
+                }
+                if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
+                    status = 101;
+                }
+
+                return true;
+
             }
         }
 
-        return m_minutes.size() >= 40;
+        return (wofficers.size() + bofficers.size()) <= 8;
 
     }
 
@@ -1716,7 +1812,7 @@
     }
 
 
-    int32_t cMatch::eval_term(uint8_t depth){
+    int32_t cMatch::eval_terminate(uint8_t depth){
 
             if(is_king_attacked(REVERSED_COLORS[next_color()])){
                 if(next_color() == mWHITE){
@@ -1733,11 +1829,11 @@
     }
 
 
-    int32_t cMatch::eval_move(cMove &move, uint8_t depth){
+    int32_t cMatch::eval_move(cMove &move){
 
         int32_t rscore = 0;
 
-        if(depth == 1){
+        /*if(depth == 1){
             if(move.is_short_castling() || move.is_long_castling()){
                 if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
                         rscore += SCORES[mWPLUS] * 2;
@@ -1746,11 +1842,37 @@
                         rscore += SCORES[mBPLUS] * 2;
                     }
             }
-        }
+        }*/
 
         return rscore;
 
-        // ToDo mate with bp + kn
+    }
+
+
+    int32_t cMatch::eval_first_move(cMove &move){
+
+        int32_t rscore = 0;
+
+        if(move.is_short_castling() || move.is_long_castling()){
+            if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+                    rscore += SCORES[mWPLUS] * 2;
+                }
+                else{
+                    rscore += SCORES[mBPLUS] * 2;
+                }
+        }
+
+        uint8_t status;
+        if(is_endgame(status)){
+            //mate with kn+bp
+            if(status == 100){
+                rscore += cEndGame001::m_white_WKG[m_board.m_wKg_x][m_board.m_wKg_y];
+
+                rscore += cEndGame001::m_white_BKG[m_board.m_bKg_x][m_board.m_bKg_y];
+            }
+        }
+
+        return rscore;
 
     }
 
@@ -1760,7 +1882,7 @@
         int32_t rscore = 0;
 
         // opening
-        if(m_minutes.size() <= 20){
+        if(is_opening()){
 
             // penalty for move repetition
             if(m_minutes.size() >= 2){
@@ -1858,7 +1980,8 @@
         }
         
         // opening and middlegame
-        if(is_endgame() == false){
+        uint8_t status;
+        if(is_endgame(status) == false){
             
             int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
@@ -2045,10 +2168,10 @@
                 }
             }
         }
-
-
-        // endgame - check pawns
-        if(is_endgame()){
+        else{
+            // endgame
+            
+            // check pawns
             for(uint8_t y = 1; y < 7; ++y){
                 for(uint8_t x = 0; x < 7; ++x){
                     uint8_t pawn = m_board.getfield(x, y);
@@ -2064,6 +2187,51 @@
                     }
                 }
             }
+
+            // mate with kn+bp
+            //rscore += cEndGame001::m_WKG[m_board.m_wKg_x][m_board.m_wKg_y];
+
+            //rscore += cEndGame001::m_BKG[m_board.m_bKg_x][m_board.m_bKg_y];
+
+            /*
+            uint8_t fields[8][8] = { 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                { 0, 0, 0, 0, 0, 0, 0, 0 }
+            };
+
+            for(uint8_t i = 0; i < 8; ++i){
+
+                for(uint8_t y = 0; y < 8; ++y){
+
+                    for(uint8_t x = 0; x < 8; ++x){
+
+                        fields[y][x] = 0;
+                    }
+
+                }
+
+                for(uint8_t j = 0; j < 4; ++j){
+
+                    cPiece cpiece = cEndGame001::m_mate_with_wkn_wbp[i][j];
+
+                    fields[cpiece.m_src_y][cpiece.m_src_x] = cpiece.m_piece;
+
+                }
+                
+                if(m_board.compare_fields(fields)){
+                    cout << "heureka" << endl;
+                    rscore += SCORES[mWPLUS] * 7;
+                    break;
+                }
+
+            }*/
+
         }
 
         return rscore;

@@ -29,7 +29,7 @@
 
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
-            if(m_threads[i].joinable() == false && m_pool_idx + 1 < (uint8_t)m_pool_moves.size()){
+            if(m_threads[i].joinable() == false && m_pool_idx < (uint8_t)m_pool_moves.size()){
                 
                 m_threading_mutex.lock();
 
@@ -39,13 +39,13 @@
 
                 m_pool_idx++;
 
-                cout << "thread started for: " + move.format(true) << endl;
-
                 m_thmatches[i] = new cMatch(*m_match);
 
                 m_thmatches[i]->do_move(move);
-
+                
                 m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta);
+
+                cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
 
                 m_threading_mutex.unlock();
             }
@@ -94,8 +94,11 @@
 
                 m_threads[i].join();
 
+                //***
                 cMove move = m_thmatches[i]->m_minutes.back();
-                
+                m_thscores[i] += m_thmatches[i]->eval_first_move(move);
+                //***
+
                 cout << "...............thread finished for: " + move.format(false);
                 cMatch::prnt_fmttime(" time: ", time(0) - m_start_time[i]);
 
@@ -103,35 +106,35 @@
                     if(m_thscores[i] > m_candidate_score){
                         m_candidate_score = m_thscores[i];
 
-                        m_alpha = max(m_candidate_score, m_alpha);
-
-                        cout << "*****************\nm_candidate_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n*****************" << endl;
-
-                        //if(m_alpha >= m_beta){
-                        //    cutoff = true;
-                        //}
+                        cout << "\nm_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n" << endl;
 
                         m_candidate_moves.clear();
                         m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());
                         m_candidate_moves.insert(m_candidate_moves.begin(), move);
                     }
+
+                    m_alpha = max(m_candidate_score, m_alpha);
+
+                    //if(m_alpha >= m_beta){
+                    //    cutoff = true;
+                    //}
                 }
                 else{
                     if(m_thscores[i] < m_candidate_score){
                         m_candidate_score = m_thscores[i];
 
-                        m_beta = min(m_candidate_score, m_beta);
-
-                        cout << "*****************\nm_candidate_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n*****************" << endl;
-
-                        //if(m_beta <= m_alpha){
-                        //    cutoff = true;
-                        //}
+                        cout << "\nm_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n" << endl;
 
                         m_candidate_moves.clear();
                         m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());
                         m_candidate_moves.insert(m_candidate_moves.begin(), move);
                     }
+
+                    m_beta = min(m_candidate_score, m_beta);
+
+                    //if(m_beta <= m_alpha){
+                    //    cutoff = true;
+                    //}
                 }
 
                 delete m_thmatches[i];
@@ -179,7 +182,7 @@
     }
 
 
-    void cThreading::term(){
+    void cThreading::terminate(){
 
         terminate();
 

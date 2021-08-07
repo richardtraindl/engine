@@ -10,6 +10,7 @@
     #include "./values.hpp"
     #include "./board.hpp"
     #include "./move.hpp"
+    #include "./endgame.hpp"
 
 
     using namespace std;
@@ -106,13 +107,17 @@
 
             void eval_prio(cMove &move);
 
-            bool is_endgame();
+            bool is_opening();
+
+            bool is_endgame(uint8_t &status);
 
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
 
-            int32_t eval_term(uint8_t depth);
+            int32_t eval_terminate(uint8_t depth);
 
-            int32_t eval_move(cMove &move, uint8_t depth);
+            int32_t eval_move(cMove &move);
+
+            int32_t eval_first_move(cMove &move);
 
             int32_t eval_board(cMove &move);
 

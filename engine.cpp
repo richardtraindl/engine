@@ -6,7 +6,7 @@
     #include <algorithm>
     #include "./match.hpp"
     #include "./move.hpp"
-    #include "./bitboard.hpp"
+    #include "./endgame.hpp"
 
 
     using namespace std;
@@ -28,12 +28,129 @@
     }
 
 
+    bool import_minutes(cMatch &match, string path_and_filename){
+
+        match.reset();
+
+        ifstream file(path_and_filename);
+
+        string content;
+        
+        uint8_t src_x, src_y, dst_x, dst_y;
+
+        uint8_t prompiece = mBLK;
+
+        while(file >> content) {
+
+            cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
+
+            cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
+
+            if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
+                match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
+            }
+            else{
+                cout << "import error!" << endl;
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+
+    bool import_board(cMatch &match, string path_and_filename){
+
+        match.reset();
+
+        ifstream file(path_and_filename);
+
+        string content;
+
+        uint8_t y = 7;
+
+        while(file >> content) {
+
+            if(content.length() == 32){
+
+                for(uint8_t x = 0; x < 8; ++x){
+
+                    uint8_t piece = PIECES[content.substr((x * 4), 3)];
+
+                    match.m_board.setfield(x, y, piece);
+
+                }
+
+                --y;
+
+            }
+            else{
+                cout << "import error!" << endl;
+                return false;
+            }
+        }
+
+        // check kings and set vars
+        bool wkg = false;
+        bool bkg = false;
+
+        for(uint8_t y = 0; y < 8; ++y){
+
+            for(uint8_t x = 0; x < 8; ++x){
+
+                uint8_t piece = match.m_board.getfield(x, y);
+
+                if(piece == mWKG){
+                    if(wkg){ 
+                        cout << "import error: wkg!" << endl;
+                        return false;
+                    }
+                    else{
+                        wkg = true;
+                        match.m_board.m_wKg_x = x;
+                        match.m_board.m_wKg_y = y;
+                    }
+                }
+                else if(piece == mBKG){
+                    if(bkg){ 
+                        cout << "import error: bkg!" << endl;
+                        return false;
+                    }
+                    else{
+                        bkg = true;
+                        match.m_board.m_bKg_x = x;
+                        match.m_board.m_bKg_y = y;
+                    }
+                }
+            }
+        }
+                    
+        if(wkg && bkg){
+            match.m_board.m_wKg_has_moved_at = 1;
+            match.m_board.m_bKg_has_moved_at = 1;
+            match.m_board.m_wRkA_has_moved_at = 1;
+            match.m_board.m_wRkH_has_moved_at = 1;
+            match.m_board.m_bRkA_has_moved_at = 1;
+            match.m_board.m_bRkH_has_moved_at = 1;
+
+            return true;
+        }
+        else{
+            cout << "import error: kg!" << endl;
+            return false;
+        }
+
+    }
+
+
     void play(cMatch &match, uint8_t maxdepth, uint8_t engine_color){
 
         char buffer[12];
         int length = 13;
 
         uint8_t src_x, src_y, dst_x, dst_y;
+
         uint8_t prompiece = mBLK;
 
         cout << " movecnt: " << match.m_minutes.size() << endl;
@@ -78,7 +195,7 @@
 
                 if(input == "h" || input == "H"){ 
                     cout << "\nmove formats: e2e4 | e7e8q | 0-0 | 0-0-0";
-                    cout << "\ncommands: q(uit) | u(ndo) | w(hite engine) | b(lack engine) | pb(print board) | pm(print minutes) | im(import moves) | ib(import board)";
+                    cout << "\ncommands: quit) | u(ndo) | w(hite engine) | b(lack engine) | pb(print board) | pm(print minutes) | im(import moves) | ib(import board)";
                     continue;
                 }
 
@@ -115,29 +232,16 @@
                         continue;
                     }
 
-                    match.reset();
+                    string path_and_filename = "./matches/game" + input.substr(2) + ".txt";
+                    if(import_minutes(match, path_and_filename)){
 
-                    string substr = input.substr(2);
-                    ifstream file("./matches/game" + substr + ".txt");
-                    string content;
+                        match.prnt_minutes();
 
-                    while(file >> content) {
-                        //cout << content << " ";
-                        cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
-                        cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
-                        if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
-                            match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
-                        }
-                        else{
-                            cout << "import error!" << endl;
-                            continue;
-                        }
+                        match.m_board.prnt();
                     }
-                    cout << endl;
 
-                    match.prnt_minutes();
-                    match.m_board.prnt();
                     continue;
+
                 }
 
                 if(input == "w" || input == "W"){
@@ -156,79 +260,13 @@
                         continue;
                     }
 
-                    match.reset();
-
-                    string substr = input.substr(2);
-                    ifstream file("./matches/board" + substr + ".txt");
-                    string content;
-                    uint8_t y = 7;
-
-                    while(file >> content) {
-                        //cout << content << " ";
-                        if(content.length() == 32){
-
-                            for(uint8_t x = 0; x < 8; ++x){
-                                uint8_t piece = PIECES[content.substr((x * 4), 3)];
-                                
-                                match.m_board.setfield(x, y, piece);
-                            }
-                            --y;
-                        }
-                        else{
-                            cout << "import error!" << endl;
-                            continue;
-                        }
-                    }
-                    cout << endl;
-
-                    bool wkg = false;
-                    bool bkg = false;
-                    for(uint8_t y = 0; y < 8; ++y){
-                        for(uint8_t x = 0; x < 8; ++x){
-                            uint8_t piece = match.m_board.getfield(x, y);
-                            if(piece == mWKG){
-                                if(wkg){ 
-                                    cout << "import error: wkg!" << endl;
-                                    continue;
-                                }
-                                else{
-                                    wkg = true;
-                                    match.m_board.m_wKg_x = x;
-                                    match.m_board.m_wKg_y = y;
-                                }
-                            }
-                            else if(piece == mBKG){
-                                if(bkg){ 
-                                    cout << "import error: bkg!" << endl;
-                                    continue;
-                                }
-                                else{
-                                    bkg = true;
-                                    match.m_board.m_bKg_x = x;
-                                    match.m_board.m_bKg_y = y;
-                                }
-                            }
-                        }
-                    }
-                    
-                    if(wkg && bkg){
-                        match.m_board.m_wKg_has_moved_at = 1;
-                        match.m_board.m_bKg_has_moved_at = 1;
-                        match.m_board.m_wRkA_has_moved_at = 1;
-                        match.m_board.m_wRkH_has_moved_at = 1;
-                        match.m_board.m_bRkA_has_moved_at = 1;
-                        match.m_board.m_bRkH_has_moved_at = 1;
-
-                        //fake first move
-                        //match.minutes.push_back(cMove(match.board.wKg_x, match.board.wKg_y, match.board.wKg_x, match.board.wKg_y, mWKG, mBLK, mBLK));
-
+                    string path_and_filename = "./matches/board" + input.substr(2) + ".txt";
+                    if(import_board(match, path_and_filename)){
                         match.m_board.prnt();
-                        continue;
                     }
-                    else{
-                        cout << "import error: kg!" << endl;
-                        continue;
-                    }
+
+                    continue;
+
                 }
 
                 if(input.compare("test") == 0){
@@ -293,8 +331,13 @@
                 }
 
                 if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
+
                     match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
+
                     match.m_board.prnt();
+                }
+                else{
+                    cout << "invalid move: " << input << endl;
                 }
             }
         }
@@ -308,48 +351,6 @@
 
         uint8_t engine_color = mBLANK;
         
-        
-        ifstream file("./matches/game001.txt");
-        string content;
-
-        uint8_t src_x, src_y, dst_x, dst_y;
-        uint8_t prompiece = mBLK;
-
-        while(file >> content) {
-            cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
-            cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
-            if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
-                match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
-            }
-            else{
-                cout << "import error!" << endl;
-                continue;
-            }
-        }
-        
-        cBitBoard bitboard;
-        
-        bitboard.import_fields(match.m_board.m_fields);
-        
-        bitboard.prnt();
-        
-        /*cBitBoard bitboard;
-        bitboard.set(1, 1, mWPW);        
-        cout << to_string(bitboard.get(1, 1)) << endl;
-
-        bitboard.set(0, 0, mWKG);
-        cout << to_string(bitboard.get(0, 0)) << endl;
-
-        bitboard.set(0, 0, mBQU);
-        cout << to_string(bitboard.get(0, 0)) << endl;
-
-        cout << hex << bitboard.m_bitfields[0] << endl;
-        cout << hex << bitboard.m_bitfields[1] << endl;
-        cout << hex << bitboard.m_bitfields[2] << endl;
-        cout << hex << bitboard.m_bitfields[3] << endl;
-
-        bitboard.prnt(); */
-
         play(match, maxdepth, engine_color);
 
         return 0;

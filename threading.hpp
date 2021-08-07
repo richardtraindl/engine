@@ -54,7 +54,7 @@
 
             bool has_finished();
 
-            void term();
+            void terminate();
 
     };
 
