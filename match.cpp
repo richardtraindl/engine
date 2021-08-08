@@ -4,6 +4,16 @@
     #include "./threading.hpp"
 
 
+    /*uint32_t g_depthcnt[30] = { 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+    };
+    
+    uint32_t g_filterdedector[10] = { 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };*/
+
     cMatch::cMatch(){ 
 
         cBoard m_board;
@@ -758,16 +768,19 @@
         // for endgame increase maxdepth with 2
         uint8_t status;
         if(is_endgame(status) && depth <= maxdepth + 2){
+            //g_filterdedector[0]++;
             return true;
         }
 
         // take en passant moves
         if(move.is_en_passant()){ 
+            //g_filterdedector[1]++;
             return true; 
         }
 
         // take promotion moves
         if(move.m_prompiece != mBLK){ 
+            //g_filterdedector[2]++;
             return true; 
         }
 
@@ -775,6 +788,7 @@
         if(move.m_dstpiece != mBLK){ 
             // piece must be lower than captured piece
             if(PIECES_RANKS[move.m_srcpiece] < PIECES_RANKS[move.m_dstpiece]){
+                //g_filterdedector[3]++;
                 return true;
             }
 
@@ -783,6 +797,7 @@
 
             // move is good because captured piece is not supported
             if(supporting_pieces.size() == 0){
+                //g_filterdedector[4]++;
                 return true; 
             }
 
@@ -791,6 +806,7 @@
             
             // move is good because captured piece is more attacked than supported 
             if(attacking_pieces.size() > supporting_pieces.size()){
+                //g_filterdedector[5]++;
                 return true; 
             }
 
@@ -815,6 +831,7 @@
             attacking_pieces.clear();
 
             if(has_lower_attacker){
+                //g_filterdedector[6]++;
                 return true;
             }
         }
@@ -822,10 +839,12 @@
         //if(depth > 6){ return false; } // 8
 
         if(move.m_srcpiece == mWPW && move.m_dst_y >= 6){
+            //g_filterdedector[7]++;
             return true;
         }
 
         if(move.m_srcpiece == mBPW && move.m_dst_y <= 2){
+            //g_filterdedector[8]++;
             return true;
         }
 
@@ -1517,6 +1536,9 @@
         }
 
         for(cMove move : moves){
+            // debug
+            //g_depthcnt[depth]++;
+            
             count++;
 
             newmoves.clear();
@@ -1582,6 +1604,19 @@
         }
 
         moves.clear();
+        
+        // debug
+        /*if(depth == 1){
+            for(uint8_t j = 0; j < 30; ++j){
+                cout << to_string(j) << ": " << dec << g_depthcnt[j] << endl;
+                g_depthcnt[j] = 0;
+            }
+            
+            for(uint8_t j = 0; j < 10; ++j){
+                cout << to_string(j) << ": " << dec << g_filterdedector[j]  << endl;
+                g_filterdedector[j] = 0;
+            }
+        } */
 
     }
 
@@ -1691,6 +1726,10 @@
 
         uint8_t bpwcnt = 0;
 
+        uint8_t wqucnt = 0;
+
+        uint8_t bqucnt = 0;
+
         vector<uint8_t> wofficers;
 
         vector<uint8_t> bofficers;
@@ -1711,16 +1750,32 @@
                     bpwcnt++;
                 }
                 else if(PIECES_COLORS[piece] == mWHITE){
-                    wofficers.push_back(piece);
+                    if(piece == mWQU){
+                        wqucnt++;
+                    }
+                    else{
+                        wofficers.push_back(piece);
+                    }
                 }
                 else{
-                    bofficers.push_back(piece);
+                    if(piece == mBQU){
+                        bqucnt++;
+                    }
+                    else{
+                        bofficers.push_back(piece);
+                    }
                 }
             }
 
         }
+        
+        uint8_t offcnt = wqucnt + bqucnt + wofficers.size() + bofficers.size();
+        
+        if(offcnt > 6){
+            return false;
+        }
 
-        if(wpwcnt == 0 && bpwcnt == 0){
+        if(wpwcnt == 0 && bpwcnt == 0 && wqucnt == 0 && bqucnt == 0){
 
             if(wofficers.size() == 3 && bofficers.size() == 1){
 
@@ -1776,7 +1831,7 @@
             }
         }
 
-        return (wofficers.size() + bofficers.size()) <= 8;
+        return true;
 
     }
 
