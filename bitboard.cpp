@@ -86,7 +86,7 @@
     }
 
 
-    bool cBitBoard::compare(uint64_t bitfields[4]){
+    bool cBitBoard::compare(const uint64_t bitfields[4]){
 
         for(int i = 0; i < 4; ++i){
 

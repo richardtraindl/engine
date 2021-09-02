@@ -70,6 +70,8 @@
 
         uint8_t y = 7;
 
+        int32_t sum = 0;
+
         while(file >> content) {
 
             if(content.length() == 32){
@@ -123,6 +125,9 @@
                         match.m_board.m_bKg_y = y;
                     }
                 }
+                else{
+                    sum += SCORES[piece];
+                }
             }
         }
                     
@@ -133,6 +138,13 @@
             match.m_board.m_wRkH_has_moved_at = 1;
             match.m_board.m_bRkA_has_moved_at = 1;
             match.m_board.m_bRkH_has_moved_at = 1;
+            
+            match.m_score = sum * -1;
+
+            // perform 30 fake moves to pretend not to be opening
+            for(uint8_t i = 0; i < 30; ++i){
+                match.m_minutes.push_back(cMove(1, 1, 1, 1, 1, 1, 1, 100));
+            }
 
             return true;
         }
@@ -271,12 +283,18 @@
 
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
-                    cMove move(5, 7, 2, 4, mBBP, mBLK, mBLK, 100);
+
+                    cMove move(3, 7, 4, 7, mBKG, mBLK, mBLK, 100);
                     //match.eval_prio(move);
-                    bool flag = match.is_three_times_repetition(move);
+                    
+                    
+                    
+                    bool flag = match.is_three_times_repetition(move, 0);
                     //bool flag = match.does_move_touch_weak_piece(move);
                     cout << to_string(flag) << endl;
+                    
                     cout << "test end" << endl;
+
                     continue;
                 }
 
@@ -346,6 +364,25 @@
 
     int main(void){
         cMatch match;
+
+        /*cBitBoard bitboard;
+
+        for(uint8_t i = 0; i < 4; ++i){
+            cout << "------------------------------" << endl;
+            for(uint8_t j = 0; j < 8; ++j){
+                for(uint8_t k = 0; k < 4; ++k){
+                    bitboard.m_bitfields[k] = cEndGame001::m_bitboard100[i][j][k];
+                }
+
+                bitboard.prnt();
+
+                cout << endl;
+            }
+        }
+
+        cout << endl;
+        */
+        //cout << size(cEndGame001::m_bitboard010[][]) << endl;
 
         uint8_t maxdepth = 5;
 

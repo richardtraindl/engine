@@ -6,7 +6,12 @@
             m_match = match;
 
             m_pool_moves = moves;
-            
+
+            for(uint8_t i = 0; i < MAXTHREADS; ++i){
+                m_pool_status[i][0] = -1;
+                m_pool_status[i][1] = 0;
+            }
+
             if(m_match->next_color() == mWHITE){
                 m_candidate_score = SCORES[mWKG] * 10;
             }
@@ -29,7 +34,71 @@
 
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
-            if(m_threads[i].joinable() == false && m_pool_idx < (uint8_t)m_pool_moves.size()){
+            if(m_threads[i].joinable() == false && m_pool_idx < (uint8_t)m_pool_moves.size() && m_pool_status[i][1] != 1){
+
+                m_threading_mutex.lock();
+
+                m_start_time[i] = time(0);
+
+                cMove move = m_pool_moves[m_pool_idx];
+
+                m_pool_status[i][0] = m_pool_idx;
+                m_pool_status[i][1] = 1;
+
+                m_pool_idx++;
+
+                m_thmatches[i] = new cMatch(*m_match);
+
+                m_thmatches[i]->do_move(move);
+
+                m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta);
+
+                cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
+
+                m_threading_mutex.unlock();
+            }
+        }
+
+    }
+
+
+    void cThreading::start_endgame(uint8_t depth, uint8_t maxdepth, uint8_t status){
+
+        for(uint8_t i = 0; i < MAXTHREADS; ++i){
+
+            if(m_threads[i].joinable() == false && m_pool_idx < (uint8_t)m_pool_moves.size() && m_pool_status[i][1] != 1){
+
+                m_threading_mutex.lock();
+
+                m_start_time[i] = time(0);
+
+                cMove move = m_pool_moves[m_pool_idx];
+
+                m_pool_status[i][0] = m_pool_idx;
+                m_pool_status[i][1] = 1;
+
+                m_pool_idx++;
+
+                m_thmatches[i] = new cMatch(*m_match);
+
+                m_thmatches[i]->do_move(move);
+
+                m_threads[i] = thread(&cMatch::calc_alphabeta_endgame, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, status);
+
+                cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
+
+                m_threading_mutex.unlock();
+            }
+        }
+
+    }
+
+
+    void cThreading::start_endgame3(uint8_t depth, uint8_t maxdepth, uint8_t status){
+
+        for(uint8_t i = 0; i < MAXTHREADS; ++i){
+
+            if(m_threads[i].joinable() == false && m_pool_idx < (uint8_t)m_pool_moves.size() && m_pool_status[i][1] != 1){
                 
                 m_threading_mutex.lock();
 
@@ -37,13 +106,103 @@
 
                 cMove move = m_pool_moves[m_pool_idx];
 
+                m_pool_status[i][0] = m_pool_idx;
+                m_pool_status[i][1] = 1;
+
                 m_pool_idx++;
 
                 m_thmatches[i] = new cMatch(*m_match);
 
                 m_thmatches[i]->do_move(move);
+
+                //*********************
+                /*
+                if(status == 100 && PIECES_COLORS[move.m_srcpiece] == mWHITE){
+
+                    //int32_t score = m_thmatches[i]->eval_pos_for_1xx(&move, depth, status);
+                    int32_t score = m_thmatches[i]->eval_move_100(move);
+
+                    if(score != 0){
+                        
+                        cout << "score: " << to_string(score) << endl;
+                        
+                        cout << move.format(false) << endl;
+
+                        m_thscores[i] = m_thmatches[i]->m_score + score;
+
+                        if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+                            if(m_thscores[i] > m_candidate_score){
+                                
+                                cout << move.format(false) << endl;
+
+                                m_candidate_score = m_thscores[i];
+
+                                cout << "\nm_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n" << endl;
+
+                                m_candidate_moves.clear();
+                                m_candidate_moves.push_back(move);
+                            }
+
+                            m_alpha = max(m_candidate_score, m_alpha);
+                        }
+                        else{
+                            if(m_thscores[i] < m_candidate_score){
+                                m_candidate_score = m_thscores[i];
+
+                                cout << "\nm_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n" << endl;
+
+                                m_candidate_moves.clear();
+                                m_candidate_moves.push_back(move);
+                            }
+
+                            m_beta = min(m_candidate_score, m_beta);
+                        }
+                    
+                        delete m_thmatches[i];
+
+                        m_thmoves[i].clear();
+
+                        m_threading_mutex.unlock();
+
+                        continue;
+                    }
+
+                } */
                 
-                m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta);
+                /*if(status == 100){
+                    int32_t score = m_thmatches[i]->eval_move_100(move);
+
+                    m_thmatches[i]->m_score += score;
+
+                    if(move.m_srcpiece == mBKG && score < 0){
+                        cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") !!!100!!! thread started and finished for: " + move.format(true) << endl;
+
+                        m_thscores[i] = m_thmatches[i]->m_score;
+
+                        if(m_thscores[i] < m_candidate_score){
+                            m_candidate_score = m_thscores[i];
+
+                            cout << "\nm_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n" << endl;
+
+                            m_candidate_moves.clear();
+                            m_candidate_moves.push_back(move);
+                        }
+
+                        m_beta = min(m_candidate_score, m_beta);
+
+                        delete m_thmatches[i];
+
+                        m_thmoves[i].clear();
+
+                        m_threading_mutex.unlock();
+
+                        continue;
+                    }
+                }*/
+
+                //*********************   
+
+                m_threads[i] = thread(&cMatch::calc_alphabeta_endgame, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, status);
 
                 cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
 
@@ -88,15 +247,16 @@
 
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
-            if(m_threads[i].joinable() && m_thmatches[i]->m_minutes.size() - 1 == m_match->m_minutes.size()){
+            if(m_threads[i].joinable() && m_thmatches[i]->m_minutes.size() - 1 == m_match->m_minutes.size() && m_pool_status[i][1] == 1){
 
                 m_threading_mutex.lock();
 
                 m_threads[i].join();
 
-                //***
                 cMove move = m_thmatches[i]->m_minutes.back();
-                m_thscores[i] += m_thmatches[i]->eval_first_move(move);
+
+                //***
+                //m_thscores[i] += m_thmatches[i]->post_eval_first_move(move);
                 //***
 
                 cout << "...............thread finished for: " + move.format(false);
@@ -137,6 +297,8 @@
                     //}
                 }
 
+                m_pool_status[i][1] = 2;
+
                 delete m_thmatches[i];
 
                 m_thmoves[i].clear();
@@ -158,21 +320,23 @@
         
         m_threading_mutex.lock();
 
-        if(m_pool_idx == 0 || m_pool_idx + 1 < (uint8_t)m_pool_moves.size()){
-
-            m_threading_mutex.unlock();
-
-            return false;
-        }
-
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
-            if(m_threads[i].joinable()){
+            if(m_threads[i].joinable() && m_thmatches[i]->m_minutes.size() - 1 != m_match->m_minutes.size() && m_pool_status[i][1] == 1){
+            //if(m_threads[i].joinable()){
 
                 m_threading_mutex.unlock();
 
                 return false;
             }
+        }
+
+        if(m_pool_idx == 0 || m_pool_idx + 1 < (uint8_t)m_pool_moves.size()){
+        //if(m_pool_idx <= (uint8_t)m_pool_moves.size()){
+
+            m_threading_mutex.unlock();
+
+            return false;
         }
 
         m_threading_mutex.unlock();

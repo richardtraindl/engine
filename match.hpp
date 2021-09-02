@@ -11,6 +11,7 @@
     #include "./board.hpp"
     #include "./move.hpp"
     #include "./endgame.hpp"
+    #include "./bitboard.hpp"
 
 
     using namespace std;
@@ -54,8 +55,8 @@
 
             bool undo_move();
 
-            bool is_three_times_repetition(cMove &move);            
-            
+            bool is_three_times_repetition(cMove &move, uint8_t depth);
+
             bool is_fifty_moves_rule();
 
             static string fmt_moves(vector<cMove> &moves);
@@ -71,7 +72,11 @@
 
             void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
 
+            void calc_alphabeta_endgame(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status);
+
             void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
+
+            void start_alphabeta_endgame_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status);
 
             static bool sortByPrio(const cMove &a, const cMove &b);
 
@@ -111,15 +116,19 @@
 
             bool is_endgame(uint8_t &status);
 
+            uint8_t eval_pos_1xx_final_stage(vector<cPiece> officers, uint8_t status, uint8_t color);
+
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
 
             int32_t eval_terminate(uint8_t depth);
 
-            int32_t eval_move(cMove &move);
-
-            int32_t eval_first_move(cMove &move);
+            int32_t eval_move(cMove &move, uint8_t status);
 
             int32_t eval_board(cMove &move);
+
+            int32_t eval_endgame_board(cMove &move, uint8_t depth, uint8_t status);
+
+            int32_t eval_pos(cMove &move, uint8_t status);
 
     };
 

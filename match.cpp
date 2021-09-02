@@ -178,10 +178,19 @@
         int32_t beta = SCORES[mBKG] * 10;
 
         uint8_t depth = 1;
+        
+        uint8_t status;
 
-        calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta);
+        if(is_endgame(status)){
+            cout << "status: " << to_string(status) << endl;
+            calc_alphabeta_endgame(rscore, rmoves, depth, maxdepth + 2, alpha, beta, status);
+        }
+        else{
+            calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta);
+        }
 
         m_prev_search.clear();
+
         for(cMove move : rmoves){
             m_prev_search.push_back(move);
         }
@@ -542,7 +551,7 @@
     }
 
 
-    bool cMatch::is_three_times_repetition(cMove &move){
+    bool cMatch::is_three_times_repetition(cMove &move, uint8_t depth){
 
         cMatch *match = new cMatch(*this);
 
@@ -554,10 +563,10 @@
 
         uint8_t equalcnt = 0;
 
-        uint8_t maxcnt = min((uint8_t)5, (uint8_t)(match->m_minutes.size() / 2));
+        uint8_t maxcnt = min((uint8_t)(8 + depth), (uint8_t)match->m_minutes.size()); // 8
 
         for(uint8_t i = 0; i < maxcnt; ++i){
-            match->undo_move();
+            //match->undo_move();
             match->undo_move();
 
             if(match->m_board.compare_fields(fields)){
@@ -765,13 +774,6 @@
             return false;
         }
 
-        // for endgame increase maxdepth with 2
-        uint8_t status;
-        if(is_endgame(status) && depth <= maxdepth + 2){
-            //g_filterdedector[0]++;
-            return true;
-        }
-
         // take en passant moves
         if(move.is_en_passant()){ 
             //g_filterdedector[1]++;
@@ -899,8 +901,11 @@
         }
         else{
             for(uint8_t y = 0; y < 8; ++y){
+
                 for(uint8_t x = 0; x < 8; ++x){
+
                     uint8_t piece = m_board.getfield(x, y);
+
                     if(PIECES_COLORS[piece] == color){
                         if(piece == mWPW){ 
                             gen_wpw_moves(moves, x, y); 
@@ -943,8 +948,11 @@
                             gen_qrb_moves(moves, x, y, piece, 'q');
                             continue; 
                         }
+
                     }
+
                 }
+
             }
 
             attacking_pieces.clear();
@@ -956,13 +964,13 @@
     void cMatch::add_wpw_moves(vector<cMove> &moves, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t dstpiece){
 
         if(src_y == 6 && dst_y == 7){
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWQU, 10));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWQU, cMove::PRIO_PROMOTION));
             
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWRK, 11));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWRK, cMove::PRIO_PROMOTION + 1));
             
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWBP, 12));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWBP, cMove::PRIO_PROMOTION + 2));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWKN, 13));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mWKN, cMove::PRIO_PROMOTION + 3));
         }
         else{
             cMove move(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mBLK, cMove::PRIO_STANDARD);
@@ -988,7 +996,7 @@
                 cMove prevmove = m_minutes.back();
                 uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
                 if(enpiece == mBPW && prevmove.m_src_y == 6 && prevmove.m_dst_y == 4 && prevmove.m_src_x == prevmove.m_dst_x && x + 1 == prevmove.m_src_x){
-                    moves.push_back(cMove(x, y, x + 1, y + 1, mWPW, dstpiece, mBLK, 20));
+                    moves.push_back(cMove(x, y, x + 1, y + 1, mWPW, dstpiece, mBLK, cMove::PRIO_EN_PASSANT));
                 }
             }
         }
@@ -1004,7 +1012,7 @@
                 cMove prevmove = m_minutes.back();
                 uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
                 if(enpiece == mBPW && prevmove.m_src_y == 6 && prevmove.m_dst_y == 4 && prevmove.m_src_x == prevmove.m_dst_x && x - 1 == prevmove.m_src_x){
-                    moves.push_back(cMove(x, y, x - 1, y + 1, mWPW, dstpiece, mBLK, 20));
+                    moves.push_back(cMove(x, y, x - 1, y + 1, mWPW, dstpiece, mBLK, cMove::PRIO_EN_PASSANT));
                 }
             }
         }
@@ -1031,13 +1039,13 @@
     void cMatch::add_bpw_moves(vector<cMove> &moves, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t dstpiece){
 
         if(src_y == 1 && dst_y == 0){
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBQU, 10));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBQU, cMove::PRIO_PROMOTION));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBRK, 11));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBRK, cMove::PRIO_PROMOTION + 1));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBBP, 12));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBBP, cMove::PRIO_PROMOTION + 2));
 
-            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBKN, 13));
+            moves.push_back(cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBKN, cMove::PRIO_PROMOTION + 3));
         }
         else{
             cMove move(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBLK, cMove::PRIO_STANDARD);
@@ -1064,7 +1072,7 @@
                 cMove prevmove = m_minutes.back();
                 uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
                 if(enpiece == mWPW && prevmove.m_src_y == 1 && prevmove.m_dst_y == 3 && prevmove.m_src_x == prevmove.m_dst_x && x + 1 == prevmove.m_src_x){
-                    moves.push_back(cMove(x, y, x + 1, y - 1, mBPW, dstpiece, mBLK, 20));
+                    moves.push_back(cMove(x, y, x + 1, y - 1, mBPW, dstpiece, mBLK, cMove::PRIO_EN_PASSANT));
                 }
             }
         }
@@ -1078,7 +1086,7 @@
                 cMove prevmove = m_minutes.back();
                 uint8_t enpiece = m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
                 if(enpiece == mWPW && prevmove.m_src_y == 1 && prevmove.m_dst_y == 3 && prevmove.m_src_x == prevmove.m_dst_x && x - 1 == prevmove.m_src_x){
-                    moves.push_back(cMove(x, y, x - 1, y - 1, mBPW, dstpiece, mBLK, 20));
+                    moves.push_back(cMove(x, y, x - 1, y - 1, mBPW, dstpiece, mBLK, cMove::PRIO_EN_PASSANT));
                 }
             }
         }
@@ -1112,8 +1120,10 @@
 
         int8_t steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(steps); ++i){
+
             if(cBoard::is_inbounds(x + steps[i][0], y + steps[i][1])){
+
                 uint8_t dst_x = x + steps[i][0];
                 uint8_t dst_y = y + steps[i][1];
 
@@ -1188,42 +1198,49 @@
 
         int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
-        for(uint8_t idx = 0; idx < 8; ++idx){
+        for(uint8_t i = 0; i < size(steps); ++i){
+
             uint8_t dst_x = x;
+
             uint8_t dst_y = y;
-            for(uint8_t j = 0; j < 1; ++j){
-                if(cBoard::is_inbounds(dst_x + steps[idx][0], dst_y + steps[idx][1]) == false){
-                    break;
-                }
-                dst_x += steps[idx][0];
-                dst_y += steps[idx][1];
+
+            if(cBoard::is_inbounds(dst_x + steps[i][0], dst_y + steps[i][1])){
+
+                dst_x += steps[i][0];
+                dst_y += steps[i][1];
 
                 uint8_t dstpiece = m_board.getfield(dst_x, dst_y);
 
                 if(PIECES_COLORS[dstpiece] == PIECES_COLORS[king]){
-                    break;
+                    continue;
                 }
 
                 bool is_clear = false;
+
                 if(PIECES_COLORS[king] == mWHITE){
                     m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
+
                     if(m_board.search_for_touching_piece(dst_x, dst_y, mBLACK) == mBLK){
                         is_clear = true;
                     }
+
                     m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
                 }
                 else{
                     m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
+
                     if(m_board.search_for_touching_piece(dst_x, dst_y, mWHITE) == mBLK){
                         is_clear = true;
                     }
+
                     m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
                 }
+
                 if(is_clear == false){ 
-                    break; 
+                    continue; 
                 }
 
-                cMove move(x, y, dst_x, dst_y, king, dstpiece, mBLK, cMove::PRIO_STANDARD);
+                cMove move(x, y, dst_x, dst_y, king, dstpiece, mBLK, cMove::PRIO_STANDARD - 1);
 
                 if(dstpiece != mBLK){ 
                     move.m_prio = cMove::PRIO_CAPTURE;
@@ -1234,6 +1251,7 @@
 
                 moves.push_back(move);
             }
+
         }
 
     }
@@ -1243,16 +1261,22 @@
 
         // short white castling
         if(m_board.m_wKg_has_moved_at == 0 && m_board.m_wRkH_has_moved_at == 0 && cBoard::is_inbounds(x + 3, y)){
+
             if(y == 0 && m_board.getfield(x + 1, y) == mBLK && m_board.getfield(x + 2, y) == mBLK && m_board.getfield(x + 3, y) == mWRK){
+
                 m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
+
                 bool is_clear = true;
+
                 for(uint8_t i = 0; i < 3; ++i){
                     if(m_board.search_for_touching_piece(x + i, y, mBLACK) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
+
                 m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
+
                 if(is_clear){
                     cMove move(x, y, x + 2, y, mWKG, mBLK, mBLK, cMove::PRIO_CASTLING);
 
@@ -1267,16 +1291,22 @@
 
         // long white castling
         if(m_board.m_wKg_has_moved_at == 0 && m_board.m_wRkA_has_moved_at == 0 && cBoard::is_inbounds(x - 4, y)){
+
             if(y == 0 && m_board.getfield(x - 1, y) == mBLK && m_board.getfield(x - 2, y) == mBLK && m_board.getfield(x - 3, y) == mBLK && m_board.getfield(x - 4, y) == mWRK){
+
                 m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
+
                 bool is_clear = true;
+
                 for(uint8_t i = 0; i < 3; ++i){
                     if(m_board.search_for_touching_piece(x - i, y, mBLACK) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
+
                 m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
+
                 if(is_clear){
                     cMove move(x, y, x - 2, y, mWKG, mBLK, mBLK, cMove::PRIO_CASTLING);
 
@@ -1296,16 +1326,22 @@
 
         // short black castling
         if(m_board.m_bKg_has_moved_at == 0 && m_board.m_bRkH_has_moved_at == 0 && cBoard::is_inbounds(x + 3, y)){
+
             if(y == 7 && m_board.getfield(x + 1, y) == mBLK && m_board.getfield(x + 2, y) == mBLK && m_board.getfield(x + 3, y) == mBRK){
+
                 m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
+
                 bool is_clear = true;
+
                 for(uint8_t i = 0; i < 3; ++i){
                     if(m_board.search_for_touching_piece(x + i, y, mWHITE) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
+
                 m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
+
                 if(is_clear){
                     cMove move(x, y, x + 2, y, mBKG, mBLK, mBLK, cMove::PRIO_CASTLING);
 
@@ -1320,16 +1356,22 @@
 
         // long black castling
         if(m_board.m_bKg_has_moved_at == 0 && m_board.m_bRkA_has_moved_at == 0 && cBoard::is_inbounds(x - 4, y)){
+
             if(y == 7 && m_board.getfield(x - 1, y) == mBLK && m_board.getfield(x - 2, y) == mBLK && m_board.getfield(x - 3, y) == mBLK && m_board.getfield(x - 4, y) == mBRK){
+
                 m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
+
                 bool is_clear = true;
+
                 for(uint8_t i = 0; i < 3; ++i){
                     if(m_board.search_for_touching_piece(x - i, y, mWHITE) != mBLK){
                         is_clear = false;
                         break;
                     }
                 }
+
                 m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
+
                 if(is_clear){
                     cMove move(x, y, x - 2, y, mBKG, mBLK, mBLK, cMove::PRIO_CASTLING);
 
@@ -1496,7 +1538,7 @@
         }
         else if(moves.size() == 1 && depth == 1){
             cMove move = moves.back();
-            rscore = m_score + eval_move(move) + eval_board(move);
+            rscore = m_score + eval_move(move, 0) + eval_board(move);
             rmoves.push_back(move);
             return;
         }
@@ -1538,40 +1580,220 @@
         for(cMove move : moves){
             // debug
             //g_depthcnt[depth]++;
-            
+
             count++;
 
             newmoves.clear();
 
             bool skip = false;
 
-            if(depth > maxdepth){
+            if(is_three_times_repetition(move, depth)){
+
+                newscore = 0;
+
+                skip = true;
+            }
+            else if(depth > maxdepth){
                 // skip move if filter says move is not worth to search deeper
                 if(filter(move, depth, maxdepth) == false){
 
-                    if(is_three_times_repetition(move)){
-                        newscore = 0;
-                    }
-                    else{
-                        newscore = m_score + eval_move(move) + eval_board(move);
-                    }
+                    newscore = m_score + eval_move(move, 0) + eval_board(move);
 
                     skip = true;
                 }
             }
 
             if(skip == false){
-                //int32_t rscore = eval_move(move);
-
                 do_move(move);
 
-                //score += rscore;
-                
                 calc_alphabeta(newscore, newmoves, depth + 1, maxdepth, alpha, beta);
 
                 undo_move();
+            }
 
-                //score -= rscore;
+            if(maximizing){
+                if(newscore > rscore){
+                    rscore = newscore;
+
+                    append_newmove(rmoves, newmoves, move);
+                }
+
+                alpha = max(rscore, alpha);
+
+                if(alpha >= beta){
+                    break;
+                }
+            }
+            else{
+                if(newscore < rscore){
+                    rscore = newscore;
+
+                    append_newmove(rmoves, newmoves, move);
+
+                }
+
+                beta = min(rscore, beta);
+
+                if(beta <= alpha){
+                    break;
+                }
+            }
+        }
+
+        moves.clear();
+        
+        // debug
+        /*if(depth == 1){
+            for(uint8_t j = 0; j < 30; ++j){
+                cout << to_string(j) << ": " << dec << g_depthcnt[j] << endl;
+                g_depthcnt[j] = 0;
+            }
+            
+            for(uint8_t j = 0; j < 10; ++j){
+                cout << to_string(j) << ": " << dec << g_filterdedector[j]  << endl;
+                g_filterdedector[j] = 0;
+            }
+        } */
+
+    }
+
+
+   void cMatch::calc_alphabeta_endgame(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status){
+
+        vector<cMove> newmoves;
+
+        int32_t newscore;
+
+        u_int8_t count = 0;
+
+        bool maximizing = (next_color() == mWHITE);
+
+        if(maximizing){
+            rscore = SCORES[mWKG] * 10;
+        }
+        else{
+            rscore = SCORES[mBKG] * 10;
+        }
+
+        vector<cMove> moves;
+        gen_moves(moves, next_color());
+ 
+        if(moves.size() == 0){
+
+            rscore = eval_terminate(depth);
+
+            rmoves.clear();
+
+            return;
+        }
+        else if(moves.size() == 1 && depth == 1){
+
+            cMove move = moves.back();
+
+            rscore = m_score + eval_move(move, status);
+
+            rmoves.clear();
+            rmoves.push_back(move);
+
+            return;
+        }
+        else{
+            if(depth == 1){
+                if(m_minutes.size() > 0 && m_prev_search.size() > 2){
+                    cMove last_move = m_minutes.back();
+
+                    cMove search_move = m_prev_search.at(1);
+
+                    if(last_move.compare(search_move)){
+                        cMove candidate = m_prev_search.at(2);
+
+                        for(cMove &move : moves){
+                            if(candidate.compare(move)){
+                                move.m_prio = min(move.m_prio, cMove::PRIO_PRE_CALC);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            sort(moves.begin(), moves.end(), sortByPrio);
+        }
+
+        if(depth == 1){
+            start_alphabeta_endgame_threads(newscore, newmoves, moves, depth, maxdepth, alpha, beta, status);
+
+            rscore = newscore;
+
+            for(cMove nmove : newmoves){
+                rmoves.push_back(nmove);
+            }
+
+            return;
+        }
+
+        for(cMove move : moves){
+            // debug
+            //g_depthcnt[depth]++;
+
+            count++;
+
+            newmoves.clear();
+
+            int32_t score = 0;
+            
+            score += eval_move(move, status);
+            if(maximizing){
+                score -= depth;
+            }
+            else{
+                score += depth;
+            }
+
+            bool skip = false;
+
+            if(is_three_times_repetition(move, depth)){
+
+                newscore = 0;
+
+                skip = true;
+            }
+            else if(depth > 9){
+
+                //int32_t pscore = eval_pos(move, status);
+                int32_t pscore = eval_endgame_board(move, depth, status);
+                if(maximizing){
+                    pscore -= depth;
+                }
+                else{
+                    pscore += depth;
+                }
+
+                newscore = m_score + pscore;
+
+                skip = true;
+            }            
+            else if(!maximizing && score < 0){
+
+                rscore = m_score + score;
+
+                rmoves.clear();
+                rmoves.push_back(move);
+
+                break;
+            }
+
+            if(skip == false){
+
+                do_move(move);
+
+                //m_score += (score / 10);
+
+                calc_alphabeta_endgame(newscore, newmoves, depth + 1, maxdepth, alpha, beta, status);
+
+                //m_score -= (score / 10);
+
+                undo_move();
             }
 
             if(maximizing){
@@ -1628,6 +1850,28 @@
         while(threading.has_finished() == false){
 
             threading.start(depth, maxdepth);
+
+            sleep(0.6);
+
+            threading.update_candidates();
+        }
+
+        threading.update_candidates();
+
+        threading.fetch_candidates(rscore, rmoves);
+
+        moves.clear();
+
+    }
+
+
+    void cMatch::start_alphabeta_endgame_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status){
+
+        cThreading threading(this, moves, alpha, beta);
+
+        while(threading.has_finished() == false){
+
+            threading.start_endgame(depth, maxdepth, status);
 
             sleep(0.6);
 
@@ -1730,9 +1974,9 @@
 
         uint8_t bqucnt = 0;
 
-        vector<uint8_t> wofficers;
+        vector<cPiece> wofficers;
 
-        vector<uint8_t> bofficers;
+        vector<cPiece> bofficers;
 
         for(uint8_t y = 0; y < 8; ++y){
 
@@ -1754,7 +1998,7 @@
                         wqucnt++;
                     }
                     else{
-                        wofficers.push_back(piece);
+                        wofficers.push_back(cPiece(piece, x, y));
                     }
                 }
                 else{
@@ -1762,7 +2006,7 @@
                         bqucnt++;
                     }
                     else{
-                        bofficers.push_back(piece);
+                        bofficers.push_back(cPiece(piece, x, y));
                     }
                 }
             }
@@ -1783,21 +2027,31 @@
 
                 uint8_t bpcnt = 0;
 
+                bool is_wsquare;
+
                 uint8_t elsecnt = 0;
 
-                for(uint8_t piece : wofficers){
-                    if(piece == mWKN){
+                for(cPiece piece : wofficers){
+                    if(piece.m_piece == mWKN){
                         kncnt++;
                     }
-                    else if(piece == mWBP){
+                    else if(piece.m_piece == mWBP){
                         bpcnt++;
+
+                        is_wsquare = !(piece.m_src_x % 2 == piece.m_src_y % 2);
                     }
                     else{
                         elsecnt++;
                     }
                 }
+
                 if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
-                    status = 100;
+                    if(is_wsquare){
+                        status = eval_pos_1xx_final_stage(wofficers, 100, mWHITE);
+                    }
+                    else{
+                        status = eval_pos_1xx_final_stage(wofficers, 110, mWHITE);
+                    }
                 }
 
                 return true;
@@ -1809,21 +2063,30 @@
 
                 uint8_t bpcnt = 0;
 
+                bool is_wsquare;
+
                 uint8_t elsecnt = 0;
 
-                for(uint8_t piece : bofficers){
-                    if(piece == mBKN){
+                for(cPiece piece : bofficers){
+                    if(piece.m_piece == mBKN){
                         kncnt++;
                     }
-                    else if(piece == mBBP){
+                    else if(piece.m_piece == mBBP){
                         bpcnt++;
+    
+                        is_wsquare = !(piece.m_src_x % 2 == piece.m_src_y % 2);
                     }
                     else{
                         elsecnt++;
                     }
                 }
                 if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
-                    status = 101;
+                    if(is_wsquare){
+                        status = eval_pos_1xx_final_stage(bofficers, 120, mBLACK);
+                    }
+                    else{
+                        status = eval_pos_1xx_final_stage(bofficers, 130, mBLACK);
+                    }
                 }
 
                 return true;
@@ -1836,12 +2099,76 @@
     }
 
 
+    uint8_t cMatch::eval_pos_1xx_final_stage(vector<cPiece> officers, uint8_t status, uint8_t color){
+
+        uint8_t single_kg_x, single_kg_y, army_kg_x, army_kg_y, army_kn;
+
+        if(color == mWHITE){
+            single_kg_x = m_board.m_bKg_x;
+            single_kg_y = m_board.m_bKg_y;
+            army_kg_x = m_board.m_wKg_x;
+            army_kg_y = m_board.m_wKg_y;
+            army_kn = mWPW;
+        }
+        else{
+            single_kg_x = m_board.m_wKg_x;
+            single_kg_y = m_board.m_wKg_y;
+            army_kg_x = m_board.m_bKg_x;
+            army_kg_y = m_board.m_bKg_y;
+            army_kn = mBPW;
+        } 
+
+        for(cPiece piece : officers){
+
+            if(piece.m_piece == army_kn){
+
+                int8_t diffx = piece.m_src_x - single_kg_x;
+                int8_t diffy = piece.m_src_y - single_kg_y;
+                if(abs(diffx) > 2 || abs(diffy) > 2){
+                    return status;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+
+        if(single_kg_y == 7 && army_kg_y == 5){
+            int8_t diff = single_kg_x - army_kg_x;
+            if(abs(diff) <= 1){
+                return status + 1;
+            }
+        }
+        else if(single_kg_x == 7 && army_kg_x == 5){
+            int8_t diff = single_kg_y - army_kg_y;
+            if(abs(diff) <= 1){
+                return status + 2;
+            }
+        }
+        else if(single_kg_y == 0 && army_kg_y == 2){
+            int8_t diff = single_kg_x - army_kg_x;
+            if(abs(diff) <= 1){
+                return status + 3;
+            }
+        }
+        else if(single_kg_x == 0 && army_kg_x == 2){
+            int8_t diff = single_kg_y - army_kg_y;
+            if(abs(diff) <= 1){
+                return status + 4;
+            }
+        }
+
+        return status;
+
+    }
+
+
     bool cMatch::is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y){
 
         int8_t xsteps[3] = { 1, 0, -1 };
         
 
-        for(uint8_t i = 0; i < 3; ++i){
+        for(uint8_t i = 0; i < size(xsteps); ++i){
             if(cBoard::is_inbounds(src_x + xsteps[i], src_y) == false){
                 continue;
             }
@@ -1884,57 +2211,63 @@
     }
 
 
-    int32_t cMatch::eval_move(cMove &move){
+    int32_t cMatch::eval_move(cMove &move, uint8_t status){
 
-        int32_t rscore = 0;
+        int32_t score = 0;
 
-        /*if(depth == 1){
-            if(move.is_short_castling() || move.is_long_castling()){
-                if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
-                        rscore += SCORES[mWPLUS] * 2;
-                    }
-                    else{
-                        rscore += SCORES[mBPLUS] * 2;
-                    }
+        if(status == 100 || status == 110){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_100_white_army_BKG[move.m_dst_y][move.m_dst_x];
             }
+            else{
+                return 0;
+            }
+        }
+        else if(status == 120 || status == 130){
+            if(move.m_srcpiece == mWKG){
+                return cEndGame001::m_100_black_army_WKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return 0;
+            }
+        }
+
+        /*uint8_t diffx, diffy;
+
+        if(move.m_srcpiece == mWKG){
+            diffx = abs(move.m_dst_x - m_board.m_bKg_x);
+            diffy = abs(move.m_dst_y - m_board.m_bKg_y);
+        }
+        else if(move.m_srcpiece == mBKG){
+            diffx = abs(m_board.m_wKg_x - move.m_dst_x);
+            diffy = abs(m_board.m_wKg_y - move.m_dst_y);
+        }
+        else{
+            diffx = abs(m_board.m_wKg_x - m_board.m_bKg_x);
+            diffy = abs(m_board.m_wKg_y - m_board.m_bKg_y);
+        }
+
+        if(diffx <= 2 && diffy <= 2){
+            score += 1;
+            //if(diffx == 0 || diffy == 0){
+            //     score += 25;
+            //}
+            //else if(diffx == 1 || diffy == 1){
+            //    score += 20;
+            //}
+            //else{
+            //    score += 15;
+            //}
         }*/
 
-        return rscore;
-
-    }
-
-
-    int32_t cMatch::eval_first_move(cMove &move){
-
-        int32_t rscore = 0;
-
-        if(move.is_short_castling() || move.is_long_castling()){
-            if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
-                    rscore += SCORES[mWPLUS] * 2;
-                }
-                else{
-                    rscore += SCORES[mBPLUS] * 2;
-                }
-        }
-
-        uint8_t status;
-        if(is_endgame(status)){
-            //mate with kn+bp
-            if(status == 100){
-                rscore += cEndGame001::m_white_WKG[m_board.m_wKg_x][m_board.m_wKg_y];
-
-                rscore += cEndGame001::m_white_BKG[m_board.m_bKg_x][m_board.m_bKg_y];
-            }
-        }
-
-        return rscore;
+        return score;
 
     }
 
 
     int32_t cMatch::eval_board(cMove &move){
 
-        int32_t rscore = 0;
+        int32_t score = 0;
 
         // opening
         if(is_opening()){
@@ -1946,10 +2279,10 @@
 
                 if(move.m_dst_x == pre_prev_move.m_src_x && move.m_dst_y ==  pre_prev_move.m_src_y && move.m_src_x == pre_prev_move.m_dst_x &&  move.m_src_y == pre_prev_move.m_dst_y){
                     if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
-                        rscore += SCORES[mBPLUS] * 4;
+                        score += SCORES[mBPLUS] * 4;
                     }
                     else{
-                        rscore += SCORES[mWPLUS] * 4;
+                        score += SCORES[mWPLUS] * 4;
                     }
                 }
             }
@@ -1963,7 +2296,7 @@
                 }
             }
             if(wcnt > 2){
-                rscore += SCORES[mBPLUS] * 2; // penalty
+                score += SCORES[mBPLUS] * 2; // penalty
             }
 
             cPiece black_pieces[4] = { cPiece(mBKN, 1, 7), cPiece(mBKN, 6, 7), cPiece(mBBP, 2, 7), cPiece(mBBP, 5, 7) };
@@ -1974,7 +2307,7 @@
                 }
             }
             if(bcnt > 2){
-                rscore += SCORES[mWPLUS] * 2; // penalty
+                score += SCORES[mWPLUS] * 2; // penalty
             }
             
             wcnt = 0;
@@ -1984,7 +2317,7 @@
                 }
             }
             if(wcnt >= 6){
-                rscore += SCORES[mBPLUS]; // penalty
+                score += SCORES[mBPLUS]; // penalty
             }
 
             bcnt = 0;
@@ -1994,7 +2327,7 @@
                 }
             }
             if(bcnt >= 6){
-                rscore += SCORES[mWPLUS]; // penalty
+                score += SCORES[mWPLUS]; // penalty
             }
 
             // pawns on central fields
@@ -2009,27 +2342,27 @@
             }
             for(cPiece wpiece : wpieces){
                 if(wpiece.m_piece == mWPW){
-                    rscore += SCORES[mWPLUS];
+                    score += SCORES[mWPLUS];
                     if(wpiece.m_src_y == 3){
-                        rscore += SCORES[mWPLUS]; // addition plus for 4th rank
+                        score += SCORES[mWPLUS]; // addition plus for 4th rank
                     }
                 }
             }
             for(cPiece bpiece : bpieces){
                 if(bpiece.m_piece == mBPW){
-                    rscore += SCORES[mBPLUS];
+                    score += SCORES[mBPLUS];
                     if(bpiece.m_src_y == 4){
-                        rscore += SCORES[mBPLUS]; // addition plus for 5th rank
+                        score += SCORES[mBPLUS]; // addition plus for 5th rank
                     }
                 }
             }
             
             // penalty for f2 / f7 moved pawns
             if(m_board.getfield(5, 1) == mBLK){
-                rscore += SCORES[mBPLUS] * 3; // penalty
+                score += SCORES[mBPLUS] * 3; // penalty
             }
             else if(m_board.getfield(5, 6) == mBLK){
-                rscore += SCORES[mWPLUS] * 3; // penalty
+                score += SCORES[mWPLUS] * 3; // penalty
             }
 
         }
@@ -2041,7 +2374,7 @@
             int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
             //weak white king?
-            for(uint8_t i = 0; i < 8; ++i){
+            for(uint8_t i = 0; i < size(steps); ++i){
                 vector <cPiece> wpieces, bpieces;
 
                 m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mBLK);
@@ -2050,7 +2383,7 @@
                     m_board.search_for_all_touching_pieces(wpieces, bpieces, m_board.m_wKg_x + steps[i][0], m_board.m_wKg_y + steps[i][1]);
 
                     if(wpieces.size() < bpieces.size()){
-                        rscore += SCORES[mBPLUS] * 3; // penalty
+                        score += SCORES[mBPLUS] * 3; // penalty
                         m_board.setfield(m_board.m_wKg_x, m_board.m_wKg_y, mWKG);
                         break;
                     }
@@ -2064,7 +2397,7 @@
             if(wpieces.size() == 2){
                 cPiece second = wpieces.at(1);
                 if(second.m_piece == mBRK || second.m_piece == mBQU){
-                    rscore += SCORES[mBPLUS] * 3; // penalty
+                    score += SCORES[mBPLUS] * 3; // penalty
                 }
             }
             else if(wpieces.size() > 2){
@@ -2072,17 +2405,17 @@
                 cPiece second = wpieces.at(1);
                 cPiece third = wpieces.at(2);
                 if(second.m_piece == mBRK || second.m_piece == mBQU){
-                    rscore += SCORES[mBPLUS] * 3; // penalty
+                    score += SCORES[mBPLUS] * 3; // penalty
                 }
                 else if((third.m_piece == mBRK || third.m_piece == mBQU)){
                     if((first.m_piece != mWPW && first.m_piece != mBPW) || (second.m_piece != mWPW && second.m_piece != mBPW)){
-                        rscore += SCORES[mBPLUS] * 3; // penalty
+                        score += SCORES[mBPLUS] * 3; // penalty
                     }
                 }
             }
 
             //weak black king?
-            for(uint8_t i = 0; i < 8; ++i){
+            for(uint8_t i = 0; i < size(steps); ++i){
                 vector <cPiece> wpieces, bpieces;
 
                 m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBLK);
@@ -2091,7 +2424,7 @@
                     m_board.search_for_all_touching_pieces(wpieces, bpieces, m_board.m_bKg_x + steps[i][0], m_board.m_bKg_y + steps[i][1]);
 
                     if(bpieces.size() < wpieces.size()){
-                        rscore += SCORES[mWPLUS] * 3; // penalty
+                        score += SCORES[mWPLUS] * 3; // penalty
                         m_board.setfield(m_board.m_bKg_x, m_board.m_bKg_y, mBKG);
                         break;
                     }
@@ -2105,7 +2438,7 @@
             if(bpieces.size() == 2){
                 cPiece second = bpieces.at(1);
                 if(second.m_piece == mWRK || second.m_piece == mWQU){
-                    rscore += SCORES[mWPLUS] * 3; // penalty
+                    score += SCORES[mWPLUS] * 3; // penalty
                 }
             }
             else if(bpieces.size() > 2){
@@ -2113,11 +2446,11 @@
                 cPiece second = bpieces.at(1);
                 cPiece third = bpieces.at(2);
                 if(second.m_piece == mWRK || second.m_piece == mWQU){
-                    rscore += SCORES[mWPLUS] * 3; // penalty
+                    score += SCORES[mWPLUS] * 3; // penalty
                 }
                 else if((third.m_piece == mWRK || third.m_piece == mWQU)){
                     if((first.m_piece != mBPW && first.m_piece != mWPW) || (second.m_piece != mBPW && second.m_piece != mWPW)){
-                        rscore += SCORES[mWPLUS] * 3; // penalty
+                        score += SCORES[mWPLUS] * 3; // penalty
                     }
                 }
             }
@@ -2169,7 +2502,7 @@
                 m_board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
 
                 if(wpieces.size() >= bpieces.size()){
-                    rscore += SCORES[mWPLUS] * 2;
+                    score += SCORES[mWPLUS] * 2;
                 }
             }
                     
@@ -2219,77 +2552,224 @@
                 m_board.search_for_all_touching_pieces(wpieces, bpieces, rk_x, rk_y);
 
                 if(bpieces.size() >= wpieces.size()){
-                    rscore += SCORES[mBPLUS] * 2;
+                    score += SCORES[mBPLUS] * 2;
                 }
             }
         }
-        else{
-            // endgame
-            
-            // check pawns
+
+        return score;
+
+    }
+
+
+    int32_t cMatch::eval_endgame_board(cMove &move, uint8_t depth, uint8_t status){
+
+        int32_t score = 0;
+
+        if(status == 0){
+        // check pawns
             for(uint8_t y = 1; y < 7; ++y){
                 for(uint8_t x = 0; x < 7; ++x){
+
                     uint8_t pawn = m_board.getfield(x, y);
+
                     if(pawn == mWPW){
                         if(is_running_pawn(pawn, x, y)){
-                            rscore += SCORES[mWPLUS] * y;
+                            score += SCORES[mWPLUS] * y;
                         }
                     }
+
                     if(pawn == mBPW){
                         if(is_running_pawn(pawn, x, y)){
-                            rscore += SCORES[mBPLUS] * (7 - y);
+                            score += SCORES[mBPLUS] * (7 - y);
                         }
                     }
                 }
             }
-
-            // mate with kn+bp
-            //rscore += cEndGame001::m_WKG[m_board.m_wKg_x][m_board.m_wKg_y];
-
-            //rscore += cEndGame001::m_BKG[m_board.m_bKg_x][m_board.m_bKg_y];
-
-            /*
-            uint8_t fields[8][8] = { 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }, 
-                { 0, 0, 0, 0, 0, 0, 0, 0 }
-            };
-
-            for(uint8_t i = 0; i < 8; ++i){
-
-                for(uint8_t y = 0; y < 8; ++y){
-
-                    for(uint8_t x = 0; x < 8; ++x){
-
-                        fields[y][x] = 0;
-                    }
-
-                }
-
-                for(uint8_t j = 0; j < 4; ++j){
-
-                    cPiece cpiece = cEndGame001::m_mate_with_wkn_wbp[i][j];
-
-                    fields[cpiece.m_src_y][cpiece.m_src_x] = cpiece.m_piece;
-
-                }
-                
-                if(m_board.compare_fields(fields)){
-                    cout << "heureka" << endl;
-                    rscore += SCORES[mWPLUS] * 7;
-                    break;
-                }
-
-            }*/
-
+            
+            return score;
         }
 
-        return rscore;
+        if(status >= 100 && status < 140){
+            // kn+bp
+
+            uint8_t wkg_x, wkg_y, bkg_x, bkg_y; 
+
+            if(move.m_srcpiece == mWKG){
+                wkg_x = move.m_dst_x;
+                wkg_y = move.m_dst_y;
+                bkg_x = m_board.m_bKg_x;
+                bkg_y = m_board.m_bKg_y;
+            }
+            else if(move.m_srcpiece == mBKG){
+                wkg_x = m_board.m_wKg_x;
+                wkg_y = m_board.m_wKg_y;
+                bkg_x = move.m_dst_x;
+                bkg_y = move.m_dst_y;
+            }
+            else{
+                wkg_x = m_board.m_wKg_x;
+                wkg_y = m_board.m_wKg_y;
+                bkg_x = m_board.m_bKg_x;
+                bkg_y = m_board.m_bKg_y;
+            }
+
+            if(status == 100 || status == 110){
+                // white kn+bp
+
+                //uint8_t diffx, diffy;
+
+                score += cEndGame001::m_100_white_army_WKG[wkg_y][wkg_x];
+
+                score += cEndGame001::m_100_white_army_BKG[bkg_y][bkg_x];
+
+                //diffx = abs(wkg_x - bkg_x);
+                //diffy = abs(wkg_y - bkg_y);
+
+                //if(diffx <= 2 && diffy <= 2){
+                    //score += 4;
+                //}
+            }
+            else if(status == 120 || status == 130){
+                // black kn+bp
+
+                //uint8_t diffx, diffy;
+
+                score += cEndGame001::m_100_black_army_WKG[wkg_y][wkg_x];
+
+                score += cEndGame001::m_100_black_army_BKG[bkg_y][bkg_x];
+
+                //diffx = abs(wkg_x - bkg_x);
+                //diffy = abs(wkg_y - bkg_y);
+
+                //if(diffx <= 2 && diffy <= 2){
+                    //score += 4;
+                //}
+            }
+            else if(status == 101){
+                score += cEndGame001::m_101_BKG[bkg_y][bkg_x];
+            }
+            else if(status == 102){
+                score += cEndGame001::m_102_BKG[bkg_y][bkg_x];
+            }
+            else if(status == 103){
+                score += cEndGame001::m_103_BKG[bkg_y][bkg_x];
+            }
+            else if(status == 104){
+                score += cEndGame001::m_104_BKG[bkg_y][bkg_x];
+            }
+            else if(status == 111){
+                score += cEndGame001::m_111_BKG[bkg_y][bkg_x];
+            }
+            else if(status == 112){
+                score += cEndGame001::m_112_BKG[bkg_y][bkg_x];
+            }
+            else if(status == 113){
+                score += cEndGame001::m_113_BKG[bkg_y][bkg_x];
+            }
+            else if(status == 114){
+                score += cEndGame001::m_114_BKG[bkg_y][bkg_x];
+            }
+            else if(status > 120 && status < 130){
+                score += cEndGame001::m_120_final_black_army_WKG[wkg_y][wkg_x];
+            }
+            else if(status > 130 && status < 140){
+                score += cEndGame001::m_130_final_black_army_WKG[wkg_y][wkg_x];
+            }
+        }
+
+        return score;
+
+    }
+
+
+    int32_t cMatch::eval_pos(cMove &move, uint8_t status){
+
+        if(status == 0){
+            return 0;
+        }
+        else if(status == 101){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_101_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_101_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status == 102){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_102_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_102_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status == 103){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_103_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_103_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status == 104){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_104_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_104_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status == 111){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_111_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_111_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status == 112){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_112_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_112_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status == 113){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_113_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_113_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status == 114){
+            if(move.m_srcpiece == mBKG){
+                return cEndGame001::m_114_BKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_114_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
+            }
+        }
+        else if(status > 120 && status < 130){
+            if(move.m_srcpiece == mWKG){
+                return cEndGame001::m_120_final_black_army_WKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_120_final_black_army_WKG[m_board.m_wKg_y][m_board.m_wKg_x];
+            }
+        }
+        else if(status > 130 && status < 140){
+            if(move.m_srcpiece == mWKG){
+                return cEndGame001::m_130_final_black_army_WKG[move.m_dst_y][move.m_dst_x];
+            }
+            else{
+                return cEndGame001::m_130_final_black_army_WKG[m_board.m_wKg_y][m_board.m_wKg_x];
+            }
+        }
+
+        return 0;
 
     }
 

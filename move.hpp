@@ -30,6 +30,7 @@
             uint8_t m_prio;
 
             static const uint8_t PRIO_PROMOTION = 10;
+            static const uint8_t PRIO_EN_PASSANT = 29;
             static const uint8_t PRIO_CAPTURE = 30;
             static const uint8_t PRIO_RUNNING_PAWN = 35;
             static const uint8_t PRIO_PRE_CALC = 35;

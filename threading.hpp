@@ -23,6 +23,8 @@
 
             uint8_t m_pool_idx = 0;
 
+            int8_t m_pool_status[MAXTHREADS][2];
+
             thread m_threads[MAXTHREADS];
 
             array<vector<cMove>, MAXTHREADS> m_thmoves;
@@ -47,6 +49,10 @@
             ~cThreading();
 
             void start(uint8_t depth, uint8_t maxdepth);
+
+            void start_endgame(uint8_t depth, uint8_t maxdepth, uint8_t status);
+
+            void start_endgame3(uint8_t depth, uint8_t maxdepth, uint8_t status);
 
             bool fetch_candidates(int32_t &newscore, vector<cMove> &newmoves);
 

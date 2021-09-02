@@ -79,7 +79,7 @@
 
         int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(steps); ++i){
 
             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 7);
 
@@ -98,7 +98,7 @@
             }
         }
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(steps); ++i){
 
             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 1);
 
@@ -111,7 +111,7 @@
 
         int8_t kn_steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(kn_steps); ++i){
 
             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, kn_steps[i][0], kn_steps[i][1], 1);
 
@@ -157,7 +157,7 @@
         // qu, rk and bp
         int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(steps); ++i){
             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 7);
 
             if(PIECES_COLORS[piece] == color){
@@ -179,7 +179,7 @@
         }
         
         // kg
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(steps); ++i){
             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 1);
 
             if(PIECES_COLORS[piece] == color){
@@ -192,7 +192,7 @@
         // kn
         int8_t kn_steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(kn_steps); ++i){
              piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, kn_steps[i][0], kn_steps[i][1], 1);
 
             if(PIECES_COLORS[piece] == color){
@@ -270,7 +270,7 @@
         // qu, rk and bp
         int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(steps); ++i){
             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 7);
 
             if(piece == mBLK){
@@ -304,7 +304,7 @@
         }
         
         // kg
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(steps); ++i){
             piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 1);
 
             if(piece == mWKG){
@@ -318,7 +318,7 @@
         // kn
         int8_t kn_steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < size(kn_steps); ++i){
              piece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, kn_steps[i][0], kn_steps[i][1], 1);
 
             if(piece == mWKN){
@@ -384,7 +384,7 @@
             if(piece == mWKN || piece == mBKN){
                 int8_t steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
 
-                for(uint8_t i = 0; i < 8; ++i){
+                for(uint8_t i = 0; i < size(steps); ++i){
                     uint8_t dir = eval_dir(piece_x, piece_y, steps[i][0], steps[i][1]);
                     if(excl_dir != mNO_DIR && excl_dir == dir){
                         continue;
@@ -531,7 +531,7 @@
 
         int8_t steps2[][2] = { { -1, 0 }, { 0, -1 }, { -1, -1 }, { 1, -1 } };
 
-        for(uint8_t i = 0; i < 4; ++i){
+        for(uint8_t i = 0; i < size(steps1); ++i){
             piece1 = search_dir_for_piece(dst1_x, dst1_y, piece_x, piece_y, steps1[i][0], steps1[i][1], 6);
 
             piece2 = search_dir_for_piece(dst2_x, dst2_y, piece_x, piece_y, steps2[i][0], steps2[i][1], 6);
@@ -578,11 +578,14 @@
     bool cBoard::compare_fields(uint8_t fields[8][8]){
 
         for(uint8_t y = 0; y < 8; ++y){
+
             for(uint8_t x = 0; x < 8; ++x){
+
                 if(m_fields[y][x] != fields[y][x]){
                     return false;
                 }
             }
+
         }
 
         return true;
@@ -595,6 +598,7 @@
         string textcolor, backcolor, strpiece;
 
         for(int8_t y = 7; y >=0; --y){
+
             for(uint8_t x = 0; x < 8; ++x){
 
                 uint8_t piece = getfield(x, (uint8_t)y);
@@ -625,13 +629,16 @@
             cout << endl;
             
             for(uint8_t x = 0; x < 8; ++x){
+
                 if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1)){
                     cout << "\033[104m" + textcolor + "    " + (const string)"\033[0m"; 
                 }
                 else{
                     cout << "\033[42m" + textcolor + "    " + (const string)"\033[0m"; 
                 }
+
             }
+
             cout << endl;
 
         }
@@ -642,9 +649,11 @@
     void cBoard::copy_fields(uint8_t fields[8][8]){
 
         for(uint8_t y = 0; y < 8; ++y){
+
             for(uint8_t x = 0; x < 8; ++x){
                 fields[y][x] = m_fields[y][x];
             }
+
         }
 
     }
@@ -657,14 +666,19 @@
         if(getfield(m_bKg_x, m_bKg_y) != mBKG){ return false; }
 
         for(uint8_t y = 0; y < 8; ++y){
+
             for(uint8_t x = 0; x < 8; ++x){
+
                 if(m_fields[y][x] == mWKG && (x != m_wKg_x || y != m_wKg_y)){
                     return false;
                 }
+
                 if(m_fields[y][x] == mBKG && (x != m_bKg_x || y != m_bKg_y)){
                     return false;
                 }
+
             }
+
         }
 
         return true;

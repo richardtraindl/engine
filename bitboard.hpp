@@ -26,7 +26,7 @@
 
             void import_fields(uint8_t fields[8][8]);
 
-            bool compare(uint64_t bitfields[4]);
+            bool compare(const uint64_t bitfields[4]);
 
             void prnt();
 
