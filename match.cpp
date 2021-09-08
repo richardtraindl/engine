@@ -9,9 +9,9 @@
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
     };
-    
-    uint32_t g_filterdedector[10] = { 
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+    uint32_t g_filterdetector[20] = { 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };*/
 
     cMatch::cMatch(){ 
@@ -182,10 +182,18 @@
         uint8_t status;
 
         if(is_endgame(status)){
-            cout << "status: " << to_string(status) << endl;
-            calc_alphabeta_endgame(rscore, rmoves, depth, maxdepth + 2, alpha, beta, status);
+            cout << "Endgame - status: " << to_string(status) << endl;
+            
+            uint8_t newmaxdepth = maxdepth;
+
+            if(status > 0){
+                newmaxdepth += 4;
+            }
+
+            calc_alphabeta_endgame(rscore, rmoves, depth, newmaxdepth, alpha, beta, status);
         }
         else{
+            cout << "Opening or Middlegame - status: " << to_string(status) << endl;
             calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta);
         }
 
@@ -776,13 +784,13 @@
 
         // take en passant moves
         if(move.is_en_passant()){ 
-            //g_filterdedector[1]++;
+            //g_filterdetector[1]++;
             return true; 
         }
 
         // take promotion moves
         if(move.m_prompiece != mBLK){ 
-            //g_filterdedector[2]++;
+            //g_filterdetector[2]++;
             return true; 
         }
 
@@ -790,7 +798,7 @@
         if(move.m_dstpiece != mBLK){ 
             // piece must be lower than captured piece
             if(PIECES_RANKS[move.m_srcpiece] < PIECES_RANKS[move.m_dstpiece]){
-                //g_filterdedector[3]++;
+                //g_filterdetector[3]++;
                 return true;
             }
 
@@ -799,7 +807,7 @@
 
             // move is good because captured piece is not supported
             if(supporting_pieces.size() == 0){
-                //g_filterdedector[4]++;
+                //g_filterdetector[4]++;
                 return true; 
             }
 
@@ -808,7 +816,7 @@
             
             // move is good because captured piece is more attacked than supported 
             if(attacking_pieces.size() > supporting_pieces.size()){
-                //g_filterdedector[5]++;
+                //g_filterdetector[5]++;
                 return true; 
             }
 
@@ -833,7 +841,7 @@
             attacking_pieces.clear();
 
             if(has_lower_attacker){
-                //g_filterdedector[6]++;
+                //g_filterdetector[6]++;
                 return true;
             }
         }
@@ -841,12 +849,12 @@
         //if(depth > 6){ return false; } // 8
 
         if(move.m_srcpiece == mWPW && move.m_dst_y >= 6){
-            //g_filterdedector[7]++;
+            //g_filterdetector[7]++;
             return true;
         }
 
-        if(move.m_srcpiece == mBPW && move.m_dst_y <= 2){
-            //g_filterdedector[8]++;
+        if(move.m_srcpiece == mBPW && move.m_dst_y <= 1){
+            //g_filterdetector[8]++;
             return true;
         }
 
@@ -1538,7 +1546,7 @@
         }
         else if(moves.size() == 1 && depth == 1){
             cMove move = moves.back();
-            rscore = m_score + eval_move(move, 0) + eval_board(move);
+            rscore = m_score + eval_board(move); // eval_move(move, 0) + 
             rmoves.push_back(move);
             return;
         }
@@ -1597,7 +1605,7 @@
                 // skip move if filter says move is not worth to search deeper
                 if(filter(move, depth, maxdepth) == false){
 
-                    newscore = m_score + eval_move(move, 0) + eval_board(move);
+                    newscore = m_score + eval_board(move); // eval_move(move, 0) + 
 
                     skip = true;
                 }
@@ -1644,14 +1652,15 @@
         
         // debug
         /*if(depth == 1){
+
             for(uint8_t j = 0; j < 30; ++j){
                 cout << to_string(j) << ": " << dec << g_depthcnt[j] << endl;
                 g_depthcnt[j] = 0;
             }
-            
-            for(uint8_t j = 0; j < 10; ++j){
-                cout << to_string(j) << ": " << dec << g_filterdedector[j]  << endl;
-                g_filterdedector[j] = 0;
+
+            for(uint8_t j = 0; j < 20; ++j){
+                cout << to_string(j) << ": " << dec << g_filterdetector[j]  << endl;
+                g_filterdetector[j] = 0;
             }
         } */
 
@@ -1690,7 +1699,7 @@
 
             cMove move = moves.back();
 
-            rscore = m_score + eval_move(move, status);
+            rscore = m_score + eval_endgame_board(move, depth, status);
 
             rmoves.clear();
             rmoves.push_back(move);
@@ -1742,13 +1751,7 @@
 
             int32_t score = 0;
             
-            score += eval_move(move, status);
-            if(maximizing){
-                score -= depth;
-            }
-            else{
-                score += depth;
-            }
+            score += eval_endgame_board(move, depth, status);
 
             bool skip = false;
 
@@ -1758,40 +1761,18 @@
 
                 skip = true;
             }
-            else if(depth > 9){
+            else if(depth > maxdepth){ // (status >= 100 && status <= 130 && depth > maxdepth + 4) ||
 
-                //int32_t pscore = eval_pos(move, status);
-                int32_t pscore = eval_endgame_board(move, depth, status);
-                if(maximizing){
-                    pscore -= depth;
-                }
-                else{
-                    pscore += depth;
-                }
-
-                newscore = m_score + pscore;
+                newscore = m_score + score;
 
                 skip = true;
             }            
-            else if(!maximizing && score < 0){
-
-                rscore = m_score + score;
-
-                rmoves.clear();
-                rmoves.push_back(move);
-
-                break;
-            }
 
             if(skip == false){
 
                 do_move(move);
 
-                //m_score += (score / 10);
-
                 calc_alphabeta_endgame(newscore, newmoves, depth + 1, maxdepth, alpha, beta, status);
-
-                //m_score -= (score / 10);
 
                 undo_move();
             }
@@ -1829,14 +1810,15 @@
         
         // debug
         /*if(depth == 1){
+            
             for(uint8_t j = 0; j < 30; ++j){
                 cout << to_string(j) << ": " << dec << g_depthcnt[j] << endl;
                 g_depthcnt[j] = 0;
             }
-            
+
             for(uint8_t j = 0; j < 10; ++j){
-                cout << to_string(j) << ": " << dec << g_filterdedector[j]  << endl;
-                g_filterdedector[j] = 0;
+                cout << to_string(j) << ": " << dec << g_filterdetector[j]  << endl;
+                g_filterdetector[j] = 0;
             }
         } */
 
@@ -2047,10 +2029,10 @@
 
                 if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
                     if(is_wsquare){
-                        status = eval_pos_1xx_final_stage(wofficers, 100, mWHITE);
+                        status = 100;
                     }
                     else{
-                        status = eval_pos_1xx_final_stage(wofficers, 110, mWHITE);
+                        status = 110;
                     }
                 }
 
@@ -2082,110 +2064,15 @@
                 }
                 if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
                     if(is_wsquare){
-                        status = eval_pos_1xx_final_stage(bofficers, 120, mBLACK);
+                        status = 120;
                     }
                     else{
-                        status = eval_pos_1xx_final_stage(bofficers, 130, mBLACK);
+                        status = 130;
                     }
                 }
 
                 return true;
 
-            }
-        }
-
-        return true;
-
-    }
-
-
-    uint8_t cMatch::eval_pos_1xx_final_stage(vector<cPiece> officers, uint8_t status, uint8_t color){
-
-        uint8_t single_kg_x, single_kg_y, army_kg_x, army_kg_y, army_kn;
-
-        if(color == mWHITE){
-            single_kg_x = m_board.m_bKg_x;
-            single_kg_y = m_board.m_bKg_y;
-            army_kg_x = m_board.m_wKg_x;
-            army_kg_y = m_board.m_wKg_y;
-            army_kn = mWPW;
-        }
-        else{
-            single_kg_x = m_board.m_wKg_x;
-            single_kg_y = m_board.m_wKg_y;
-            army_kg_x = m_board.m_bKg_x;
-            army_kg_y = m_board.m_bKg_y;
-            army_kn = mBPW;
-        } 
-
-        for(cPiece piece : officers){
-
-            if(piece.m_piece == army_kn){
-
-                int8_t diffx = piece.m_src_x - single_kg_x;
-                int8_t diffy = piece.m_src_y - single_kg_y;
-                if(abs(diffx) > 2 || abs(diffy) > 2){
-                    return status;
-                }
-                else{
-                    break;
-                }
-            }
-        }
-
-        if(single_kg_y == 7 && army_kg_y == 5){
-            int8_t diff = single_kg_x - army_kg_x;
-            if(abs(diff) <= 1){
-                return status + 1;
-            }
-        }
-        else if(single_kg_x == 7 && army_kg_x == 5){
-            int8_t diff = single_kg_y - army_kg_y;
-            if(abs(diff) <= 1){
-                return status + 2;
-            }
-        }
-        else if(single_kg_y == 0 && army_kg_y == 2){
-            int8_t diff = single_kg_x - army_kg_x;
-            if(abs(diff) <= 1){
-                return status + 3;
-            }
-        }
-        else if(single_kg_x == 0 && army_kg_x == 2){
-            int8_t diff = single_kg_y - army_kg_y;
-            if(abs(diff) <= 1){
-                return status + 4;
-            }
-        }
-
-        return status;
-
-    }
-
-
-    bool cMatch::is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y){
-
-        int8_t xsteps[3] = { 1, 0, -1 };
-        
-
-        for(uint8_t i = 0; i < size(xsteps); ++i){
-            if(cBoard::is_inbounds(src_x + xsteps[i], src_y) == false){
-                continue;
-            }
-
-            if(PIECES_COLORS[piece] == mWHITE){
-                for(uint8_t y = src_y; y < 7; ++y){
-                    if(m_board.getfield(src_x + xsteps[i], y) == mBPW){
-                        return false;
-                    }
-                }
-            }
-            else{
-                for(uint8_t y = src_y; y > 0; --y){
-                    if(m_board.getfield(src_x + xsteps[i], y) == mWPW){
-                        return false;
-                    }
-                }
             }
         }
 
@@ -2207,60 +2094,6 @@
             else{
                 return 0; // draw
             }
-
-    }
-
-
-    int32_t cMatch::eval_move(cMove &move, uint8_t status){
-
-        int32_t score = 0;
-
-        if(status == 100 || status == 110){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_100_white_army_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return 0;
-            }
-        }
-        else if(status == 120 || status == 130){
-            if(move.m_srcpiece == mWKG){
-                return cEndGame001::m_100_black_army_WKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return 0;
-            }
-        }
-
-        /*uint8_t diffx, diffy;
-
-        if(move.m_srcpiece == mWKG){
-            diffx = abs(move.m_dst_x - m_board.m_bKg_x);
-            diffy = abs(move.m_dst_y - m_board.m_bKg_y);
-        }
-        else if(move.m_srcpiece == mBKG){
-            diffx = abs(m_board.m_wKg_x - move.m_dst_x);
-            diffy = abs(m_board.m_wKg_y - move.m_dst_y);
-        }
-        else{
-            diffx = abs(m_board.m_wKg_x - m_board.m_bKg_x);
-            diffy = abs(m_board.m_wKg_y - m_board.m_bKg_y);
-        }
-
-        if(diffx <= 2 && diffy <= 2){
-            score += 1;
-            //if(diffx == 0 || diffy == 0){
-            //     score += 25;
-            //}
-            //else if(diffx == 1 || diffy == 1){
-            //    score += 20;
-            //}
-            //else{
-            //    score += 15;
-            //}
-        }*/
-
-        return score;
 
     }
 
@@ -2574,13 +2407,13 @@
                     uint8_t pawn = m_board.getfield(x, y);
 
                     if(pawn == mWPW){
-                        if(is_running_pawn(pawn, x, y)){
+                        if(m_board.is_running_pawn(pawn, x, y)){
                             score += SCORES[mWPLUS] * y;
                         }
                     }
 
                     if(pawn == mBPW){
-                        if(is_running_pawn(pawn, x, y)){
+                        if(m_board.is_running_pawn(pawn, x, y)){
                             score += SCORES[mBPLUS] * (7 - y);
                         }
                     }
@@ -2590,7 +2423,7 @@
             return score;
         }
 
-        if(status >= 100 && status < 140){
+        if(status >= 100 && status <= 130){
             // kn+bp
 
             uint8_t wkg_x, wkg_y, bkg_x, bkg_y; 
@@ -2617,159 +2450,84 @@
             if(status == 100 || status == 110){
                 // white kn+bp
 
-                //uint8_t diffx, diffy;
+                if(status == 100){
+                    score += cEndGame001::m_wsquare_bp_single_KG[bkg_y][bkg_x];
+                }
+                else{
+                    score += cEndGame001::m_bsquare_bp_single_KG[bkg_y][bkg_x];
+                }
 
-                score += cEndGame001::m_100_white_army_WKG[wkg_y][wkg_x];
+                uint8_t diff = m_board.max_diff(wkg_x, wkg_y, bkg_x, bkg_y);
+                if(diff < 5){
+                    score += (5 - diff);
+                }
+                else{
+                    score -= (diff - 4);
+                }
 
-                score += cEndGame001::m_100_white_army_BKG[bkg_y][bkg_x];
+                if(m_board.is_margin_pos(bkg_x, bkg_y)){
+                    score += 4;
+                }
 
-                //diffx = abs(wkg_x - bkg_x);
-                //diffy = abs(wkg_y - bkg_y);
+                if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+                    if(m_board.is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
+                        score += 2;
+                    }
 
-                //if(diffx <= 2 && diffy <= 2){
-                    //score += 4;
-                //}
+                    score -= depth;
+                }
+                else{
+                    if(m_board.is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
+                        score -= 2;
+                    }
+
+                    score += depth;
+                }
+
+                return score;
             }
             else if(status == 120 || status == 130){
                 // black kn+bp
 
-                //uint8_t diffx, diffy;
+                if(status == 120){
+                    score -= cEndGame001::m_wsquare_bp_single_KG[wkg_y][wkg_x];
+                }
+                else{
+                    score -= cEndGame001::m_bsquare_bp_single_KG[wkg_y][wkg_x];
+                }
 
-                score += cEndGame001::m_100_black_army_WKG[wkg_y][wkg_x];
+                uint8_t diff = m_board.max_diff(wkg_x, wkg_y, bkg_x, bkg_y);
+                if(diff < 5){
+                    score -= (5 - diff);
+                }
+                else{
+                    score += (diff - 4);
+                }
 
-                score += cEndGame001::m_100_black_army_BKG[bkg_y][bkg_x];
+                if(m_board.is_margin_pos(wkg_x, wkg_y)){
+                    score -= 4;
+                }
 
-                //diffx = abs(wkg_x - bkg_x);
-                //diffy = abs(wkg_y - bkg_y);
+                if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+                    if(m_board.is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
+                        score += 2;
+                    }
 
-                //if(diffx <= 2 && diffy <= 2){
-                    //score += 4;
-                //}
-            }
-            else if(status == 101){
-                score += cEndGame001::m_101_BKG[bkg_y][bkg_x];
-            }
-            else if(status == 102){
-                score += cEndGame001::m_102_BKG[bkg_y][bkg_x];
-            }
-            else if(status == 103){
-                score += cEndGame001::m_103_BKG[bkg_y][bkg_x];
-            }
-            else if(status == 104){
-                score += cEndGame001::m_104_BKG[bkg_y][bkg_x];
-            }
-            else if(status == 111){
-                score += cEndGame001::m_111_BKG[bkg_y][bkg_x];
-            }
-            else if(status == 112){
-                score += cEndGame001::m_112_BKG[bkg_y][bkg_x];
-            }
-            else if(status == 113){
-                score += cEndGame001::m_113_BKG[bkg_y][bkg_x];
-            }
-            else if(status == 114){
-                score += cEndGame001::m_114_BKG[bkg_y][bkg_x];
-            }
-            else if(status > 120 && status < 130){
-                score += cEndGame001::m_120_final_black_army_WKG[wkg_y][wkg_x];
-            }
-            else if(status > 130 && status < 140){
-                score += cEndGame001::m_130_final_black_army_WKG[wkg_y][wkg_x];
+                    score -= depth;
+                }
+                else{
+                    if(m_board.is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
+                        score -= 2;
+                    }
+
+                    score += depth;
+                }
+
+                return score;
             }
         }
 
         return score;
-
-    }
-
-
-    int32_t cMatch::eval_pos(cMove &move, uint8_t status){
-
-        if(status == 0){
-            return 0;
-        }
-        else if(status == 101){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_101_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_101_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status == 102){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_102_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_102_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status == 103){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_103_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_103_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status == 104){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_104_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_104_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status == 111){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_111_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_111_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status == 112){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_112_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_112_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status == 113){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_113_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_113_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status == 114){
-            if(move.m_srcpiece == mBKG){
-                return cEndGame001::m_114_BKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_114_BKG[m_board.m_bKg_y][m_board.m_bKg_x];
-            }
-        }
-        else if(status > 120 && status < 130){
-            if(move.m_srcpiece == mWKG){
-                return cEndGame001::m_120_final_black_army_WKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_120_final_black_army_WKG[m_board.m_wKg_y][m_board.m_wKg_x];
-            }
-        }
-        else if(status > 130 && status < 140){
-            if(move.m_srcpiece == mWKG){
-                return cEndGame001::m_130_final_black_army_WKG[move.m_dst_y][move.m_dst_x];
-            }
-            else{
-                return cEndGame001::m_130_final_black_army_WKG[m_board.m_wKg_y][m_board.m_wKg_x];
-            }
-        }
-
-        return 0;
 
     }
 

@@ -116,19 +116,11 @@
 
             bool is_endgame(uint8_t &status);
 
-            uint8_t eval_pos_1xx_final_stage(vector<cPiece> officers, uint8_t status, uint8_t color);
-
-            bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
-
             int32_t eval_terminate(uint8_t depth);
-
-            int32_t eval_move(cMove &move, uint8_t status);
 
             int32_t eval_board(cMove &move);
 
             int32_t eval_endgame_board(cMove &move, uint8_t depth, uint8_t status);
-
-            int32_t eval_pos(cMove &move, uint8_t status);
 
     };
 

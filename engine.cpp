@@ -28,6 +28,49 @@
     }
 
 
+    void play_endgame(cMatch &match, uint8_t maxdepth, uint8_t engine_color){
+
+        for(uint8_t i = 0; i < 100; ++i){
+            
+            cout << "\n*****************" << endl;
+            cout << "count: " << to_string(i + 1) << endl;
+            cout << "*****************" << endl;
+
+            if(i % 10 == 0){
+                match.m_board.prnt();
+            }
+
+            vector<cMove> rmoves;
+
+            int32_t rscore;
+
+            /*vector <cMove> moves;
+            match.gen_moves(moves, match.next_color());
+            if(moves.size() > 0){
+                uint8_t idx = rand() % moves.size();
+                cMove move = moves.at(idx);
+                match.do_move(move);
+            }*/
+
+            match.calc_move(rscore, rmoves, maxdepth);
+
+            if(rmoves.size() > 0){
+                cMove move = rmoves.front();
+                match.do_move(move);
+            }
+            else{
+                uint8_t status = match.eval_status();
+                cout << "count: " << to_string(i) << endl;
+                prnt_status(match, status);
+                cout << "game over! " << to_string(i) << endl;
+                return;
+            }
+        }
+
+        cout << "regular finish " << endl;
+    }
+
+
     bool import_minutes(cMatch &match, string path_and_filename){
 
         match.reset();
@@ -283,17 +326,17 @@
 
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
+                    
+                    play_endgame(match, maxdepth, engine_color);
 
-                    cMove move(3, 7, 4, 7, mBKG, mBLK, mBLK, 100);
-                    //match.eval_prio(move);
+                    //cMove move(3, 7, 4, 7, mBKG, mBLK, mBLK, 100);
                     
-                    
-                    
-                    bool flag = match.is_three_times_repetition(move, 0);
-                    //bool flag = match.does_move_touch_weak_piece(move);
-                    cout << to_string(flag) << endl;
+                    //bool flag = match.is_three_times_repetition(move, 0);
+                    //cout << to_string(flag) << endl;
                     
                     cout << "test end" << endl;
+                    
+                    match.m_board.prnt();
 
                     continue;
                 }
@@ -365,28 +408,9 @@
     int main(void){
         cMatch match;
 
-        /*cBitBoard bitboard;
-
-        for(uint8_t i = 0; i < 4; ++i){
-            cout << "------------------------------" << endl;
-            for(uint8_t j = 0; j < 8; ++j){
-                for(uint8_t k = 0; k < 4; ++k){
-                    bitboard.m_bitfields[k] = cEndGame001::m_bitboard100[i][j][k];
-                }
-
-                bitboard.prnt();
-
-                cout << endl;
-            }
-        }
-
-        cout << endl;
-        */
-        //cout << size(cEndGame001::m_bitboard010[][]) << endl;
-
         uint8_t maxdepth = 5;
 
-        uint8_t engine_color = mBLANK;
+        uint8_t engine_color = mBLACK;
         
         play(match, maxdepth, engine_color);
 

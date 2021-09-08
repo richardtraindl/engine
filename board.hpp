@@ -43,6 +43,14 @@
 
             static bool is_inbounds(uint8_t x, uint8_t y);
 
+            uint8_t max_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+            bool is_margin_pos(uint8_t x, uint8_t y);
+
+            bool is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y);
+
+            bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y);
+
             uint8_t search_dir_for_piece(uint8_t &dst_x, uint8_t &dst_y, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y, uint8_t maxcnt);
 
             void search_dir_for_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y);

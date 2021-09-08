@@ -36,6 +36,64 @@
     }
 
 
+    uint8_t cBoard::max_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
+
+        uint8_t diffx = abs(x1 - x2);
+
+        uint8_t diffy = abs(y1 - y2);
+
+        return max(diffx, diffy);
+    }
+
+
+    bool cBoard::is_margin_pos(uint8_t x, uint8_t y){
+
+        return (x == 0 || x == 7 || y == 0 || y ==7);
+
+    }
+
+
+    bool cBoard::is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
+        
+        uint8_t diffx = abs(wkg_x - bkg_x);
+        uint8_t diffy = abs(wkg_y - bkg_y);
+        
+        return ((diffx == 2 && diffy == 0) || (diffx == 0 && diffy == 2));
+
+    }
+
+
+    bool cBoard::is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y){
+
+        int8_t xsteps[3] = { 1, 0, -1 };
+        
+
+        for(uint8_t i = 0; i < size(xsteps); ++i){
+            if(is_inbounds(src_x + xsteps[i], src_y) == false){
+                continue;
+            }
+
+            if(PIECES_COLORS[piece] == mWHITE){
+                for(uint8_t y = src_y; y < 7; ++y){
+                    if(getfield(src_x + xsteps[i], y) == mBPW){
+                        return false;
+                    }
+                }
+            }
+            else{
+                for(uint8_t y = src_y; y > 0; --y){
+                    if(getfield(src_x + xsteps[i], y) == mWPW){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+
     uint8_t cBoard::search_dir_for_piece(uint8_t &dst_x, uint8_t &dst_y, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y, uint8_t maxcnt){
 
         dst_x = src_x;

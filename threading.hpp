@@ -52,8 +52,6 @@
 
             void start_endgame(uint8_t depth, uint8_t maxdepth, uint8_t status);
 
-            void start_endgame3(uint8_t depth, uint8_t maxdepth, uint8_t status);
-
             bool fetch_candidates(int32_t &newscore, vector<cMove> &newmoves);
 
             void update_candidates();
