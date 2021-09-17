@@ -36,26 +36,32 @@
             cout << "count: " << to_string(i + 1) << endl;
             cout << "*****************" << endl;
 
-            if(i % 10 == 0){
+            if(i % 6 == 0){
                 match.m_board.prnt();
+
+                sleep(5);
             }
+
+            //if(cBoard::is_margin_pos(match.m_board.m_wKg_x, match.m_board.m_wKg_y) && cBoard::max_diff(match.m_board.m_wKg_x, match.m_board.m_wKg_y, match.m_board.m_bKg_x, match.m_board.m_bKg_y) == 2 && i > 10){
+            //    match.m_board.prnt();
+
+            //    cout << "\nMARGIN" << endl;
+            //    return;
+            //}
 
             vector<cMove> rmoves;
 
             int32_t rscore;
 
-            /*vector <cMove> moves;
-            match.gen_moves(moves, match.next_color());
-            if(moves.size() > 0){
-                uint8_t idx = rand() % moves.size();
-                cMove move = moves.at(idx);
-                match.do_move(move);
-            }*/
-
+            //match.gen_moves(rmoves, match.next_color());
             match.calc_move(rscore, rmoves, maxdepth);
 
             if(rmoves.size() > 0){
+                //uint8_t idx = rand() % rmoves.size();
+                //cMove move = rmoves.at(idx);
+
                 cMove move = rmoves.front();
+
                 match.do_move(move);
             }
             else{
@@ -326,6 +332,21 @@
 
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
+
+                    uint8_t diffkg = cBoard::max_diff(match.m_board.m_wKg_x, match.m_board.m_wKg_y, match.m_board.m_bKg_x, match.m_board.m_bKg_y);
+                    cout << "diffkg:" << to_string(diffkg) << endl;
+
+                    uint8_t diffmg = cBoard::diff_to_margin(match.m_board.m_bKg_x, match.m_board.m_bKg_y);
+                    cout << "diffmg:" << to_string(diffmg) << endl;
+
+                    bool is_margin = match.m_board.is_margin_pos(match.m_board.m_bKg_x, match.m_board.m_bKg_y);
+                    cout << "is_margin:" << is_margin << endl;
+    
+
+                //if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+                    //if(m_board.is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
+                    //    score += 4;
+                    //}
                     
                     play_endgame(match, maxdepth, engine_color);
 
@@ -334,11 +355,12 @@
                     //bool flag = match.is_three_times_repetition(move, 0);
                     //cout << to_string(flag) << endl;
                     
-                    cout << "test end" << endl;
+                    //cout << "test end" << endl;
                     
-                    match.m_board.prnt();
-
-                    continue;
+                    //match.m_board.prnt();
+                    
+                    return;
+                    //continue;
                 }
 
                 if(input.size() == 3 && input.compare(0, 3, "0-0") == 0){
@@ -408,10 +430,33 @@
     int main(void){
         cMatch match;
 
+        cEndGame100 endgame1; // ToDo constructor....
+
+        cEndGame110 endgame2;
+
+        cEndGame120 endgame3;
+
+        cEndGame130 endgame4;
+
+        cBitBoard bitboard;
+
+        for(uint8_t i = 0; i < 5; ++i){
+
+            for(uint8_t j = 0; j < 4; ++j){
+                bitboard.m_bitfields[j] = cEndGame130::m_top_left_sthbnd[i][j];
+            }
+
+            cout << endl;
+
+            bitboard.prnt();
+
+        }
+
+
         uint8_t maxdepth = 5;
 
         uint8_t engine_color = mBLACK;
-        
+
         play(match, maxdepth, engine_color);
 
         return 0;

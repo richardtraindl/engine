@@ -86,6 +86,8 @@
 
             bool filter(cMove &move, uint8_t depth, uint8_t maxdepth);
 
+            bool filter_endgame(cMove &move, uint8_t depth, uint8_t maxdepth, uint8_t status);
+
             void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, cMove &move);
 
             void gen_moves(vector<cMove> &moves, uint8_t color);
@@ -121,6 +123,8 @@
             int32_t eval_board(cMove &move);
 
             int32_t eval_endgame_board(cMove &move, uint8_t depth, uint8_t status);
+
+            int32_t eval_1xx_series(uint8_t status, uint8_t depth);
 
     };
 
