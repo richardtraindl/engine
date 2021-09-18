@@ -124,8 +124,6 @@
 
             int32_t eval_endgame_board(cMove &move, uint8_t depth, uint8_t status);
 
-            int32_t eval_1xx_series(uint8_t status, uint8_t depth);
-
     };
 
 #endif

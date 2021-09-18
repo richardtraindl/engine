@@ -36,10 +36,10 @@
             cout << "count: " << to_string(i + 1) << endl;
             cout << "*****************" << endl;
 
-            if(i % 6 == 0){
+            if(i % 10 == 0){
                 match.m_board.prnt();
 
-                sleep(5);
+                sleep(4);
             }
 
             //if(cBoard::is_margin_pos(match.m_board.m_wKg_x, match.m_board.m_wKg_y) && cBoard::max_diff(match.m_board.m_wKg_x, match.m_board.m_wKg_y, match.m_board.m_bKg_x, match.m_board.m_bKg_y) == 2 && i > 10){
@@ -430,32 +430,9 @@
     int main(void){
         cMatch match;
 
-        cEndGame100 endgame1; // ToDo constructor....
-
-        cEndGame110 endgame2;
-
-        cEndGame120 endgame3;
-
-        cEndGame130 endgame4;
-
-        cBitBoard bitboard;
-
-        for(uint8_t i = 0; i < 5; ++i){
-
-            for(uint8_t j = 0; j < 4; ++j){
-                bitboard.m_bitfields[j] = cEndGame130::m_top_left_sthbnd[i][j];
-            }
-
-            cout << endl;
-
-            bitboard.prnt();
-
-        }
-
-
         uint8_t maxdepth = 5;
 
-        uint8_t engine_color = mBLACK;
+        uint8_t engine_color = mWHITE;
 
         play(match, maxdepth, engine_color);
 

@@ -63,6 +63,13 @@
     }
 
 
+    bool cBoard::is_horizontal_margin_pos(uint8_t y){
+
+        return (y == 0 || y ==7);
+
+    }
+
+
     bool cBoard::is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
         
         uint8_t diffx = abs(wkg_x - bkg_x);
@@ -70,32 +77,6 @@
         
         return ((diffx == 2 && diffy == 0) || (diffx == 0 && diffy == 2) || (diffx == 2 && diffy == 2));
 
-    }
-
-
-    uint8_t cBoard::kings_square_pos(){
-        // check if kings are in same square
-        if((m_wKg_x / 4 == m_bKg_x / 4) && (m_wKg_y / 4 == m_bKg_y / 4)){
-
-            if(m_wKg_x / 4 == 0){
-                if(m_wKg_y / 4 == 0){
-                    return SQUARE_STH_EST;
-                }
-                else{
-                    return SQUARE_NTH_EST;
-                }
-            }
-            else{
-                if(m_wKg_y / 4 == 0){
-                    return SQUARE_STH_WST;
-                }
-                else{
-                    return SQUARE_NTH_WST;
-                }
-            }
-        }
-        
-        return SQUARE_UNDEF;
     }
 
 
@@ -122,111 +103,6 @@
         }
         
         return false;
-    }
-
-
-    bool cBoard::is_exit_closed(uint8_t status){
-
-        uint8_t kg_x, kg_y, color;
-
-        int8_t (*steps)[2];
-
-        if((status == ENDGAME_STAT_100 && m_bKg_y == 7 && m_wKg_y == 5) || (status == ENDGAME_STAT_120 && m_wKg_y == 7 && m_bKg_y == 5)){
-            int8_t steps100[5][2] = { 
-                { 0, -1 }, { 1, -1 }, { 1, 0 }, { 2, 0 }, { 2, -1 } 
-            };
-
-            steps = steps100;
-        }
-        else if((status == ENDGAME_STAT_100 && m_bKg_y == 0 && m_wKg_y == 2) || (status == ENDGAME_STAT_120 && m_wKg_y == 0 && m_bKg_y == 2)){
-            int8_t steps100[5][2] = { 
-                { 0, 1 }, { -1, 1 }, { -1, 0 }, { -2, 0 }, { -2, 1 } 
-            };
-
-            steps = steps100;
-        }
-        else if((status == ENDGAME_STAT_100 && m_bKg_x == 0 && m_wKg_x == 2 ) || (status == ENDGAME_STAT_120 && m_wKg_x == 0 && m_bKg_x == 2 )){
-            int8_t steps100[5][2] = { 
-                { 1, 0 }, { 1, -1 }, { 0, -1 }, { 1, -2 }, { 0, -2 } 
-            };
-
-            steps = steps100;
-        }
-        else if((status == ENDGAME_STAT_100 && m_bKg_x == 7 && m_wKg_x == 5 ) || (status == ENDGAME_STAT_120 && m_wKg_x == 7 && m_bKg_x == 5)){
-            int8_t steps100[5][2] = { 
-                { -1, 0 }, { -1, 1 }, { 0, 1 }, { -1, 2 }, { 0, 2 } 
-            };
-
-            steps = steps100;
-        }
-        else if((status == ENDGAME_STAT_110 && m_bKg_y == 7 && m_wKg_y == 5) || (status == ENDGAME_STAT_130 && m_wKg_y == 7 && m_bKg_y == 5)){
-            int8_t steps100[5][2] = { 
-                { 0, -1 }, { -1, -1 }, { -1, 0 }, { -2, 0 }, { -2, -1 } 
-            };
-
-            steps = steps100;
-        }
-        else if((status == ENDGAME_STAT_110 && m_bKg_y == 0 && m_wKg_y == 2) || (status == ENDGAME_STAT_130 && m_wKg_y == 0 && m_bKg_y == 2)){
-            int8_t steps100[5][2] = { 
-                { 0, 1 }, { 1, 1 }, { 1, 0 }, { 2, 0 }, { 2, 1 } 
-            };
-
-            steps = steps100;
-        }
-        else if((status == ENDGAME_STAT_110 && m_bKg_x == 0 && m_wKg_x == 2) || (status == ENDGAME_STAT_130 && m_wKg_x == 0 && m_bKg_x == 2)){
-            int8_t steps100[5][2] = { 
-                { 1, 0 }, { 1, 1 }, { 0, 1 }, { 1, 2 }, { 0, 2 } 
-            };
-
-            steps = steps100;
-        }
-        else if((status == ENDGAME_STAT_110 && m_bKg_x == 7 && m_wKg_x == 5) || (status == ENDGAME_STAT_130 && m_wKg_x == 7 && m_bKg_x == 5)){
-            int8_t steps100[5][2] = { 
-                { -1, 0 }, { -1, -1 }, { 0, -1 }, { -1, -2 }, { 0, -2 } 
-            };
-
-            steps = steps100;
-        }
-        else{
-            return false;
-        }
-
-        if(status == ENDGAME_STAT_100 || status == ENDGAME_STAT_110){
-            kg_x = m_bKg_x;
-            kg_y = m_bKg_y;
-
-            color = mWHITE;
-        }
-        else{
-            kg_x = m_wKg_x;
-            kg_y = m_wKg_y;
-
-            color = mBLACK;
-        }
-
-        for(uint8_t i = 0; i < 5; ++i){
-
-            //vector<cPiece> pieces;
-
-            uint8_t x = *(steps + i)[0] + kg_x;
-            uint8_t y = *(steps + i)[1] + kg_y;
-
-            if(is_inbounds(x, y)){
-                //search_for_touching_pieces(pieces, x, y, color, true);
-                  if(search_for_touching_piece(x, y, color) == false){
-                    if(i == 2){
-                        continue;
-                    }
-                    return false;
-                }
-                if(i == 2){
-                    return true;
-                }
-            }
-        }
-
-        return false;
-
     }
 
 
