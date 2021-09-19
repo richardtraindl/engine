@@ -11,9 +11,13 @@
 
     class cEndGame100{
         public:
+            static const int32_t m_single_bKG[8][8];
+        
             static const int32_t m_single_top_right_KG[8][8];
 
             static const int32_t m_single_bottom_left_KG[8][8];
+
+            static const uint64_t m_prolong_filter[4][4];
 
             cEndGame100();
 
@@ -22,11 +26,33 @@
 
     class cEndGame110{
         public:
+            static const int32_t m_single_bKG[8][8];
+
             static const int32_t m_single_top_left_KG[8][8];
 
             static const int32_t m_single_bottom_right_KG[8][8];
 
+            static const uint64_t m_prolong_filter[4][4];
+
             cEndGame110();
+
+    };
+
+
+    class cEndGame120{
+        public:
+            static const uint64_t m_prolong_filter[4][4];
+
+            cEndGame120();
+
+    };
+
+
+    class cEndGame130{
+        public:
+            static const uint64_t m_prolong_filter[4][4];
+
+            cEndGame130();
 
     };
 

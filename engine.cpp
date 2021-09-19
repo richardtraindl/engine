@@ -428,11 +428,27 @@
 
 
     int main(void){
+
+        cBitBoard bitboard;
+
+        for(uint8_t i = 0; i < 4; ++i){
+
+            for(uint8_t j = 0; j < 4; ++j){
+                bitboard.m_bitfields[j] = cEndGame110::m_prolong_filter[i][j];
+            }
+
+            cout << endl;
+
+            bitboard.prnt();
+
+            cout << endl;
+        }
+
         cMatch match;
 
         uint8_t maxdepth = 5;
 
-        uint8_t engine_color = mWHITE;
+        uint8_t engine_color = mBLANK;
 
         play(match, maxdepth, engine_color);
 
