@@ -65,7 +65,7 @@
 
     bool cBoard::is_horizontal_margin_pos(uint8_t y){
 
-        return (y == 0 || y ==7);
+        return (y == 0 || y == 7);
 
     }
 

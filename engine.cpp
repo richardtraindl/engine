@@ -431,10 +431,10 @@
 
         cBitBoard bitboard;
 
-        for(uint8_t i = 0; i < 4; ++i){
+        for(uint8_t i = 0; i < 8; ++i){
 
             for(uint8_t j = 0; j < 4; ++j){
-                bitboard.m_bitfields[j] = cEndGame110::m_prolong_filter[i][j];
+                bitboard.m_bitfields[j] = cEndGame100::m_prolong_filter[i][j];
             }
 
             cout << endl;

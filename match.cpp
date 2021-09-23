@@ -891,7 +891,7 @@
 
         uint64_t tmpfields[4];
 
-        for(uint8_t j = 0; j < 4; ++j){
+        for(uint8_t j = 0; j < 8; ++j){
 
             for(uint8_t k = 0; k < 4; ++k){
                 tmpfields[k] = (bitboard.m_bitfields[k] & *(*(tstfields + j) + k));
@@ -904,7 +904,7 @@
             }
         }
 
-        if(prolong && depth <= maxdepth + 4){
+        if(prolong && depth <= 12){ // maxdepth + 4
             return true;
         }
         else if(depth <= maxdepth + 2){
@@ -2541,35 +2541,10 @@
             if(status == cBoard::ENDGAME_STAT_100 || status == cBoard::ENDGAME_STAT_110){
 
                 if(status == cBoard::ENDGAME_STAT_100){
-
-                    if(wkg_y >= 5 && bkg_y >= 5){
-                        score += cEndGame100::m_single_top_right_KG[bkg_y][bkg_x];
-                    }
-                    else if(wkg_y <= 2 && bkg_y <= 2){
-                        score += cEndGame100::m_single_bottom_left_KG[bkg_y][bkg_x];
-                    }
-                    else{
-                        score += cEndGame100::m_single_bKG[bkg_y][bkg_x];
-
-                        if(bkg_y < 5 && bkg_y > 2){
-                            score -= 20;
-                        }
-                    }
+                    score += cEndGame100::m_single_bKG[bkg_y][bkg_x];
                 }
                 else{
-                    if(wkg_y >= 5 && bkg_y >= 5){
-                        score += cEndGame110::m_single_top_left_KG[bkg_y][bkg_x];
-                    }
-                    else if(wkg_y <= 2 && bkg_y <= 2){
-                        score += cEndGame110::m_single_bottom_right_KG[bkg_y][bkg_x];
-                    }
-                    else{
-                        score += cEndGame110::m_single_bKG[bkg_y][bkg_x];
-
-                        if(bkg_y < 5 && bkg_y > 2){
-                            score -= 20;
-                        }
-                    }
+                    score += cEndGame110::m_single_bKG[bkg_y][bkg_x];
                 }
 
                 uint8_t diffkg = cBoard::max_diff(wkg_x, wkg_y, bkg_x, bkg_y);
@@ -2577,10 +2552,6 @@
 
                 uint8_t diffmg = cBoard::diff_to_margin(bkg_x, bkg_y);
                 score += (2 - diffmg) * 8;
-
-                if(cBoard::is_horizontal_margin_pos(bkg_y)){
-                    score += 12;
-                }
 
                 if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
                     if(cBoard::is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
@@ -2607,34 +2578,10 @@
                 // black kn+bp
 
                 if(status == cBoard::ENDGAME_STAT_120){
-                    if(bkg_y >= 5 && wkg_y >= 5){
-                        score -= cEndGame100::m_single_top_right_KG[wkg_y][wkg_x];
-                    }
-                    else if(bkg_y <= 2 && wkg_y <= 2){
-                        score -= cEndGame100::m_single_bottom_left_KG[wkg_y][wkg_x];
-                    }
-                    else{
-                        score -= cEndGame100::m_single_bKG[wkg_y][wkg_x];
-
-                        if(wkg_y < 5 && wkg_y > 2){
-                            score += 20;
-                        }
-                    }
+                    score -= cEndGame100::m_single_bKG[wkg_y][wkg_x];
                 }
                 else{
-                     if(bkg_y >= 5 && wkg_y >= 5){
-                        score -= cEndGame110::m_single_top_left_KG[wkg_y][wkg_x];
-                    }
-                    else if(bkg_y <= 2 && wkg_y <= 2){
-                        score -= cEndGame110::m_single_bottom_right_KG[wkg_y][wkg_x];
-                    }
-                    else{
-                        score -= cEndGame110::m_single_bKG[wkg_y][wkg_x];
-
-                        if(wkg_y < 5 && wkg_y > 2){
-                            score += 20;
-                        }
-                    }
+                    score -= cEndGame110::m_single_bKG[wkg_y][wkg_x];
                 }
 
                 uint8_t diffkg = cBoard::max_diff(wkg_x, wkg_y, bkg_x, bkg_y);
@@ -2642,10 +2589,6 @@
 
                 uint8_t diffmg = cBoard::diff_to_margin(wkg_x, wkg_y);
                 score -= (2 - diffmg) * 8;
-
-                if(cBoard::is_horizontal_margin_pos(wkg_y)){
-                    score -= 12;
-                }
 
                 if(PIECES_COLORS[move.m_srcpiece] == mBLACK){
                     if(cBoard::is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
