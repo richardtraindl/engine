@@ -354,17 +354,6 @@
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
 
-                    uint8_t diffkg = cBoard::max_diff(match.m_board.m_wKg_x, match.m_board.m_wKg_y, match.m_board.m_bKg_x, match.m_board.m_bKg_y);
-                    cout << "diffkg:" << to_string(diffkg) << endl;
-
-                    uint8_t diffmg = cBoard::diff_to_margin(match.m_board.m_bKg_x, match.m_board.m_bKg_y);
-                    cout << "diffmg:" << to_string(diffmg) << endl;
-
-                //if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
-                    //if(m_board.is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
-                    //    score += 4;
-                    //}
-                    
                     play_endgame(match, maxdepth, engine_color);
 
                     //cMove move(3, 7, 4, 7, mBKG, mBLK, mBLK, 100);
@@ -377,7 +366,6 @@
                     //match.m_board.prnt();
                     
                     return;
-                    //continue;
                 }
 
                 if(input.size() == 3 && input.compare(0, 3, "0-0") == 0){
