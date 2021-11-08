@@ -80,6 +80,8 @@
 
             static bool sortByPrio(const cMove &a, const cMove &b);
 
+            static bool sortByEngame_100(const cMove &a, const cMove &b);
+
             bool does_move_touch_weak_piece(cMove &move);
 
             bool is_good_field_for_piece(cPiece piece, uint8_t dst_x, uint8_t dst_y);
@@ -122,7 +124,7 @@
 
             int32_t eval_board(cMove &move);
 
-            int32_t eval_endgame_board(cMove &move, uint8_t depth, uint8_t status);
+            int32_t eval_endgame_board(bool &islib, cMove &move, uint8_t depth, uint8_t status);
 
     };
 

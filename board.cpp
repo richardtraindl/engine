@@ -36,6 +36,16 @@
     }
 
 
+    /*uint8_t cBoard::min_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
+
+        uint8_t diffx = abs(x1 - x2);
+
+        uint8_t diffy = abs(y1 - y2);
+
+        return min(diffx, diffy);
+    }*/
+
+
     uint8_t cBoard::max_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
 
         uint8_t diffx = abs(x1 - x2);
@@ -56,28 +66,56 @@
     }
 
 
-    bool cBoard::is_margin_pos(uint8_t x, uint8_t y){
+    /*uint8_t cBoard::diff_to_frame(uint8_t x, uint8_t y){
+
+        uint8_t diffx1 = abs(2 - x);
+        uint8_t diffx2 = abs(5 - x);
+        uint8_t diffx = min(diffx1, diffx2);
+
+        uint8_t diffy1 = abs(2 - y);
+        uint8_t diffy2 = abs(5 - y);
+        uint8_t diffy = min(diffy1, diffy2);
+
+        return min(diffx, diffy);
+    }*/
+
+
+    /*bool cBoard::is_margin_pos(uint8_t x, uint8_t y){
 
         return (x == 0 || x == 7 || y == 0 || y ==7);
 
+    }*/
+
+
+    bool cBoard::is_margin_frame_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
+
+        return ((y1 <= 2 && y2 <= 2) || (y1 >= 5 && y2 >= 5) || (x1 <= 2 && x2 <= 2) || (x1 >= 5 && x2 >= 5));
+
     }
 
 
-    bool cBoard::is_horizontal_margin_pos(uint8_t y){
+    bool cBoard::is_margin_frame_ypos(uint8_t y1, uint8_t y2){
 
-        return (y == 0 || y == 7);
+        return ((y1 <= 2 && y2 <= 2) || (y1 >= 5 && y2 >= 5));
 
     }
 
 
-    bool cBoard::is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
+    bool cBoard::is_corner_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
+
+        return ((y1 <= 2 && x1 <= 2 && y2 <= 2 && x2 <= 2 ) || (y1 <= 2 && x1 >= 5 && y2 <= 2 && x2 >= 5) || (y1 >= 5 && x1 >= 5 && y2 >= 5 && x2 >= 2 ) || (y1 >= 5 && x1 <= 2 && y2 >= 5 && x2 <= 2));
+
+    }
+
+
+    /*bool cBoard::is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
         
         uint8_t diffx = abs(wkg_x - bkg_x);
         uint8_t diffy = abs(wkg_y - bkg_y);
         
         return ((diffx == 2 && diffy == 0) || (diffx == 0 && diffy == 2) || (diffx == 2 && diffy == 2));
 
-    }
+    }*/
 
 
     bool cBoard::is_within_two_squares(uint8_t piece, uint8_t src_x, uint8_t src_y){

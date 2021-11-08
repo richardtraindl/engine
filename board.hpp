@@ -49,15 +49,23 @@
 
             static bool is_inbounds(uint8_t x, uint8_t y);
 
+            //static uint8_t min_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
             static uint8_t max_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
 
             static uint8_t diff_to_margin(uint8_t x, uint8_t y);
 
-            static bool is_margin_pos(uint8_t x, uint8_t y);
+            //static uint8_t diff_to_frame(uint8_t x, uint8_t y);
 
-            static bool is_horizontal_margin_pos(uint8_t y);
+            //static bool is_margin_pos(uint8_t x, uint8_t y);
 
-            static bool is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y);
+            static bool is_margin_frame_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+            static bool is_margin_frame_ypos(uint8_t y1, uint8_t y2);
+
+            static bool is_corner_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
+
+            //static bool is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y);
 
             bool is_within_two_squares(uint8_t piece, uint8_t src_x, uint8_t src_y);
 

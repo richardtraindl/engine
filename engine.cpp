@@ -29,6 +29,13 @@
 
 
     void play_endgame(cMatch &match, uint8_t maxdepth, uint8_t engine_color){
+        
+        time_t time_start = time(0);
+
+        uint8_t wkgcnt = 0;
+        uint8_t bkgcnt = 0;
+        uint8_t bpcnt = 0;
+        uint8_t kncnt = 0;
 
         for(uint8_t i = 0; i < 100; ++i){
             
@@ -36,18 +43,11 @@
             cout << "count: " << to_string(i + 1) << endl;
             cout << "*****************" << endl;
 
-            if(i % 10 == 0){
+            if(i % 5 == 0){
                 match.m_board.prnt();
 
-                sleep(4);
+                sleep(5);
             }
-
-            //if(cBoard::is_margin_pos(match.m_board.m_wKg_x, match.m_board.m_wKg_y) && cBoard::max_diff(match.m_board.m_wKg_x, match.m_board.m_wKg_y, match.m_board.m_bKg_x, match.m_board.m_bKg_y) == 2 && i > 10){
-            //    match.m_board.prnt();
-
-            //    cout << "\nMARGIN" << endl;
-            //    return;
-            //}
 
             vector<cMove> rmoves;
 
@@ -63,17 +63,38 @@
                 cMove move = rmoves.front();
 
                 match.do_move(move);
+
+                switch(move.m_srcpiece){
+                    case mWKG: wkgcnt++; break;
+                    case mBKG: bkgcnt++; break;
+                    case mWKN: kncnt++; break;
+                    case mBKN: kncnt++; break;
+                    case mWBP: bpcnt++; break;
+                    case mBBP: bpcnt++; break;
+                }
             }
             else{
-                uint8_t status = match.eval_status();
+                match.m_board.prnt();
+
                 cout << "count: " << to_string(i) << endl;
+
+                uint8_t status = match.eval_status();
                 prnt_status(match, status);
+
+                cout << "wkg: " + to_string(wkgcnt) + " bkg:" + to_string(bkgcnt) + " bp: " + to_string(bpcnt) + " kn: " + to_string(kncnt) << endl;
+
                 cout << "game over! " << to_string(i) << endl;
+
+                cMatch::prnt_fmttime("\ncalc-time: ", time(0) - time_start);
+
                 return;
             }
         }
 
         cout << "regular finish " << endl;
+
+        cMatch::prnt_fmttime("\ncalc-time: ", time(0) - time_start);
+
     }
 
 
@@ -339,10 +360,6 @@
                     uint8_t diffmg = cBoard::diff_to_margin(match.m_board.m_bKg_x, match.m_board.m_bKg_y);
                     cout << "diffmg:" << to_string(diffmg) << endl;
 
-                    bool is_margin = match.m_board.is_margin_pos(match.m_board.m_bKg_x, match.m_board.m_bKg_y);
-                    cout << "is_margin:" << is_margin << endl;
-    
-
                 //if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
                     //if(m_board.is_opposition(wkg_x, wkg_y, bkg_x, bkg_y)){
                     //    score += 4;
@@ -431,17 +448,21 @@
 
         cBitBoard bitboard;
 
-        for(uint8_t i = 0; i < 8; ++i){
+        for(uint8_t i = 0; i < 4; ++i){
 
-            for(uint8_t j = 0; j < 4; ++j){
-                bitboard.m_bitfields[j] = cEndGame100::m_prolong_filter[i][j];
+            for(uint8_t j = 0; j < 5; ++j){
+
+                for(uint8_t k = 0; k < 4; ++k){
+            
+                    bitboard.m_bitfields[k] = cEndGame110::m_path_to_mate[i][j][k];
+                }
+
+                cout << endl;
+
+                bitboard.prnt();
+
+                cout << endl;
             }
-
-            cout << endl;
-
-            bitboard.prnt();
-
-            cout << endl;
         }
 
         cMatch match;
