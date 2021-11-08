@@ -4,4 +4,6 @@
 engine
 data/
 matches/
+templates/
+tools/
 unused/
