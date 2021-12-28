@@ -1,12 +1,15 @@
 CC = g++
 
-all: ./values.o ./piece.o ./move.o ./board.o ./bitboard.o ./endgame.o ./match.o ./threading.o ./engine.o \
+all: ./values.o ./piece.o ./field.o ./move.o ./board.o ./bitboard.o ./endgame.o ./match.o ./threading.o ./test.o ./engine.o \
 
 	$(CC) -Wall --std=c++17 -lpthread -O3 \
-	./values.o ./piece.o ./move.o ./board.o ./bitboard.o ./endgame.o ./match.o ./threading.o ./engine.o -o ./engine
+	./values.o ./piece.o ./field.o ./move.o ./board.o ./bitboard.o ./endgame.o ./match.o ./threading.o ./test.o ./engine.o -o ./engine
 
 engine.o: ./engine.cpp
 	$(CC) -Wall --std=c++17 -O3 -c ./engine.cpp -o ./engine.o
+
+test.o: ./test.cpp ./test.hpp
+	$(CC) -Wall --std=c++17 -O3 -c ./test.cpp -o ./test.o
 
 threading.o: ./threading.cpp ./threading.hpp
 	$(CC) -Wall --std=c++17 -O3 -c ./threading.cpp -o ./threading.o
@@ -25,6 +28,9 @@ endgame.o: ./endgame.cpp ./endgame.hpp
 
 move.o: ./move.cpp ./move.hpp
 	$(CC) -Wall --std=c++17 -O3 -c ./move.cpp -o ./move.o
+
+field.o: field.cpp field.hpp
+	$(CC) -Wall --std=c++17 -O3 -c field.cpp -o ./field.o
 
 piece.o: piece.cpp piece.hpp
 	$(CC) -Wall --std=c++17 -O3 -c piece.cpp -o ./piece.o

@@ -4,24 +4,33 @@
 
 
     cBoard::cBoard(){ 
-        m_wKg_x = 4;
-        m_wKg_y = 0;
-        m_bKg_x = 4;
-        m_bKg_y = 7;
-        m_wKg_has_moved_at = 0;
-        m_bKg_has_moved_at = 0;
-        m_wRkA_has_moved_at = 0;
-        m_wRkH_has_moved_at = 0;
-        m_bRkA_has_moved_at = 0;
-        m_bRkH_has_moved_at = 0;
     }
 
 
+    // copy constructor
     cBoard::cBoard(const cBoard &board){
-    } // copy constructor
+
+        for(uint8_t y = 0; y < 8; ++y){
+            for(uint8_t x = 0; x < 8; ++x){
+                m_fields[y][x] = board.m_fields[y][x];
+            }
+        }
+
+        m_wKg_x = board.m_wKg_x;
+        m_wKg_y = board.m_wKg_y;
+        m_bKg_x = board.m_bKg_x;
+        m_bKg_y = board.m_bKg_y;
+        m_wKg_has_moved_at = board.m_wKg_has_moved_at;
+        m_bKg_has_moved_at = board.m_bKg_has_moved_at;
+        m_wRkA_has_moved_at = board.m_wRkA_has_moved_at;
+        m_wRkH_has_moved_at = board.m_wRkH_has_moved_at;
+        m_bRkA_has_moved_at = board.m_bRkA_has_moved_at;
+        m_bRkH_has_moved_at = board.m_bRkH_has_moved_at;
+
+    }
 
 
-    uint8_t cBoard::getfield(uint8_t x, uint8_t y){
+    uint8_t cBoard::getfield(uint8_t x, uint8_t y) const{
         return m_fields[y][x];
     }
 
@@ -36,14 +45,16 @@
     }
 
 
-    /*uint8_t cBoard::min_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
+    bool cBoard::is_king_attacked(uint8_t attacker_color) const{
 
-        uint8_t diffx = abs(x1 - x2);
+        if(attacker_color == mWHITE){
+            return search_for_touching_piece(m_bKg_x, m_bKg_y, mWHITE);
+        }
+        else{
+            return search_for_touching_piece(m_wKg_x, m_wKg_y, mBLACK);
+        }
 
-        uint8_t diffy = abs(y1 - y2);
-
-        return min(diffx, diffy);
-    }*/
+    }
 
 
     uint8_t cBoard::max_diff(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
@@ -64,27 +75,6 @@
 
         return min(diffx, diffy);
     }
-
-
-    /*uint8_t cBoard::diff_to_frame(uint8_t x, uint8_t y){
-
-        uint8_t diffx1 = abs(2 - x);
-        uint8_t diffx2 = abs(5 - x);
-        uint8_t diffx = min(diffx1, diffx2);
-
-        uint8_t diffy1 = abs(2 - y);
-        uint8_t diffy2 = abs(5 - y);
-        uint8_t diffy = min(diffy1, diffy2);
-
-        return min(diffx, diffy);
-    }*/
-
-
-    /*bool cBoard::is_margin_pos(uint8_t x, uint8_t y){
-
-        return (x == 0 || x == 7 || y == 0 || y ==7);
-
-    }*/
 
 
     bool cBoard::is_margin_frame_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
@@ -108,17 +98,7 @@
     }
 
 
-    /*bool cBoard::is_opposition(uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
-        
-        uint8_t diffx = abs(wkg_x - bkg_x);
-        uint8_t diffy = abs(wkg_y - bkg_y);
-        
-        return ((diffx == 2 && diffy == 0) || (diffx == 0 && diffy == 2) || (diffx == 2 && diffy == 2));
-
-    }*/
-
-
-    bool cBoard::is_within_two_squares(uint8_t piece, uint8_t src_x, uint8_t src_y){
+    bool cBoard::is_within_two_squares(uint8_t piece, uint8_t src_x, uint8_t src_y) const{
 
         int8_t steps[][2] = { 
             { -2, 0 },  { -1, 0 },  { 1, 0 },  { 2, 0 },
@@ -144,7 +124,7 @@
     }
 
 
-    bool cBoard::is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y){
+    bool cBoard::is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y) const{
 
         int8_t xsteps[3] = { 1, 0, -1 };
         
@@ -175,7 +155,7 @@
     }
 
 
-    uint8_t cBoard::search_dir_for_piece(uint8_t &dst_x, uint8_t &dst_y, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y, uint8_t maxcnt){
+    uint8_t cBoard::search_dir_for_piece(uint8_t &dst_x, uint8_t &dst_y, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y, uint8_t maxcnt) const{
 
         dst_x = src_x;
         dst_y = src_y;
@@ -196,7 +176,7 @@
     }
 
 
-    void cBoard::search_dir_for_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y){
+    void cBoard::search_dir_for_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y) const{
 
         uint8_t dst_x = src_x;
         uint8_t dst_y = src_y;
@@ -212,7 +192,7 @@
     }
 
 
-    bool cBoard::search_for_touching_piece(uint8_t src_x, uint8_t src_y, uint8_t color){
+    bool cBoard::search_for_touching_piece(uint8_t src_x, uint8_t src_y, uint8_t color) const{
 
         uint8_t piece, dst_x, dst_y;
 
@@ -289,7 +269,7 @@
     }
 
 
-    void cBoard::search_for_touching_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, uint8_t color, bool touching_only){
+    void cBoard::search_for_touching_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, uint8_t color, bool touching_only) const{
 
         uint8_t piece, dst_x, dst_y;
 
@@ -402,7 +382,7 @@
     }
 
 
-    void cBoard::search_for_all_touching_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t src_x, uint8_t src_y){
+    void cBoard::search_for_all_touching_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t src_x, uint8_t src_y) const{
 
         uint8_t piece, dst_x, dst_y;
 
@@ -415,6 +395,16 @@
             if(piece == mBLK){
                 continue;
             }
+
+            // skip if piece is pinned - start
+            uint8_t pindir = eval_pindir(dst_x, dst_y, PIECES_COLORS[piece]);
+            
+            uint8_t search_dir = eval_dir(src_x, src_y, dst_x, dst_y);
+
+            if(pindir != mNO_DIR && pindir != search_dir){
+                continue;
+            }
+            // skip if piece is pinned - end
 
             if(piece == mWQU){
                 wpieces.push_back(cPiece(piece, dst_x, dst_y));
@@ -493,7 +483,7 @@
     }
 
 
-    void cBoard::search_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir){
+    void cBoard::search_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir) const{
 
         uint8_t dstpiece, dst_x, dst_y;
 
@@ -569,7 +559,7 @@
     }
 
 
-    uint8_t cBoard::eval_pindir(uint8_t src_x, uint8_t src_y, uint8_t color){
+    uint8_t cBoard::eval_pindir(uint8_t src_x, uint8_t src_y, uint8_t color) const{
 
         uint8_t king, kg_x, kg_y, enmycolor;
 
@@ -662,8 +652,10 @@
     }
 
 
-    bool cBoard::is_piece_soft_pinned(uint8_t piece, uint8_t piece_x, uint8_t piece_y){
-        
+    uint8_t cBoard::eval_pin_state(uint8_t piece, uint8_t x, uint8_t y) const{
+
+        uint8_t state = PINNED_NO;
+
         uint8_t piece1, dst1_x, dst1_y, piece2, dst2_x, dst2_y;
 
         int8_t steps1[][2] = { { 1, 0 }, { 0, 1 }, { 1, 1 }, { -1, 1 } };
@@ -671,50 +663,280 @@
         int8_t steps2[][2] = { { -1, 0 }, { 0, -1 }, { -1, -1 }, { 1, -1 } };
 
         for(uint8_t i = 0; i < size(steps1); ++i){
-            piece1 = search_dir_for_piece(dst1_x, dst1_y, piece_x, piece_y, steps1[i][0], steps1[i][1], 6);
+            piece1 = search_dir_for_piece(dst1_x, dst1_y, x, y, steps1[i][0], steps1[i][1], 6);
 
-            piece2 = search_dir_for_piece(dst2_x, dst2_y, piece_x, piece_y, steps2[i][0], steps2[i][1], 6);
+            piece2 = search_dir_for_piece(dst2_x, dst2_y, x, y, steps2[i][0], steps2[i][1], 6);
 
             if(piece1 != mBLK && piece2 != mBLK && PIECES_COLORS[piece1] != PIECES_COLORS[piece2]){
                 if(PIECES_COLORS[piece1] == PIECES_COLORS[piece]){
                     if(PIECES_RANKS[piece1] > PIECES_RANKS[piece]){
                         if(piece2 == mWQU || piece2 == mBQU){
-                            return true;
+                            if(PIECES_RANKS[piece1] == PIECES_RANKS[mWKG]){
+                                return PINNED_HARD;
+                            }
+                            else{
+                                state = PINNED_SOFT;
+                                continue;
+                            }
                         }
 
                         if(i < 2 && (piece2 == mWRK || piece2 == mBRK)){
-                            return true;
+                            if(PIECES_RANKS[piece1] == PIECES_RANKS[mWKG]){
+                                return PINNED_HARD;
+                            }
+                            else{
+                                state = PINNED_SOFT;
+                                continue;
+                            }
                         }
 
                         if(i >= 2 && (piece2 == mWBP || piece2 == mBBP)){
-                            return true;
+                            if(PIECES_RANKS[piece1] == PIECES_RANKS[mWKG]){
+                                return PINNED_HARD;
+                            }
+                            else{
+                                state = PINNED_SOFT;
+                                continue;
+                            }
                         }
                     }
                 }
                 else{
                     if(PIECES_RANKS[piece2] > PIECES_RANKS[piece]){
                         if(piece1 == mWQU || piece1 == mBQU){
-                            return true;
+                            if(PIECES_RANKS[piece1] == PIECES_RANKS[mWKG]){
+                                return PINNED_HARD;
+                            }
+                            else{
+                                state = PINNED_SOFT;
+                                continue;
+                            }
                         }
 
                         if(i < 2 && (piece1 == mWRK || piece1 == mBRK)){
-                            return true;
+                            if(PIECES_RANKS[piece1] == PIECES_RANKS[mWKG]){
+                                return PINNED_HARD;
+                            }
+                            else{
+                                state = PINNED_SOFT;
+                                continue;
+                            }
                         }
 
                         if(i >= 2 && (piece1 == mWBP || piece1 == mBBP)){
-                            return true;
+                            if(PIECES_RANKS[piece1] == PIECES_RANKS[mWKG]){
+                                return PINNED_HARD;
+                            }
+                            else{
+                                state = PINNED_SOFT;
+                                continue;
+                            }
                         }
                     }
                 }
             }
         }
 
-        return false;
+        return state;
 
     }
 
 
-    bool cBoard::compare_fields(uint8_t fields[8][8]){
+    int8_t cBoard::eval_field_state(uint8_t x, uint8_t y) const{
+        uint8_t piece = getfield(x, y);
+        uint8_t wtouchcnt = 0;
+        uint8_t btouchcnt = 0;
+        uint8_t wsoftpincnt = 0;
+        uint8_t bsoftpincnt = 0;
+        uint8_t wlowesttouch = mWKG;
+        uint8_t blowesttouch = mBKG;
+
+        vector<cPiece> wpieces, bpieces;
+        search_for_all_touching_pieces(wpieces, bpieces, x, y);
+
+        for(const cPiece wpiece : wpieces){
+            uint8_t state = eval_pin_state(wpiece.m_piece, wpiece.m_src_x, wpiece.m_src_y);
+            if(state == cBoard::PINNED_NO){
+                wtouchcnt++;
+            }
+            else if(state == cBoard::PINNED_SOFT){
+                wsoftpincnt++;
+            }
+            else{
+                continue;
+            }
+            if(PIECES_RANKS[wpiece.m_piece] < PIECES_RANKS[wlowesttouch]){
+                wlowesttouch = wpiece.m_piece;
+            }
+        }
+
+        uint8_t wadvant = (wtouchcnt * 2) + wsoftpincnt;
+
+        for(const cPiece bpiece : bpieces){
+            uint8_t state = eval_pin_state(bpiece.m_piece, bpiece.m_src_x, bpiece.m_src_y);
+            if(state == cBoard::PINNED_NO){
+                btouchcnt++;
+            }
+            else if(state == cBoard::PINNED_SOFT){
+                bsoftpincnt++;
+            }
+            else{
+                continue;
+            }
+            if(PIECES_RANKS[bpiece.m_piece] < PIECES_RANKS[blowesttouch]){
+                blowesttouch = bpiece.m_piece;
+            }
+        }
+
+        uint8_t badvant = (btouchcnt * 2) + bsoftpincnt;
+
+        if(PIECES_COLORS[piece] == mWHITE && badvant > 0 && PIECES_RANKS[blowesttouch] < PIECES_RANKS[piece]){
+            return wadvant - badvant - (PIECES_RANKS[piece]- PIECES_RANKS[blowesttouch]);
+        }
+        else if(PIECES_COLORS[piece] == mBLACK && wadvant > 0 && PIECES_RANKS[wlowesttouch] < PIECES_RANKS[piece]){
+            return wadvant - badvant + (PIECES_RANKS[piece]- PIECES_RANKS[wlowesttouch]);
+        }
+        else{
+            return wadvant - badvant;
+        }
+
+    }
+
+
+    /*int8_t cBoard::eval_field_state(uint8_t x, uint8_t y) const{
+
+        cBoard board(*this);
+
+        uint8_t piece = board.getfield(x, y);
+
+        board.setfield(x, y, mBLK);
+
+        vector<cPiece> wpieces, bpieces;
+        board.search_for_all_touching_pieces(wpieces, bpieces, x, y);
+
+        vector <cPiece>::iterator it;
+
+        uint8_t lowestwhite = mWKG;
+        uint8_t lowestblack = mBKG;
+
+        // remove pinned white pieces
+        int8_t wpincnt = 1;
+
+        for(it = wpieces.begin(); it != wpieces.end();){
+            uint8_t state = board.eval_pin_state(it->m_piece, it->m_src_x, it->m_src_y);
+            if(state != PINNED_NO){
+                if(state == PINNED_SOFT){
+                    if(PIECES_RANKS[it->m_piece] < PIECES_RANKS[lowestwhite]){
+                        lowestwhite = it->m_piece;
+                        wpincnt++;
+                    }
+                }
+                it = wpieces.erase(it);
+            }
+            else{
+                it++;
+            }
+        }
+        wpincnt = (wpincnt / 2);
+
+        // remove pinned black pieces
+        int8_t bpincnt = 0;
+
+        for(it = bpieces.begin(); it != bpieces.end();){
+            uint8_t state = board.eval_pin_state(it->m_piece, it->m_src_x, it->m_src_y);
+            if(state != PINNED_NO){
+                if(state == PINNED_SOFT){
+                    if(PIECES_RANKS[it->m_piece] < PIECES_RANKS[lowestblack]){
+                        lowestblack = it->m_piece;
+                        bpincnt++;
+                    }
+                }
+                it = bpieces.erase(it);
+            }
+            else{
+                it++;
+            }
+        }
+        bpincnt = (bpincnt / 2);
+
+        // eval lowest touching white piece
+        for(cPiece wpiece : wpieces){
+            if(PIECES_RANKS[wpiece.m_piece] < PIECES_RANKS[lowestwhite]){
+                lowestwhite = wpiece.m_piece;
+            }
+        }
+
+        // eval lowest touching black piece
+        for(cPiece bpiece : bpieces){
+            if(PIECES_RANKS[bpiece.m_piece] < PIECES_RANKS[lowestblack]){
+                lowestblack = bpiece.m_piece;
+            }
+        }
+
+        // eval state
+
+        int8_t adjust = 0;
+
+        if((wpieces.size() + wpincnt) == 0 && (bpieces.size() + bpincnt) == 0){
+            adjust = 0;
+        }
+        else if((wpieces.size() + wpincnt) > 0 && (bpieces.size() + bpincnt) == 0){
+            adjust = 1;
+        }
+        else if((wpieces.size() + wpincnt) == 0 && (bpieces.size() + bpincnt) > 0){
+            adjust = -1;
+        }
+        else if(piece == mBLK){
+            if(PIECES_RANKS[lowestwhite] > PIECES_RANKS[lowestblack]){
+                adjust = -1;
+            }
+            if(PIECES_RANKS[lowestwhite] == PIECES_RANKS[lowestblack]){
+                adjust = 0;
+            }
+            else{
+                adjust = 1;
+            }
+        }
+        else if(PIECES_COLORS[piece] == mWHITE){
+            if(PIECES_RANKS[lowestblack] > PIECES_RANKS[piece]){
+                adjust = 1;
+            }
+            if(PIECES_RANKS[lowestblack] == PIECES_RANKS[piece]){
+                adjust = 0;
+            }
+            else{
+                adjust = -1;
+            }
+        }
+        // PIECES_COLORS[piece] == mBLACK
+        else{
+            if(PIECES_RANKS[lowestwhite] > PIECES_RANKS[piece]){
+                adjust = -1;
+            }
+            if(PIECES_RANKS[lowestwhite] == PIECES_RANKS[piece]){
+                adjust = 0;
+            }
+            else{
+                adjust = 1;
+            }
+        }
+        
+        if((wpieces.size() + wpincnt) > (bpieces.size() + bpincnt)){
+            return 3 + adjust;
+        }
+        else if((wpieces.size() + wpincnt) == (bpieces.size() + bpincnt)){
+            return 0 + adjust;
+        }
+        else{
+            return -3 + adjust;
+        }
+            
+        return 0;
+
+    }*/
+
+
+    bool cBoard::compare_fields(uint8_t fields[8][8]) const{
 
         for(uint8_t y = 0; y < 8; ++y){
 
@@ -732,7 +954,7 @@
     }
 
 
-    void cBoard::prnt(){
+    void cBoard::prnt() const{
 
         string textcolor, backcolor, strpiece;
 
@@ -785,7 +1007,7 @@
     }
 
 
-    void cBoard::copy_fields(uint8_t fields[8][8]){
+    void cBoard::copy_fields(uint8_t fields[8][8]) const{
 
         for(uint8_t y = 0; y < 8; ++y){
 
@@ -798,7 +1020,7 @@
     }
 
 
-    bool cBoard::debug_check_flags(){
+    bool cBoard::debug_check_flags() const{
 
         if(getfield(m_wKg_x, m_wKg_y) != mWKG){ return false; }
 

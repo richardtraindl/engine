@@ -74,8 +74,14 @@
         {mBRK, 450},
         {mBQU, 900},
         {mBKG, 20000},
-        {mWPLUS, 10},
-        {mBPLUS, -10}
+        {mWPLUS1, 30},
+        {mWPLUS2, 50},
+        {mWPLUS3, 70},
+        {mWPLUS4, 90},
+        {mBPLUS1, -30},
+        {mBPLUS2, -50},
+        {mBPLUS3, -70},
+        {mBPLUS4, -90}
     };
 
 

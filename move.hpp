@@ -46,17 +46,17 @@
             cMove(const cMove &move);
             // copy constructor
 
-            bool is_en_passant();
+            bool is_en_passant() const;
 
-            bool is_promotion();
+            bool is_promotion() const;
 
-            bool is_short_castling();
+            bool is_short_castling() const;
 
-            bool is_long_castling();
+            bool is_long_castling() const;
 
-            bool compare(const cMove &move);
+            bool compare(const cMove &move) const;
 
-            string format(bool ext);
+            string format(bool ext) const;
 
             static void coord_to_indices(uint8_t &x, uint8_t &y, string coord);
 

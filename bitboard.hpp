@@ -20,15 +20,15 @@
 
             cBitBoard();
 
-            uint8_t get(uint8_t x, uint8_t y);
+            uint8_t get(uint8_t x, uint8_t y) const;
 
             void set(uint8_t x, uint8_t y, uint8_t piece);
 
-            void import_fields(uint8_t fields[8][8]);
+            void import_fields(const uint8_t fields[8][8]);
 
-            bool compare(const uint64_t bitfields[4]);
+            bool compare(const uint64_t bitfields[4]) const;
 
-            void prnt();
+            void prnt() const;
 
     };
 

@@ -64,14 +64,37 @@
     #endif
 
     // fake pieces for board evaluation
-    #if !defined(mWPLUS)
-        #define mWPLUS    0x10
+    #if !defined(mWPLUS1)
+        #define mWPLUS1    0x10
     #endif
 
-    #if !defined(mBPLUS)
-        #define mBPLUS    0x11
+    #if !defined(mBPLUS1)
+        #define mBPLUS1    0x11
     #endif
 
+    #if !defined(mWPLUS2)
+        #define mWPLUS2    0x12
+    #endif
+
+    #if !defined(mBPLUS2)
+        #define mBPLUS2    0x13
+    #endif
+
+    #if !defined(mWPLUS3)
+        #define mWPLUS3    0x14
+    #endif
+
+    #if !defined(mBPLUS3)
+        #define mBPLUS3    0x15
+    #endif
+
+    #if !defined(mWPLUS4)
+        #define mWPLUS4    0x16
+    #endif
+
+    #if !defined(mBPLUS4)
+        #define mBPLUS4    0x17
+    #endif
 
     // colors
     #if !defined(mBLANK)

@@ -17,7 +17,7 @@
     };
 
 
-    uint8_t cBitBoard::get(uint8_t x, uint8_t y){
+    uint8_t cBitBoard::get(uint8_t x, uint8_t y) const{
 
         uint8_t piece = 0;
 
@@ -69,7 +69,7 @@
     }
 
 
-    void cBitBoard::import_fields(uint8_t fields[8][8]){
+    void cBitBoard::import_fields(const uint8_t fields[8][8]){
         
         for(uint8_t y = 0; y < 8; ++y){
 
@@ -86,7 +86,7 @@
     }
 
 
-    bool cBitBoard::compare(const uint64_t bitfields[4]){
+    bool cBitBoard::compare(const uint64_t bitfields[4]) const{
 
         for(int i = 0; i < 4; ++i){
 
@@ -101,7 +101,7 @@
     }
 
 
-    void cBitBoard::prnt(){
+    void cBitBoard::prnt() const{
 
         string textcolor, backcolor, strpiece;
 

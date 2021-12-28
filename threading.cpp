@@ -51,9 +51,11 @@
 
                 m_thmatches[i]->do_move(move);
 
-                m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta);
+                m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, m_pool_idx);
 
-                cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
+                if(depth == 1){
+                    cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
+                }
 
                 m_threading_mutex.unlock();
             }
@@ -85,7 +87,9 @@
 
                 m_threads[i] = thread(&cMatch::calc_alphabeta_endgame, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, status);
 
-                cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
+                if(depth == 1){
+                    cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
+                }
 
                 m_threading_mutex.unlock();
             }
@@ -108,7 +112,7 @@
 
             m_threading_mutex.unlock();
 
-            cout << "___fetch candidates - score: " << newscore << " " + cMatch::fmt_moves(newmoves) << endl;
+            //cout << "___fetch candidates - score: " << newscore << " " + cMatch::fmt_moves(newmoves) << endl;
 
             return true;
 
@@ -136,14 +140,18 @@
 
                 cMove move = m_thmatches[i]->m_minutes.back();
 
-                cout << "...............thread finished for: " + move.format(false);
-                cMatch::prnt_fmttime(" time: ", time(0) - m_start_time[i]);
+                //cout << "...............thread finished for: " + move.format(false);
+                //cMatch::prnt_fmttime(" time: ", time(0) - m_start_time[i]);
 
                 if(m_match->next_color() == mWHITE){
                     if(m_thscores[i] > m_candidate_score){
                         m_candidate_score = m_thscores[i];
 
-                        cout << "\nm_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n" << endl;
+                        
+                        //cout << "\n*********************" << endl;
+                        //cout << move.format(true);
+                        //cout << "          m_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << endl;
+                        //cout << "*********************\n" << endl;
 
                         m_candidate_moves.clear();
                         m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());
@@ -160,7 +168,10 @@
                     if(m_thscores[i] < m_candidate_score){
                         m_candidate_score = m_thscores[i];
 
-                        cout << "\nm_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << "\n" << endl;
+                        //cout << "\n*********************" << endl;
+                        //cout << move.format(true);
+                        //cout << "          m_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << endl;
+                        //cout << "*********************\n" << endl;
 
                         m_candidate_moves.clear();
                         m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());

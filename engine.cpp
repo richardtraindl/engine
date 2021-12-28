@@ -7,28 +7,13 @@
     #include "./match.hpp"
     #include "./move.hpp"
     #include "./endgame.hpp"
+    #include "./test.hpp"
 
 
     using namespace std;
 
 
-    void prnt_status(cMatch &match, uint8_t status){
-        if(status == cMatch::STATUS_WINNER_WHITE){
-            match.prnt_minutes();
-            cout << "winner white!" << endl;
-        }
-        else if(status == cMatch::STATUS_WINNER_BLACK){
-            match.prnt_minutes();
-            cout << "winner black!" << endl;
-        }
-        else if(status == cMatch::STATUS_DRAW){
-            match.prnt_minutes();
-            cout << "draw!" << endl;
-        }
-    }
-
-
-    void play_endgame(cMatch &match, uint8_t maxdepth, uint8_t engine_color){
+    void play100(cMatch &match, uint8_t engine_color){
         
         time_t time_start = time(0);
 
@@ -54,7 +39,7 @@
             int32_t rscore;
 
             //match.gen_moves(rmoves, match.next_color());
-            match.calc_move(rscore, rmoves, maxdepth);
+            match.calc_move(rscore, rmoves);
 
             if(rmoves.size() > 0){
                 //uint8_t idx = rand() % rmoves.size();
@@ -79,7 +64,7 @@
                 cout << "count: " << to_string(i) << endl;
 
                 uint8_t status = match.eval_status();
-                prnt_status(match, status);
+                match.prnt_status(status);
 
                 cout << "wkg: " + to_string(wkgcnt) + " bkg:" + to_string(bkgcnt) + " bp: " + to_string(bpcnt) + " kn: " + to_string(kncnt) << endl;
 
@@ -103,9 +88,9 @@
         match.reset();
 
         ifstream file(path_and_filename);
-
-        string content;
         
+        string content;
+
         uint8_t src_x, src_y, dst_x, dst_y;
 
         uint8_t prompiece = mBLK;
@@ -115,7 +100,7 @@
             cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
 
             cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
-
+            
             if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
                 match.do_usr_move(src_x, src_y, dst_x, dst_y, prompiece);
             }
@@ -226,7 +211,7 @@
     }
 
 
-    void play(cMatch &match, uint8_t maxdepth, uint8_t engine_color){
+    void play(cMatch &match, uint8_t engine_color){
 
         char buffer[12];
         int length = 13;
@@ -248,7 +233,7 @@
 
                 int32_t rscore;
 
-                match.calc_move(rscore, rmoves, maxdepth);
+                match.calc_move(rscore, rmoves);
 
                 if(rmoves.size() > 0){
                    cMove move = rmoves.front();
@@ -258,16 +243,16 @@
                 }
                 else{
                     uint8_t status = match.eval_status();
-                    prnt_status(match, status);
+                    match.prnt_status(status);
                     cout << "game over - congratulation!" << endl;
                     return;
                 }
             }
             else{
                 uint8_t status = match.eval_status();
+
                 if(status != cMatch::STATUS_OPEN){
-                    prnt_status(match, status);
-                    //return;
+                    match.prnt_status(status);
                 }
 
                 cout << "\n>";
@@ -316,7 +301,6 @@
 
                     string path_and_filename = "./matches/game" + input.substr(2) + ".txt";
                     if(import_minutes(match, path_and_filename)){
-
                         match.prnt_minutes();
 
                         match.m_board.prnt();
@@ -354,17 +338,19 @@
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
 
-                    play_endgame(match, maxdepth, engine_color);
+                    play100(match, engine_color);
 
-                    //cMove move(3, 7, 4, 7, mBKG, mBLK, mBLK, 100);
+                    //prnt_eval_field_states(match);
                     
-                    //bool flag = match.is_three_times_repetition(move, 0);
-                    //cout << to_string(flag) << endl;
-                    
-                    //cout << "test end" << endl;
-                    
-                    //match.m_board.prnt();
-                    
+                    //match.m_board.setfield(1, 2, mBLK);
+                    //match.m_board.setfield(1, 7, mWQU);
+                    //int8_t state = match.m_board.eval_field_state(1, 7);
+                    //cout << to_string(state) << endl;
+
+                    //cMove move(1, 2, 1, 7, mWQU, mBLK, mBLK, 100);
+                    //match.set_prio_for_move(move);
+                    //cout << to_string(move.m_prio) << endl;                    
+
                     return;
                 }
 
@@ -433,33 +419,11 @@
 
 
     int main(void){
-
-        cBitBoard bitboard;
-
-        for(uint8_t i = 0; i < 4; ++i){
-
-            for(uint8_t j = 0; j < 5; ++j){
-
-                for(uint8_t k = 0; k < 4; ++k){
-            
-                    bitboard.m_bitfields[k] = cEndGame110::m_path_to_mate[i][j][k];
-                }
-
-                cout << endl;
-
-                bitboard.prnt();
-
-                cout << endl;
-            }
-        }
-
         cMatch match;
-
-        uint8_t maxdepth = 5;
 
         uint8_t engine_color = mBLANK;
 
-        play(match, maxdepth, engine_color);
+        play(match, engine_color);
 
         return 0;
     }

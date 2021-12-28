@@ -7,7 +7,7 @@
     }
 
 
-    int32_t cEndGame100_base::eval_push_kg_to_margin(uint8_t status, uint8_t depth, uint8_t fields[8][8], uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
+    int32_t cEndGame100_base::eval_push_kg_to_margin(uint8_t status, uint8_t depth, const uint8_t fields[8][8], uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
 
         int32_t score = 0;
 
@@ -51,7 +51,7 @@
     }
 
 
-    uint8_t cEndGame100_base::eval_path_to_mate(uint8_t status, uint8_t fields[8][8]){
+    uint8_t cEndGame100_base::eval_path_to_mate(uint8_t status, const uint8_t fields[8][8]){
 
         uint8_t lib = 0;
 

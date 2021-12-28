@@ -30,7 +30,7 @@
     }
 
 
-    bool cMove::is_en_passant(){
+    bool cMove::is_en_passant() const{
 
         if(m_srcpiece == mWPW){
             if(m_dstpiece == mBLK && m_src_y == 4 && m_dst_y == 5){
@@ -52,7 +52,7 @@
     }
 
 
-    bool cMove::is_promotion(){
+    bool cMove::is_promotion() const{
 
         if(m_srcpiece == mWPW){
             if(m_prompiece != mBLK && m_src_y == 6 && m_dst_y == 7){
@@ -70,7 +70,7 @@
     }
 
 
-   bool cMove::is_short_castling(){
+   bool cMove::is_short_castling() const{
 
         if(m_srcpiece == mWKG){
             if(m_src_y == 0 && m_dst_y == 0 && m_src_x == 4 && m_dst_x == 6){
@@ -88,7 +88,7 @@
     }
 
 
-    bool cMove::is_long_castling(){
+    bool cMove::is_long_castling() const{
 
         if(m_srcpiece == mWKG){
             if(m_src_y == 0 && m_dst_y == 0 && m_src_x == 4 && m_dst_x == 2){
@@ -106,14 +106,14 @@
     }
 
 
-    bool cMove::compare(const cMove &move){
+    bool cMove::compare(const cMove &move) const{
 
         return (m_src_x == move.m_src_x && m_src_y == move.m_src_y && m_dst_x == move.m_dst_x && m_dst_y == move.m_dst_y);
 
     }
 
 
-    string cMove::format(bool ext){
+    string cMove::format(bool ext) const{
 
         string hyphen = "";
         string trailing = "";
@@ -131,7 +131,7 @@
         string out = indices_to_coord(m_src_x, m_src_y) + hyphen + indices_to_coord(m_dst_x, m_dst_y) + trailing;
 
         if(ext){
-            return out +  + " prio: " + to_string(m_prio);
+            return out + " prio: " + to_string(m_prio);
         }
         else{
             return out;
