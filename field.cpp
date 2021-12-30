@@ -25,7 +25,7 @@
         vector<cPiece> wpieces, bpieces;
         m_board->search_for_all_touching_pieces(wpieces, bpieces, m_pos_x, m_pos_y);
 
-        for(cPiece wpiece : wpieces){
+        for(const cPiece &wpiece : wpieces){
             uint8_t state = m_board->eval_pin_state(wpiece.m_piece, wpiece.m_src_x, wpiece.m_src_y);
             if(state == cBoard::PINNED_NO){
                 m_wtouchcnt++;
@@ -41,7 +41,7 @@
             }
         }
 
-        for(cPiece bpiece : bpieces){
+        for(const cPiece &bpiece : bpieces){
             uint8_t state = m_board->eval_pin_state(bpiece.m_piece, bpiece.m_src_x, bpiece.m_src_y);
             if(state == cBoard::PINNED_NO){
                 m_btouchcnt++;

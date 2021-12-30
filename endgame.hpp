@@ -3,6 +3,7 @@
 
     #include "./values.hpp"
     #include "./piece.hpp"
+    #include "./match.hpp"
     #include "./board.hpp"
     #include "./bitboard.hpp"
 
@@ -12,9 +13,9 @@
 
     class cEndGame100_base{
         public:
-            static int32_t eval_push_kg_to_margin(uint8_t status, uint8_t depth, const uint8_t fields[8][8], uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y);
+            static int32_t eval_push_kg_to_margin(uint8_t stage, uint8_t depth, const uint8_t fields[8][8], uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y);
 
-            uint8_t eval_path_to_mate(uint8_t status, const uint8_t fields[8][8]);
+            uint8_t eval_path_to_mate(uint8_t stage, const uint8_t fields[8][8]);
 
             cEndGame100_base();
 

@@ -35,12 +35,6 @@
             uint8_t m_bRkA_has_moved_at = 0;
             uint8_t m_bRkH_has_moved_at = 0;
 
-            static const uint8_t ENDGAME_STAT_0 =     0;
-            static const uint8_t ENDGAME_STAT_100 = 100;
-            static const uint8_t ENDGAME_STAT_110 = 110;
-            static const uint8_t ENDGAME_STAT_120 = 120;
-            static const uint8_t ENDGAME_STAT_130 = 130;
-
             static const uint8_t PINNED_NO = 0;
             static const uint8_t PINNED_SOFT = 1;
             static const uint8_t PINNED_HARD = 2;
@@ -68,7 +62,7 @@
 
             static bool is_corner_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
 
-            bool is_within_two_squares(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
+            bool is_within_three_squares(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
 
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
 

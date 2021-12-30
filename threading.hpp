@@ -48,9 +48,7 @@
 
             ~cThreading();
 
-            void start(uint8_t depth, uint8_t maxdepth);
-
-            void start_endgame(uint8_t depth, uint8_t maxdepth, uint8_t status);
+            void start(const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
 
             bool fetch_candidates(int32_t &newscore, vector<cMove> &newmoves);
 

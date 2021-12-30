@@ -15,7 +15,7 @@
 
 
     using namespace std;
-    #define DEBUG
+    //#define DEBUG
 
     class cMatch{
         public:
@@ -31,6 +31,14 @@
             static const uint8_t STATUS_WINNER_WHITE = 1;
             static const uint8_t STATUS_WINNER_BLACK = 2;
             static const uint8_t STATUS_DRAW = 3;
+
+            static const uint8_t STAGE_OPENING     =  10;
+            static const uint8_t STAGE_MIDDLE      =  50;
+            static const uint8_t STAGE_ENDGAME     =  90;
+            static const uint8_t STAGE_ENDGAME_100 = 100;
+            static const uint8_t STAGE_ENDGAME_110 = 110;
+            static const uint8_t STAGE_ENDGAME_120 = 120;
+            static const uint8_t STAGE_ENDGAME_130 = 130;
 
             cMatch();
 
@@ -55,7 +63,7 @@
 
             bool undo_move();
 
-            bool is_three_times_repetition(cMove &move, uint8_t depth) const;
+            bool is_three_times_repetition(const cMove &move, uint8_t depth) const;
 
             bool is_fifty_moves_rule() const;
 
@@ -71,16 +79,12 @@
             void calc_move(int32_t &rscore, vector<cMove> &rmoves);
 
             #ifdef DEBUG
-            void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t mvidx);
+              void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage, const uint8_t mvidx);
             #else
-                void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
+              void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage);
             #endif
 
-            void calc_alphabeta_endgame(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status);
-
-            void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta);
-
-            void start_alphabeta_endgame_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status);
+            void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage);
 
             static bool sortByPrio(const cMove &a, const cMove &b);
 
@@ -90,11 +94,9 @@
 
             bool does_move_sac_for_supply(const cMove &move) const;
 
-            bool eval_move(const cMove &move, uint8_t depth, uint8_t maxdepth);
+            bool eval_move(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
 
-            bool eval_endgame_move(const cMove &move, uint8_t depth, uint8_t maxdepth, uint8_t status) const;
-
-            void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, cMove &move);
+            void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove &move);
 
             void gen_moves(vector<cMove> &moves, uint8_t color);
 
@@ -122,17 +124,17 @@
 
             void set_prio_for_castling(cMove &move);
 
-            bool is_opening() const;
+            uint8_t eval_stage() const;
 
-            bool is_endgame(uint8_t &status) const;
-
-            int32_t eval_terminate(uint8_t depth) const;
+            int32_t score_terminate(uint8_t depth) const;
 
             bool is_stormy() const;
 
-            int32_t score_board(const cMove &move) const;
+            int32_t score_board(const cMove &move, const uint8_t depth, const uint8_t stage) const;
 
-            int32_t score_endgame_board(const cMove &move, uint8_t depth, uint8_t status) const;
+            int32_t score_opening_middlegame_board(const cMove &move, const uint8_t stage) const;
+
+            int32_t score_endgame_board(const cMove &move, const uint8_t depth, const uint8_t status) const;
 
     };
 

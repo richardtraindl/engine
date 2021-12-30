@@ -4,8 +4,6 @@
     #include "./threading.hpp"
 
 
-#define DEBUG
-
 #ifdef DEBUG
     uint32_t g_depthcnt[100] = { 
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -35,11 +33,11 @@
 
         m_score = match.m_score;
 
-        for(cMove move : match.m_minutes){
+        for(const cMove &move : match.m_minutes){
             m_minutes.push_back(move);
         }
 
-        for(cMove move : match.m_prev_search){
+        for(const cMove &move : match.m_prev_search){
             m_prev_search.push_back(move);
         }
 
@@ -115,7 +113,7 @@
 
     void cMatch::prnt_minutes() const{
 
-        for(cMove move : m_minutes){
+        for(const cMove &move : m_minutes){
             cout << move.format(false) << endl;
         }
 
@@ -126,7 +124,7 @@
 
         string str_moves = "";
 
-        for(cMove move : moves){
+        for(const cMove &move : moves){
             str_moves += " [" + move.format(false) + "] ";
         }
         return str_moves;
@@ -139,7 +137,7 @@
         uint8_t idx = 1;
 
         cout << "-------------------------------------------" << endl;
-        for(cMove move : moves){
+        for(const cMove &move : moves){
             cout << "\n" << dec << idx << ". ";
             cout << move.format(false) << endl;
             idx++;
@@ -186,25 +184,26 @@
 
         uint8_t maxdepth = 5;
 
-        uint8_t status;
+        uint8_t stage = eval_stage();
+        cout << "stage: " << to_string(stage) << endl;
 
-        if(is_endgame(status)){
-            cout << "Endgame - status: " << to_string(status) << endl;
+        //if(stage != STAGE_OPENING && stage != STAGE_MIDDLE){
+        //    cout << "Endgame - stage: " << to_string(stage) << endl;
 
-            calc_alphabeta_endgame(rscore, rmoves, depth, maxdepth, alpha, beta, status);
-        }
-        else{
-            cout << "Opening or Middlegame - status: " << to_string(status) << endl;
+        //    calc_alphabeta_endgame(rscore, rmoves, depth, maxdepth, alpha, beta, stage);
+        //}
+        //else{
+        //    cout << "Opening or Middlegame - stage: " << to_string(stage) << endl;
             #ifdef DEBUG
-              calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta, 0);
+              calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta, stage, 0);
             #else
-              calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta);
+              calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta, stage);
             #endif
-        }
+        //}
 
         m_prev_search.clear();
 
-        for(cMove move : rmoves){
+        for(const cMove &move : rmoves){
             m_prev_search.push_back(move);
         }
 
@@ -304,11 +303,11 @@
         bool found = false;
         
         //cout << "\ngen. züge: ";
-        //for(cMove move : moves){
+        //for(const cMove &move : moves){
         //    cout << move.format() << endl;
         //}
 
-        for(cMove move : moves){
+        for(const cMove &move : moves){
             if(move.m_src_x == src_x && move.m_src_y == src_y &&
             move.m_dst_x == dst_x && move.m_dst_y == dst_y){
                 found = true;
@@ -577,7 +576,7 @@
     }
 
 
-    bool cMatch::is_three_times_repetition(cMove &move, uint8_t depth) const{
+    bool cMatch::is_three_times_repetition(const cMove &move, uint8_t depth) const{
 
         cMatch *match = new cMatch(*this);
 
@@ -672,7 +671,7 @@
 
         board.search_for_touched_pieces(supported_pieces, move.m_srcpiece, move.m_dst_x, move.m_dst_y, color, excl_dir);
 
-        for(cPiece supp_piece : supported_pieces){
+        for(const cPiece &supp_piece : supported_pieces){
             if(board.eval_pin_state(supp_piece.m_piece, supp_piece.m_src_x, supp_piece.m_src_y) != cBoard::PINNED_NO){
                 return true;
             }
@@ -698,7 +697,7 @@
 
         board.search_for_touched_pieces(attacked_pieces, move.m_srcpiece, move.m_dst_x, move.m_dst_y, REVERSED_COLORS[color], excl_dir);
 
-        for(cPiece att_piece : attacked_pieces){
+        for(const cPiece &att_piece : attacked_pieces){
             if(board.eval_pin_state(att_piece.m_piece, att_piece.m_src_x, att_piece.m_src_y) != cBoard::PINNED_NO){
                 return true;
             }
@@ -743,7 +742,7 @@
         for(uint8_t i = 0; i < 8; ++i){
             m_board.search_dir_for_pieces(pieces, move.m_src_x, move.m_src_y, steps[i][0], steps[i][1]);
 
-            for(cPiece piece : pieces){
+            for(const cPiece &piece : pieces){
                 uint8_t dir = cBoard::eval_dir(move.m_src_x, move.m_src_y, piece.m_src_x, piece.m_src_y);
                 if(excl_dir != dir && (piece.m_piece == mWRK || piece.m_piece == mBRK || piece.m_piece == mWQU || piece.m_piece == mBQU)){
                     return true;
@@ -757,7 +756,11 @@
     }
 
 
-    bool cMatch::eval_move(const cMove &move, uint8_t depth, uint8_t maxdepth){
+    bool cMatch::eval_move(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage){
+
+        if(stage == STAGE_ENDGAME_100 || stage == STAGE_ENDGAME_110 || stage == STAGE_ENDGAME_120 || stage == STAGE_ENDGAME_130){
+            return depth <= maxdepth + 2;
+        }
 
         // take en passant moves
         if(move.is_en_passant()){ 
@@ -871,14 +874,14 @@
 
             // search for lowest supporter
             uint8_t min_wpiece = PIECES_RANKS[mWKG];
-            for(cPiece piece : wpieces){
+            for(const cPiece &piece : wpieces){
                 if(PIECES_RANKS[piece.m_piece] < min_wpiece){
                     min_wpiece = PIECES_RANKS[piece.m_piece];
                 }
             }
 
             uint8_t min_bpiece = PIECES_RANKS[mWKG];
-            for(cPiece piece : bpieces){
+            for(const cPiece &piece : bpieces){
                 if(PIECES_RANKS[piece.m_piece] < min_bpiece){
                     min_bpiece = PIECES_RANKS[piece.m_piece];
                 }
@@ -936,53 +939,8 @@
             return true;
         }
 
-        return false;
-
-    }
-
-
-    bool cMatch::eval_endgame_move(const cMove &move, uint8_t depth, uint8_t maxdepth, uint8_t status) const{
-
-        bool prolong = false;
-
-        uint8_t wkg_x, wkg_y, bkg_x, bkg_y; 
-
-        if(move.m_srcpiece == mWKG){
-            wkg_x = move.m_dst_x;
-            wkg_y = move.m_dst_y;
-            bkg_x = m_board.m_bKg_x;
-            bkg_y = m_board.m_bKg_y;
-        }
-        else if(move.m_srcpiece == mBKG){
-            wkg_x = m_board.m_wKg_x;
-            wkg_y = m_board.m_wKg_y;
-            bkg_x = move.m_dst_x;
-            bkg_y = move.m_dst_y;
-        }
-        else{
-            wkg_x = m_board.m_wKg_x;
-            wkg_y = m_board.m_wKg_y;
-            bkg_x = m_board.m_bKg_x;
-            bkg_y = m_board.m_bKg_y;
-        }
-
-        if(status == cBoard::ENDGAME_STAT_100 || status == cBoard::ENDGAME_STAT_110 || status == cBoard::ENDGAME_STAT_120 || status == cBoard::ENDGAME_STAT_130){
-
-            return depth <= maxdepth + 4;
-
-            if(cBoard::is_margin_frame_ypos(wkg_y, bkg_y)){
-                prolong = true;
-            }
-            else if(cBoard::is_corner_pos(wkg_x, wkg_y, bkg_x, bkg_y)){
-                prolong = true;
-            }
-        }
-
-        if(prolong && depth <= maxdepth + 4){
-            return true;
-        }
-        else if(depth <= maxdepth + 2){
-            return true;
+        if(stage == STAGE_ENDGAME){
+            return depth <= maxdepth + 2; 
         }
 
         return false;
@@ -990,13 +948,13 @@
     }
 
 
-    void cMatch::append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, cMove &move){
+    void cMatch::append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove &move){
 
         rcandidates.clear();
 
         rcandidates.push_back(move);
 
-        for(cMove nmove : newcandidates){
+        for(const cMove &nmove : newcandidates){
             rcandidates.push_back(nmove);
         }
 
@@ -1543,7 +1501,7 @@
 
         m_board.search_for_touching_pieces(defending_pieces, attacking_x, attacking_y, color, true);
 
-        for(cPiece defending_piece : defending_pieces){
+        for(const cPiece &defending_piece : defending_pieces){
             if(defending_piece.m_piece == mWKG || defending_piece.m_piece == mBKG){
                 continue;
             }
@@ -1624,7 +1582,7 @@
             dst_y += step_y;
             while(!(dst_x == kg_x && dst_y == kg_y)){
                 m_board.search_for_touching_pieces(defending_pieces, dst_x, dst_y, color, false);
-                  for(cPiece defending_piece : defending_pieces){
+                  for(const cPiece &defending_piece : defending_pieces){
                     if(defending_piece.m_piece == mWKG || defending_piece.m_piece == mBKG){
                         continue;
                     }
@@ -1682,10 +1640,11 @@
         return (PIECES_RANKS_100[a.m_srcpiece] < PIECES_RANKS_100[b.m_srcpiece]);
     }
 
+
     #ifdef DEBUG
-        void cMatch::calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t mvidx)
+        void cMatch::calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage, const uint8_t mvidx)
     #else
-        void cMatch::calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta)
+        void cMatch::calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage)
     #endif
         {
 
@@ -1708,34 +1667,38 @@
         gen_moves(moves, next_color());
  
         if(moves.size() == 0){
-            rscore = eval_terminate(depth);
+            rscore = score_terminate(depth);
+
             return;
         }
         else if(moves.size() == 1 && depth == 1){
             cMove move = moves.back();
-            rscore = m_score + score_board(move);
+
+            rscore = m_score + score_board(move, depth, stage);
+
             rmoves.push_back(move);
+
             return;
         }
         else{
-            /*if(depth == 1){
+            if(depth == 1){
                 if(m_minutes.size() > 0 && m_prev_search.size() > 2){
                     cMove last_move = m_minutes.back();
 
-                    cMove search_move = m_prev_search.at(1);
+                    cMove first_search_move = m_prev_search.at(0);
 
-                    if(last_move.compare(search_move)){
-                        cMove candidate = m_prev_search.at(2);
+                    if(last_move.compare(first_search_move)){
+                        cMove second_search_move = m_prev_search.at(1);
 
                         for(cMove &move : moves){
-                            if(candidate.compare(move)){
+                            if(second_search_move.compare(move)){
                                 move.m_prio = min(move.m_prio, cMove::PRIO_PRE_CALC);
                                 break;
                             }
                         }
                     }
                 }
-            }*/
+            }
 
             sort(moves.begin(), moves.end(), sortByPrio);
         }
@@ -1745,18 +1708,18 @@
               g_depthcnt[mvidx] = max((uint8_t)g_depthcnt[mvidx], (uint8_t)depth);
             #endif
 
-            start_alphabeta_threads(newscore, newmoves, moves, depth, maxdepth, alpha, beta);
+            start_alphabeta_threads(newscore, newmoves, moves, depth, maxdepth, alpha, beta, stage);
 
             rscore = newscore;
 
-            for(cMove nmove : newmoves){
+            for(cMove &nmove : newmoves){
                 rmoves.push_back(nmove);
             }
 
             return;
         }
 
-        for(cMove move : moves){
+        for(const cMove &move : moves){
             #ifdef DEBUG
               g_depthcnt[mvidx] = max((uint8_t)g_depthcnt[mvidx], (uint8_t)depth);
             #endif
@@ -1769,22 +1732,44 @@
 
             if(is_three_times_repetition(move, depth)){
                 newscore = 0;
+
                 dosearch = false;
             }
             else if(depth >= maxdepth){
-                if(eval_move(move, depth, maxdepth) == false){
+                if(eval_move(move, depth, maxdepth, stage) == false){
                     // skip move if it is not worth to search deeper
-                    newscore = m_score + score_board(move);
+                    newscore = m_score + score_board(move, depth, stage);
+
                     dosearch = false;
                 }
             }
 
             if(dosearch){
-                do_move(move);
+                if(stage == STAGE_OPENING || stage == STAGE_MIDDLE || stage == STAGE_ENDGAME){
+                    do_move(move);
 
-                calc_alphabeta(newscore, newmoves, depth + 1, maxdepth, alpha, beta, mvidx);
+                    #ifdef DEBUG
+                      calc_alphabeta(newscore, newmoves, depth + 1, maxdepth, alpha, beta, stage, mvidx);
+                    #else
+                      calc_alphabeta(newscore, newmoves, depth + 1, maxdepth, alpha, beta, stage);
+                    #endif
 
-                undo_move();
+                    undo_move();
+                }
+                else{
+                    int32_t tmpscore = score_endgame_board(move, depth, stage);
+                    do_move(move);
+                    m_score += tmpscore;
+
+                    #ifdef DEBUG
+                      calc_alphabeta(newscore, newmoves, depth + 1, maxdepth, alpha, beta, stage, mvidx);
+                    #else
+                      calc_alphabeta(newscore, newmoves, depth + 1, maxdepth, alpha, beta, stage);
+                    #endif
+
+                    undo_move();
+                    m_score -= tmpscore;
+                }
             }
 
             if(maximizing){
@@ -1818,192 +1803,18 @@
     }
 
 
-   void cMatch::calc_alphabeta_endgame(int32_t &rscore, vector<cMove> &rmoves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status){
-
-        vector<cMove> newmoves;
-
-        int32_t newscore;
-
-        u_int8_t count = 0;
-
-        bool maximizing = (next_color() == mWHITE);
-
-        if(maximizing){
-            rscore = SCORES[mWKG] * 10;
-        }
-        else{
-            rscore = SCORES[mBKG] * 10;
-        }
-
-        vector<cMove> moves;
-        gen_moves(moves, next_color());
- 
-        if(moves.size() == 0){
-
-            rscore = eval_terminate(depth);
-
-            rmoves.clear();
-
-            return;
-        }
-        else if(moves.size() == 1 && depth == 1){
-
-            cMove move = moves.back();
-            
-            do_move(move);
-
-            rscore = m_score + score_endgame_board(move, depth, status);
-
-            undo_move();
-
-            rmoves.clear();
-            rmoves.push_back(move);
-
-            return;
-        }
-        else{
-            if(depth == 1){
-                if(m_minutes.size() > 0 && m_prev_search.size() > 2){
-                    cMove last_move = m_minutes.back();
-
-                    cMove search_move = m_prev_search.at(1);
-
-                    if(last_move.compare(search_move)){
-                        cMove candidate = m_prev_search.at(2);
-
-                        for(cMove &move : moves){
-                            if(candidate.compare(move)){
-                                move.m_prio = min(move.m_prio, cMove::PRIO_PRE_CALC);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            //if(status >= cBoard::ENDGAME_STAT_100 && status <= cBoard::ENDGAME_STAT_130){
-                //sort(moves.begin(), moves.end(), sortByEngame_100);
-            //}
-            //else{
-                sort(moves.begin(), moves.end(), sortByPrio);
-            //}
-        }
-
-        if(depth == 1){
-            start_alphabeta_endgame_threads(newscore, newmoves, moves, depth, maxdepth, alpha, beta, status);
-
-            rscore = newscore;
-
-            for(cMove nmove : newmoves){
-                rmoves.push_back(nmove);
-            }
-
-            return;
-        }
-
-        for(cMove move : moves){
-
-            count++;
-
-            newmoves.clear();
-
-            bool skip = false;
-
-            if(is_three_times_repetition(move, depth)){
-
-                newscore = 0;
-
-                skip = true;
-            }
-            else if(eval_endgame_move(move, depth, maxdepth, status) == false){
-
-                do_move(move);
-
-                newscore = m_score + score_endgame_board(move, depth, status);
-
-                undo_move();
-
-                skip = true;
-            }
-
-            if(skip == false){
-
-                do_move(move);
-
-                calc_alphabeta_endgame(newscore, newmoves, depth + 1, maxdepth, alpha, beta, status);
-
-                undo_move();
-            }
-
-            if(maximizing){
-                if(newscore > rscore){
-                    rscore = newscore;
-
-                    append_newmove(rmoves, newmoves, move);
-                }
-
-                alpha = max(rscore, alpha);
-
-                if(alpha >= beta){
-                    break;
-                }
-            }
-            else{
-                if(newscore < rscore){
-                    rscore = newscore;
-
-                    append_newmove(rmoves, newmoves, move);
-
-                }
-
-                beta = min(rscore, beta);
-
-                if(beta <= alpha){
-                    break;
-                }
-            }
-        }
-
-        moves.clear();
-
-    }
-
-
-    void cMatch::start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta){
+    void cMatch::start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage){
 
         cThreading threading(this, moves, alpha, beta);
 
         while(threading.has_finished() == false){
 
-            threading.start(depth, maxdepth);
+            threading.start(depth, maxdepth, stage);
 
             sleep(0.6);
             //(depth == 1) ? (sleep(0.6)) : (sleep(0.2)); // 
 
             threading.update_candidates();
-        }
-
-        threading.update_candidates();
-
-        threading.fetch_candidates(rscore, rmoves);
-
-        moves.clear();
-
-    }
-
-
-    void cMatch::start_alphabeta_endgame_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, uint8_t depth, uint8_t maxdepth, int32_t alpha, int32_t beta, uint8_t status){
-
-        cThreading threading(this, moves, alpha, beta);
-
-        while(threading.has_finished() == false){
-
-            threading.start_endgame(depth, maxdepth, status);
-
-            sleep(0.6);
-
-            threading.update_candidates();
-
         }
 
         threading.update_candidates();
@@ -2063,7 +1874,7 @@
 
                 board.search_for_touched_pieces(touched_pieces, move.m_srcpiece, move.m_dst_x, move.m_dst_y, color, mNO_DIR);
 
-                for(cPiece cpiece : touched_pieces){
+                for(cPiece &cpiece : touched_pieces){
                     if(cpiece.m_piece == mWKG || cpiece.m_piece == mBKG){
                         move.m_prio = min(move.m_prio, uint8_t(cMove::PRIO_STANDARD + (adjust + 5)));
                         break;
@@ -2137,7 +1948,7 @@
 
                 board.search_for_touched_pieces(touched_pieces, move.m_srcpiece, move.m_dst_x, move.m_dst_y, color, mNO_DIR);
 
-                for(cPiece cpiece : touched_pieces){
+                for(const cPiece &cpiece : touched_pieces){
                     if(cpiece.m_piece == mWKG || cpiece.m_piece == mBKG){
                         move.m_prio = min(move.m_prio, uint8_t(cMove::PRIO_CASTLING - 5));
                         break;
@@ -2155,33 +1966,22 @@
     }
 
 
-    bool cMatch::is_opening() const{
-
-        return (m_minutes.size() <= 20);
-
-    }
-
-
-    bool cMatch::is_endgame(uint8_t &status) const{
-
-        status = cBoard::ENDGAME_STAT_0;
-
+    uint8_t cMatch::eval_stage() const{
+        // opening
+        if(m_minutes.size() <= 20){
+            return STAGE_OPENING;
+        }
+        
+        //endgame or middlegame
         uint8_t wpwcnt = 0;
-
         uint8_t bpwcnt = 0;
-
         uint8_t wqucnt = 0;
-
         uint8_t bqucnt = 0;
 
-        vector<cPiece> wofficers;
-
-        vector<cPiece> bofficers;
+        vector<cPiece> wofficers, bofficers;
 
         for(uint8_t y = 0; y < 8; ++y){
-
             for(uint8_t x = 0; x < 8; ++x){
-
                 uint8_t piece = m_board.getfield(x, y);
 
                 if(piece == mBLK){
@@ -2210,28 +2010,21 @@
                     }
                 }
             }
-
         }
-        
+
         uint8_t offcnt = wqucnt + bqucnt + wofficers.size() + bofficers.size();
-        
         if(offcnt > 6){
-            return false;
+            return STAGE_MIDDLE;
         }
 
         if(wpwcnt == 0 && bpwcnt == 0 && wqucnt == 0 && bqucnt == 0){
-
             if(wofficers.size() == 3 && bofficers.size() == 1){
-
                 uint8_t kncnt = 0;
-
                 uint8_t bpcnt = 0;
-
                 uint8_t squcolor = mBLANK;
-
                 uint8_t elsecnt = 0;
 
-                for(cPiece piece : wofficers){
+                for(const cPiece &piece : wofficers){
                     if(piece.m_piece == mWKN){
                         kncnt++;
                     }
@@ -2252,27 +2045,23 @@
 
                 if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
                     if(squcolor == mWHITE){
-                        status = cBoard::ENDGAME_STAT_100;
+                        return STAGE_ENDGAME_100;
                     }
                     else{
-                        status = cBoard::ENDGAME_STAT_110;
+                        return STAGE_ENDGAME_110;
                     }
                 }
 
-                return true;
+                return STAGE_ENDGAME;
 
             }
             else if(bofficers.size() == 3 && wofficers.size() == 1){
-
                 uint8_t kncnt = 0;
-
                 uint8_t bpcnt = 0;
-
                 uint8_t squcolor = mBLANK;
-
                 uint8_t elsecnt = 0;
 
-                for(cPiece piece : bofficers){
+                for(const cPiece &piece : bofficers){
                     if(piece.m_piece == mBKN){
                         kncnt++;
                     }
@@ -2292,24 +2081,24 @@
                 }
                 if(kncnt == 1 && bpcnt == 1 && elsecnt == 1){
                     if(squcolor == mWHITE){
-                        status = cBoard::ENDGAME_STAT_120;
+                        return STAGE_ENDGAME_120;
                     }
                     else{
-                        status = cBoard::ENDGAME_STAT_130;
+                        return STAGE_ENDGAME_130;
                     }
                 }
 
-                return true;
+                return STAGE_ENDGAME;
 
             }
         }
 
-        return true;
+        return STAGE_ENDGAME;
 
     }
 
 
-    int32_t cMatch::eval_terminate(uint8_t depth) const{
+    int32_t cMatch::score_terminate(uint8_t depth) const{
 
             if(m_board.is_king_attacked(REVERSED_COLORS[next_color()])){
                 if(next_color() == mWHITE){
@@ -2361,12 +2150,24 @@
     }
 
 
-    int32_t cMatch::score_board(const cMove &move) const{
+    int32_t cMatch::score_board(const cMove &move, const uint8_t depth, const uint8_t stage) const{
+
+        if(stage == STAGE_OPENING || stage == STAGE_MIDDLE){
+            return score_opening_middlegame_board(move, stage);
+        }
+        else{
+            return score_endgame_board(move, depth, stage);
+        }
+
+    }
+
+
+    int32_t cMatch::score_opening_middlegame_board(const cMove &move, const uint8_t stage) const{
 
         int32_t score = 0;
 
         // opening
-        if(is_opening()){
+        if(stage == STAGE_OPENING){
 
             // penalty for move repetition
             if(m_minutes.size() >= 2){
@@ -2390,7 +2191,7 @@
                 cPiece(mWBP, 2, 0), 
                 cPiece(mWBP, 5, 0) };
             uint8_t wcnt = 0;
-            for(cPiece wpiece : white_pieces){
+            for(const cPiece &wpiece : white_pieces){
                 if(m_board.getfield(wpiece.m_src_x, wpiece.m_src_y) == wpiece.m_piece){
                     wcnt++;
                 }
@@ -2406,7 +2207,7 @@
                 cPiece(mBBP, 2, 7), 
                 cPiece(mBBP, 5, 7) };
             uint8_t bcnt = 0;
-            for(cPiece bpiece : black_pieces){
+            for(const cPiece &bpiece : black_pieces){
                 if(m_board.getfield(bpiece.m_src_x, bpiece.m_src_y) == bpiece.m_piece){
                     bcnt++;
                 }
@@ -2447,7 +2248,7 @@
                     m_board.search_for_touching_pieces(bpieces, x, y, mBLACK, true);
                 }
             }
-            for(cPiece wpiece : wpieces){
+            for(cPiece &wpiece : wpieces){
                 if(wpiece.m_piece == mWPW){
                     score += SCORES[mWPLUS1];
                     if(wpiece.m_src_y == 3){
@@ -2455,7 +2256,7 @@
                     }
                 }
             }
-            for(cPiece bpiece : bpieces){
+            for(cPiece &bpiece : bpieces){
                 if(bpiece.m_piece == mBPW){
                     score += SCORES[mBPLUS1];
                     if(bpiece.m_src_y == 4){
@@ -2475,9 +2276,9 @@
         }
 
         // opening and middlegame
-        uint8_t status;
-        if(is_endgame(status) == false){
-            
+
+        if(stage == STAGE_OPENING || stage == STAGE_MIDDLE){
+
             int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
 
             cBoard board(m_board);
@@ -2579,7 +2380,7 @@
                     m_board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, 1);
 
                     isopen = true;
-                    for(cPiece piece : pieces){
+                    for(const cPiece &piece : pieces){
                         if(piece.m_piece == mWPW){
                             isopen = false;
                         }
@@ -2630,7 +2431,7 @@
                     m_board.search_dir_for_pieces(pieces, rk_x, rk_y, 0, -1);
 
                     isopen = true;
-                    for(cPiece piece : pieces){
+                    for(const cPiece &piece : pieces){
                         if(piece.m_piece == mBPW){
                             isopen = false;
                         }
@@ -2701,17 +2502,16 @@
 
         }
 
-
         return score;
 
     }
 
 
-    int32_t cMatch::score_endgame_board(const cMove &move, uint8_t depth, uint8_t status) const{
+    int32_t cMatch::score_endgame_board(const cMove &move, const uint8_t depth, const uint8_t stage) const{
 
         int32_t score = 0;
 
-        if(status == cBoard::ENDGAME_STAT_0){
+        if(stage == STAGE_ENDGAME){
         // check pawns
             for(uint8_t y = 1; y < 7; ++y){
                 for(uint8_t x = 0; x < 7; ++x){
@@ -2735,13 +2535,13 @@
             return score;
         }
 
-        if(status == cBoard::ENDGAME_STAT_100 || status == cBoard::ENDGAME_STAT_110){
+        if(stage == STAGE_ENDGAME_100 || stage == STAGE_ENDGAME_110){
             // white kn+bp
 
             if(m_board.is_margin_frame_pos(m_board.m_wKg_x, m_board.m_wKg_y, m_board.m_bKg_x, m_board.m_bKg_y)){
                 if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
                     cEndGame100_base endgame100_base;
-                    uint8_t libidx = endgame100_base.eval_path_to_mate(status, m_board.m_fields);
+                    uint8_t libidx = endgame100_base.eval_path_to_mate(stage, m_board.m_fields);
 
                     if(libidx > 0){
                         return 100 + (libidx * 10) - depth;
@@ -2749,19 +2549,19 @@
                 }
             }
 
-            score += cEndGame100_base::eval_push_kg_to_margin(status, depth, m_board.m_fields, m_board.m_wKg_x, m_board.m_wKg_y, m_board.m_bKg_x, m_board.m_bKg_y);
+            score += cEndGame100_base::eval_push_kg_to_margin(stage, depth, m_board.m_fields, m_board.m_wKg_x, m_board.m_wKg_y, m_board.m_bKg_x, m_board.m_bKg_y);
 
-            if(m_board.is_within_two_squares(mBKN, m_board.m_wKg_x, m_board.m_wKg_y)){
+            if(m_board.is_within_three_squares(mBKN, m_board.m_wKg_x, m_board.m_wKg_y)){
                 score += 4;
             }
         }
-        else if(status == cBoard::ENDGAME_STAT_120 || status == cBoard::ENDGAME_STAT_130){
+        else if(stage == STAGE_ENDGAME_120 || stage == STAGE_ENDGAME_130){
             // black kn+bp
 
             if(m_board.is_margin_frame_pos(m_board.m_wKg_x, m_board.m_wKg_y, m_board.m_bKg_x, m_board.m_bKg_y)){
                 if(PIECES_COLORS[move.m_srcpiece] == mBLACK){
                     cEndGame100_base endgame100_base;
-                    uint8_t libidx = endgame100_base.eval_path_to_mate(status, m_board.m_fields);
+                    uint8_t libidx = endgame100_base.eval_path_to_mate(stage, m_board.m_fields);
 
                     if(libidx > 0){
                         return -100 - ((libidx * 10) - depth);
@@ -2769,9 +2569,9 @@
                 }
             }
 
-            score += cEndGame100_base::eval_push_kg_to_margin(status, depth, m_board.m_fields, m_board.m_wKg_x, m_board.m_wKg_y, m_board.m_bKg_x, m_board.m_bKg_y);
+            score += cEndGame100_base::eval_push_kg_to_margin(stage, depth, m_board.m_fields, m_board.m_wKg_x, m_board.m_wKg_y, m_board.m_bKg_x, m_board.m_bKg_y);
 
-            if(m_board.is_within_two_squares(mBKN, m_board.m_bKg_x, m_board.m_bKg_y)){
+            if(m_board.is_within_three_squares(mBKN, m_board.m_bKg_x, m_board.m_bKg_y)){
                 score -= 4;
             }
         }   

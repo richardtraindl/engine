@@ -13,82 +13,16 @@
     using namespace std;
 
 
-    void play100(cMatch &match, uint8_t engine_color){
-        
-        time_t time_start = time(0);
-
-        uint8_t wkgcnt = 0;
-        uint8_t bkgcnt = 0;
-        uint8_t bpcnt = 0;
-        uint8_t kncnt = 0;
-
-        for(uint8_t i = 0; i < 100; ++i){
-            
-            cout << "\n*****************" << endl;
-            cout << "count: " << to_string(i + 1) << endl;
-            cout << "*****************" << endl;
-
-            if(i % 5 == 0){
-                match.m_board.prnt();
-
-                sleep(5);
-            }
-
-            vector<cMove> rmoves;
-
-            int32_t rscore;
-
-            //match.gen_moves(rmoves, match.next_color());
-            match.calc_move(rscore, rmoves);
-
-            if(rmoves.size() > 0){
-                //uint8_t idx = rand() % rmoves.size();
-                //cMove move = rmoves.at(idx);
-
-                cMove move = rmoves.front();
-
-                match.do_move(move);
-
-                switch(move.m_srcpiece){
-                    case mWKG: wkgcnt++; break;
-                    case mBKG: bkgcnt++; break;
-                    case mWKN: kncnt++; break;
-                    case mBKN: kncnt++; break;
-                    case mWBP: bpcnt++; break;
-                    case mBBP: bpcnt++; break;
-                }
-            }
-            else{
-                match.m_board.prnt();
-
-                cout << "count: " << to_string(i) << endl;
-
-                uint8_t status = match.eval_status();
-                match.prnt_status(status);
-
-                cout << "wkg: " + to_string(wkgcnt) + " bkg:" + to_string(bkgcnt) + " bp: " + to_string(bpcnt) + " kn: " + to_string(kncnt) << endl;
-
-                cout << "game over! " << to_string(i) << endl;
-
-                cMatch::prnt_fmttime("\ncalc-time: ", time(0) - time_start);
-
-                return;
-            }
-        }
-
-        cout << "regular finish " << endl;
-
-        cMatch::prnt_fmttime("\ncalc-time: ", time(0) - time_start);
-
-    }
-
-
     bool import_minutes(cMatch &match, string path_and_filename){
 
         match.reset();
 
         ifstream file(path_and_filename);
-        
+        if(file.fail()){
+            cout << "file error!" << endl;
+            return false;
+        }
+
         string content;
 
         uint8_t src_x, src_y, dst_x, dst_y;
@@ -120,6 +54,10 @@
         match.reset();
 
         ifstream file(path_and_filename);
+        if(file.fail()){
+            cout << "file error!" << endl;
+            return false;
+        }
 
         string content;
 
@@ -196,7 +134,7 @@
             
             match.m_score = sum * -1;
 
-            // perform 30 fake moves to pretend not to be opening
+            //perform 30 fake moves to pretend not to be opening
             for(uint8_t i = 0; i < 30; ++i){
                 match.m_minutes.push_back(cMove(1, 1, 1, 1, 1, 1, 1, 100));
             }
@@ -211,10 +149,52 @@
     }
 
 
+    bool import(cMatch &match, string filename){
+
+        string path_and_filename = "./matches/" + filename + ".txt";
+        ifstream file(path_and_filename);
+        if(file.fail()){
+            cout << "file error!" << endl;
+            return false;
+        }
+
+        string content;
+
+        uint8_t identify_file = 0;
+
+        while(file >> content) {
+
+            if(content.length() == 0){
+                continue;
+            }
+
+            if(content.length() > 0 && content.length() < 6){
+                identify_file = 1;
+                break;
+            }
+
+            if(content.length() == 32){
+                identify_file = 2;
+                break;
+            }
+        }
+
+        if(identify_file == 1){
+            return import_minutes(match, path_and_filename);
+        }
+        else if(identify_file == 2){
+            return import_board(match, path_and_filename);
+        }
+
+        return false;
+
+    }
+
+
     void play(cMatch &match, uint8_t engine_color){
 
-        char buffer[12];
-        int length = 13;
+        char buffer[31];
+        int length = 32;
 
         uint8_t src_x, src_y, dst_x, dst_y;
 
@@ -262,7 +242,7 @@
 
                 if(input == "h" || input == "H"){ 
                     cout << "\nmove formats: e2e4 | e7e8q | 0-0 | 0-0-0";
-                    cout << "\ncommands: quit) | u(ndo) | w(hite engine) | b(lack engine) | pb(print board) | pm(print minutes) | im(import moves) | ib(import board)";
+                    cout << "\ncommands: quit) | u(ndo) | w(hite engine) | b(lack engine) | pb(print board) | pm(print minutes) | im(import file)";
                     continue;
                 }
 
@@ -295,15 +275,17 @@
 
                 if(input.substr(0, 2) == "im" || input.substr(0, 2) == "IM"){
                     if(input.length() < 5){
-                        cout << "format for import moves: 'im 001'" << endl;
+                        cout << "format for import: 'im <filename>'" << endl;
                         continue;
                     }
 
-                    string path_and_filename = "./matches/game" + input.substr(2) + ".txt";
-                    if(import_minutes(match, path_and_filename)){
-                        match.prnt_minutes();
+                    if(import(match, input.substr(2))){
+                        //match.prnt_minutes();
 
                         match.m_board.prnt();
+                    }
+                    else{
+                          match.reset();
                     }
 
                     continue;
@@ -320,36 +302,12 @@
                     continue;
                 }
 
-                if(input.substr(0, 2) == "ib" || input.substr(0, 2) == "IB"){
-                    if(input.length() < 5){
-                        cout << "format for import board: 'ib 001'" << endl;
-                        continue;
-                    }
-
-                    string path_and_filename = "./matches/board" + input.substr(2) + ".txt";
-                    if(import_board(match, path_and_filename)){
-                        match.m_board.prnt();
-                    }
-
-                    continue;
-
-                }
-
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
 
                     play100(match, engine_color);
 
                     //prnt_eval_field_states(match);
-                    
-                    //match.m_board.setfield(1, 2, mBLK);
-                    //match.m_board.setfield(1, 7, mWQU);
-                    //int8_t state = match.m_board.eval_field_state(1, 7);
-                    //cout << to_string(state) << endl;
-
-                    //cMove move(1, 2, 1, 7, mWQU, mBLK, mBLK, 100);
-                    //match.set_prio_for_move(move);
-                    //cout << to_string(move.m_prio) << endl;                    
 
                     return;
                 }

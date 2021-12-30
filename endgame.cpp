@@ -7,11 +7,11 @@
     }
 
 
-    int32_t cEndGame100_base::eval_push_kg_to_margin(uint8_t status, uint8_t depth, const uint8_t fields[8][8], uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
+    int32_t cEndGame100_base::eval_push_kg_to_margin(uint8_t stage, uint8_t depth, const uint8_t fields[8][8], uint8_t wkg_x, uint8_t wkg_y, uint8_t bkg_x, uint8_t bkg_y){
 
         int32_t score = 0;
 
-        if(status == cBoard::ENDGAME_STAT_100 || status == cBoard::ENDGAME_STAT_110){
+        if(stage == cMatch::STAGE_ENDGAME_100 || stage == cMatch::STAGE_ENDGAME_110){
 
             score = 10 - depth;
 
@@ -21,7 +21,7 @@
             uint8_t diff_to_margin = cBoard::diff_to_margin(bkg_x, bkg_y);
             score += (2 - diff_to_margin) * 2 ;
 
-            if(status == cBoard::ENDGAME_STAT_100){
+            if(stage == cMatch::STAGE_ENDGAME_100){
                 score += cEndGame100::m_single_KG[bkg_y][bkg_x];
             }
             else{
@@ -38,7 +38,7 @@
             uint8_t diff_to_margin = cBoard::diff_to_margin(wkg_x, wkg_y);
             score -= (2 - diff_to_margin) * 2 ;
             
-            if(status == cBoard::ENDGAME_STAT_120){
+            if(stage == cMatch::STAGE_ENDGAME_120){
                 score -= cEndGame100::m_single_KG[wkg_y][wkg_x];
             }
             else{
@@ -51,26 +51,26 @@
     }
 
 
-    uint8_t cEndGame100_base::eval_path_to_mate(uint8_t status, const uint8_t fields[8][8]){
+    uint8_t cEndGame100_base::eval_path_to_mate(uint8_t stage, const uint8_t fields[8][8]){
 
         uint8_t lib = 0;
 
         const uint64_t (*tstfields)[5][4];
 
-        switch(status){
-            case cBoard::ENDGAME_STAT_100: 
+        switch(stage){
+            case cMatch::STAGE_ENDGAME_100: 
                 tstfields = cEndGame100::m_path_to_mate; 
                 break;
             
-            case cBoard::ENDGAME_STAT_110: 
+            case cMatch::STAGE_ENDGAME_110: 
                 tstfields = cEndGame110::m_path_to_mate; 
                 break;
             
-            case cBoard::ENDGAME_STAT_120: 
+            case cMatch::STAGE_ENDGAME_120: 
                 tstfields = cEndGame120::m_path_to_mate; 
                 break;
         
-            case cBoard::ENDGAME_STAT_130: 
+            case cMatch::STAGE_ENDGAME_130: 
                 tstfields = cEndGame130::m_path_to_mate; 
                 break;
                 
@@ -110,6 +110,17 @@
 
 
     const int32_t cEndGame100::m_single_KG[8][8] = {
+        { 0,   0,   10,  20,  30,  40,  50,  60 },  // first row
+        { 0,   0,   0,   10,  20,  30,  50,  50 },
+        { 10,  0,   0,    0,  10,  20,  30,  40 },
+        { 20,  10,  0,    0,   0,  10,  20,  30 },
+        { 30,  20,  10,   0,   0,   0,  10,  20 },
+        { 40,  30,  20,  10,   0,   0,   0,  10 },
+        { 50,  50,  30,  20,  10,   0,   0,  0 },
+        { 60,  50,  40,  30,  20,  10,   0,  0 }
+    };
+
+    /*const int32_t cEndGame100::m_single_KG[8][8] = {
         { 0,  0,  1,  2,  3,  4,  5,  6 },  // first row
         { 0,  0,  0,  1,  2,  3,  5,  5 },
         { 1,  0,  0,  0,  1,  2,  3,  4 },
@@ -118,7 +129,8 @@
         { 4,  3,  2,  1,  0,  0,  0,  1 },
         { 5,  5,  3,  2,  1,  0,  0,  0 },
         { 6,  5,  4,  3,  2,  1,  0,  0 }
-    };
+    };*/
+
 
     const uint64_t cEndGame100::m_path_to_mate[4][5][4] = {
         // wKg_y == 2
@@ -233,6 +245,17 @@
 
 
     const int32_t cEndGame110::m_single_KG[8][8] = {
+        { 60,  50,  40,  30,  20,  10,   0,   0 }, // first row
+        { 50,  50,  30,  20,  10,   0,   0,   0 },
+        { 40,  30,  20,  10,   0,   0,   0,  10 },
+        { 30,  20,  10,   0,   0,   0,  10,  20 },
+        { 20,  10,   0,   0,   0,  10,  20,  30 },
+        { 10,   0,   0,   0,  10,  20,  30,  40 },
+        {  0,   0,   0,  10,  20,  30,  50,  50 },
+        {  0,   0,  10,  20,  30,  40,  50,  60 }
+    };
+
+    /*const int32_t cEndGame110::m_single_KG[8][8] = {
         { 6,  5,  4,  3,  2,  1,  0,  0 }, // first row
         { 5,  5,  3,  2,  1,  0,  0,  0 },
         { 4,  3,  2,  1,  0,  0,  0,  1 },
@@ -241,7 +264,7 @@
         { 1,  0,  0,  0,  1,  2,  3,  4 },
         { 0,  0,  0,  1,  2,  3,  5,  5 },
         { 0,  0,  1,  2,  3,  4,  5,  6 }
-    };
+    };*/
 
 
     const uint64_t cEndGame110::m_path_to_mate[4][5][4] = {

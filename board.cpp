@@ -98,29 +98,20 @@
     }
 
 
-    bool cBoard::is_within_two_squares(uint8_t piece, uint8_t src_x, uint8_t src_y) const{
+    bool cBoard::is_within_three_squares(uint8_t piece, uint8_t src_x, uint8_t src_y) const{
 
-        int8_t steps[][2] = { 
-            { -2, 0 },  { -1, 0 },  { 1, 0 },  { 2, 0 },
-            { -2, 1 },  { -1, 1 },  { 0, 1 },  { 1, 1 },  { 2, 1 },
-            { -2, 2 },  { -1, 2 },  { 0, 2 },  { 1, 2 },  { 2, 2 },
-            { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 },
-            { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 },
-        };
-
-        for(uint8_t i = 0; i < size(steps); ++i){
-
-            uint8_t x = steps[i][0] + src_x;
-            uint8_t y = steps[i][1] + src_y;
-
-            if(is_inbounds(x, y)){
-                if(getfield(x, y) == piece){
-                    return true;
+        for(int8_t a = -3; a <= 3; ++a){
+            for(int8_t b = -3; b <= 3; ++b){
+                if(is_inbounds(src_x + a, src_y + b)){
+                    if(getfield(src_x + a, src_y + b) == piece){
+                        return true;
+                    }
                 }
             }
         }
-        
+
         return false;
+
     }
 
 
@@ -754,7 +745,7 @@
         vector<cPiece> wpieces, bpieces;
         search_for_all_touching_pieces(wpieces, bpieces, x, y);
 
-        for(const cPiece wpiece : wpieces){
+        for(const cPiece &wpiece : wpieces){
             uint8_t state = eval_pin_state(wpiece.m_piece, wpiece.m_src_x, wpiece.m_src_y);
             if(state == cBoard::PINNED_NO){
                 wtouchcnt++;
@@ -772,7 +763,7 @@
 
         uint8_t wadvant = (wtouchcnt * 2) + wsoftpincnt;
 
-        for(const cPiece bpiece : bpieces){
+        for(const cPiece &bpiece : bpieces){
             uint8_t state = eval_pin_state(bpiece.m_piece, bpiece.m_src_x, bpiece.m_src_y);
             if(state == cBoard::PINNED_NO){
                 btouchcnt++;
@@ -860,14 +851,14 @@
         bpincnt = (bpincnt / 2);
 
         // eval lowest touching white piece
-        for(cPiece wpiece : wpieces){
+        for(const cPiece &wpiece : wpieces){
             if(PIECES_RANKS[wpiece.m_piece] < PIECES_RANKS[lowestwhite]){
                 lowestwhite = wpiece.m_piece;
             }
         }
 
         // eval lowest touching black piece
-        for(cPiece bpiece : bpieces){
+        for(const cPiece &bpiece : bpieces){
             if(PIECES_RANKS[bpiece.m_piece] < PIECES_RANKS[lowestblack]){
                 lowestblack = bpiece.m_piece;
             }

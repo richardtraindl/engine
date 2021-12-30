@@ -29,42 +29,7 @@
     cThreading::~cThreading(){
     }
 
-
-    void cThreading::start(uint8_t depth, uint8_t maxdepth){
-
-        for(uint8_t i = 0; i < MAXTHREADS; ++i){
-
-            if(m_threads[i].joinable() == false && m_pool_idx < (uint8_t)m_pool_moves.size() && m_pool_status[i][1] != 1){
-
-                m_threading_mutex.lock();
-
-                m_start_time[i] = time(0);
-
-                cMove move = m_pool_moves[m_pool_idx];
-
-                m_pool_status[i][0] = m_pool_idx;
-                m_pool_status[i][1] = 1;
-
-                m_pool_idx++;
-
-                m_thmatches[i] = new cMatch(*m_match);
-
-                m_thmatches[i]->do_move(move);
-
-                m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, m_pool_idx);
-
-                if(depth == 1){
-                    cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
-                }
-
-                m_threading_mutex.unlock();
-            }
-        }
-
-    }
-
-
-    void cThreading::start_endgame(uint8_t depth, uint8_t maxdepth, uint8_t status){
+    void cThreading::start(const uint8_t depth, const uint8_t maxdepth, const uint8_t stage){
 
         for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
@@ -85,7 +50,11 @@
 
                 m_thmatches[i]->do_move(move);
 
-                m_threads[i] = thread(&cMatch::calc_alphabeta_endgame, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, status);
+                #ifdef DEBUG
+                  m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, stage, m_pool_idx);
+                #else
+                    m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, stage);
+                #endif
 
                 if(depth == 1){
                     cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
@@ -106,7 +75,7 @@
 
             newscore = m_candidate_score;
 
-            for(cMove move : m_candidate_moves){
+            for(const cMove &move : m_candidate_moves){
                 newmoves.push_back(move);
             }
 
