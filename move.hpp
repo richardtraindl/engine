@@ -1,9 +1,8 @@
-#ifndef MOVE_HPP
+  #ifndef MOVE_HPP
+
     #define MOVE_HPP
 
-    #include <cstring>
-    #include <cstdint>
-    #include <string>
+
     #include <sstream>
     #include "./values.hpp"
 
@@ -12,6 +11,7 @@
 
 
     class cMove{
+
         public:
             uint8_t m_src_x;
 
@@ -29,16 +29,15 @@
 
             uint8_t m_prio;
 
-            static const uint8_t PRIO_PROMOTION = 10;
-            static const uint8_t PRIO_EN_PASSANT = 29;
-            static const uint8_t PRIO_CAPTURE = 30;
-            static const uint8_t PRIO_PASSED_PAWN = 35;
-            static const uint8_t PRIO_PRE_CALC = 35;
-            static const uint8_t PRIO_URGENT_TOUCH = 40;
-            static const uint8_t PRIO_ADVANCED_PAWN = 50;
-            static const uint8_t PRIO_CASTLING = 70;
-            static const uint8_t PRIO_STANDARD = 100;
-            static const uint8_t PRIO_BAD_DSTFIELD = 110;
+            uint32_t m_impact;
+
+            static const uint8_t P_HIGH_UP      = 20;
+            static const uint8_t P_HIGH         = 40;
+            static const uint8_t P_HIGH_DOWN    = 60;
+            static const uint8_t P_MEDIUM_UP    = 80;
+            static const uint8_t P_MEDIUM       = 100;
+            static const uint8_t P_MEDIUM_DOWN  = 120;
+            static const uint8_t P_LOW          = 140;
 
             cMove(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t srcpiece, uint8_t dstpiece, uint8_t prompiece, uint8_t prio);
 
@@ -46,6 +45,8 @@
 
             cMove(const cMove &move);
             // copy constructor
+
+            ~cMove();
 
             bool is_en_passant() const;
 
@@ -65,4 +66,4 @@
 
     };
 
-#endif
+  #endif
