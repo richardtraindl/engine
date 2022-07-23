@@ -115,30 +115,93 @@
     }
 
 
+    bool cBoard::is_passed_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y) const{
+
+        if(piece == mWPW){
+            if(src_y >= 6){
+                return true;
+            }
+
+            for(uint8_t y = (src_y + 1); y < 7; ++y){
+                for(int8_t i = -1; i <= 1; ++i){
+
+                    if(is_inbounds((src_x + i), y)){
+                        if(getfield((src_x + i), y) == mBPW){
+                            return false;
+                        }
+                    }
+
+                }
+            }
+        }
+        else if(piece == mBPW){
+            if(src_y <= 1){
+                return true;
+            }
+
+            for(uint8_t y = (src_y - 1); y > 0; --y){
+                for(int8_t i = -1; i <= 1; ++i){
+
+                    if(is_inbounds((src_x + i), y)){
+                        if(getfield((src_x + i), y) == mWPW){
+                            return false;
+                        }
+                    }
+
+                }
+            }
+        }
+        else{
+            return false;
+        }
+
+        return true;
+
+    }
+
+
     bool cBoard::is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y) const{
 
-        int8_t xsteps[3] = { 1, 0, -1 };
-        
+        if(piece == mWPW){
+            for(uint8_t y = (src_y + 1); y < 7; ++y){
+                for(int8_t i = -1; i <= 1; ++i){
 
-        for(uint8_t i = 0; i < size(xsteps); ++i){
-            if(is_inbounds(src_x + xsteps[i], src_y) == false){
-                continue;
-            }
+                    if(is_inbounds((src_x + i), y)){
+                        uint8_t piece2 = getfield((src_x + i), y);
 
-            if(PIECES_COLORS[piece] == mWHITE){
-                for(uint8_t y = src_y; y < 7; ++y){
-                    if(getfield(src_x + xsteps[i], y) == mBPW){
-                        return false;
+                        if(piece2 == mBPW){
+                            return false;
+                        }
+
+                        if(i == 0 && PIECES_COLORS[piece2] == mBLACK){
+                            return false;
+                        }
                     }
+
                 }
             }
-            else{
-                for(uint8_t y = src_y; y > 0; --y){
-                    if(getfield(src_x + xsteps[i], y) == mWPW){
-                        return false;
+        }
+        else if(piece == mBPW){
+            for(uint8_t y = (src_y - 1); y > 0; --y){
+                for(int8_t i = -1; i <= 1; ++i){
+
+                    if(is_inbounds((src_x + i), y)){
+                        uint8_t piece2 = getfield((src_x + i), y);
+
+                        if(piece2 == mWPW){
+                            return false;
+                        }
+
+                        if(i == 0 && PIECES_COLORS[piece2] == mWHITE){
+                            return false;
+                        }
                     }
+
                 }
             }
+        }
+        else{
+            return false;
         }
 
         return true;
@@ -178,6 +241,86 @@
             }
             dst_x += step_x;
             dst_y += step_y;
+        }
+
+    }
+
+
+    void cBoard::search_all_dirs_for_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t excl_dir) const{
+
+        uint8_t dstpiece, dst_x, dst_y;
+
+        uint8_t idx, maxidx, cnt;
+
+        if(piece == mWPW){
+            idx = 4; maxidx = 6; cnt = 1;
+        }
+        else if(piece == mBPW){
+            idx = 6; maxidx = 8; cnt = 1;
+        }
+        else if(piece == mWRK || piece == mBRK){
+            idx = 0; maxidx = 4; cnt = 7;
+        }
+        else if(piece == mWBP || piece == mBBP){
+            idx = 4; maxidx = 8; cnt = 7;
+        }
+        else if(piece == mWKG || piece == mBKG){
+            idx = 0; maxidx = 8; cnt = 1;
+        }
+        else if(piece == mWQU || piece == mBQU){
+            idx = 0; maxidx = 8; cnt = 8;
+        }
+        else{
+            if(piece == mWKN || piece == mBKN){
+                int8_t steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
+
+                for(uint8_t i = 0; i < size(steps); ++i){
+                    if(is_inbounds((piece_x + steps[i][0]), (piece_y + steps[i][1]))){
+                        uint8_t dir = eval_dir(piece_x, piece_y, steps[i][0], steps[i][1]);
+                        if(excl_dir != mNO_DIR && excl_dir == dir){
+                            continue;
+                        }
+                    }
+                    else{
+                        continue;
+                    }
+
+                    dstpiece = search_dir_for_piece(dst_x, dst_y, piece_x, piece_y, steps[i][0], steps[i][1], 1);
+
+                    if(PIECES_COLORS[dstpiece] == mWHITE){
+                        wpieces.push_back(cPiece(dstpiece, dst_x, dst_y));
+                    }
+                    else if(PIECES_COLORS[dstpiece] == mBLACK){
+                        bpieces.push_back(cPiece(dstpiece, dst_x, dst_y));
+                    }
+                }
+            }
+            return;
+        }
+
+
+        int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 } };
+
+        for(; idx < maxidx; ++idx){
+            if(is_inbounds((piece_x + steps[idx][0]), (piece_y + steps[idx][1]))){
+                uint8_t dir = eval_dir(piece_x, piece_y, (piece_x + steps[idx][0]), (piece_y + steps[idx][1]));
+
+                if(excl_dir != mNO_DIR && excl_dir == dir){
+                    continue;
+                }
+            }
+            else{
+                continue;
+            }
+
+            dstpiece = search_dir_for_piece(dst_x, dst_y, piece_x, piece_y, steps[idx][0], steps[idx][1], cnt);
+
+            if(PIECES_COLORS[dstpiece] == mWHITE){
+                wpieces.push_back(cPiece(dstpiece, dst_x, dst_y));
+            }
+            else if(PIECES_COLORS[dstpiece] == mBLACK){
+                bpieces.push_back(cPiece(dstpiece, dst_x, dst_y));
+            }
         }
 
     }
@@ -474,66 +617,123 @@
     }
 
 
-    void cBoard::search_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir) const{
+    void cBoard::new_search_for_touched_pieces(vector<cPiece> &found_pieces, cPiece &piece, bool excl_pindir) const{
 
-        uint8_t dstpiece, dst_x, dst_y;
+        uint8_t pindir = mNO_DIR;
 
-        int8_t steps[][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 } };
+        uint8_t startidx, endidx, maxcnt;
 
-        uint8_t idx, maxidx, cnt;
+        const int8_t steps[20][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 }, { 1, 1 }, { -1, 1 }, { -1, -1 }, { 1, -1 } };
 
-        if(piece == mWPW){
-            idx = 4; maxidx = 6; cnt = 1;
+        if(excl_pindir){
+            pindir = eval_pindir(piece.m_xpos, piece.m_ypos, PIECES_COLORS[piece.m_piece]);
         }
-        else if(piece == mBPW){
-            idx = 6; maxidx = 8; cnt = 1;
+
+        if(piece.m_piece == mWPW){
+            startidx = 16;
+            endidx = 17;
+            maxcnt = 1;
         }
-        else if(piece == mWRK || piece == mBRK){
-            idx = 0; maxidx = 4; cnt = 7;
+        else if(piece.m_piece == mBPW){
+            startidx = 18;
+            endidx = 19;
+            maxcnt = 1;
         }
-        else if(piece == mWBP || piece == mBBP){
-            idx = 4; maxidx = 8; cnt = 7;
+        else if(piece.m_piece == mWKN || piece.m_piece == mBKN){
+            startidx = 8;
+            endidx = 15;
+            maxcnt = 1;
         }
-        else if(piece == mWKG || piece == mBKG){
-            idx = 0; maxidx = 8; cnt = 1;
+        else if(piece.m_piece == mWRK || piece.m_piece == mBRK){
+            startidx = 0;
+            endidx = 3;
+            maxcnt = 7;
         }
-        else if(piece == mWQU || piece == mBQU){
-            idx = 0; maxidx = 8; cnt = 8;
+        else if(piece.m_piece == mWBP || piece.m_piece == mBBP){
+            startidx = 4;
+            endidx = 7;
+            maxcnt = 7;
+        }
+        else if(piece.m_piece == mWKG || piece.m_piece == mBKG){
+            startidx = 0;
+            endidx = 7;
+            maxcnt = 1;
+        }
+        else if(piece.m_piece == mWQU || piece.m_piece == mBQU){
+            startidx = 0;
+            endidx = 7;
+            maxcnt = 7;
         }
         else{
-            if(piece == mWKN || piece == mBKN){
-                int8_t steps[][2] = { { 1, 2 }, { 2, 1 }, { 2, -1 }, { 1, -2 }, { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
-
-                for(uint8_t i = 0; i < size(steps); ++i){
-                    uint8_t dir = eval_dir(piece_x, piece_y, steps[i][0], steps[i][1]);
-                    if(excl_dir != mNO_DIR && excl_dir == dir){
-                        continue;
-                    }
-
-                    dstpiece = search_dir_for_piece(dst_x, dst_y, piece_x, piece_y, steps[i][0], steps[i][1], 1);
-
-                    if(PIECES_COLORS[dstpiece] == color){
-                        pieces.push_back(cPiece(dstpiece, dst_x, dst_y));
-                    }
-                }
-            }
             return;
         }
 
-        for(; idx < maxidx; ++idx){
-            if(is_inbounds((piece_x + steps[idx][0]), (piece_y + steps[idx][1]))){
-                uint8_t dir = eval_dir(piece_x, piece_y, (piece_x + steps[idx][0]), (piece_y + steps[idx][1]));
+        for(uint8_t i = startidx; i <= endidx; ++i){
 
-                if(excl_dir != mNO_DIR && excl_dir == dir){
+            if(is_inbounds((piece.m_xpos + steps[i][0]), (piece.m_ypos + steps[i][1]))){
+                uint8_t dir = eval_dir(piece.m_xpos, piece.m_ypos, (piece.m_xpos + steps[i][0]), (piece.m_ypos + steps[i][1]));
+
+                if(pindir != mNO_DIR && dir != pindir){
                     continue;
                 }
             }
-
-            dstpiece = search_dir_for_piece(dst_x, dst_y, piece_x, piece_y, steps[idx][0], steps[idx][1], cnt);
-
-            if(PIECES_COLORS[dstpiece] == color){
-                pieces.push_back(cPiece(dstpiece, dst_x, dst_y));
+            else{
+                continue;
             }
+
+            uint8_t dst_x, dst_y;
+            uint8_t dstpiece = search_dir_for_piece(dst_x, dst_y, piece.m_xpos, piece.m_ypos, steps[i][0], steps[i][1], maxcnt);
+
+            if(dstpiece != mBLK){
+                found_pieces.push_back(cPiece(dstpiece, dst_x, dst_y));
+            }
+
+        }
+
+    }
+
+
+    void cBoard::new_search_for_touching_pieces(vector<cTouchedPiece> &found_pieces, uint8_t src_x, uint8_t src_y, vector<uint8_t> &search_dirs, bool excl_pindir) const{
+
+        uint8_t startidx, endidx;
+
+        int8_t steps[8][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
+
+        for(const uint8_t &search_dir : search_dirs){
+
+            if(search_dir == mEST_WST){
+                startidx = 0;
+                endidx = 1;
+            }
+            else if(search_dir == mSTH_NTH){
+                startidx = 2;
+                endidx = 3;
+            }
+            else if(search_dir == mSTHWST_NTHEST){
+                startidx = 3;
+                endidx = 4;
+            }
+            else if(search_dir == mSTHEST_NTHWST){
+                startidx = 5;
+                endidx = 6;
+            }
+            else{
+                continue;
+            }
+
+            for(uint8_t i = startidx; i <= endidx; ++i){
+
+                // TODO pindir
+
+                uint8_t dst_x, dst_y;
+                uint8_t dstpiece = search_dir_for_piece(dst_x, dst_y, src_x, src_y, steps[i][0], steps[i][1], 7);
+
+                if(dstpiece != mBLK){
+                    found_pieces.push_back(cTouchedPiece(dstpiece, dst_x, dst_y, mNO_DIR));
+                }
+
+            }
+        
         }
 
     }
@@ -545,6 +745,8 @@
         if(x1 == x2){ return mSTH_NTH; }
         if(x1 - y1 == x2 - y2){ return mSTHWST_NTHEST; }
         if(x1 + y1 == x2 + y2){ return mSTHEST_NTHWST; }
+        if( (abs(x1 + y1) == 2) && (abs(x2 + y2) == 1) ){ return mKNIGHT_DIR; }
+        if( (abs(x1 + y1) == 1) && (abs(x2 + y2) == 2) ){ return mKNIGHT_DIR; }
         else{ return mNO_DIR; }
 
     }
@@ -655,8 +857,10 @@
 
         for(uint8_t i = 0; i < size(steps1); ++i){
             piece1 = search_dir_for_piece(dst1_x, dst1_y, x, y, steps1[i][0], steps1[i][1], 6);
+            if(piece1 == mBLK){ continue; }
 
             piece2 = search_dir_for_piece(dst2_x, dst2_y, x, y, steps2[i][0], steps2[i][1], 6);
+            if(piece2 == mBLK){ continue; }
 
             if(piece1 != mBLK && piece2 != mBLK && PIECES_COLORS[piece1] != PIECES_COLORS[piece2]){
                 if(PIECES_COLORS[piece1] == PIECES_COLORS[piece]){
@@ -746,7 +950,7 @@
         search_for_all_touching_pieces(wpieces, bpieces, x, y);
 
         for(const cPiece &wpiece : wpieces){
-            uint8_t state = eval_pin_state(wpiece.m_piece, wpiece.m_src_x, wpiece.m_src_y);
+            uint8_t state = eval_pin_state(wpiece.m_piece, wpiece.m_xpos, wpiece.m_ypos);
             if(state == cBoard::PINNED_NO){
                 wtouchcnt++;
             }
@@ -764,7 +968,7 @@
         uint8_t wadvant = (wtouchcnt * 2) + wsoftpincnt;
 
         for(const cPiece &bpiece : bpieces){
-            uint8_t state = eval_pin_state(bpiece.m_piece, bpiece.m_src_x, bpiece.m_src_y);
+            uint8_t state = eval_pin_state(bpiece.m_piece, bpiece.m_xpos, bpiece.m_ypos);
             if(state == cBoard::PINNED_NO){
                 btouchcnt++;
             }

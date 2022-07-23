@@ -11,11 +11,10 @@
     #include "./move.hpp"
     #include "./field.hpp"
     #include "./endgame.hpp"
-    #include "./bitboard.hpp"
 
 
     using namespace std;
-    //#define DEBUG
+    #define DEBUG
 
     class cMatch{
         public:
@@ -67,7 +66,7 @@
 
             bool is_fifty_moves_rule() const;
 
-            static string fmt_moves(vector<cMove> &moves);
+            static string format_moves(vector<cMove> &moves);
 
             static void prnt_moves(vector<cMove> &moves);
 
@@ -78,23 +77,21 @@
             // calculation
             void calc_move(int32_t &rscore, vector<cMove> &rmoves);
 
-            #ifdef DEBUG
-              void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage, const uint8_t mvidx);
-            #else
-              void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage);
-            #endif
+            void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage);
 
             void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage);
 
             static bool sortByPrio(const cMove &a, const cMove &b);
 
-            static bool sortByEngame_100(const cMove &a, const cMove &b);
+            static bool sortByRank(const cPiece &a, const cPiece &b);
 
-            bool does_move_touch_weak_piece(const cMove &move) const;
+            bool does_move_touch_vulnerable_piece(const cMove &move) const;
 
-            bool does_move_sac_for_supply(const cMove &move) const;
+            bool does_move_support_supply(const cMove &move) const;
 
-            bool eval_move(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
+            bool continue_search(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
+
+            bool new_is_search_continue(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
 
             void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove &move);
 
@@ -128,13 +125,11 @@
 
             int32_t score_terminate(uint8_t depth) const;
 
-            bool is_stormy() const;
+            //bool is_stormy() const;
+
+            int32_t score_move(const cMove &move) const;
 
             int32_t score_board(const cMove &move, const uint8_t depth, const uint8_t stage) const;
-
-            int32_t score_opening_middlegame_board(const cMove &move, const uint8_t stage) const;
-
-            int32_t score_endgame_board(const cMove &move, const uint8_t depth, const uint8_t status) const;
 
     };
 

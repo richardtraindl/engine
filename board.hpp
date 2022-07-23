@@ -64,11 +64,15 @@
 
             bool is_within_three_squares(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
 
+            bool is_passed_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
+
             bool is_running_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
 
             uint8_t search_dir_for_piece(uint8_t &dst_x, uint8_t &dst_y, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y, uint8_t maxcnt) const;
 
             void search_dir_for_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y) const;
+
+            void search_all_dirs_for_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t excl_dir) const;
 
             bool search_for_touching_piece(uint8_t src_x, uint8_t src_y, uint8_t color) const;
 
@@ -76,10 +80,12 @@
 
             void search_for_all_touching_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t src_x, uint8_t src_y) const;
 
-            void search_for_touched_pieces(vector<cPiece> &pieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t color, uint8_t excl_dir) const;
+            void new_search_for_touched_pieces(vector<cPiece> &found_pieces, cPiece &piece, bool excl_pindir) const;
+
+            void new_search_for_touching_pieces(vector<cTouchedPiece> &found_pieces, uint8_t src_x, uint8_t src_y, vector<uint8_t> &search_dirs, bool excl_pindir) const;
 
             static uint8_t eval_dir(uint8_t src_x1, uint8_t src_y1, uint8_t src_x2, uint8_t src_y2);
-            
+
             uint8_t eval_pindir(uint8_t src_x, uint8_t src_y, uint8_t color) const;
 
             uint8_t eval_pin_state(uint8_t piece, uint8_t x, uint8_t y) const;

@@ -58,13 +58,29 @@
             cout << "file error!" << endl;
             return false;
         }
-
+        
         string content;
+        bool white;
+        bool opening;
+        
+        file >> content;
+        if(content.substr(0, 5) == "white"){
+            white = true;
+        }
+        else{
+            white = false;
+        }
+
+        file >> content;
+        if(content == "opening"){
+            opening = true;
+        }
+        else{
+            opening = false;
+        }
 
         uint8_t y = 7;
-
         int32_t sum = 0;
-
         while(file >> content) {
 
             if(content.length() == 32){
@@ -134,8 +150,16 @@
             
             match.m_score = sum * -1;
 
-            //perform 30 fake moves to pretend not to be opening
-            for(uint8_t i = 0; i < 30; ++i){
+            //perform fake moves to pretend not to be opening
+            uint8_t maxidx;
+            if(opening){
+                white ? maxidx = 20 : maxidx = 19;
+            }
+            else{
+                white ? maxidx = 32 : maxidx = 31;
+            }
+
+            for(uint8_t i = 0; i < maxidx; ++i){
                 match.m_minutes.push_back(cMove(1, 1, 1, 1, 1, 1, 1, 100));
             }
 
@@ -169,8 +193,14 @@
             }
 
             if(content.length() > 0 && content.length() < 6){
-                identify_file = 1;
-                break;
+                if(content.substr(0, 5) == "white" || content.substr(0, 5) == "black"){
+                    identify_file = 2;
+                    break;
+                }
+                else{
+                    identify_file = 1;
+                    break;
+                }
             }
 
             if(content.length() == 32){
@@ -283,6 +313,7 @@
                         //match.prnt_minutes();
 
                         match.m_board.prnt();
+                        cout << "score: " << to_string(match.m_score) << endl;
                     }
                     else{
                           match.reset();
@@ -305,11 +336,40 @@
                 if(input.compare("test") == 0){
                     cout << "test start" << endl;
 
-                    play100(match, engine_color);
+                    //prnt_moves_weak_state(match);
+                    prnt_eval_field_states(match);
+
+                    //prnt_moves_score(match);
+
+                    //cMove move(3, 3, 3, 2, mBPW, mBLK, mBLK, 0);
+                    //prnt_does_move_touch_weak_piece(match, move);
+
+                    //vector<cMove> moves;
+                    //match.gen_moves(moves, match.next_color());
+                    //sort(moves.begin(), moves.end(), match.sortByPrio);
+                    //for(const cMove &move : moves){
+                    //    cout << move.format(true) << endl;
+                    //}
+
+                    //prnt_test(match);
+
+                    //prnt_moves_touch_weak_piece(match);
+
+                    //cPiece piece(mWPW, 0, 3);
+                    //prnt_eval_pin_state(match, piece);
+
+                    //cMove move(2, 0, 0, 0, mWRK, mBLK, mBLK, 0);
+                    //prnt_does_move_touch_weak_piece(match, move);
+
+                    //prnt_moves_weak_state(match);
+
+                    //play100(match, engine_color);
 
                     //prnt_eval_field_states(match);
 
-                    return;
+                    //prnt_moves_score(match);
+
+                    continue;
                 }
 
                 if(input.size() == 3 && input.compare(0, 3, "0-0") == 0){

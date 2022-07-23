@@ -56,7 +56,8 @@
         {"est-wst", mEST_WST},
         {"sth-nth", mSTH_NTH},
         {"sth_wst-nth_est", mSTHWST_NTHEST}, 
-        {"sth_est-nth_wst", mSTHEST_NTHWST}
+        {"sth_est-nth_wst", mSTHEST_NTHWST},
+        {"knight_dir", mKNIGHT_DIR}
     };
 
 
@@ -104,18 +105,18 @@
 
     map<uint8_t, uint8_t> PIECES_RANKS = {
         {mBLK, 0}, 
-        {mWPW, 1}, 
-        {mBPW, 1}, 
-        {mWKN, 3}, 
-        {mBKN, 3}, 
-        {mWBP, 3}, 
-        {mBBP, 3}, 
-        {mWRK, 5}, 
-        {mBRK, 5}, 
-        {mWQU, 9}, 
-        {mBQU, 9}, 
-        {mWKG, 20}, 
-        {mBKG, 20}
+        {mWPW, 10}, 
+        {mBPW, 10}, 
+        {mWKN, 34}, 
+        {mBKN, 34}, 
+        {mWBP, 34}, 
+        {mBBP, 34}, 
+        {mWRK, 45}, 
+        {mBRK, 45}, 
+        {mWQU, 90}, 
+        {mBQU, 90}, 
+        {mWKG, 200}, 
+        {mBKG, 200}
     };
 
 

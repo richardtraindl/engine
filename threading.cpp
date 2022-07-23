@@ -50,11 +50,7 @@
 
                 m_thmatches[i]->do_move(move);
 
-                #ifdef DEBUG
-                  m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, stage, m_pool_idx);
-                #else
-                    m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, stage);
-                #endif
+                m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, stage);
 
                 if(depth == 1){
                     cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
@@ -109,18 +105,18 @@
 
                 cMove move = m_thmatches[i]->m_minutes.back();
 
-                //cout << "...............thread finished for: " + move.format(false);
-                //cMatch::prnt_fmttime(" time: ", time(0) - m_start_time[i]);
+                cout << "...............thread finished for: " + move.format(false);
+                cMatch::prnt_fmttime(" time: ", time(0) - m_start_time[i]);
 
                 if(m_match->next_color() == mWHITE){
                     if(m_thscores[i] > m_candidate_score){
                         m_candidate_score = m_thscores[i];
 
                         
-                        //cout << "\n*********************" << endl;
-                        //cout << move.format(true);
-                        //cout << "          m_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << endl;
-                        //cout << "*********************\n" << endl;
+                        cout << "\n*********************" << endl;
+                        cout << move.format(true);
+                        cout << "          m_CANDIDATE_score: "  << m_candidate_score  << endl;
+                        cout << "*********************\n" << endl;
 
                         m_candidate_moves.clear();
                         m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());
@@ -137,10 +133,10 @@
                     if(m_thscores[i] < m_candidate_score){
                         m_candidate_score = m_thscores[i];
 
-                        //cout << "\n*********************" << endl;
-                        //cout << move.format(true);
-                        //cout << "          m_CANDIDATE_score: "  << m_candidate_score  << " alpha: " << m_alpha << " beta: " << m_beta << endl;
-                        //cout << "*********************\n" << endl;
+                        cout << "\n*********************" << endl;
+                        cout << move.format(true);
+                        cout << "          m_CANDIDATE_score: "  << m_candidate_score  << endl;
+                        cout << "*********************\n" << endl;
 
                         m_candidate_moves.clear();
                         m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());
@@ -204,8 +200,6 @@
 
 
     void cThreading::terminate(){
-
-        terminate();
 
         //g_threading_mutex.lock();
 

@@ -3,10 +3,10 @@
     #include "./field.hpp"
 
 
-    cField::cField(const cBoard *board, uint8_t pos_x, uint8_t pos_y){ //  : m_board(board)
+    cField::cField(const cBoard *board, uint8_t xpos, uint8_t ypos){ //  : m_board(board)
         m_board = board;
-        m_pos_x = pos_x;
-        m_pos_y = pos_y;
+        m_xpos = xpos;
+        m_ypos = ypos;
 
         fill();
 
@@ -14,7 +14,7 @@
 
 
     void cField::fill(){
-        m_piece = m_board->getfield(m_pos_x, m_pos_y);
+        m_piece = m_board->getfield(m_xpos, m_ypos);
         m_wtouchcnt = 0;
         m_btouchcnt = 0;
         m_wsoftpincnt = 0;
@@ -23,10 +23,11 @@
         m_blowesttouch = mBKG;
 
         vector<cPiece> wpieces, bpieces;
-        m_board->search_for_all_touching_pieces(wpieces, bpieces, m_pos_x, m_pos_y);
+        m_board->search_for_all_touching_pieces(wpieces, bpieces, m_xpos, m_ypos);
 
-        for(const cPiece &wpiece : wpieces){
-            uint8_t state = m_board->eval_pin_state(wpiece.m_piece, wpiece.m_src_x, wpiece.m_src_y);
+        for(const cPiece &piece : wpieces){
+            uint8_t state = m_board->eval_pin_state(piece.m_piece, piece.m_xpos, piece.m_ypos);
+
             if(state == cBoard::PINNED_NO){
                 m_wtouchcnt++;
             }
@@ -36,13 +37,15 @@
             else{
                 continue;
             }
-            if(PIECES_RANKS[wpiece.m_piece] < PIECES_RANKS[m_wlowesttouch]){
-                m_wlowesttouch = wpiece.m_piece;
+
+            if(PIECES_RANKS[piece.m_piece] < PIECES_RANKS[m_wlowesttouch]){
+                m_wlowesttouch = piece.m_piece;
             }
         }
 
-        for(const cPiece &bpiece : bpieces){
-            uint8_t state = m_board->eval_pin_state(bpiece.m_piece, bpiece.m_src_x, bpiece.m_src_y);
+        for(const cPiece &piece : bpieces){
+            uint8_t state = m_board->eval_pin_state(piece.m_piece, piece.m_xpos, piece.m_ypos);
+
             if(state == cBoard::PINNED_NO){
                 m_btouchcnt++;
             }
@@ -52,8 +55,9 @@
             else{
                 continue;
             }
-            if(PIECES_RANKS[bpiece.m_piece] < PIECES_RANKS[m_blowesttouch]){
-                m_blowesttouch = bpiece.m_piece;
+
+            if(PIECES_RANKS[piece.m_piece] < PIECES_RANKS[m_blowesttouch]){
+                m_blowesttouch = piece.m_piece;
             }
         }
 
@@ -72,7 +76,7 @@
 
 
     bool cField::is_only_btouched(){
-        return (m_wtouchcnt + m_wsoftpincnt == 0) && (m_btouchcnt + m_bsoftpincnt > 0);
+        return (m_btouchcnt + m_bsoftpincnt > 0) && (m_wtouchcnt + m_wsoftpincnt == 0);
 
     }
 
@@ -102,18 +106,18 @@
     }*/
 
 
-    int8_t cField::eval_advant_score(){
-        uint8_t wadvant = (m_wtouchcnt * 2) + m_wsoftpincnt;
-        uint8_t badvant = (m_btouchcnt * 2) + m_bsoftpincnt;
+    int8_t cField::eval_score(){
+        uint8_t wscore = (m_wtouchcnt * 2) + m_wsoftpincnt;
+        uint8_t bscore = (m_btouchcnt * 2) + m_bsoftpincnt;
 
-        if(PIECES_COLORS[m_piece] == mWHITE && badvant > 0 && PIECES_RANKS[m_blowesttouch] < PIECES_RANKS[m_piece]){
-            return wadvant - badvant - (PIECES_RANKS[m_piece]- PIECES_RANKS[m_blowesttouch]);
+        if(PIECES_COLORS[m_piece] == mWHITE && bscore > 0 && PIECES_RANKS[m_blowesttouch] < PIECES_RANKS[m_piece]){
+            return (wscore - bscore) - (PIECES_RANKS[m_piece]- PIECES_RANKS[m_blowesttouch]);
         }
-        else if(PIECES_COLORS[m_piece] == mBLACK && wadvant > 0 && PIECES_RANKS[m_wlowesttouch] < PIECES_RANKS[m_piece]){
-            return wadvant - badvant + (PIECES_RANKS[m_piece]- PIECES_RANKS[m_wlowesttouch]);
+        else if(PIECES_COLORS[m_piece] == mBLACK && wscore > 0 && PIECES_RANKS[m_wlowesttouch] < PIECES_RANKS[m_piece]){
+            return (wscore - bscore) + (PIECES_RANKS[m_piece]- PIECES_RANKS[m_wlowesttouch]);
         }
         else{
-            return wadvant - badvant;
+            return wscore - bscore;
         }
 
     }

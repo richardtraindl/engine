@@ -2,6 +2,7 @@
     #define THREADING_HPP
 
 
+    #include <array>
     #include <thread>
     #include <mutex>
     #include "./match.hpp"

@@ -131,6 +131,10 @@
         #define mSTHEST_NTHWST  0x4
     #endif
 
+    #if !defined(mKNIGHT_DIR)
+        #define mKNIGHT_DIR     0x5
+    #endif
+
     
     extern map<string, uint8_t> PIECES;
 
