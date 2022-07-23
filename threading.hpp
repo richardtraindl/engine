@@ -1,11 +1,15 @@
-#ifndef THREADING_HPP
+
+
+  #ifndef THREADING_HPP
+
     #define THREADING_HPP
 
 
-    #include <array>
     #include <thread>
     #include <mutex>
+    #include <array>
     #include "./match.hpp"
+    #include "./move.hpp"
 
 
     const uint8_t MAXTHREADS = 4;
@@ -15,6 +19,7 @@
 
 
     class cThreading{
+
         private:
             mutex m_threading_mutex;
 
@@ -61,4 +66,4 @@
 
     };
 
-#endif
+  #endif
