@@ -450,8 +450,6 @@
 
       for(const cMove &move : moves){
         
-          daemon.reset();
-
           count++;
 
           newmoves.clear();
