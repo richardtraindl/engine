@@ -665,18 +665,18 @@
 
           uint8_t dst_x, dst_y;
 
-          uint8_t npiece = search_dir(dst_x, dst_y, src_x, src_y, cPiece::all_steps[i].m_xstep, cPiece::all_steps[i].m_ystep, range[2]);
+          uint8_t newpiece = search_dir(dst_x, dst_y, src_x, src_y, cPiece::all_steps[i].m_xstep, cPiece::all_steps[i].m_ystep, range[2]);
 
-          if(npiece == mBLK){
+          if(newpiece == mBLK){
               continue;
           }
 
-          if(PIECES_COLORS[piece] == mWHITE){
-              wpieces.push_back(cPiece(npiece, dst_x, dst_y));
+          if(PIECES_COLORS[newpiece] == mWHITE){
+              wpieces.push_back(cPiece(newpiece, dst_x, dst_y));
               continue;
           }
           else{
-              bpieces.push_back(cPiece(npiece, dst_x, dst_y));
+              bpieces.push_back(cPiece(newpiece, dst_x, dst_y));
               continue;
           }
 
