@@ -28,7 +28,7 @@
           
           static int8_t eval_piece_state(cMatch &match, const uint8_t piece, const uint8_t src_x, const uint8_t src_y);
 
-          static uint8_t eval_field_state(cMatch &match, const uint8_t src_x, const uint8_t src_y);
+          static uint8_t eval_field_state(cMatch &match, const uint8_t piece, const uint8_t src_x, const uint8_t src_y);
 
           static bool does_move_touch_soft_pinned(cMatch &match, const cMove &move);
 

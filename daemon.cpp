@@ -111,7 +111,7 @@
         }
 
 
-        uint8_t dstfield_state = cEvaluator::eval_field_state(match, move.m_dst_x, move.m_dst_y);
+        uint8_t dstfield_state = cEvaluator::eval_field_state(match, move.m_srcpiece, move.m_dst_x, move.m_dst_y);
 
         bool is_dstfield_save = cEvaluator::is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece]);
 

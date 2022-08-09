@@ -99,7 +99,7 @@
 
   void test_eval_field_state(cMatch &match, const uint8_t src_x, const uint8_t src_y){
 
-      uint8_t field_state = cEvaluator::eval_field_state(match, src_x, src_y);
+      uint8_t field_state = cEvaluator::eval_field_state(match, mBLK, src_x, src_y);
 
       switch(field_state){
           case mF_CLEAR: cout << "mF_CLEAR" << endl; break;

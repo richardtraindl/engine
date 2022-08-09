@@ -414,9 +414,6 @@
 
     uint8_t maxdepth = 3;
 
-    uint8_t stage = eval_stage();
-    cout << "stage: " << to_string(stage) << endl;
-
     calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta);
 
     cout << "\nmatch m_score: " << m_score;
@@ -427,8 +424,6 @@
 
     prnt_fmttime("\ncalc-time: ", time(0) - time_start);
     
-    prnt_tracer();
-
   }
 
 

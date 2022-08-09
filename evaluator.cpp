@@ -321,7 +321,7 @@
 
 
   //*****************************************
-  uint8_t cEvaluator::eval_field_state(cMatch &match, const uint8_t src_x, const uint8_t src_y){
+  uint8_t cEvaluator::eval_field_state(cMatch &match, const uint8_t piece, const uint8_t src_x, const uint8_t src_y){
 
       uint8_t wscore = 0;
       uint8_t bscore = 0;
@@ -351,7 +351,7 @@
           }
       }
 
-      if(wscore == 0 && bscore == 0){
+    if(wscore == 0 && bscore == 0){
           return mF_CLEAR;
       }
       else if(wscore > 0 && bscore == 0){
@@ -365,7 +365,7 @@
           const cPiece *blowest = get_lowest(bpieces);
 
           if(wlowest != nullptr && blowest != nullptr){
-              if(PIECES_RANKS[wlowest->m_piece] <= PIECES_RANKS[blowest->m_piece]){
+              if(PIECES_RANKS[piece] <= PIECES_RANKS[blowest->m_piece] && PIECES_RANKS[wlowest->m_piece] <= PIECES_RANKS[blowest->m_piece]){
                   return mF_WGT;
               }
           }
@@ -377,7 +377,7 @@
           const cPiece *blowest = get_lowest(bpieces);
 
           if(wlowest != nullptr && blowest != nullptr){
-              if(PIECES_RANKS[blowest->m_piece] <= PIECES_RANKS[wlowest->m_piece]){
+              if(PIECES_RANKS[piece] <= PIECES_RANKS[wlowest->m_piece] && PIECES_RANKS[blowest->m_piece] <= PIECES_RANKS[wlowest->m_piece]){
                   return mF_BGT;
               }
           }
@@ -697,7 +697,7 @@
       cMatch match_after_move(match);
       match_after_move.do_move(move);
 
-      uint8_t dstfield_state = eval_field_state(match_after_move, move.m_dst_x, move.m_dst_y);
+      uint8_t dstfield_state = eval_field_state(match_after_move, move.m_srcpiece, move.m_dst_x, move.m_dst_y);
 
       priorize_passed_pawn_supporting_move(match_after_move, move, dstfield_state);
 
