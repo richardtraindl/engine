@@ -1,5 +1,6 @@
 
 
+
     #include "./piece.hpp"
     #include "./board.hpp"
 
@@ -54,10 +55,14 @@
 
 
     cDir cPiece::qu_steps[8] = { 
-      cDir(mEST_WST, mHORIZONTAL, 1, 0), cDir(mWST_EST, mHORIZONTAL, -1, 0), 
-      cDir(mSTH_NTH, mVERTICAL, 0, 1), cDir(mNTH_STH, mVERTICAL, 0, -1),
-      cDir(mSTHWST_NTHEST, mDIA_LEFT_BOTTOM, 1, 1), cDir(mNTHEST_STHWST, mDIA_LEFT_BOTTOM, -1, -1), 
-      cDir(mSTHEST_NTHWST, mDIA_RIGHT_BOTTOM, -1, 1), cDir(mNTHWST_STHEST, mDIA_RIGHT_BOTTOM, 1, -1) 
+      cDir(mEST_WST, mHORIZONTAL, 1, 0), 
+      cDir(mWST_EST, mHORIZONTAL, -1, 0), 
+      cDir(mSTH_NTH, mVERTICAL, 0, 1), 
+      cDir(mNTH_STH, mVERTICAL, 0, -1),
+      cDir(mSTHWST_NTHEST, mDIA_LEFT_BOTTOM, 1, 1), 
+      cDir(mNTHEST_STHWST, mDIA_LEFT_BOTTOM, -1, -1), 
+      cDir(mSTHEST_NTHWST, mDIA_RIGHT_BOTTOM, -1, 1), 
+      cDir(mNTHWST_STHEST, mDIA_RIGHT_BOTTOM, 1, -1) 
     };
 
 
@@ -100,7 +105,7 @@
       cDir(mEST_WST, mHORIZONTAL, 1, 0), 
       cDir(mWST_EST, mHORIZONTAL, -1, 0), 
       cDir(mSTH_NTH, mVERTICAL, 0, 1), 
-      cDir(mNTH_STH, mVERTICAL, -1, 0),
+      cDir(mNTH_STH, mVERTICAL, 0, -1),
       cDir(mSTHWST_NTHEST, mDIA_LEFT_BOTTOM, 1, 1), 
       cDir(mNTHEST_STHWST, mDIA_LEFT_BOTTOM, -1, -1), 
       cDir(mSTHEST_NTHWST, mDIA_RIGHT_BOTTOM, -1, 1), 

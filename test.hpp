@@ -1,28 +1,39 @@
-#ifndef TEST_HPP
+
+
+
+  #ifndef TEST_HPP
+
     #define TEST_HPP
 
-    #include <iostream>
-    #include "./match.hpp"
+
+    #include <cstdint>
+    #include <map>
+    #include <string>
 
 
     using namespace std;
 
-    void play100(cMatch &match, uint8_t engine_color);
 
-    void prnt_eval_field_states(const cMatch &match);
+    void do_usr_move(cMatch &match, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece);
 
-    void prnt_moves_score(cMatch &match);
+    bool import_minutes(cMatch &match, string filename);
+    
+    void test_eval_piece_state(cMatch &match);
 
-    void prnt_eval_pin_state(const cMatch &match, const cPiece &piece);
+    void test_search_all_dirs_for_touching_pieces(cMatch &match);
 
-    void prnt_does_move_touch_weak_piece(cMatch &match, const cMove &move);
+    void test_eval_field_state(cMatch &match, const uint8_t src_x, const uint8_t src_y);
 
-    void prnt_moves_touch_weak_piece(cMatch &match);
+    void test_gen2(cMatch &match);
+    
+    void test_does_move_escape_soft_pin(cMatch &match, const cMove &move);
 
-    void prnt_moves_weak_state(cMatch &match);
+    void test_is_continue(cMatch &match, const uint8_t depth);
 
-    void prnt_moves_support_supply(cMatch &match);
+    void test_is_continue_sequence(cMatch &match);
 
-    void prnt_test(cMatch &match);
+    void test_does_move_touch_soft_pinned(cMatch &match, cMove &move);
 
-#endif
+    void test_does_move_sac_for_supply(cMatch &match, cMove &move);
+
+  #endif

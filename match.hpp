@@ -21,7 +21,7 @@
     class cMatch{
 
       public:
-        int32_t m_score = 0;
+        int32_t m_score;
 
         cBoard m_board;
 
@@ -61,28 +61,38 @@
 
         void calc_move(int32_t &rscore, vector<cMove> &rmoves);
 
-        void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage);
-        
+        void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta);
+
+        void calc_alphabeta2(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta);
+
         bool is_move_valid(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece);
 
-      private:
         uint8_t eval_stage() const;
 
-        void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove &move);
+      private:
+          uint8_t m_wpawn_cnt;
 
-        bool is_three_times_repetition(const cMove &move, uint8_t depth) const;
+          uint8_t m_bpawn_cnt;
 
-        bool is_search_continue(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
+          uint8_t m_wofficer_cnt;
 
-        void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t stage);
+          uint8_t m_bofficer_cnt;
 
-        bool is_fifty_moves_rule() const;
+          void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove &move);
 
-        int32_t score_terminate(uint8_t depth) const;
+          bool is_three_times_repetition(const cMove &move, uint8_t depth) const;
 
-        static bool sortByPrio(const cMove &a, const cMove &b);
+          bool is_search_continue(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
 
-        static bool sortByRank(const cPiece &a, const cPiece &b);
+          void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta);
+
+          bool is_fifty_moves_rule() const;
+
+          int32_t score_terminate(uint8_t depth) const;
+
+          static bool sortByPrio(const cMove &a, const cMove &b);
+
+          static bool sortByRank(const cPiece &a, const cPiece &b);
 
     };
 

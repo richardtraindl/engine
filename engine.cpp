@@ -5,7 +5,8 @@
     #include <string>
     #include <algorithm>
     #include "./match.hpp"
-    #include "./util/test.hpp"
+    #include "./daemon.hpp"
+    #include "./util/test.hpp"    
 
 
     using namespace std;
@@ -212,7 +213,7 @@
 
         cMatch match;
 
-        uint8_t engine_color = mWHITE;
+        uint8_t engine_color = mBLANK;
 
         import_minutes(match, "morphy");
         
@@ -226,41 +227,21 @@
 
         match.m_board.prnt();
         
-        //bool touched = match.m_board.is_field_touched(6, 6, mWHITE);
-        //cout << touched << endl;
-        
-        //vector<cPiece> wpieces, bpieces;
-        //match.m_board.search_all_dirs_for_touching_pieces(wpieces, bpieces, 6, 6, match.get_last_move(), false);
-        //cout << to_string(wpieces.size()) << " " << to_string(bpieces.size()) << endl;
+        cout << "score: " << to_string(match.m_score) << endl;
 
-        //bool is_softpin = match.m_board.is_soft_pinned(5, 5);
-        //cout << "is_softpin: " << is_softpin << endl;
+        //test_is_continue_sequence(match);
         
-        //bool valid = match.is_move_valid(4, 7, 3, 7, mBLK);
-        //cout << "valid: " << valid << endl;
+        //uint8_t src_x, src_y, dst_x, dst_y;
+        //cMove::coord_to_indices(src_x, src_y, "h1");
+        //cMove::coord_to_indices(dst_x, dst_y, "d1");
+        //cMove move(src_x, src_y, dst_x, dst_y, mWRK, mBKN, mBLK, cMove::P_MEDIUM);
 
-        //test_eval_piece_state(match);
-      
-        //test_search_all_dirs_for_touching_pieces(match);
-
-        //cMove move(4, 0, 2, 0, mWKG, mBLK, mBLK, 0);
-        //cMove move2(4, 0, 6, 0, mWKG, mBLK, mBLK, 0);
+        //test_does_move_sac_for_supply(match, move);
         
-        //int32_t score = cEvaluator::score_move(match.m_board, move);
-        //cout << "score: " << score << endl;
-        
-        //int32_t score2 = cEvaluator::score_board(match.m_board, 1, 1);
-        //cout << "score2: " << score2 << endl;
-
-        //test_eval_field_state(match, 3, 6);
-
-        //test_eval_piece_state(match);
-        
-        //test_is_hotspot(match);
+        //test_does_move_touch_soft_pinned(match, move);
 
         play(match, engine_color);
 
         return 0;
 
     }
-

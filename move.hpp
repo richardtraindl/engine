@@ -1,3 +1,4 @@
+
   #ifndef MOVE_HPP
 
     #define MOVE_HPP
@@ -28,8 +29,6 @@
             uint8_t m_prompiece;
 
             uint8_t m_prio;
-
-            uint32_t m_impact;
 
             static const uint8_t P_HIGH_UP      = 20;
             static const uint8_t P_HIGH         = 40;

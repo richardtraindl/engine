@@ -46,8 +46,6 @@
 
         m_prio = move.m_prio;
 
-        m_impact = move.m_impact;
-
     }
 
 
@@ -58,30 +56,14 @@
     bool cMove::is_en_passant() const{
 
         if(m_srcpiece == mWPW){
-
-            if(m_dstpiece == mBLK && m_src_y == 4 && m_dst_y == 5){
-
-                if((m_src_x + 1 <= 7 && m_src_x + 1 == m_dst_x) || (m_src_x - 1 >= 0 && m_src_x - 1 == m_dst_x)){
-
-                    return true;
-
-                }
-
+            if(m_dstpiece == mBLK && m_src_y == 4 && m_dst_y == 5 && m_src_x != m_dst_x){
+                return true;
             }
-
         }
         else if(m_srcpiece == mBPW){
-
-            if(m_dstpiece == mBLK && m_src_y == 3 && m_dst_y == 2){
-
-                if((m_src_x + 1 <= 7 && m_src_x + 1 == m_dst_x) || (m_src_x - 1 >= 0 && m_src_x - 1 == m_dst_x)){
-
-                    return true;
-
-                }
-
+            if(m_dstpiece == mBLK && m_src_y == 3 && m_dst_y == 2 && m_src_x != m_dst_x){
+                return true;
             }
-
         }
 
         return false;

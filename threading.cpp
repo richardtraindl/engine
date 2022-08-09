@@ -1,6 +1,5 @@
 
 
-
   #include "./threading.hpp"
 
 
@@ -33,7 +32,7 @@
   }
 
 
-  void cThreading::start(const uint8_t depth, const uint8_t maxdepth, const uint8_t stage){
+  void cThreading::start(const uint8_t depth, const uint8_t maxdepth){
 
     for(uint8_t i = 0; i < MAXTHREADS; ++i){
 
@@ -54,7 +53,7 @@
 
             m_thmatches[i]->do_move(move);
 
-            m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta, stage);
+            m_threads[i] = thread(&cMatch::calc_alphabeta, ref(m_thmatches[i]), ref(m_thscores[i]), ref(m_thmoves[i]), depth + 1, maxdepth, m_alpha, m_beta);
 
             if(depth == 1){
                 cout << to_string(m_pool_idx) + "(" + to_string(m_pool_moves.size()) + ") thread started for: " + move.format(true) << endl;
@@ -109,9 +108,9 @@
 
               cMove move = m_thmatches[i]->m_minutes.back();
 
-              cout << "...............thread finished for: " + to_string(m_pool_status[i][0] + 1) + ") " << move.format(false);
+              /*cout << "...............thread finished for: " + to_string(m_pool_status[i][0] + 1) + ") " << move.format(false);
               cout << " score: " << m_thscores[i] << endl;
-              cMatch::prnt_fmttime(" time: ", time(0) - m_start_time[i]);
+              cMatch::prnt_fmttime(" time: ", time(0) - m_start_time[i]);*/
 
               if(m_match->next_color() == mWHITE){
                   if(m_thscores[i] > m_candidate_score){
@@ -121,11 +120,11 @@
                       m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());
                       m_candidate_moves.insert(m_candidate_moves.begin(), move);
                       
-                      cout << "\n******************************************" << endl;
+                      /*cout << "\n******************************************" << endl;
                       cout << move.format(true);
                       cout << "          m_CANDIDATE_score: "  << m_candidate_score  << endl;
                       cout << cMatch::format_moves(m_candidate_moves, true) << endl;
-                      cout << "******************************************\n" << endl;
+                      cout << "******************************************\n" << endl;*/
                   }
 
                   m_alpha = max(m_candidate_score, m_alpha);
@@ -142,11 +141,11 @@
                       m_candidate_moves.assign(m_thmoves[i].begin(), m_thmoves[i].end());
                       m_candidate_moves.insert(m_candidate_moves.begin(), move);
 
-                      cout << "\n*********************" << endl;
+                      /*cout << "\n*********************" << endl;
                       cout << move.format(true);
                       cout << "          m_CANDIDATE_score: "  << m_candidate_score  << endl;
                       cout << cMatch::format_moves(m_candidate_moves, true) << endl;
-                      cout << "*********************\n" << endl;
+                      cout << "*********************\n" << endl;*/
                   }
 
                   m_beta = min(m_candidate_score, m_beta);

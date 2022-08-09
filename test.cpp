@@ -1,221 +1,301 @@
 
- #include "./test.hpp"
 
 
-    void play100(cMatch &match, uint8_t engine_color){
-        
-        time_t time_start = time(0);
+    #include <iostream>
+    #include <fstream>
+    #include <string>
+    #include <vector>
+    #include "../evaluator.hpp"
+    #include "../generator.hpp"
+    #include "../generator2.hpp"
+    #include "../match.hpp"
+    #include "../daemon.hpp"
+    #include "../move.hpp"
+    #include "./test.hpp"
 
-        uint8_t wkgcnt = 0;
-        uint8_t bkgcnt = 0;
-        uint8_t bpcnt = 0;
-        uint8_t kncnt = 0;
 
-        for(uint8_t i = 0; i < 100; ++i){
+
+    //*****************************************
+    void do_usr_move(cMatch &match, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece){
+
+        uint8_t srcpiece = match.m_board.getfield(src_x, src_y);
+
+        uint8_t dstpiece = match.m_board.getfield(dst_x, dst_y);
+
+        cMove move(src_x, src_y, dst_x, dst_y, srcpiece, dstpiece, prompiece, cMove::P_MEDIUM);
+
+        match.do_move(move);
+
+    }
+    //*****************************************
+
+
+
+    //*****************************************
+    bool import_minutes(cMatch &match, string filename){
+
+        string path_and_filename = "./matches/" + filename + ".txt";
+
+        ifstream file(path_and_filename);
+
+        if(file.fail()){
+            cout << "file error!" << endl;
+            return false;
+        }
+
+        string content;
+
+        uint8_t src_x, src_y, dst_x, dst_y;
+        uint8_t prompiece = mBLK;
+
+        while(file >> content) {
+
+            cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
+
+            cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
             
-            cout << "\n*****************" << endl;
-            cout << "count: " << to_string(i + 1) << endl;
-            cout << "*****************" << endl;
-
-            if(i % 5 == 0){
-                match.m_board.prnt();
-
-                sleep(5);
-            }
-
-            vector<cMove> rmoves;
-
-            int32_t rscore;
-
-            //match.gen_moves(rmoves, match.next_color());
-            match.calc_move(rscore, rmoves);
-
-            if(rmoves.size() > 0){
-                //uint8_t idx = rand() % rmoves.size();
-                //cMove move = rmoves.at(idx);
-
-                cMove move = rmoves.front();
-
-                match.do_move(move);
-
-                switch(move.m_srcpiece){
-                    case mWKG: wkgcnt++; break;
-                    case mBKG: bkgcnt++; break;
-                    case mWKN: kncnt++; break;
-                    case mBKN: kncnt++; break;
-                    case mWBP: bpcnt++; break;
-                    case mBBP: bpcnt++; break;
-                }
+            if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
+                do_usr_move(match, src_x, src_y, dst_x, dst_y, prompiece);
             }
             else{
-                match.m_board.prnt();
-
-                cout << "count: " << to_string(i) << endl;
-
-                uint8_t status = match.eval_status();
-                match.prnt_status(status);
-
-                cout << "wkg: " + to_string(wkgcnt) + " bkg:" + to_string(bkgcnt) + " bp: " + to_string(bpcnt) + " kn: " + to_string(kncnt) << endl;
-
-                cout << "game over! " << to_string(i) << endl;
-
-                cMatch::prnt_fmttime("\ncalc-time: ", time(0) - time_start);
-
-                return;
+                cout << "import error!" << content << endl;
+                return false;
             }
+
         }
 
-        cout << "regular finish " << endl;
-
-        cMatch::prnt_fmttime("\ncalc-time: ", time(0) - time_start);
+        return true;
 
     }
 
 
-    void prnt_eval_field_states(const cMatch &match){
+  void test_eval_piece_state(cMatch &match){
 
-        for(int8_t y = 7; y >=0; --y){
-            for(uint8_t x = 0; x < 8; ++x){
+      for(int8_t y = 7; y >= 0; --y){
 
-                cField field(&match.m_board, x, y);
-                int8_t state = field.eval_score();
-                //int8_t state = match.m_board.eval_field_state(x, y);
+          for(uint8_t x = 0; x <= 7; ++x){
 
-                cout << setfill(' ') << setw(3) << to_string(state);
-            }
-            cout << endl;
+              uint8_t piece = match.m_board.getfield(x, (uint8_t)y);
+
+              if(piece == mBLK){
+                  cout << setw(5) << setfill(' ') << "0";
+              }
+              else{
+                  int8_t piece_state;
+
+                  piece_state = cEvaluator::eval_piece_state(match, piece, x, y);
+
+                  cout << setw(5) << setfill(' ') <<  to_string(piece_state);
+              }
+
+          }
+          cout << endl;
+          cout << endl;
+
+      }
+
+  }
+
+
+  void test_eval_field_state(cMatch &match, const uint8_t src_x, const uint8_t src_y){
+
+      uint8_t field_state = cEvaluator::eval_field_state(match, src_x, src_y);
+
+      switch(field_state){
+          case mF_CLEAR: cout << "mF_CLEAR" << endl; break;
+
+          case mF_HAZY: cout << "mF_HAZY" << endl; break;
+
+          case mF_WGT: cout << "mF_WGT" << endl; break;
+
+          case mF_WDOM: cout << "mF_WDOM" << endl; break;
+
+          case mF_BGT: cout << "mF_BGT" << endl; break;
+
+          case mF_BDOM: cout << "mF_BDOM" << endl; break;
+
+          default: cout << "???" << endl;
+    }
+
+  }
+
+
+  void test_gen2(cMatch &match){
+
+    cGenerator2 gen2(match);
+
+    cMove *moveptr;
+
+    while(true){
+
+        moveptr = gen2.gen_move();
+
+        if(moveptr != nullptr){
+            cout << moveptr->format(true) << endl;
+
+            delete moveptr;
+        }
+        else{
+            return;
         }
 
     }
 
+  }
 
-    void prnt_moves_score(cMatch &match){
 
-        vector<cMove> moves;
-        match.gen_moves(moves, match.next_color());
+  void test_does_move_escape_soft_pin(cMatch &match, const cMove &move){
 
-        cout << "score_moves" << endl;
+      bool flag = match.m_board.is_piece_behind_soft_pinned(4, 6);
+      cout << flag << endl;
 
-        for(const cMove &move : moves){
-            int32_t score = match.score_move(move);
-            cout << move.format(true) << setfill(' ') << setw(5) << to_string(score) << endl;
+      flag = cEvaluator::does_move_escape_soft_pin(match, move);
+      
+      cout << flag << endl;
+
+  }
+
+
+  void test_is_continue(cMatch &match, const uint8_t depth){
+
+      vector<cMove> moves;
+
+      cGenerator gen(match);
+      gen.gen_moves(moves, match.next_color());
+
+      //match.sort(moves.begin(), moves.end(), match.sortByPrio);
+
+      cDaemon daemon(match);
+
+      for(const cMove &move : moves){
+
+          cout << "started for: " + move.format(true) << endl;
+
+          bool flag = daemon.is_continue(match, move, depth, 1);
+
+          cout << flag << endl;
+
+          cout << "************" << endl;
+
         }
 
-    }
+  }
 
 
-    void prnt_eval_pin_state(const cMatch &match, const cPiece &piece){
-    
-        uint8_t state = match.m_board.eval_pin_state(piece.m_piece, piece.m_xpos, piece.m_ypos);
+  void test_is_continue_sequence(cMatch &match){
 
-        cout << "state: " << to_string(state) << endl;
+        uint8_t src_x, src_y, dst_x, dst_y, depth;
 
-    }
+        vector<cMove> sequence;
+        
+        cMove *moveptr;
 
+        cMove::coord_to_indices(src_x, src_y, "h1");
+        cMove::coord_to_indices(dst_x, dst_y, "d1");
+        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWRK, mBLK, mBLK, cMove::P_MEDIUM);
+        cEvaluator::priorize_move(match, *moveptr);
+        sequence.push_back(*moveptr);
 
-    void prnt_does_move_touch_weak_piece(cMatch &match, const cMove &move){
+        match.do_move(*moveptr);
 
-        bool isweak = match.does_move_touch_vulnerable_piece(move);
+        cMove::coord_to_indices(src_x, src_y, "e7");
+        cMove::coord_to_indices(dst_x, dst_y, "e6");
+        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBQU, mBLK, mBLK, cMove::P_MEDIUM);
+        cEvaluator::priorize_move(match, *moveptr);
+        sequence.push_back(*moveptr);
 
-        cout << "isweak: " << to_string(isweak) << endl;
+        match.do_move(*moveptr);
 
-    }
+        cMove::coord_to_indices(src_x, src_y, "b5");
+        cMove::coord_to_indices(dst_x, dst_y, "d7");
+        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWBP, mBRK, mBLK, cMove::P_MEDIUM);
+        cEvaluator::priorize_move(match, *moveptr);
+        sequence.push_back(*moveptr);
 
+        match.do_move(*moveptr);
 
-    void prnt_moves_touch_vulnerable_piece(cMatch &match){
+        cMove::coord_to_indices(src_x, src_y, "f6");
+        cMove::coord_to_indices(dst_x, dst_y, "d7");
+        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBKN, mWBP, mBLK, cMove::P_MEDIUM);
+        cEvaluator::priorize_move(match, *moveptr);
+        sequence.push_back(*moveptr);
 
-        vector<cMove> moves;
-        match.gen_moves(moves, match.next_color());
+        match.do_move(*moveptr);
 
-        uint8_t stage = match.eval_stage();
-        cout << "stage: " << to_string(stage) << endl;
+        cMove::coord_to_indices(src_x, src_y, "b3");
+        cMove::coord_to_indices(dst_x, dst_y, "b8");
+        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWQU, mBLK, mBLK, cMove::P_MEDIUM);
+        cEvaluator::priorize_move(match, *moveptr);
+        sequence.push_back(*moveptr);
 
-        for(const cMove &move : moves){
+        match.do_move(*moveptr);
+
+        cMove::coord_to_indices(src_x, src_y, "d7");
+        cMove::coord_to_indices(dst_x, dst_y, "b8");
+        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBKN, mWQU, mBLK, cMove::P_MEDIUM);
+        cEvaluator::priorize_move(match, *moveptr);
+        sequence.push_back(*moveptr);
+
+        match.do_move(*moveptr);
+
+        cMove::coord_to_indices(src_x, src_y, "d1");
+        cMove::coord_to_indices(dst_x, dst_y, "d8");
+        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWRK, mBLK, mBLK, cMove::P_MEDIUM);
+        cEvaluator::priorize_move(match, *moveptr);
+        sequence.push_back(*moveptr);
+
+        match.do_move(*moveptr);
+
+        /*cMove::coord_to_indices(src_x, src_y, "f6");
+        cMove::coord_to_indices(dst_x, dst_y, "d7");
+        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mBKN, mWBP, mBLK, cMove::P_MEDIUM));
+
+        cMove::coord_to_indices(src_x, src_y, "b3");
+        cMove::coord_to_indices(dst_x, dst_y, "b8");
+        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mWQU, mBLK, mBLK, cMove::P_MEDIUM));
+
+        cMove::coord_to_indices(src_x, src_y, "d7");
+        cMove::coord_to_indices(dst_x, dst_y, "b8");
+        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mBKN, mWQU, mBLK, cMove::P_MEDIUM));
+
+        cMove::coord_to_indices(src_x, src_y, "d1");
+        cMove::coord_to_indices(dst_x, dst_y, "d8"); 
+        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mWRK, mBLK, mBLK, cMove::P_MEDIUM));*/
+
+        depth = 1;
+
+        cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
+
+        for(const cMove &move : sequence){
+
+            cDaemon daemon(match);
+
+            bool flag = daemon.is_continue(match, move, depth, 1);
+
+            cout << move.format(true) << " : " << flag << endl;
+            cout << "-----------------------------" << endl;
+
             match.do_move(move);
 
-            bool isweak = match.does_move_touch_vulnerable_piece(move);
+            depth++;
 
-            cout << move.format(true) << setfill(' ') << setw(2) << to_string(isweak) << endl;
-
-            match.undo_move();
         }
 
     }
 
 
-    void prnt_moves_weak_state(cMatch &match){
+    void test_does_move_touch_soft_pinned(cMatch &match, cMove &move){
 
-        vector<cMove> moves;
-        match.gen_moves(moves, match.next_color());
-
-        for(const cMove &move : moves){
-            bool isweak = match.does_move_touch_vulnerable_piece(move);
-            cout << move.format(true) << setfill(' ') << setw(3) << to_string(isweak) << endl;
-        }
+        bool flag = cEvaluator::does_move_touch_soft_pinned(match, move);
+        cout << "does_move_touch_soft_pinned: " << flag << endl;
 
     }
 
 
-    void prnt_moves_support_supply(cMatch &match){
+    void test_does_move_sac_for_supply(cMatch &match, cMove &move){
 
-        vector<cMove> moves;
-        match.gen_moves(moves, match.next_color());
-
-        for(const cMove &move : moves){
-            bool does_move_support_supply = match.does_move_support_supply(move);
-
-            cout << "does_move_support_supply: " << to_string(does_move_support_supply) << endl;
-        }
+        bool flag = cEvaluator::does_move_sac_for_supply(match, move);
+        cout << move.format(true) << " " << flag << endl;
 
     }
 
-
-    void prnt_test(cMatch &match){
-
-        bool isinbounds = cBoard::is_inbounds(3, -1);
-        cout << "isinbounds 3, -1: " << setfill(' ') << setw(3) << to_string(isinbounds) << endl;
-
-        bool iswhitekingattacked = match.m_board.is_king_attacked(mBLACK);
-        cout << "iswhitekingattacked " << setfill(' ') << setw(3) << to_string(iswhitekingattacked) << endl;
-
-        bool isblackkingattacked = match.m_board.is_king_attacked(mWHITE);
-        cout << "isblackkingattacked " << setfill(' ') << setw(3) << to_string(isblackkingattacked) << endl;
-
-        uint8_t maxdiff = cBoard::max_diff(4, 4, 2, 0);
-        cout << "maxdiff 4, 4, 2, 0: " << setfill(' ') << setw(3) << to_string(maxdiff) << endl;
-
-        uint8_t difftomargin = cBoard::diff_to_margin(5, 5);
-        cout << "difftomargin 5, 5: " << setfill(' ') << setw(3) << to_string(difftomargin) << endl;
-
-        /*
-        static bool is_margin_frame_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
-
-        static bool is_margin_frame_ypos(uint8_t y1, uint8_t y2);
-
-        static bool is_corner_pos(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
-
-        bool is_within_three_squares(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
-
-        bool is_passed_pawn(uint8_t piece, uint8_t src_x, uint8_t src_y) const;
-
-        uint8_t search_dir_for_piece(uint8_t &dst_x, uint8_t &dst_y, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y, uint8_t maxcnt) const;
-
-        void search_dir_for_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, int8_t step_x, int8_t step_y) const;
-
-        void search_all_dirs_for_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t piece, uint8_t piece_x, uint8_t piece_y, uint8_t excl_dir) const;
-
-        bool search_for_touching_piece(uint8_t src_x, uint8_t src_y, uint8_t color) const;
-
-        void search_for_touching_pieces(vector<cPiece> &pieces, uint8_t src_x, uint8_t src_y, uint8_t color, bool touching_only) const;
-
-        void search_for_all_touching_pieces(vector<cPiece> &wpieces, vector<cPiece> &bpieces, uint8_t src_x, uint8_t src_y) const;
-
-        static uint8_t eval_dir(uint8_t src_x1, uint8_t src_y1, uint8_t src_x2, uint8_t src_y2);
-        
-        uint8_t eval_pindir(uint8_t src_x, uint8_t src_y, uint8_t color) const;
-
-        uint8_t eval_pin_state(uint8_t piece, uint8_t x, uint8_t y) const;
-
-        int8_t eval_field_state(uint8_t x, uint8_t y) const;
-        */
-    }

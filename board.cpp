@@ -357,37 +357,79 @@
                 continue;
             }
 
-            // create dummy pieces - is a hack but what else? pointers???
-            cPiece pfriend(mBLK, 0, 0);
-            cPiece penemy(mBLK, 0, 0);
+            cPiece *friendptr, *enemyptr;
 
             if(PIECES_COLORS[targets.front().m_piece] == PIECES_COLORS[piece]){
-                pfriend = targets.front();
-                penemy = targets.back();
+                friendptr = &(targets.front());
+                enemyptr = &(targets.back());
             }
             else{
-                pfriend = targets.back();
-                penemy = targets.front();
+                friendptr = &(targets.back());
+                enemyptr = &(targets.front());
             }
 
-            if(PIECES_COLORS[pfriend.m_piece] == PIECES_COLORS[penemy.m_piece]){
+            if(PIECES_COLORS[friendptr->m_piece] == PIECES_COLORS[enemyptr->m_piece]){
                 continue;
             }
 
-            if(PIECES_RANKS[pfriend.m_piece] > PIECES_RANKS[piece]){
-                if(penemy.m_piece == mWQU || penemy.m_piece == mBQU){
+            if(PIECES_RANKS[friendptr->m_piece] > PIECES_RANKS[piece]){
+                if(enemyptr->m_piece == mWQU || enemyptr->m_piece == mBQU){
                     return true;
                 }
                 else if(cPiece::qu_steps[i].m_cardinale == mVERTICAL || cPiece::qu_steps[i].m_cardinale == mHORIZONTAL){
-                    if(penemy.m_piece == mWRK || penemy.m_piece == mBRK){
+                    if(enemyptr->m_piece == mWRK || enemyptr->m_piece == mBRK){
                         return true;
                     }
                 }
                 else if(cPiece::qu_steps[i].m_cardinale == mDIA_LEFT_BOTTOM || cPiece::qu_steps[i].m_cardinale == mDIA_RIGHT_BOTTOM){
-                    if(penemy.m_piece == mWBP || penemy.m_piece == mBBP){
+                    if(enemyptr->m_piece == mWBP || enemyptr->m_piece == mBBP){
                         return true;
                     }
                 }
+            }
+
+        }
+
+        return false;
+
+    }
+  //*****************************************
+
+
+
+   //*****************************************
+    bool cBoard::is_piece_behind_soft_pinned(const uint8_t src_x, const uint8_t src_y) const{
+
+        uint8_t behind_piece = getfield(src_x, src_y);
+
+        if(behind_piece == mBLK){
+            return false;
+        }
+
+        for(uint8_t i = 0; i < size(cPiece::qu_steps); ++i){
+          
+            uint8_t dst_x, dst_y;
+
+            uint8_t piece = search_dir(dst_x, dst_y, src_x, src_y, cPiece::qu_steps[i].m_xstep, cPiece::qu_steps[i].m_ystep, 6);
+
+            if(piece == mBLK || PIECES_COLORS[piece] != PIECES_COLORS[behind_piece] || PIECES_RANKS[piece] > PIECES_RANKS[behind_piece]){
+                continue;
+            }
+
+            uint8_t enemy = search_dir(dst_x, dst_y, dst_x, dst_y, cPiece::qu_steps[i].m_xstep, cPiece::qu_steps[i].m_ystep, 6);
+
+            if(enemy == mBLK || PIECES_COLORS[enemy] == PIECES_COLORS[behind_piece]){
+                continue;
+            }
+
+            if(enemy == mWQU || enemy == mBQU){
+                return true;
+            }
+            else if((enemy == mWRK || enemy == mBRK) && (cPiece::qu_steps[i].m_cardinale == mHORIZONTAL || cPiece::qu_steps[i].m_cardinale == mVERTICAL)){
+                return true;
+            }
+            else if((enemy == mWBP || enemy == mBBP) && (cPiece::qu_steps[i].m_cardinale == mDIA_LEFT_BOTTOM || cPiece::qu_steps[i].m_cardinale == mDIA_RIGHT_BOTTOM)){
+                return true;
             }
 
         }
@@ -657,7 +699,7 @@
       }
 
       // search
-      for(uint8_t i = range[0]; i <= range[1]; ++i){
+      for(uint8_t i = range[0]; i <= range[1]; ++i){ 
 
           if(pindir != mNO_DIR && pindir != cPiece::all_steps[i].m_cardinale){
               continue;
@@ -670,8 +712,7 @@
           if(newpiece == mBLK){
               continue;
           }
-
-          if(PIECES_COLORS[newpiece] == mWHITE){
+          else if(PIECES_COLORS[newpiece] == mWHITE){
               wpieces.push_back(cPiece(newpiece, dst_x, dst_y));
               continue;
           }
@@ -789,7 +830,7 @@
 
 
   //*****************************************
-  void cBoard::do_move_on_fields_only(const cMove &move){
+  void cBoard::do_move_on_board_only(const cMove &move){
 
       if(move.is_promotion()){
           setfield(move.m_src_x, move.m_src_y, mBLK);

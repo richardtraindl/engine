@@ -74,6 +74,8 @@
 
         bool is_soft_pinned(const uint8_t src_x, const uint8_t src_y) const;
 
+        bool is_piece_behind_soft_pinned(const uint8_t src_x, const uint8_t src_y) const;
+
         bool is_field_touched(const uint8_t src_x, const uint8_t src_y, const uint8_t color) const;
 
         uint8_t search_dir(uint8_t &dst_x, uint8_t &dst_y, const uint8_t src_x, const uint8_t src_y, const int8_t step_x, const int8_t step_y, const uint8_t maxcnt) const;
@@ -90,7 +92,7 @@
 
         void prnt() const;
 
-        void do_move_on_fields_only(const cMove &move);
+        void do_move_on_board_only(const cMove &move);
 
     };
 
