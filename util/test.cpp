@@ -16,13 +16,13 @@
 
 
     //*****************************************
-    void do_usr_move(cMatch &match, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece){
+    void do_usr_move(cMatch &match, const uint8_t src_x, const uint8_t src_y, const uint8_t dst_x, const uint8_t dst_y, const uint8_t prompiece){
 
         uint8_t srcpiece = match.m_board.getfield(src_x, src_y);
 
         uint8_t dstpiece = match.m_board.getfield(dst_x, dst_y);
 
-        cMove move(src_x, src_y, dst_x, dst_y, srcpiece, dstpiece, prompiece, cMove::P_MEDIUM);
+        cMove move(src_x, src_y, dst_x, dst_y, srcpiece, dstpiece, prompiece, cMove::P_BOTTOM);
 
         match.do_move(move);
 
@@ -50,9 +50,9 @@
 
         while(file >> content) {
 
-            cMove::coord_to_indices(src_x, src_y, content.substr(0, 2));
+            cBoard::coord_to_indices(src_x, src_y, content.substr(0, 2));
 
-            cMove::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
+            cBoard::coord_to_indices(dst_x, dst_y, content.substr(2, 2));
             
             if(match.is_move_valid(src_x, src_y, dst_x, dst_y, prompiece)){
                 do_usr_move(match, src_x, src_y, dst_x, dst_y, prompiece);
@@ -67,235 +67,234 @@
         return true;
 
     }
+    //*****************************************
 
 
-  void test_eval_piece_state(cMatch &match){
 
-      for(int8_t y = 7; y >= 0; --y){
+    //*****************************************
+    void test_eval_piece_state(cMatch &match){
 
-          for(uint8_t x = 0; x <= 7; ++x){
+        for(int8_t y = 7; y >= 0; --y){
 
-              uint8_t piece = match.m_board.getfield(x, (uint8_t)y);
+            for(uint8_t x = 0; x <= 7; ++x){
 
-              if(piece == mBLK){
-                  cout << setw(5) << setfill(' ') << "0";
-              }
-              else{
-                  int8_t piece_state;
+                uint8_t piece = match.m_board.getfield(x, (uint8_t)y);
 
-                  piece_state = cEvaluator::eval_piece_state(match, piece, x, y);
+                if(piece == mBLK){
+                    cout << setw(5) << setfill(' ') << "0";
+                }
+                else{
+                    int8_t piece_state;
 
-                  cout << setw(5) << setfill(' ') <<  to_string(piece_state);
-              }
+                    piece_state = cEvaluator::eval_piece_state(match, piece, x, y);
 
+                    cout << setw(5) << setfill(' ') <<  to_string(piece_state);
+                }
+
+            }
+            cout << endl;
+            cout << endl;
+
+        }
+
+    }
+    //*****************************************
+
+
+
+    //*****************************************
+    void test_eval_field_state(cMatch &match, const uint8_t src_x, const uint8_t src_y){
+
+        cPiece *wlowest, *blowest;
+        uint8_t field_state = cEvaluator::eval_field_state(wlowest, blowest, match, mBLK, src_x, src_y);
+
+        switch(field_state){
+            case mF_CLEAR: cout << "mF_CLEAR" << endl; break;
+
+            case mF_HAZY: cout << "mF_HAZY" << endl; break;
+
+            case mF_WGT: cout << "mF_WGT" << endl; break;
+
+            case mF_WDOM: cout << "mF_WDOM" << endl; break;
+
+            case mF_BGT: cout << "mF_BGT" << endl; break;
+
+            case mF_BDOM: cout << "mF_BDOM" << endl; break;
+
+            default: cout << "???" << endl;
+      }
+
+    }
+    //*****************************************
+
+
+
+    //*****************************************
+    void test_gen2(cMatch &match){
+
+      cGenerator2 gen2(match);
+
+      cMove *moveptr;
+
+      while(true){
+
+          moveptr = gen2.gen_move();
+
+          if(moveptr != nullptr){
+              cout << moveptr->format(true) << endl;
+
+              delete moveptr;
           }
-          cout << endl;
-          cout << endl;
+          else{
+              return;
+          }
 
       }
 
-  }
-
-
-  void test_eval_field_state(cMatch &match, const uint8_t src_x, const uint8_t src_y){
-
-      uint8_t field_state = cEvaluator::eval_field_state(match, mBLK, src_x, src_y);
-
-      switch(field_state){
-          case mF_CLEAR: cout << "mF_CLEAR" << endl; break;
-
-          case mF_HAZY: cout << "mF_HAZY" << endl; break;
-
-          case mF_WGT: cout << "mF_WGT" << endl; break;
-
-          case mF_WDOM: cout << "mF_WDOM" << endl; break;
-
-          case mF_BGT: cout << "mF_BGT" << endl; break;
-
-          case mF_BDOM: cout << "mF_BDOM" << endl; break;
-
-          default: cout << "???" << endl;
     }
-
-  }
-
-
-  void test_gen2(cMatch &match){
-
-    cGenerator2 gen2(match);
-
-    cMove *moveptr;
-
-    while(true){
-
-        moveptr = gen2.gen_move();
-
-        if(moveptr != nullptr){
-            cout << moveptr->format(true) << endl;
-
-            delete moveptr;
-        }
-        else{
-            return;
-        }
-
-    }
-
-  }
+    //*****************************************
 
 
-  void test_does_move_escape_soft_pin(cMatch &match, const cMove &move){
 
-      bool flag = match.m_board.is_piece_behind_soft_pinned(4, 6);
-      cout << flag << endl;
+    //*****************************************
+    void test_gen2_king(cMatch &match, const uint8_t color){
 
-      flag = cEvaluator::does_move_escape_soft_pin(match, move);
+      cGenerator2 gen2(match);
       
-      cout << flag << endl;
+      /*if(color == mWHITE){
+          gen2.m_gen_x = match.m_board.m_wKg_x;
+          gen2.m_gen_y = match.m_board.m_wKg_y;
+      }
+      else{
+          gen2.m_gen_x = match.m_board.m_bKg_x;
+          gen2.m_gen_y = match.m_board.m_bKg_y;
+      }*/
 
-  }
+      cMove *moveptr;
+
+      for(uint8_t i = 0; i < 20; ++i){
+
+          moveptr = gen2.gen_move();
+
+          if(moveptr == nullptr){
+              return;
+          }
+          else{
+              cout << moveptr->format(true) << endl;
+
+              delete moveptr;
+          }
+
+      }
+
+    }
+    //*****************************************
 
 
-  void test_is_continue(cMatch &match, const uint8_t depth){
 
-      vector<cMove> moves;
+    //*****************************************
+    void test_does_move_escape_soft_pin(cMatch &match, const cMove &move){
 
-      cGenerator gen(match);
-      gen.gen_moves(moves, match.next_color());
+        bool flag = match.m_board.is_piece_behind_soft_pinned(4, 6);
+        cout << flag << endl;
 
-      //match.sort(moves.begin(), moves.end(), match.sortByPrio);
-
-      cDaemon daemon(match);
-
-      for(const cMove &move : moves){
-
-          cout << "started for: " + move.format(true) << endl;
-
-          bool flag = daemon.is_continue(match, move, depth, 1);
-
-          cout << flag << endl;
-
-          cout << "************" << endl;
-
-        }
-
-  }
-
-
-  void test_is_continue_sequence(cMatch &match){
-
-        uint8_t src_x, src_y, dst_x, dst_y, depth;
-
-        vector<cMove> sequence;
+        flag = cEvaluator::does_move_escape_soft_pin(match, move);
         
-        cMove *moveptr;
+        cout << flag << endl;
 
-        cMove::coord_to_indices(src_x, src_y, "h1");
-        cMove::coord_to_indices(dst_x, dst_y, "d1");
-        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWRK, mBLK, mBLK, cMove::P_MEDIUM);
-        cEvaluator::priorize_move(match, *moveptr);
-        sequence.push_back(*moveptr);
+    }
+    //*****************************************
 
-        match.do_move(*moveptr);
 
-        cMove::coord_to_indices(src_x, src_y, "e7");
-        cMove::coord_to_indices(dst_x, dst_y, "e6");
-        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBQU, mBLK, mBLK, cMove::P_MEDIUM);
-        cEvaluator::priorize_move(match, *moveptr);
-        sequence.push_back(*moveptr);
 
-        match.do_move(*moveptr);
+    //*****************************************
+    void test_is_continue(cMatch &match, const uint8_t depth){
 
-        cMove::coord_to_indices(src_x, src_y, "b5");
-        cMove::coord_to_indices(dst_x, dst_y, "d7");
-        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWBP, mBRK, mBLK, cMove::P_MEDIUM);
-        cEvaluator::priorize_move(match, *moveptr);
-        sequence.push_back(*moveptr);
+        vector<cMove> moves;
 
-        match.do_move(*moveptr);
+        cGenerator gen(match);
+        gen.gen_moves(moves, match.next_color());
 
-        cMove::coord_to_indices(src_x, src_y, "f6");
-        cMove::coord_to_indices(dst_x, dst_y, "d7");
-        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBKN, mWBP, mBLK, cMove::P_MEDIUM);
-        cEvaluator::priorize_move(match, *moveptr);
-        sequence.push_back(*moveptr);
+        sort(moves.begin(), moves.end(), cMatch::sortByPrio);
 
-        match.do_move(*moveptr);
+        cDaemon daemon(match);
 
-        cMove::coord_to_indices(src_x, src_y, "b3");
-        cMove::coord_to_indices(dst_x, dst_y, "b8");
-        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWQU, mBLK, mBLK, cMove::P_MEDIUM);
-        cEvaluator::priorize_move(match, *moveptr);
-        sequence.push_back(*moveptr);
+        for(const cMove &move : moves){
 
-        match.do_move(*moveptr);
+            cout << "started for: " + move.format(true) << endl;
 
-        cMove::coord_to_indices(src_x, src_y, "d7");
-        cMove::coord_to_indices(dst_x, dst_y, "b8");
-        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBKN, mWQU, mBLK, cMove::P_MEDIUM);
-        cEvaluator::priorize_move(match, *moveptr);
-        sequence.push_back(*moveptr);
+            bool flag = daemon.is_continue(match, move, depth);
 
-        match.do_move(*moveptr);
+            cout << flag << endl;
 
-        cMove::coord_to_indices(src_x, src_y, "d1");
-        cMove::coord_to_indices(dst_x, dst_y, "d8");
-        moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWRK, mBLK, mBLK, cMove::P_MEDIUM);
-        cEvaluator::priorize_move(match, *moveptr);
-        sequence.push_back(*moveptr);
+            cout << "************" << endl;
 
-        match.do_move(*moveptr);
+          }
 
-        /*cMove::coord_to_indices(src_x, src_y, "f6");
-        cMove::coord_to_indices(dst_x, dst_y, "d7");
-        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mBKN, mWBP, mBLK, cMove::P_MEDIUM));
+    }
+    //*****************************************
 
-        cMove::coord_to_indices(src_x, src_y, "b3");
-        cMove::coord_to_indices(dst_x, dst_y, "b8");
-        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mWQU, mBLK, mBLK, cMove::P_MEDIUM));
 
-        cMove::coord_to_indices(src_x, src_y, "d7");
-        cMove::coord_to_indices(dst_x, dst_y, "b8");
-        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mBKN, mWQU, mBLK, cMove::P_MEDIUM));
 
-        cMove::coord_to_indices(src_x, src_y, "d1");
-        cMove::coord_to_indices(dst_x, dst_y, "d8"); 
-        sequence.push_back(cMove(src_x, src_y, dst_x, dst_y, mWRK, mBLK, mBLK, cMove::P_MEDIUM));*/
+    //*****************************************
+    void test_does_move_touch_weak_piece(cMatch &match, const cMove &move){
 
-        depth = 1;
+        bool flag = cEvaluator::does_move_touch_weak_piece(match, move);
 
-        cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
+        cout << move.format(false) << endl;
+        cout << "test_does_move_touch_weak_piece: " << flag << endl;
 
-        for(const cMove &move : sequence){
+    }
+    //*****************************************
 
-            cDaemon daemon(match);
 
-            bool flag = daemon.is_continue(match, move, depth, 1);
 
-            cout << move.format(true) << " : " << flag << endl;
-            cout << "-----------------------------" << endl;
+    //*****************************************
+    void test_is_piece_weak(cMatch &match){
 
-            match.do_move(move);
+        for(int8_t y = 7; y >= 0; --y){
 
-            depth++;
+            for(uint8_t x = 0; x <= 7; ++x){
+
+                uint8_t piece = match.m_board.getfield(x, (uint8_t)y);
+                
+                if(piece == mBLK){
+                    cout << "-";
+                }
+                else{
+                    bool flag = cEvaluator::is_piece_weak(match, cPiece(piece, x, y));
+                    cout << flag;
+                }
+
+            }
+            
+            cout << endl;
 
         }
+        
+    }
+    //*****************************************
+
+
+
+    //*****************************************
+    void test_find_mate(cMatch &match, const cMove &move, const uint8_t maxdepth){
+
+          bool mate = cEvaluator::find_mate(match, move, maxdepth);
+
+          cout << "mate: " << mate << endl;
 
     }
+    //*****************************************
 
 
-    void test_does_move_touch_soft_pinned(cMatch &match, cMove &move){
 
-        bool flag = cEvaluator::does_move_touch_soft_pinned(match, move);
-        cout << "does_move_touch_soft_pinned: " << flag << endl;
+    //*****************************************
+    void test_pins(cMatch &match, const uint8_t src_x, const uint8_t src_y){
 
-    }
+        bool pin = match.m_board.is_soft_pinned(src_x, src_y);
 
-
-    void test_does_move_sac_for_supply(cMatch &match, cMove &move){
-
-        bool flag = cEvaluator::does_move_sac_for_supply(match, move);
-        cout << move.format(true) << " " << flag << endl;
+        cout << "pin: " << pin << endl;
 
     }
-
+    //*****************************************

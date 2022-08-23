@@ -57,9 +57,9 @@
 
         static string format_moves(const vector<cMove> &moves, const bool ext);
 
-        static void prnt_fmttime(string msg, int seconds);
+        static string fmttime(time_t seconds);
 
-        void calc_move(int32_t &rscore, vector<cMove> &rmoves);
+        void calc_move(int32_t &rscore, vector<cMove> &rmoves, const uint8_t version);
 
         void calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta);
 
@@ -68,6 +68,10 @@
         bool is_move_valid(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece);
 
         uint8_t eval_stage() const;
+
+        static bool sortByPrio(const cMove &a, const cMove &b);
+
+        static bool sortByRank(const cPiece &a, const cPiece &b);
 
       private:
           uint8_t m_wpawn_cnt;
@@ -80,19 +84,17 @@
 
           void append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove &move);
 
+          void append_newmove2(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove *moveptr);
+
           bool is_three_times_repetition(const cMove &move, uint8_t depth) const;
 
           bool is_search_continue(const cMove &move, const uint8_t depth, const uint8_t maxdepth, const uint8_t stage);
 
-          void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta);
+          void start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t version);
 
           bool is_fifty_moves_rule() const;
 
           int32_t score_terminate(uint8_t depth) const;
-
-          static bool sortByPrio(const cMove &a, const cMove &b);
-
-          static bool sortByRank(const cPiece &a, const cPiece &b);
 
     };
 

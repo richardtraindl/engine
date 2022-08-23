@@ -6,40 +6,48 @@
     #include <algorithm>
     #include "./match.hpp"
     #include "./daemon.hpp"
+    #include "./evaluator.hpp"
     #include "./util/test.hpp"    
 
 
     using namespace std;
 
 
-  void prnt_minutes(const cMatch &match){
+    //*****************************************
+    void prnt_minutes(const cMatch &match){
 
-      for(const cMove &move : match.m_minutes){
+        for(const cMove &move : match.m_minutes){
 
-          cout << move.format(false) << endl;
+            cout << move.format(false) << endl;
 
-      }
+        }
 
-  }
-
-
-  void prnt_status(const cMatch &match, const uint8_t status){
-      if(status == cMatch::STATUS_WINNER_WHITE){
-          prnt_minutes(match);
-          cout << "winner white!" << endl;
-      }
-      else if(status == cMatch::STATUS_WINNER_BLACK){
-          prnt_minutes(match);
-          cout << "winner black!" << endl;
-      }
-      else if(status == cMatch::STATUS_DRAW){
-          prnt_minutes(match);
-          cout << "draw!" << endl;
-      }
-  }
+    }
+    //*****************************************
 
 
-  void play(cMatch &match, uint8_t engine_color){
+
+    //*****************************************
+    void prnt_status(const cMatch &match, const uint8_t status){
+        if(status == cMatch::STATUS_WINNER_WHITE){
+            prnt_minutes(match);
+            cout << "winner white!" << endl;
+        }
+        else if(status == cMatch::STATUS_WINNER_BLACK){
+            prnt_minutes(match);
+            cout << "winner black!" << endl;
+        }
+        else if(status == cMatch::STATUS_DRAW){
+            prnt_minutes(match);
+            cout << "draw!" << endl;
+        }
+    }
+    //*****************************************
+
+
+
+    //*****************************************
+    void play(cMatch &match, uint8_t engine_color, const uint8_t version){
 
         char buffer[31];
         int length = 32;
@@ -52,6 +60,14 @@
         match.m_board.prnt();
 
         while(true){
+
+              uint8_t status = match.eval_status();
+              if(status != cMatch::STATUS_OPEN){
+                  cout << "status " << to_string(status) << " game over!" << endl;
+
+                  return;
+              }
+          
             if((match.next_color() == mWHITE && engine_color == mWHITE) || 
                (match.next_color() == mBLACK && engine_color == mBLACK)){
 
@@ -61,7 +77,7 @@
 
                 int32_t rscore;
 
-                match.calc_move(rscore, rmoves);
+                match.calc_move(rscore, rmoves, version);
 
                 if(rmoves.size() > 0){
                    cMove move = rmoves.front();
@@ -74,39 +90,12 @@
 
                    match.m_board.prnt();
                 }
-                else{
-                    uint8_t status = match.eval_status();
-
-                    cout << "status " << status;
-
-                    cout << "game over - congratulation!" << endl;
-
-                    return;
-                }
             }
             else{
-                uint8_t status = match.eval_status();
-
-                if(status != cMatch::STATUS_OPEN){
-                    cout << "status " << status;
-                }
-
                 cout << "\n>";
                 cin.getline(buffer, length);
                 string input(buffer);
                 input.erase(remove(input.begin(), input.end(), ' '), input.end());
-
-                if(input == "h" || input == "H"){ 
-                    cout << "\nmove formats: e2e4 | e7e8q | 0-0 | 0-0-0";
-                    cout << "\ncommands: u(ndo) | w(hite engine) | b(lack engine) | pb(print board) | pm(print minutes)";
-                    continue;
-                }
-
-                if(input == "quit" || input == "QUIT"){ 
-                    cout << "good bye!" << endl; 
-
-                    return; 
-                }
 
                 if(input == "u" || input == "U"){
                     if(engine_color == mWHITE || engine_color == mBLACK){
@@ -117,18 +106,6 @@
                         match.undo_move(); // undo last human move
                     }
                     match.m_board.prnt();
-
-                    continue;
-                }
-
-                if(input == "pb" || input == "PB"){
-                    match.m_board.prnt();
-
-                    continue;
-                }
-
-                if(input == "pm" || input == "PM"){
-                    prnt_minutes(match);
 
                     continue;
                 }
@@ -170,8 +147,8 @@
                     }
                 }
                 else if(input.size() == 4 || input.size() == 5){
-                    cMove::coord_to_indices(src_x, src_y, input.substr(0, 2));
-                    cMove::coord_to_indices(dst_x, dst_y, input.substr(2, 2));
+                    cBoard::coord_to_indices(src_x, src_y, input.substr(0, 2));
+                    cBoard::coord_to_indices(dst_x, dst_y, input.substr(2, 2));
 
                     if(input.size() > 4){
                         if(match.next_color() == mWHITE){
@@ -205,8 +182,12 @@
                     cout << "invalid move: " << input << endl;
                 }
             }
+
         }
+
     }
+    //*****************************************
+
 
 
     int main(void){
@@ -217,30 +198,38 @@
 
         import_minutes(match, "morphy");
         
-        if(match.m_board.getfield(match.m_board.m_wKg_x, match.m_board.m_wKg_y) != mWKG || match.m_board.getfield(match.m_board.m_bKg_x, match.m_board.m_bKg_y) != mBKG){
-            cout << "DAMAGE" << endl;
-            return 0;
-        }
-        else{
-            cout << "OK" << endl;
-        }
-
+        //match.m_board.setfield(2, 2, mWQU);
+        //match.m_board.setfield(3, 0, mWBP);
+        
         match.m_board.prnt();
-        
-        cout << "score: " << to_string(match.m_score) << endl;
 
-        //test_is_continue_sequence(match);
-        
-        //uint8_t src_x, src_y, dst_x, dst_y;
-        //cMove::coord_to_indices(src_x, src_y, "h1");
-        //cMove::coord_to_indices(dst_x, dst_y, "d1");
-        //cMove move(src_x, src_y, dst_x, dst_y, mWRK, mBKN, mBLK, cMove::P_MEDIUM);
+        //test_pins(match, 4, 4);
 
-        //test_does_move_sac_for_supply(match, move);
-        
-        //test_does_move_touch_soft_pinned(match, move);
+        //cout << "score: " << to_string(match.m_score) << endl;
 
-        play(match, engine_color);
+
+        /*uint8_t src_x, src_y, dst_x, dst_y;
+        cBoard::coord_to_indices(src_x, src_y, "d1");
+        cBoard::coord_to_indices(dst_x, dst_y, "d7");
+        cMove move(src_x, src_y, dst_x, dst_y, mWRK, mBKN, mBLK, cMove::P_BOTTOM);
+        test_does_move_touch_weak_piece(match, move);*/
+
+        //uint8_t state = cEvaluator::eval_field_state(match, mWRK, 3, 0);
+        //cout << "state " << to_string(state) << endl;
+
+        test_is_continue(match, 12);
+
+        //test_is_piece_weak(match);
+
+        //test_gen2(match);
+        
+        //test_gen2_king(match, mWHITE);
+
+        //test_find_mate(match, move, 5);
+        
+        //cout << cMatch::fmttime(160) << endl;;
+
+        play(match, engine_color, 2);
 
         return 0;
 

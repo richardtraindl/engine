@@ -65,6 +65,8 @@
 
           static bool is_touching_dir(uint8_t piece, uint16_t dir, uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y);
 
+          string format() const;
+
       };
 
     #endif

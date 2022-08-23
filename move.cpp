@@ -1,6 +1,7 @@
 
 
     #include "./move.hpp"
+    #include "./board.hpp"
 
 
     cMove::cMove(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t srcpiece, uint8_t dstpiece, uint8_t prompiece, uint8_t prio){ 
@@ -50,6 +51,17 @@
 
 
     cMove::~cMove(){
+    }
+
+
+    bool cMove::is_capture() const{
+
+      if(m_dstpiece != mBLK){
+          return true;
+      }
+
+      return is_en_passant();
+
     }
 
 
@@ -149,6 +161,40 @@
     }
 
 
+    void cMove::create_fake_rook_move(cMove &rookmove) const{
+
+        if(is_short_castling()){
+            uint8_t rook;
+
+            PIECES_COLORS[m_srcpiece] == mWHITE ? rook = mWRK : rook = mBRK;
+
+            rookmove.m_src_x = (m_dst_x + 1);
+            rookmove.m_src_y = m_src_y;
+            rookmove.m_dst_x = (m_src_x + 1);
+            rookmove.m_dst_y = m_src_y;
+            rookmove.m_srcpiece = rook;
+            rookmove.m_dstpiece = mBLK;
+            rookmove.m_prompiece = mBLK;
+            rookmove.m_prio = cMove::P_BOTTOM;
+        }
+        else if(is_long_castling()){
+            uint8_t rook;
+
+            PIECES_COLORS[m_srcpiece] == mWHITE ? rook = mWRK : rook = mBRK;
+
+            rookmove.m_src_x = (m_dst_x - 2);
+            rookmove.m_src_y = m_src_y;
+            rookmove.m_dst_x = (m_dst_x + 1);
+            rookmove.m_dst_y = m_src_y;
+            rookmove.m_srcpiece = rook;
+            rookmove.m_dstpiece = mBLK;
+            rookmove.m_prompiece = mBLK;
+            rookmove.m_prio = cMove::P_BOTTOM;
+        }
+
+    }
+
+
     bool cMove::compare(const cMove &move) const{
 
         return (m_src_x == move.m_src_x && m_src_y == move.m_src_y && m_dst_x == move.m_dst_x && m_dst_y == move.m_dst_y);
@@ -164,7 +210,7 @@
 
         if(is_en_passant()){
 
-            return indices_to_coord(m_src_x, m_src_y) + "x" + indices_to_coord(m_dst_x, m_dst_y) + ", e.p.";
+            return cBoard::indices_to_coord(m_src_x, m_src_y) + "x" + cBoard::indices_to_coord(m_dst_x, m_dst_y) + ", e.p.";
 
         }
 
@@ -176,7 +222,7 @@
 
         }
 
-        string out = indices_to_coord(m_src_x, m_src_y) + hyphen + indices_to_coord(m_dst_x, m_dst_y) + trailing;
+        string out = cBoard::indices_to_coord(m_src_x, m_src_y) + hyphen + cBoard::indices_to_coord(m_dst_x, m_dst_y) + trailing;
 
         if(ext){
 
@@ -188,39 +234,6 @@
             return out;
 
         }
-
-    }
-
-
-    void cMove::coord_to_indices(uint8_t &x, uint8_t &y, string coord){
-
-        uint8_t x1 = (uint8_t)(coord[0]);
-
-        if(x1 > (uint8_t)'H'){
-
-            x = x1 - (uint8_t)'a';
-
-        }
-        else{
-
-            x = x1 - (uint8_t)'A';
-
-        }
-
-        uint8_t y1 = (uint8_t)(coord[1]);
-
-        y = y1 - (uint8_t)'1';
-
-    }
-
-
-    string cMove::indices_to_coord(uint8_t x, uint8_t y){
-
-        ostringstream outstream;
-
-        outstream << (char)(x + (uint8_t)'a' ) << (char)(y + (uint8_t)'1');
-
-        return outstream.str();
 
     }
 

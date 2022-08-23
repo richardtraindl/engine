@@ -4,6 +4,7 @@
   #include "./evaluator.hpp"
 
 
+    //*****************************************
     cGenerator2::cGenerator2(cMatch &match){
 
         m_matchptr = &match;
@@ -19,10 +20,23 @@
 
         m_check_cnt = attacking_pieces.size();
 
-        if(attacking_pieces.size() == 0){
+        if(m_check_cnt == 2){
             m_king_attackerptr = nullptr;
 
-            m_attacked_kg_move_remaining = false;
+            if(m_matchptr->next_color() == mWHITE){
+                m_gen_x = m_matchptr->m_board.m_wKg_x;
+
+                m_gen_y = m_matchptr->m_board.m_wKg_y;
+            }
+            else{
+                m_gen_x = m_matchptr->m_board.m_bKg_x;
+
+                m_gen_y = m_matchptr->m_board.m_bKg_y;
+            }
+
+            m_king_move_remaining = true;
+
+            m_king_move_has_started = false;
 
             m_capture_of_checking_remaining = false;
 
@@ -31,39 +45,59 @@
         else if(attacking_pieces.size() == 1){
             m_king_attackerptr = new cPiece(attacking_pieces.front());
 
-            m_attacked_kg_move_remaining = true;
+            if(m_matchptr->next_color() == mWHITE){
+                m_gen_x = m_matchptr->m_board.m_wKg_x;
+
+                m_gen_y = m_matchptr->m_board.m_wKg_y;
+            }
+            else{
+                m_gen_x = m_matchptr->m_board.m_bKg_x;
+
+                m_gen_y = m_matchptr->m_board.m_bKg_y;
+            }
+
+            m_king_move_remaining = true;
+
+            m_king_move_has_started = false;
 
             m_capture_of_checking_remaining = true;
 
+            m_capture_of_checking_has_startet = false;
+
             m_blocking_of_checking_remaining = true;
+
+            m_blocking_of_checking_has_started = false;
         }
         else{
             m_king_attackerptr = nullptr;
 
-            m_attacked_kg_move_remaining = true;
+            m_gen_x = 0;
+
+            m_gen_y = 0;
+
+            m_king_move_remaining = false;
 
             m_capture_of_checking_remaining = false;
 
             m_blocking_of_checking_remaining = false;
         }
 
-        m_gen_x = 0;
-
-        m_gen_y = 0;
-
-        m_dir_idx = 0;
+        m_prom_idx = 0;
 
         m_step_idx = 0;
 
-        m_sh_castl_remaining = true;
-
-        m_lg_castl_remaining = true;
+        m_dir_idx = 0;
 
         m_gen_end = false;
 
+        m_postponedptr = nullptr;
+
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cGenerator2::~cGenerator2(){
 
         if(m_king_attackerptr != nullptr){
@@ -71,43 +105,164 @@
         }
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::gen_move(){
+      
+        cMove *moveptr = _gen_move();
+
+        if(m_postponedptr == nullptr && moveptr == nullptr){
+            return moveptr;
+        }
+
+        if(m_postponedptr != nullptr && moveptr == nullptr){
+            moveptr = m_postponedptr;
+            
+            m_postponedptr = nullptr;
+
+            return moveptr;
+        }
+
+        if(m_postponedptr == nullptr && moveptr != nullptr){
+            cMove *tmpmoveptr = _gen_move();
+
+            if(tmpmoveptr == nullptr){
+                return moveptr;
+            }
+            else{
+                if(moveptr->m_prio <= tmpmoveptr->m_prio){
+                    return moveptr;
+                }
+                else{
+                    m_postponedptr = moveptr;
+
+                    return tmpmoveptr;
+                }
+            }
+        }
+
+        if(m_postponedptr != nullptr && moveptr != nullptr){
+            if(moveptr->m_prio <= m_postponedptr->m_prio){
+                return moveptr;
+            }
+            else{
+                cMove *tmpmoveptr = moveptr;
+
+                moveptr = m_postponedptr;
+
+                m_postponedptr = tmpmoveptr;
+
+                return moveptr;
+            }
+        }
+
+        return moveptr;
+
+    }
+    //*****************************************
+
+
+
+    //*****************************************
+    cMove *cGenerator2::_gen_move(){
 
         uint8_t color = m_matchptr->next_color();
 
         if(m_check_cnt == 2){
-            cMove *moveptr;
+            if(m_king_move_remaining){
+                if( ! m_king_move_has_started){
+                    m_king_move_has_started = true;
 
-            if(m_attacked_kg_move_remaining){
+                    m_dir_idx = 0;
+                    m_step_idx = 0;
+                }
+
+                cMove *moveptr = nullptr;
+
                 if(color == mWHITE){
-                    moveptr = gen_bare_kg_move(mWKG, false);
+                    moveptr = gen_kg_move(mWKG, true);
                 }
                 else{
-                    moveptr = gen_bare_kg_move(mBKG, false);
+                    moveptr = gen_kg_move(mBKG, true);
+                }
+
+                if(moveptr != nullptr){
+                    return moveptr;
+                }
+                else{
+                    m_king_move_remaining = false;
+                }
+            }
+
+            return nullptr;
+        }
+        else if(m_check_cnt == 1){
+            if( m_king_move_remaining){
+                if( ! m_king_move_has_started){
+                    m_king_move_has_started = true;
+
+                    m_step_idx = 0;
+                    m_dir_idx = 0;
+                }
+
+                cMove *moveptr = nullptr;
+
+                if(color == mWHITE){
+                    moveptr = gen_kg_move(mWKG, true);
+                }
+                else{
+                    moveptr = gen_kg_move(mBKG, true);
                 }
 
                 if(moveptr != nullptr){
                     return moveptr;
                 }
 
-                m_attacked_kg_move_remaining = false;
+                m_king_move_remaining = false;
+            }
+
+            if(m_capture_of_checking_remaining){
+                if( ! m_capture_of_checking_has_startet ){
+                    m_capture_of_checking_has_startet = true;
+
+                    m_step_idx = 0;
+                    m_dir_idx = 0;
+                }
+
+                cMove *moveptr = nullptr;
+
+                moveptr = gen_capture_move_checking_piece();
+
+                if(moveptr != nullptr){
+                    return moveptr;
+                }
+
+                m_capture_of_checking_remaining = false;
+            }
+
+            if(m_blocking_of_checking_remaining){
+                if( ! m_blocking_of_checking_has_started ){
+                    m_blocking_of_checking_has_started = true;
+
+                    m_step_idx = 0;
+                    m_dir_idx = 0;
+                }
+
+                cMove *moveptr = nullptr;
+
+                moveptr = gen_blocking_move_checking_piece();
+
+                if(moveptr != nullptr){
+                    return moveptr;
+                }
+
+                m_blocking_of_checking_remaining = false;
             }
 
             return nullptr;
-        }
-        else if(m_check_cnt == 1){
-            cMove *moveptr;
-
-            if(color == mWHITE){
-                moveptr = gen_kg_and_supporting_move(mWKG);
-            }
-            else{
-                moveptr = gen_kg_and_supporting_move(mBKG);
-            }
-
-            return moveptr;
         }
         else{
             while(m_gen_end == false){
@@ -115,11 +270,11 @@
                 uint8_t piece = m_matchptr->m_board.getfield(m_gen_x, m_gen_y);
 
                 if(PIECES_COLORS[piece] != color){
-                    incr_gen(0, 0);
+                    incr_gen(0, 0, 0);
 
                     continue;
                 }
-                  
+
                 if(piece == mWPW){ 
                     cMove *moveptr = gen_wpw_move(piece);
 
@@ -134,29 +289,8 @@
                         return moveptr;
                     }
                 }
-                else if(piece == mWKG){ 
-                    cMove *moveptr = gen_kg_and_castl_move(piece);
-
-                    if(moveptr != nullptr){
-                        return moveptr;
-                    }
-                }
-                else if(piece == mBKG){ 
-                    cMove *moveptr = gen_kg_and_castl_move(piece);
-
-                    if(moveptr != nullptr){
-                        return moveptr;
-                    }
-                } 
-                else if(piece == mWRK || piece == mBRK){ 
-                    cMove *moveptr = gen_qu_rk_bp_move(piece);
-
-                    if(moveptr != nullptr){
-                        return moveptr;
-                    }
-                }
-                else if(piece == mWBP || piece == mBBP){ 
-                    cMove *moveptr = gen_qu_rk_bp_move(piece);
+                else if(piece == mWKG || piece == mBKG){ 
+                    cMove *moveptr = gen_kg_move(piece, false);
 
                     if(moveptr != nullptr){
                         return moveptr;
@@ -169,60 +303,52 @@
                         return moveptr;
                     }
                 }
-                else if(piece == mWQU || piece == mBQU){
-                    cMove *moveptr = gen_qu_rk_bp_move(piece);
+                else if(piece == mWRK || piece == mBRK || piece == mWBP || piece == mBBP || piece == mWQU || piece == mBQU){ 
+                    cMove *moveptr = gen_long_range_move(piece);
 
                     if(moveptr != nullptr){
                         return moveptr;
                     }
                 }
                 else{
-                    incr_gen(0, 0);
+                    cout << "NOOOOOOOOOOOOOOOOOOOOOOO";
+                    incr_gen(0, 0, 0);
                 }
 
             }
 
             return nullptr;
-        }
-        
+       }
+
     }
+    //*****************************************
 
 
-    void cGenerator2::incr_gen(const uint8_t max_step_idx, const uint8_t max_dir_idx){
 
-        if((m_step_idx + 1) < max_step_idx){
+    //*****************************************
+    void cGenerator2::incr_gen(const uint8_t max_prom_cnt, const uint8_t max_step_cnt, const uint8_t max_dir_cnt){
+
+        if((m_prom_idx + 1) < max_prom_cnt){
+            m_prom_idx++;
+        }
+        else if((m_step_idx + 1) < max_step_cnt){
+            m_prom_idx = 0;
             m_step_idx++;
         }
-        else{
+        else if((m_dir_idx + 1) < max_dir_cnt){
+            m_prom_idx = 0;
             m_step_idx = 0;
-
-            incr_dir(max_dir_idx);
-        }
-
-    }
-
-
-    void cGenerator2::incr_dir(const uint8_t max_dir_idx){
-
-        if((m_dir_idx + 1) < max_dir_idx){
             m_dir_idx++;
         }
         else{
+            m_prom_idx = 0;
+            m_step_idx = 0;
             m_dir_idx = 0;
 
-            incr_coord();
-        }
-
-    }
-
-
-    void cGenerator2::incr_coord(){
-
-        if(cBoard::is_inbounds(m_gen_x + 1, m_gen_y)){
-            m_gen_x++;
-        }
-        else{
-            if(cBoard::is_inbounds(0, m_gen_y + 1)){
+            if(cBoard::is_inbounds(m_gen_x + 1, m_gen_y)){
+                m_gen_x++;
+            }
+            else if(cBoard::is_inbounds(0, m_gen_y + 1)){
                 m_gen_x = 0;
                 m_gen_y++;
             }
@@ -232,8 +358,11 @@
         }
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::gen_wpw_move(const uint8_t pawn){
 
         uint16_t pindir = m_matchptr->m_board.eval_pindir(m_gen_x, m_gen_y);
@@ -242,6 +371,7 @@
             for(uint8_t idx = m_dir_idx; idx < 2; ++idx){
 
                 if(pindir == mNO_DIR || pindir == cPiece::wpw_capture_steps[idx].m_cardinale){
+
                     if(cBoard::is_inbounds(m_gen_x + cPiece::wpw_capture_steps[idx].m_xstep, m_gen_y + cPiece::wpw_capture_steps[idx].m_ystep)){
                         uint8_t dst_x = m_gen_x + cPiece::wpw_capture_steps[idx].m_xstep;
                         uint8_t dst_y = m_gen_y + cPiece::wpw_capture_steps[idx].m_ystep;
@@ -253,7 +383,12 @@
 
                             m_dir_idx = idx;
 
-                            incr_gen(0, 4);
+                            if(moveptr != nullptr && moveptr->is_promotion()){
+                                incr_gen(4, 0, 4);
+                            }
+                            else{
+                                incr_gen(0, 0, 4);
+                            }
 
                             return moveptr;
 
@@ -263,13 +398,13 @@
                             uint8_t enpiece = m_matchptr->m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
 
                             if(enpiece == mBPW && prevmove.m_src_y == 6 && prevmove.m_dst_y == 4 && prevmove.m_src_x == dst_x){
-                                cMove *moveptr = new cMove(m_gen_x, m_gen_y, dst_x, dst_y, pawn, dstpiece, mBLK, cMove::P_HIGH_UP);
+                                cMove *moveptr = new cMove(m_gen_x, m_gen_y, dst_x, dst_y, pawn, dstpiece, mBLK, cMove::P_BOTTOM);
 
                                 cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
                                 m_dir_idx = idx;
 
-                                incr_gen(0, 4);
+                                incr_gen(0, 0, 4);
 
                                 return moveptr;
                             }
@@ -281,7 +416,7 @@
 
             m_dir_idx = 1;
 
-            incr_gen(0, 4);
+            incr_gen(0, 0, 4);
 
         }
 
@@ -298,7 +433,12 @@
 
                         m_dir_idx = 2;
 
-                        incr_gen(0, 4);
+                        if(moveptr != nullptr && moveptr->is_promotion()){
+                            incr_gen(4, 0, 4);
+                        }
+                        else{
+                            incr_gen(0, 0, 4);
+                        }
 
                         return moveptr;
                     }
@@ -307,7 +447,7 @@
 
             m_dir_idx = 2;
 
-            incr_gen(0, 4);
+            incr_gen(0, 0, 4);
         }
 
         if(m_dir_idx == 3){
@@ -326,7 +466,7 @@
 
                         m_dir_idx = 3;
 
-                        incr_gen(0, 4);
+                        incr_gen(0, 0, 4);
 
                         return moveptr;
                     }
@@ -334,32 +474,30 @@
             }
             m_dir_idx = 3;
 
-            incr_gen(0, 4);
+            incr_gen(0, 0, 4);
         }
 
         return nullptr;
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::_create_wpw_move(const uint8_t src_x, const uint8_t src_y, const uint8_t dst_x, const uint8_t dst_y, const uint8_t dstpiece){
 
         if(src_y == 6 && dst_y == 7){
             uint8_t prom_pieces[4] = { mWQU, mWRK, mWBP, mWKN };
 
-            for(uint8_t i = 0; i < 1; ++i){ // Todo 4 times
+            cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, prom_pieces[m_prom_idx], cMove::P_PROMOTION + m_prom_idx);
 
-                cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, prom_pieces[i], cMove::P_HIGH_UP + i);
+            cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
-                cEvaluator::priorize_move(*m_matchptr, *moveptr);
-
-                return moveptr;
-
-            }
-
+            return moveptr;
         }
         else{
-            cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mBLK, cMove::P_MEDIUM);
+            cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mBLK, cMove::P_BOTTOM);
 
             cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -369,9 +507,12 @@
         return nullptr;
 
     }
+    //*****************************************
 
 
-   cMove *cGenerator2::gen_bpw_move(const uint8_t pawn){
+
+    //*****************************************
+    cMove *cGenerator2::gen_bpw_move(const uint8_t pawn){
 
         uint16_t pindir = m_matchptr->m_board.eval_pindir(m_gen_x, m_gen_y);
 
@@ -390,7 +531,12 @@
 
                             m_dir_idx = idx;
 
-                            incr_gen(0, 4);
+                            if(moveptr != nullptr && moveptr->is_promotion()){
+                                incr_gen(4, 0, 4);
+                            }
+                            else{
+                                incr_gen(0, 0, 4);
+                            }
 
                             return moveptr;
 
@@ -400,13 +546,13 @@
                             uint8_t enpiece = m_matchptr->m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
 
                             if(enpiece == mWPW && prevmove.m_src_y == 1 && prevmove.m_dst_y == 3 && prevmove.m_src_x == dst_x){
-                                cMove *moveptr = new cMove(m_gen_x, m_gen_y, dst_x, dst_y, pawn, dstpiece, mBLK, cMove::P_HIGH_UP);
+                                cMove *moveptr = new cMove(m_gen_x, m_gen_y, dst_x, dst_y, pawn, dstpiece, mBLK, cMove::P_BOTTOM);
 
                                 cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
                                 m_dir_idx = idx;
 
-                                incr_gen(0, 4);
+                                incr_gen(0, 0, 4);
 
                                 return moveptr;
                             }
@@ -418,7 +564,7 @@
 
             m_dir_idx = 1;
 
-            incr_gen(0, 4);
+            incr_gen(0, 0, 4);
 
         }
 
@@ -435,7 +581,12 @@
 
                         m_dir_idx = 2;
 
-                        incr_gen(0, 4);
+                        if(moveptr != nullptr && moveptr->is_promotion()){
+                            incr_gen(4, 0, 4);
+                        }
+                        else{
+                            incr_gen(0, 0, 4);
+                        }
 
                         return moveptr;
                     }
@@ -444,7 +595,7 @@
 
             m_dir_idx = 2;
 
-            incr_gen(0, 4);
+            incr_gen(0, 0, 4);
         }
 
         if(m_dir_idx == 3){
@@ -463,7 +614,7 @@
 
                         m_dir_idx = 3;
 
-                        incr_gen(0, 4);
+                        incr_gen(0, 0, 4);
 
                         return moveptr;
                     }
@@ -471,32 +622,30 @@
             }
             m_dir_idx = 3;
 
-            incr_gen(0, 4);
+            incr_gen(0, 0, 4);
         }
 
         return nullptr;
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::_create_bpw_move(const uint8_t src_x, const uint8_t src_y, const uint8_t dst_x, const uint8_t dst_y, const uint8_t dstpiece){
 
         if(src_y == 1 && dst_y == 0){
             uint8_t prom_pieces[4] = { mBQU, mBRK, mBBP, mBKN };
 
-            for(uint8_t i = 0; i < 1; ++i){ // Todo 4 times
+            cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, prom_pieces[m_prom_idx], cMove::P_PROMOTION + m_prom_idx);
 
-                cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, prom_pieces[i], cMove::P_HIGH_UP + i);
+            cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
-                cEvaluator::priorize_move(*m_matchptr, *moveptr);
-
-                return moveptr;
-
-            }
-
+            return moveptr;
         }
         else{
-            cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBLK, cMove::P_MEDIUM);
+            cMove *moveptr = new cMove(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBLK, cMove::P_BOTTOM);
 
             cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -506,13 +655,16 @@
         return nullptr;
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::gen_kn_move(const uint8_t knight){
 
         uint16_t pindir = m_matchptr->m_board.eval_pindir(m_gen_x, m_gen_y);
         if(pindir != mNO_DIR){ 
-            incr_gen(0, 0);
+            incr_gen(0, 0, 0);
 
             return nullptr; 
         }
@@ -527,13 +679,13 @@
                 uint8_t dstpiece = m_matchptr->m_board.getfield(dst_x, dst_y);
 
                 if(PIECES_COLORS[dstpiece] != PIECES_COLORS[knight]){
-                    cMove *moveptr =  new cMove(m_gen_x, m_gen_y, dst_x, dst_y, knight, dstpiece, mBLK, cMove::P_MEDIUM);
+                    cMove *moveptr =  new cMove(m_gen_x, m_gen_y, dst_x, dst_y, knight, dstpiece, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
                     m_dir_idx = idx;
 
-                    incr_gen(0, 8);
+                    incr_gen(0, 0, 8);
 
                     return moveptr;
                 }
@@ -541,150 +693,107 @@
 
         }
 
-        m_dir_idx = 7;
-
-        incr_gen(0, 8);
-        
-        //incr_gen(0, 0);
+        incr_gen(0, 0, 0);
 
         return nullptr;
 
     }
+    //*****************************************
 
 
-    cMove *cGenerator2::gen_qu_rk_bp_move(const uint8_t piece){
-      
+
+    //*****************************************
+    cMove *cGenerator2::gen_long_range_move(const uint8_t piece){
+
+        int8_t steps[][7][2] = {
+            { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 }, { 7, 0 } },
+            { { -1, 0 }, { -2, 0 }, { -3, 0 }, { -4, 0 }, { -5, 0 }, { -6, 0 }, { -7, 0 } },
+            { { 0, 1 }, { 0 , 2 }, { 0, 3 }, { 0, 4 }, { 0, 5 }, { 0, 6 }, { 0, 7 } },
+            { { 0, -1 }, { 0 , -2 }, { 0, -3 }, { 0, -4 }, { 0, -5 }, { 0, -6 }, { 0, -7 } }, 
+            { { 1, 1 }, { 2, 2 }, { 3, 3 }, { 4, 4 }, { 5, 5 }, { 6, 6 }, { 7, 7 } },
+            { { -1, -1 }, { -2, -2 }, { -3, -3 }, { -4, -4 }, { -5, -5 }, { -6, -6 }, { -7, -7 } },
+            { { -1, 1 }, { -2, 2 }, { -3, 3 }, { -4, 4 }, { -5, 5 }, { -6, 6 }, { -7, 7 } },
+            { { 1, -1 }, { 2, -2 }, { 3, -3 }, { 4, -4 }, { 5, -5 }, { 6, -6 }, { 7, -7 } } 
+            };
+
         uint8_t offset = 0;
         uint8_t maxidx = 4;
 
         if(piece == mWBP || piece == mBBP){
             offset = 4;
         }
-
-        if(piece == mWQU || piece == mBQU){
+        else if(piece == mWQU || piece == mBQU){
             maxidx = 8;
         }
-      
+
         uint16_t pindir = m_matchptr->m_board.eval_pindir(m_gen_x, m_gen_y);
 
         for(uint8_t idx = m_dir_idx; idx < maxidx; ++idx){
-
-            uint8_t dst_x = m_gen_x + (cPiece::qu_steps[idx+offset].m_xstep * m_step_idx);
-            uint8_t dst_y = m_gen_y + (cPiece::qu_steps[idx+offset].m_ystep * m_step_idx);
+            
+            uint8_t dst_x = m_gen_x;
+            uint8_t dst_y = m_gen_y;
 
             for(uint8_t j = m_step_idx; j < 7; ++j){
 
-                if(cBoard::is_inbounds(dst_x + cPiece::qu_steps[idx+offset].m_xstep, dst_y + cPiece::qu_steps[idx+offset].m_ystep) == false){
-                    m_dir_idx = idx;
-
-                    incr_gen(0, maxidx);
-
+                if( ! cBoard::is_inbounds(dst_x + steps[idx+offset][j][0], dst_y + steps[idx+offset][j][1]) ){
                     break;
                 }
 
-                dst_x += cPiece::qu_steps[idx+offset].m_xstep;
-                dst_y += cPiece::qu_steps[idx+offset].m_ystep;
+                dst_x += steps[idx+offset][j][0];
+                dst_y += steps[idx+offset][j][1];
 
                 if(pindir != mNO_DIR && (pindir & cBoard::eval_dir(m_gen_x, m_gen_y, dst_x, dst_y)) == 0){ 
-                    m_dir_idx = idx;
-
-                    incr_gen(0, maxidx);
-
-                    break;
+                  break;
                 }
 
                 uint8_t dstpiece = m_matchptr->m_board.getfield(dst_x, dst_y);
 
                 if(PIECES_COLORS[dstpiece] == PIECES_COLORS[piece]){
-                    m_dir_idx = idx;
-
-                    incr_gen(0, maxidx);
-
                     break;
                 }
 
-                cMove *moveptr = new cMove(m_gen_x, m_gen_y, dst_x, dst_y, piece, dstpiece, mBLK, cMove::P_MEDIUM);
+                cMove *moveptr = new cMove(m_gen_x, m_gen_y, dst_x, dst_y, piece, dstpiece, mBLK, cMove::P_BOTTOM);
 
                 cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
+                m_step_idx = j;
+
+                m_dir_idx = idx;
+
                 if(dstpiece == mBLK){
-                    m_step_idx = j;
-
-                    m_dir_idx = idx;
-
-                    incr_gen(7, maxidx);
+                    incr_gen(0, 7, maxidx);
                 }
                 else{
-                    m_dir_idx = idx;
-
-                    incr_gen(0, maxidx);
+                    incr_gen(0, 0, maxidx);
                 }
 
                 return moveptr;
 
             }
 
+            m_dir_idx = idx;
+
+            incr_gen(0, 0, maxidx);
+
         }
 
-        m_dir_idx = (maxidx - 1);
-
-        incr_gen(0, maxidx);
+        incr_gen(0, 0, maxidx);
 
         return nullptr;
 
     }
-
-    cMove *cGenerator2::gen_kg_and_castl_move(const uint8_t king){
-
-        cMove *moveptr;
-
-        if(m_sh_castl_remaining){
-            if(king == mWKG){
-                moveptr = _gen_wkg_sh_castl_move();
-            }
-            else{
-                moveptr = _gen_bkg_sh_castl_move();
-            }
-
-            m_sh_castl_remaining = false;
-
-            if(moveptr != nullptr){
-                return moveptr;
-            }
-        }
-
-        if(m_lg_castl_remaining){
-            if(king == mWKG){
-                moveptr = _gen_wkg_lg_castl_move();
-            }
-            else{
-                moveptr = _gen_bkg_lg_castl_move();
-            }
-
-            m_lg_castl_remaining = false;
-
-            if(moveptr != nullptr){
-                return moveptr;
-            }
-        }
-
-        moveptr = gen_bare_kg_move(king, true);
-
-        return moveptr;
-
-    }
+    //*****************************************
 
 
-    cMove *cGenerator2::gen_bare_kg_move(const uint8_t king, const bool nonattacked){
+
+    //*****************************************
+    cMove *cGenerator2::gen_kg_move(const uint8_t king, const bool isattacked){
 
         uint8_t kg_x, kg_y, maxidx;
 
-        if(nonattacked){
-            maxidx = 8;
-        }
-        else{
-            maxidx = 10; // does not set m_dir_idx after 8 loops to 0
-        }
+        uint8_t idx = m_dir_idx;
+
+        maxidx = 10; //include castlings, makes also sense for isattacked, because of incr_gen...
 
         cBoard board(m_matchptr->m_board);
 
@@ -699,72 +808,93 @@
             kg_y = m_matchptr->m_board.m_bKg_y;
         }
 
-        for(uint8_t idx = m_dir_idx; idx < size(cPiece::qu_steps); ++idx){
+        for(;idx < size(cPiece::qu_steps); ++idx){
 
-            if(cBoard::is_inbounds((kg_x + cPiece::qu_steps[idx].m_xstep), (kg_y + cPiece::qu_steps[idx].m_ystep)) == false){
-                //m_dir_idx = idx;
+            if(cBoard::is_inbounds((kg_x + cPiece::qu_steps[idx].m_xstep), (kg_y + cPiece::qu_steps[idx].m_ystep))){
 
-                //incr_gen(0, maxidx);
+                uint8_t dst_x = (kg_x + cPiece::qu_steps[idx].m_xstep);
+                uint8_t dst_y = (kg_y + cPiece::qu_steps[idx].m_ystep);
 
-                continue;
+                uint8_t dstpiece = m_matchptr->m_board.getfield(dst_x, dst_y);
+
+                if(PIECES_COLORS[dstpiece] != PIECES_COLORS[king]){
+
+                    if( !(board.is_field_touched(dst_x, dst_y, REVERSED_COLORS[PIECES_COLORS[king]])) ){
+
+                        cMove *moveptr = new cMove(kg_x, kg_y, dst_x, dst_y, king, dstpiece, mBLK, cMove::P_BOTTOM);
+
+                        cEvaluator::priorize_move(*m_matchptr, *moveptr);
+
+                        m_dir_idx = idx;
+                        incr_gen(0, 0, maxidx);
+
+                        return moveptr;
+                    }
+                }
             }
-
-            uint8_t dst_x = (kg_x + cPiece::qu_steps[idx].m_xstep);
-            uint8_t dst_y = (kg_y + cPiece::qu_steps[idx].m_ystep);
-
-            uint8_t dstpiece = m_matchptr->m_board.getfield(dst_x, dst_y);
-
-            if(PIECES_COLORS[dstpiece] == PIECES_COLORS[king]){
-                //m_dir_idx = idx;
-
-                //incr_gen(0, maxidx);
-
-                continue;
-            }
-
-            if(board.is_field_touched(dst_x, dst_y, REVERSED_COLORS[PIECES_COLORS[king]])){
-                //m_dir_idx = idx;
-
-                //incr_gen(0, maxidx);
-
-                continue;
-            }
-
-            cMove *moveptr = new cMove(kg_x, kg_y, dst_x, dst_y, king, dstpiece, mBLK, cMove::P_MEDIUM);
-
-            cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
             m_dir_idx = idx;
-
-            incr_gen(0, maxidx);
-
-            return moveptr;
+            incr_gen(0, 0, maxidx);
 
         }
 
-        m_dir_idx = (maxidx - 1); // 7
+        if(isattacked == false && m_dir_idx == 8){
+            cMove *moveptr = nullptr;
 
-        incr_gen(0, maxidx);
+            if(PIECES_COLORS[king] == mWHITE){
+                moveptr = _gen_wkg_sh_castl_move();
+            }
+            else{
+                moveptr = _gen_bkg_sh_castl_move();
+            }
+
+            incr_gen(0, 0, maxidx);
+
+            if(moveptr != nullptr){
+                return moveptr;
+            }
+        }
+
+
+        if(isattacked == false && m_dir_idx == 9){
+            cMove *moveptr = nullptr;
+
+            if(PIECES_COLORS[king] == mWHITE){
+                moveptr = _gen_wkg_lg_castl_move();
+            }
+            else{
+                moveptr = _gen_bkg_lg_castl_move();
+            }
+
+            incr_gen(0, 0, maxidx);
+
+            if(moveptr != nullptr){
+                return moveptr;
+            }
+        }
 
         return nullptr;
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::_gen_wkg_sh_castl_move(){
 
         cBoard board(m_matchptr->m_board);
         board.setfield(board.m_wKg_x, board.m_wKg_y, mBLK);
 
-        if(board.m_wKg_has_moved_at == 0 && board.m_wRkH_has_moved_at == 0 && cBoard::is_inbounds(m_gen_x + 3, m_gen_y)){
+        if(board.m_wKg_has_moved_at == 0 && board.m_wRkH_has_moved_at == 0 && cBoard::is_inbounds(board.m_wKg_x + 3, board.m_wKg_y)){
 
-            if(m_gen_y == 0 && board.getfield(m_gen_x + 1, m_gen_y) == mBLK && board.getfield(m_gen_x + 2, m_gen_y) == mBLK && board.getfield(m_gen_x + 3, m_gen_y) == mWRK){
+            if(board.m_wKg_y == 0 && board.getfield(board.m_wKg_x + 1, board.m_wKg_y) == mBLK && board.getfield(board.m_wKg_x + 2, board.m_wKg_y) == mBLK && board.getfield(board.m_wKg_x + 3, board.m_wKg_y) == mWRK){
 
                 bool is_touched = false;
 
                 for(uint8_t i = 0; i < 3; ++i){
 
-                    if(board.is_field_touched(m_gen_x + i, m_gen_y, mBLACK)){
+                    if(board.is_field_touched(board.m_wKg_x + i, board.m_wKg_y, mBLACK)){
                         is_touched = true;
 
                         break;
@@ -773,7 +903,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove *moveptr = new cMove(m_gen_x, m_gen_y, m_gen_x + 2, m_gen_y, mWKG, mBLK, mBLK, cMove::P_MEDIUM);
+                    cMove *moveptr = new cMove(board.m_wKg_x, board.m_wKg_y, board.m_wKg_x + 2, board.m_wKg_y, mWKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -785,22 +915,25 @@
         return nullptr;
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::_gen_wkg_lg_castl_move(){
 
         cBoard board(m_matchptr->m_board);
         board.setfield(board.m_wKg_x, board.m_wKg_y, mBLK);
 
-        if(board.m_wKg_has_moved_at == 0 && board.m_wRkA_has_moved_at == 0 && cBoard::is_inbounds(m_gen_x - 4, m_gen_y)){
+        if(board.m_wKg_has_moved_at == 0 && board.m_wRkA_has_moved_at == 0 && cBoard::is_inbounds(board.m_wKg_x - 4, board.m_wKg_y)){
 
-            if(m_gen_y == 0 && board.getfield(m_gen_x - 1, m_gen_y) == mBLK && board.getfield(m_gen_x - 2, m_gen_y) == mBLK && board.getfield(m_gen_x - 3, m_gen_y) == mBLK && board.getfield(m_gen_x - 4, m_gen_y) == mWRK){
+            if(m_gen_y == 0 && board.getfield(board.m_wKg_x - 1, board.m_wKg_y) == mBLK && board.getfield(board.m_wKg_x - 2, board.m_wKg_y) == mBLK && board.getfield(board.m_wKg_x - 3, board.m_wKg_y) == mBLK && board.getfield(board.m_wKg_x - 4, board.m_wKg_y) == mWRK){
 
                 bool is_touched = false;
 
                 for(uint8_t i = 0; i < 3; ++i){
 
-                    if(board.is_field_touched(m_gen_x - i, m_gen_y, mBLACK)){
+                    if(board.is_field_touched(board.m_wKg_x - i, board.m_wKg_y, mBLACK)){
                         is_touched = true;
 
                         break;
@@ -809,7 +942,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove *moveptr = new cMove(m_gen_x, m_gen_y, m_gen_x - 2, m_gen_y, mWKG, mBLK, mBLK, cMove::P_MEDIUM);
+                    cMove *moveptr = new cMove(board.m_wKg_x, board.m_wKg_y, board.m_wKg_x - 2, board.m_wKg_y, mWKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -821,22 +954,25 @@
         return nullptr;
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::_gen_bkg_sh_castl_move(){
 
         cBoard board(m_matchptr->m_board);
         board.setfield(board.m_bKg_x, board.m_bKg_y, mBLK);
 
-        if(board.m_bKg_has_moved_at == 0 && board.m_bRkH_has_moved_at == 0 && cBoard::is_inbounds(m_gen_x + 3, m_gen_y)){
+        if(board.m_bKg_has_moved_at == 0 && board.m_bRkH_has_moved_at == 0 && cBoard::is_inbounds(board.m_bKg_x + 3, board.m_bKg_y)){
 
-            if(m_gen_y == 7 && board.getfield(m_gen_x + 1, m_gen_y) == mBLK && board.getfield(m_gen_x + 2, m_gen_y) == mBLK && board.getfield(m_gen_x + 3, m_gen_y) == mBRK){
+            if(m_gen_y == 7 && board.getfield(board.m_bKg_x + 1, board.m_bKg_y) == mBLK && board.getfield(board.m_bKg_x + 2, board.m_bKg_y) == mBLK && board.getfield(board.m_bKg_x + 3, board.m_bKg_y) == mBRK){
 
                 bool is_touched = false;
 
                 for(uint8_t i = 0; i < 3; ++i){
 
-                    if(board.is_field_touched(m_gen_x + i, m_gen_y, mWHITE)){
+                    if(board.is_field_touched(board.m_bKg_x + i, board.m_bKg_y, mWHITE)){
                         is_touched = true;
                         break;
                     }
@@ -844,7 +980,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove *moveptr = new cMove(m_gen_x, m_gen_y, m_gen_x + 2, m_gen_y, mBKG, mBLK, mBLK, cMove::P_MEDIUM);
+                    cMove *moveptr = new cMove(board.m_bKg_x, board.m_bKg_y, board.m_bKg_x + 2, board.m_bKg_y, mBKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -856,22 +992,25 @@
         return nullptr;
 
     }
+    //*****************************************
 
 
+
+    //*****************************************
     cMove *cGenerator2::_gen_bkg_lg_castl_move(){
 
         cBoard board(m_matchptr->m_board);
         board.setfield(board.m_bKg_x, board.m_bKg_y, mBLK);
 
-        if(board.m_bKg_has_moved_at == 0 && board.m_bRkA_has_moved_at == 0 && cBoard::is_inbounds(m_gen_x - 4, m_gen_y)){
+        if(board.m_bKg_has_moved_at == 0 && board.m_bRkA_has_moved_at == 0 && cBoard::is_inbounds(board.m_bKg_x - 4, board.m_bKg_y)){
 
-            if(m_gen_y == 7 && board.getfield(m_gen_x - 1, m_gen_y) == mBLK && board.getfield(m_gen_x - 2, m_gen_y) == mBLK && board.getfield(m_gen_x - 3, m_gen_y) == mBLK && board.getfield(m_gen_x - 4, m_gen_y) == mBRK){
+            if(m_gen_y == 7 && board.getfield(board.m_bKg_x - 1, board.m_bKg_y) == mBLK && board.getfield(board.m_bKg_x - 2, board.m_bKg_y) == mBLK && board.getfield(board.m_bKg_x - 3, board.m_bKg_y) == mBLK && board.getfield(board.m_bKg_x - 4, board.m_bKg_y) == mBRK){
 
                 bool is_touched = false;
 
                 for(uint8_t i = 0; i < 3; ++i){
 
-                    if(board.is_field_touched(m_gen_x - i, m_gen_y, mWHITE)){
+                    if(board.is_field_touched(board.m_bKg_x - i, board.m_bKg_y, mWHITE)){
                         is_touched = true;
                         break;
                     }
@@ -879,7 +1018,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove *moveptr = new cMove(m_gen_x, m_gen_y, m_gen_x - 2, m_gen_y, mBKG, mBLK, mBLK, cMove::P_MEDIUM);
+                    cMove *moveptr = new cMove(board.m_bKg_x, board.m_bKg_y, board.m_bKg_x - 2, board.m_bKg_y, mBKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -891,51 +1030,14 @@
         return nullptr;
 
     }
+    //*****************************************
 
 
-    cMove *cGenerator2::gen_kg_and_supporting_move(const uint8_t king){
 
-        cMove *moveptr;
+    //*****************************************
+    cMove *cGenerator2::gen_capture_move_checking_piece(){
 
-        if(m_capture_of_checking_remaining){
-            moveptr = _gen_capture_move_checking_piece();
-
-            if(moveptr != nullptr){
-                return moveptr;
-            }
-
-            m_capture_of_checking_remaining = false;
-        }
-
-        if(m_blocking_of_checking_remaining){
-            moveptr = _gen_blocking_move_checking_piece();
-
-            if(moveptr != nullptr){
-                return moveptr;
-            }
-
-            m_blocking_of_checking_remaining = false;
-
-        }
-
-        if(m_attacked_kg_move_remaining){
-            moveptr = gen_bare_kg_move(king, false);
-            
-            if(moveptr != nullptr){
-                return moveptr;
-            }
-
-            m_attacked_kg_move_remaining = false;
-        }
-
-        return nullptr;
-
-    }
-
-
-    cMove *cGenerator2::_gen_capture_move_checking_piece(){
-
-        // search for capturing pieces
+        // search capturing pieces
         vector<cPiece> defending, others;
 
         if(PIECES_COLORS[m_king_attackerptr->m_piece] == mBLACK){
@@ -967,7 +1069,7 @@
                 return moveptr;
             }
             else{
-                cMove *moveptr = new cMove(defending.at(j).m_xpos, defending.at(j).m_ypos, m_king_attackerptr->m_xpos, m_king_attackerptr->m_ypos, defending.at(j).m_piece, m_king_attackerptr->m_piece, mBLK, cMove::P_HIGH_UP);
+                cMove *moveptr = new cMove(defending.at(j).m_xpos, defending.at(j).m_ypos, m_king_attackerptr->m_xpos, m_king_attackerptr->m_ypos, defending.at(j).m_piece, m_king_attackerptr->m_piece, mBLK, cMove::P_BOTTOM);
 
                 cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -978,6 +1080,8 @@
 
         }
 
+        m_prom_idx = 0;
+        
         m_step_idx = 0;
         
         m_dir_idx = 0;
@@ -985,9 +1089,16 @@
         return nullptr;
 
     }
-
+    //*****************************************
  
-    cMove *cGenerator2::_gen_blocking_move_checking_piece(){
+ 
+ 
+    //*****************************************
+    cMove *cGenerator2::gen_blocking_move_checking_piece(){
+
+        if(m_king_attackerptr == nullptr){
+            return nullptr;
+        }
 
         // search blocking pieces
         vector<cPiece> defending, others;
@@ -999,19 +1110,19 @@
             m_matchptr->m_board.search_all_dirs_for_touching_pieces(others, defending, m_king_attackerptr->m_xpos, m_king_attackerptr->m_ypos, m_matchptr->get_last_move(), true);
         }
 
+        // for pawns and knights no blocking moves exist
         if(m_king_attackerptr->m_piece == mWPW || m_king_attackerptr->m_piece == mBPW || m_king_attackerptr->m_piece == mWKN || m_king_attackerptr->m_piece == mBKN){
-            // for pawns and knights no blocking moves exist
             return nullptr;
         }
 
         uint8_t kg_x, kg_y;
-        if(PIECES_COLORS[m_king_attackerptr->m_piece] == mWHITE){
-            kg_x = m_matchptr->m_board.m_bKg_x;
-            kg_y = m_matchptr->m_board.m_bKg_y;
-        }
-        else{
+        if(PIECES_COLORS[m_king_attackerptr->m_piece] == mBLACK){
             kg_x = m_matchptr->m_board.m_wKg_x;
             kg_y = m_matchptr->m_board.m_wKg_y;
+        }
+        else{
+            kg_x = m_matchptr->m_board.m_bKg_x;
+            kg_y = m_matchptr->m_board.m_bKg_y;
         }
 
         uint16_t dir = cBoard::eval_dir(kg_x, kg_y, m_king_attackerptr->m_xpos, m_king_attackerptr->m_ypos);
@@ -1022,8 +1133,6 @@
             return nullptr;
         }
         
-        //cout << to_string(step_x) << " " << to_string(step_y) << "should never occur" << endl;
-
         uint8_t dst_x, dst_y;
         if(m_matchptr->m_board.is_inbounds((kg_x + (step_x * (m_dir_idx + 1))), kg_y + (step_y * (m_dir_idx + 1)))){
             dst_x = (kg_x + (step_x * (m_dir_idx + 1)));
@@ -1033,7 +1142,7 @@
             return nullptr;
         }
 
-        while(!(dst_x == m_king_attackerptr->m_xpos && dst_y == m_king_attackerptr->m_ypos)){
+        while( !(dst_x == m_king_attackerptr->m_xpos && dst_y == m_king_attackerptr->m_ypos) ){
 
             vector<cPiece> blocking, others;
       
@@ -1043,7 +1152,8 @@
             else{
                 m_matchptr->m_board.search_all_dirs_for_touching_pieces(others, blocking, dst_x, dst_y, m_matchptr->get_last_move(), true);
             }
-            
+
+            // remove touching pawns on blank fields
             vector<cPiece>::iterator it = blocking.begin();
             while(it != blocking.end()){
                 if(it->m_piece == mWPW || it->m_piece == mBPW){
@@ -1056,6 +1166,7 @@
                 }
             }
 
+            // add blocking vertical pawns
             if(PIECES_COLORS[m_king_attackerptr->m_piece] == mBLACK){
                 m_matchptr->m_board.search_vertical_for_straight_pawns(blocking, others, dst_x, dst_y);
             }
@@ -1066,6 +1177,8 @@
             for(uint8_t j = m_step_idx; j < blocking.size(); ++j){
 
                 if(blocking.at(j).m_piece == mWKG || blocking.at(j).m_piece == mBKG){
+                    m_step_idx = (j + 1);
+
                     continue;
                 }
 
@@ -1084,7 +1197,7 @@
                     return moveptr;
                 }
                 else{
-                    cMove *moveptr = new cMove(blocking.at(j).m_xpos, blocking.at(j).m_ypos, dst_x, dst_y, blocking.at(j).m_piece, mBLK, mBLK, cMove::P_HIGH_UP);
+                    cMove *moveptr = new cMove(blocking.at(j).m_xpos, blocking.at(j).m_ypos, dst_x, dst_y, blocking.at(j).m_piece, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, *moveptr);
 
@@ -1117,6 +1230,12 @@
 
         m_step_idx = 0;
 
+        m_dir_idx = 0;
+
         return nullptr;
 
     }
+  //*****************************************
+ 
+
+

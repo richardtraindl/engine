@@ -175,24 +175,28 @@
       #define mF_CLEAR   0x0
     #endif
 
+    #if !defined(mF_EQUAL)
+      #define mF_EQUAL   0x1
+    #endif
+
     #if !defined(mF_HAZY)
-      #define mF_HAZY    0x1
+      #define mF_HAZY    0x2
     #endif
 
     #if !defined(mF_WGT)
-      #define mF_WGT     0x2
+      #define mF_WGT     0x3
     #endif
 
     #if !defined(mF_WDOM)
-      #define mF_WDOM    0x3
+      #define mF_WDOM    0x4
     #endif
 
     #if !defined(mF_BGT)
-      #define mF_BGT     0x4
+      #define mF_BGT     0x5
     #endif
 
     #if !defined(mF_BDOM)
-      #define mF_BDOM    0x5
+      #define mF_BDOM    0x6
     #endif
 
 

@@ -30,13 +30,20 @@
 
             uint8_t m_prio;
 
-            static const uint8_t P_HIGH_UP      = 20;
-            static const uint8_t P_HIGH         = 40;
-            static const uint8_t P_HIGH_DOWN    = 60;
-            static const uint8_t P_MEDIUM_UP    = 80;
-            static const uint8_t P_MEDIUM       = 100;
-            static const uint8_t P_MEDIUM_DOWN  = 120;
-            static const uint8_t P_LOW          = 140;
+            static const uint8_t P_TOP                 =   0;
+            static const uint8_t P_BOTTOM              = 250;
+            static const uint8_t P_PROMOTION           =   5;
+            static const uint8_t P_CAPTURE             =  10;
+            static const uint8_t P_SAC_FOR_SUPPLY      =  30;
+            static const uint8_t P_TOUCH_WEAK_PIECE    =  31;
+            static const uint8_t P_ESCAPE              =  32;
+            static const uint8_t P_CHECK               =  40;
+            static const uint8_t P_CASTLING            =  41;
+            static const uint8_t P_PASSED_PAWN         =  50;
+            static const uint8_t P_PASSED_PAWN_SUPPORT =  51;
+            static const uint8_t A_QUITE_GOOD          =  10;
+            static const uint8_t A_HAZY                =  35;
+            static const uint8_t A_BAD                 =  70;
 
             cMove(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t srcpiece, uint8_t dstpiece, uint8_t prompiece, uint8_t prio);
 
@@ -47,6 +54,8 @@
 
             ~cMove();
 
+            bool is_capture() const;
+
             bool is_en_passant() const;
 
             bool is_promotion() const;
@@ -55,13 +64,11 @@
 
             bool is_long_castling() const;
 
+            void create_fake_rook_move(cMove &rookmove) const;
+
             bool compare(const cMove &move) const;
 
             string format(bool ext) const;
-
-            static void coord_to_indices(uint8_t &x, uint8_t &y, string coord);
-
-            static string indices_to_coord(uint8_t x, uint8_t y);
 
     };
 

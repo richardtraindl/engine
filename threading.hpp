@@ -54,7 +54,7 @@
 
             ~cThreading();
 
-            void start(const uint8_t depth, const uint8_t maxdepth);
+            void start(const uint8_t depth, const uint8_t maxdepth, const uint8_t version);
 
             bool fetch_candidates(int32_t &newscore, vector<cMove> &newmoves);
 

@@ -112,7 +112,7 @@
 
             for(uint8_t i = 0; i < 4; ++i){
 
-                cMove move(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, prom_pieces[i], cMove::P_LOW);
+                cMove move(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, prom_pieces[i], (cMove::P_PROMOTION + i));
 
                 cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -122,7 +122,7 @@
 
         }
         else{
-            cMove move(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mBLK, cMove::P_LOW);
+            cMove move(src_x, src_y, dst_x, dst_y, mWPW, dstpiece, mBLK, cMove::P_BOTTOM);
 
             cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -152,7 +152,7 @@
                         uint8_t enpiece = m_matchptr->m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
 
                         if(enpiece == mBPW && prevmove.m_src_y == 6 && prevmove.m_dst_y == 4 && prevmove.m_src_x == dst_x){
-                            cMove move(x, y, dst_x, dst_y, mWPW, dstpiece, mBLK, cMove::P_LOW);
+                            cMove move(x, y, dst_x, dst_y, mWPW, dstpiece, mBLK, cMove::P_BOTTOM);
 
                             cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -199,7 +199,7 @@
 
             for(uint8_t i = 0; i < 4; ++i){
 
-                cMove move(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, prom_pieces[i], cMove::P_LOW);
+                cMove move(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, prom_pieces[i], (cMove::P_PROMOTION + i));
 
                 cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -209,7 +209,7 @@
 
         }
         else{
-            cMove move(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBLK, cMove::P_LOW);
+            cMove move(src_x, src_y, dst_x, dst_y, mBPW, dstpiece, mBLK, cMove::P_BOTTOM);
 
             cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -240,7 +240,7 @@
                         uint8_t enpiece = m_matchptr->m_board.getfield(prevmove.m_dst_x, prevmove.m_dst_y);
 
                         if(enpiece == mWPW && prevmove.m_src_y == 1 && prevmove.m_dst_y == 3 && prevmove.m_src_x == dst_x){
-                            cMove move(x, y, dst_x, dst_y, mBPW, dstpiece, mBLK, cMove::P_LOW);
+                            cMove move(x, y, dst_x, dst_y, mBPW, dstpiece, mBLK, cMove::P_BOTTOM);
 
                             cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -298,7 +298,7 @@
                 uint8_t dstpiece = m_matchptr->m_board.getfield(dst_x, dst_y);
 
                 if(PIECES_COLORS[dstpiece] != PIECES_COLORS[knight]){
-                    cMove move(x, y, dst_x, dst_y, knight, dstpiece, mBLK, cMove::P_LOW);
+                    cMove move(x, y, dst_x, dst_y, knight, dstpiece, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -342,7 +342,7 @@
                     break;
                 }
 
-                cMove move(x, y, dst_x, dst_y, piece, dstpiece, mBLK, cMove::P_LOW);
+                cMove move(x, y, dst_x, dst_y, piece, dstpiece, mBLK, cMove::P_BOTTOM);
 
                 cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -389,7 +389,7 @@
                     continue;
                 }
 
-                cMove move(x, y, dst_x, dst_y, king, dstpiece, mBLK, cMove::P_LOW);
+                cMove move(x, y, dst_x, dst_y, king, dstpiece, mBLK, cMove::P_BOTTOM);
 
                 cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -423,7 +423,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove move(kg_x, kg_y, kg_x + 2, kg_y, mWKG, mBLK, mBLK, cMove::P_LOW);
+                    cMove move(kg_x, kg_y, kg_x + 2, kg_y, mWKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -449,7 +449,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove move(kg_x, kg_y, kg_x - 2, kg_y, mWKG, mBLK, mBLK, cMove::P_LOW);
+                    cMove move(kg_x, kg_y, kg_x - 2, kg_y, mWKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -483,7 +483,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove move(kg_x, kg_y, kg_x + 2, kg_y, mBKG, mBLK, mBLK, cMove::P_LOW);
+                    cMove move(kg_x, kg_y, kg_x + 2, kg_y, mBKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -509,7 +509,7 @@
                 }
 
                 if(is_touched == false){
-                    cMove move(kg_x, kg_y, kg_x - 2, kg_y, mBKG, mBLK, mBLK, cMove::P_LOW);
+                    cMove move(kg_x, kg_y, kg_x - 2, kg_y, mBKG, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -546,7 +546,7 @@
                 add_bpw_moves(moves, defender.m_xpos, defender.m_ypos, attacker.m_xpos, attacker.m_ypos, attacker.m_piece);
             }
             else{
-                cMove move(defender.m_xpos, defender.m_ypos, attacker.m_xpos, attacker.m_ypos, defender.m_piece, attacker.m_piece, mBLK, cMove::P_LOW);
+                cMove move(defender.m_xpos, defender.m_ypos, attacker.m_xpos, attacker.m_ypos, defender.m_piece, attacker.m_piece, mBLK, cMove::P_BOTTOM);
 
                 cEvaluator::priorize_move(*m_matchptr, move);
 
@@ -637,7 +637,7 @@
                     add_bpw_moves(moves, blocker.m_xpos, blocker.m_ypos, dst_x, dst_y, mBLK);
                 }
                 else{
-                    cMove move(blocker.m_xpos, blocker.m_ypos, dst_x, dst_y, blocker.m_piece, mBLK, mBLK, cMove::P_LOW);
+                    cMove move(blocker.m_xpos, blocker.m_ypos, dst_x, dst_y, blocker.m_piece, mBLK, mBLK, cMove::P_BOTTOM);
 
                     cEvaluator::priorize_move(*m_matchptr, move);
 

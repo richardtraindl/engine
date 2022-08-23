@@ -72,6 +72,8 @@
 
         uint16_t eval_pindir(const uint8_t src_x, const uint8_t src_y) const;
 
+        bool get_soft_pinned(vector<cPiece> &targets, const uint8_t src_x, const uint8_t src_y) const;
+
         bool is_soft_pinned(const uint8_t src_x, const uint8_t src_y) const;
 
         bool is_piece_behind_soft_pinned(const uint8_t src_x, const uint8_t src_y) const;
@@ -91,6 +93,10 @@
         bool is_passed_pawn(const uint8_t piece, const uint8_t src_x, const uint8_t src_y) const;
 
         void prnt() const;
+
+        static void coord_to_indices(uint8_t &x, uint8_t &y, string coord);
+
+        static string indices_to_coord(uint8_t x, uint8_t y);
 
         void do_move_on_board_only(const cMove &move);
 

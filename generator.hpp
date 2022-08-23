@@ -45,7 +45,7 @@
 
           void gen_capture_checking_piece_moves(vector<cMove> &moves, const cPiece &attacker); 
 
-          void gen_blocking_checking_piece_moves(vector<cMove> &moves, const cPiece &attacker); 
+          void gen_blocking_checking_piece_moves(vector<cMove> &moves, const cPiece &attacker);
 
     };
 

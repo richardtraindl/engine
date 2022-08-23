@@ -2,6 +2,7 @@
 
 
   #include "./evaluator.hpp"
+  #include "./generator2.hpp"
 
 
   //*****************************************
@@ -320,75 +321,102 @@
 
 
 
-  //*****************************************
-  uint8_t cEvaluator::eval_field_state(cMatch &match, const uint8_t piece, const uint8_t src_x, const uint8_t src_y){
+    //*****************************************
+    uint8_t cEvaluator::eval_field_state(cPiece *wlowest, cPiece *blowest, cMatch &match, const uint8_t piece, const uint8_t src_x, const uint8_t src_y){
 
-      uint8_t wscore = 0;
-      uint8_t bscore = 0;
+        wlowest = nullptr;
+        blowest = nullptr;
 
-      vector <cPiece> wpieces, bpieces;
+        uint8_t wscore = 0;
+        uint8_t bscore = 0;
 
-      match.m_board.search_all_dirs_for_touching_pieces(wpieces, bpieces, src_x, src_y, match.get_last_move(), true);
+        vector <cPiece> wpieces, bpieces;
 
-      for(const cPiece &piece : wpieces){
+        match.m_board.search_all_dirs_for_touching_pieces(wpieces, bpieces, src_x, src_y, match.get_last_move(), true);
 
-          if(match.m_board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
-              wscore += 1;
-          }
-          else{
-              wscore += 2;
-          }
+        for(const cPiece &piece : wpieces){
 
-      }
+            if(match.m_board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
+                wscore += 1;
+            }
+            else{
+                wscore += 2;
+            }
 
-      for(const cPiece &piece : bpieces){
+        }
 
-          if(match.m_board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
-              bscore += 1;
-          }
-          else{
-              bscore += 2;
-          }
-      }
+        for(const cPiece &piece : bpieces){
 
-    if(wscore == 0 && bscore == 0){
-          return mF_CLEAR;
-      }
-      else if(wscore > 0 && bscore == 0){
-          return mF_WDOM;
-      }
-      else if(wscore == 0 && bscore > 0){
-          return mF_BDOM;
-      }
-      else if(wscore > bscore){
-          const cPiece *wlowest = get_lowest(wpieces);
-          const cPiece *blowest = get_lowest(bpieces);
+            if(match.m_board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
+                bscore += 1;
+            }
+            else{
+                bscore += 2;
+            }
+        }
 
-          if(wlowest != nullptr && blowest != nullptr){
-              if(PIECES_RANKS[piece] <= PIECES_RANKS[blowest->m_piece] && PIECES_RANKS[wlowest->m_piece] <= PIECES_RANKS[blowest->m_piece]){
-                  return mF_WGT;
-              }
-          }
+        if(wscore == 0 && bscore == 0){
+            return mF_CLEAR;
+        }
+        else if(wscore > 0 && bscore == 0){
+            return mF_WDOM;
+        }
+        else if(wscore == 0 && bscore > 0){
+            return mF_BDOM;
+        }
+        else if(wscore == bscore){
+            wlowest = get_lowest(wpieces);
+            blowest = get_lowest(bpieces);
 
-          return mF_HAZY;
-      }
-      else if(wscore < bscore){
-          const cPiece *wlowest = get_lowest(wpieces);
-          const cPiece *blowest = get_lowest(bpieces);
+            if(wlowest != nullptr && blowest != nullptr){
+                if(piece == mBLK){
+                  if(PIECES_RANKS[wlowest->m_piece] == PIECES_RANKS[blowest->m_piece]){
+                      return mF_EQUAL;
+                  }
+                }
+                else if(PIECES_COLORS[piece] == mWHITE){
+                    if(PIECES_RANKS[piece] <= PIECES_RANKS[blowest->m_piece]){
+                        return mF_EQUAL;
+                    }
+                }
+                else{
+                    if(PIECES_RANKS[piece] <= PIECES_RANKS[wlowest->m_piece]){
+                        return mF_EQUAL;
+                    }
+                }
+            }
 
-          if(wlowest != nullptr && blowest != nullptr){
-              if(PIECES_RANKS[piece] <= PIECES_RANKS[wlowest->m_piece] && PIECES_RANKS[blowest->m_piece] <= PIECES_RANKS[wlowest->m_piece]){
-                  return mF_BGT;
-              }
-          }
+            return mF_HAZY;
+        }
+        else if(wscore > bscore){
+            wlowest = get_lowest(wpieces);
+            blowest = get_lowest(bpieces);
 
-          return mF_HAZY;
-      }
+            if(wlowest != nullptr && blowest != nullptr){
+                if(PIECES_RANKS[piece] <= PIECES_RANKS[blowest->m_piece] && PIECES_RANKS[wlowest->m_piece] <= PIECES_RANKS[blowest->m_piece]){
+                    return mF_WGT;
+                }
+            }
 
-      return mF_HAZY;
+            return mF_HAZY;
+        }
+        else if(bscore > wscore){
+            wlowest = get_lowest(wpieces);
+            blowest = get_lowest(bpieces);
 
-  }
-  //*****************************************
+            if(wlowest != nullptr && blowest != nullptr){
+                if(PIECES_RANKS[piece] <= PIECES_RANKS[wlowest->m_piece] && PIECES_RANKS[blowest->m_piece] <= PIECES_RANKS[wlowest->m_piece]){
+                    return mF_BGT;
+                }
+            }
+
+            return mF_HAZY;
+        }
+
+        return mF_HAZY;
+
+    }
+    //*****************************************
 
 
 
@@ -396,10 +424,10 @@
   bool cEvaluator::is_field_save_for_color(const uint8_t field_state, const uint8_t color){
 
       if(color == mWHITE){
-          return (field_state == mF_CLEAR || field_state == mF_WGT || field_state == mF_WDOM);
+          return (field_state == mF_CLEAR || field_state == mF_EQUAL || field_state == mF_WGT || field_state == mF_WDOM);
       }
       else{
-          return (field_state == mF_CLEAR ||field_state == mF_BGT || field_state == mF_BDOM);
+          return (field_state == mF_CLEAR || field_state == mF_EQUAL || field_state == mF_BGT || field_state == mF_BDOM);
       }
 
   }
@@ -408,7 +436,7 @@
 
 
   //*****************************************
-  bool cEvaluator::does_move_touch_soft_pinned(cMatch &match, const cMove &move){
+  bool cEvaluator::does_move_touch_weak_piece(cMatch &match, const cMove &move){
 
       cBoard board(match.m_board);
       board.do_move_on_board_only(move);
@@ -417,18 +445,79 @@
 
       board.search_from_piece(wpieces, bpieces, move.m_srcpiece, move.m_dst_x, move.m_dst_y, false);
 
-      uint16_t move_dir = cBoard::eval_cardinale(move.m_src_x, move.m_src_y, move.m_dst_x, move.m_dst_y);
+      uint16_t move_dir;
+
+      if(move.is_short_castling()){
+          cMove rookmove;
+          move.create_fake_rook_move(rookmove);
+
+          board.search_from_piece(wpieces, bpieces, rookmove.m_srcpiece, rookmove.m_dst_x, rookmove.m_dst_y, false);
+
+          move_dir = mNO_DIR;
+      }
+      else if(move.is_long_castling()){
+          cMove rookmove;
+          move.create_fake_rook_move(rookmove);
+
+          board.search_from_piece(wpieces, bpieces, rookmove.m_srcpiece, rookmove.m_dst_x, rookmove.m_dst_y, false);
+
+          move_dir = mNO_DIR;
+      }
+      else{
+          if(move.m_srcpiece == mWBP || move.m_srcpiece == mBBP || 
+             move.m_srcpiece == mWRK || move.m_srcpiece == mBRK || 
+             move.m_srcpiece == mWQU || move.m_srcpiece == mBQU){
+              move_dir = cBoard::eval_cardinale(move.m_src_x, move.m_src_y, move.m_dst_x, move.m_dst_y);
+          }
+          else{
+              move_dir = mNO_DIR;
+          }
+      }
 
       for(const cPiece &piece : wpieces){
 
           uint16_t touch_dir = cBoard::eval_cardinale(move.m_dst_x, move.m_dst_y, piece.m_xpos, piece.m_ypos);
 
-          if(move_dir == touch_dir){
+          if(move_dir != mNO_DIR && move_dir == touch_dir){
               continue;
           }
 
-          if(match.m_board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
+          if(board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
               return true;
+          }
+
+          cPiece *wlowest = nullptr;
+          cPiece *blowest = nullptr;
+          uint8_t field_state = eval_field_state(wlowest, blowest, match, piece.m_piece, piece.m_xpos, piece.m_ypos);
+
+          // support
+          if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+              if(is_piece_weak(match, piece)){
+                  if(blowest != nullptr){
+                      if(move.m_srcpiece == mWPW || blowest->m_piece != mBPW){
+                          return true;
+                      }
+                  }
+                  else{
+                      return true;
+                  }
+              }
+          }
+          // attack
+          else if(PIECES_COLORS[move.m_srcpiece] == mBLACK){
+              if(field_state == mF_CLEAR){
+                  return true;
+              }
+              else if(is_piece_weak(match, piece)){
+                  if(wlowest != nullptr){
+                      if(move.m_srcpiece == mBPW || wlowest->m_piece != mWPW){
+                          return true;
+                      }
+                  }
+                  else{
+                       return true;
+                  }
+              }
           }
 
       }
@@ -437,12 +526,46 @@
 
           uint16_t touch_dir = cBoard::eval_cardinale(move.m_dst_x, move.m_dst_y, piece.m_xpos, piece.m_ypos);
 
-          if(move_dir == touch_dir){
+          if(move_dir != mNO_DIR && move_dir == touch_dir){
               continue;
           }
 
-          if(match.m_board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
+          if(board.is_soft_pinned(piece.m_xpos, piece.m_ypos)){
               return true;
+          }
+
+          cPiece *wlowest = nullptr;
+          cPiece *blowest = nullptr;
+          uint8_t field_state = eval_field_state(wlowest, blowest, match, piece.m_piece, piece.m_xpos, piece.m_ypos);
+
+          // support
+          if(PIECES_COLORS[move.m_srcpiece] == mBLACK){
+              if(is_piece_weak(match, piece)){
+                  if(wlowest != nullptr){
+                      if(move.m_srcpiece == mBPW || wlowest->m_piece != mWPW){
+                          return true;
+                      }
+                  }
+                  else{
+                      return true;
+                  }
+              }
+          }
+          // attack
+          else if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
+              if(field_state == mF_CLEAR){
+                  return true;
+              }
+              else if(is_piece_weak(match, piece)){
+                  if(blowest != nullptr){
+                      if(move.m_srcpiece == mWPW || blowest->m_piece != mBPW){
+                          return true;
+                      }
+                  }
+                  else{
+                      return true;
+                  }
+              }
           }
 
       }
@@ -458,7 +581,6 @@
   bool cEvaluator::does_move_escape_soft_pin(cMatch &match, const cMove &move){
 
       if(match.m_board.is_piece_behind_soft_pinned(move.m_src_x, move.m_src_y)){
-
           cBoard board(match.m_board);
           board.do_move_on_board_only(move);
 
@@ -470,70 +592,111 @@
   }
   //*****************************************
 
- 
-  
-  
-  //*****************************************
-  bool cEvaluator::does_move_sac_for_supply(cMatch &match, cMove &move){
-
-        if(PIECES_COLORS[move.m_dstpiece] == mBLK){
-            return false;
-        }
-
-        if( ! (match.m_board.is_soft_pinned(move.m_dst_x, move.m_dst_y)) ){
-            return false;
-        }
-
-        vector<cPiece> supplies, others;
-
-        uint8_t queen;
-
-        if(PIECES_COLORS[move.m_srcpiece] == mWHITE){
-            match.m_board.search_all_dirs_for_touching_pieces(supplies, others, move.m_src_x, move.m_src_y, match.get_last_move(), true);
-            
-            queen = mWQU;
-        }
-        else{
-            match.m_board.search_all_dirs_for_touching_pieces(others, supplies, move.m_src_x, move.m_src_y, match.get_last_move(), true);
-
-            queen = mBQU;
-        }
-
-        // remove short range friends and friends with not matching move steps
-        vector<cPiece>::iterator it = supplies.begin();
-
-        while(it != supplies.end()){
-
-            if(it->m_piece == mWPW || it->m_piece == mBPW ||
-               it->m_piece == mWKG || it->m_piece == mBKG ||
-               it->m_piece == mWKN || it->m_piece == mBKN){
-
-                it = supplies.erase(it);
-
-            }
-            else if(it->m_piece != move.m_srcpiece && it->m_piece != queen){
-                it = supplies.erase(it);
-            }
-            else{
-                ++it;
-                return true;
-            }
-
-        }
-
-        return false;
-    }
-  //*****************************************
-  
 
 
   //*****************************************
-  bool cEvaluator::does_move_attack_king(cMatch &match, const cMove &move){
+  bool cEvaluator::does_move_escape_attacks(cMatch &match, const cMove &move){
 
-    cMatch nmatch(match);
-    nmatch.do_move(move);
+      if(is_piece_weak(match, cPiece(move.m_srcpiece, move.m_src_x, move.m_src_y))){
+          cMatch newmatch(match);
+          newmatch.do_move(move);
 
-    return nmatch.is_king_attacked();
+          return (! is_piece_weak(newmatch, cPiece(move.m_srcpiece, move.m_dst_x, move.m_dst_y)) );
+      }
+
+      return false;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cEvaluator::does_move_do_check(cMatch &match, const cMove &move){
+
+    cMatch newmatch(match);
+    newmatch.do_move(move);
+
+    return newmatch.is_king_attacked();
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cEvaluator::find_mate(cMatch &match, const cMove &move, const uint8_t maxdepth){
+
+      cMatch newmatch(match);
+
+      newmatch.do_move(move);
+      
+      return _find_mate(newmatch, 1, maxdepth);
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cEvaluator::_find_mate(cMatch &match, const uint8_t depth, const uint8_t maxdepth){
+
+      cGenerator2 gen2(match);
+
+      uint8_t count = 0;
+
+      bool mate = false;
+
+      while(true){
+
+          cMove *moveptr = gen2.gen_move();
+
+          if(moveptr == nullptr){
+              if(count == 0){
+                  // mate of odds are to find
+                  if((depth % 2) == 1){
+                      return true;
+                  }
+                  // mate of even don't count
+                  else{
+                      return false;
+                  }
+              }
+
+              return mate;
+          }
+
+          if(depth >= maxdepth){
+              return false;
+          }
+
+          count++;
+
+          match.do_move(cMove(*moveptr));
+
+          bool newmate = _find_mate(match, depth + 1, maxdepth);
+
+          // even take move to mate
+          if((depth % 2) == 0){
+              mate = (mate || newmate);
+          }
+          else{
+              // odds reject move to mate - if possible
+              if(count == 1){
+                  mate = newmate;
+              }
+              else{
+                  mate = (mate && newmate);
+              }
+          }
+
+          match.undo_move();
+
+          delete moveptr;
+
+      }
+
+      return false;
 
   }
   //*****************************************
@@ -591,6 +754,20 @@
       }
 
       return false;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cEvaluator::is_piece_weak(cMatch &match, const cPiece &piece){
+
+      cPiece *wlowest = nullptr;
+      cPiece *blowest = nullptr;
+      uint8_t field_state = eval_field_state(wlowest, blowest, match, piece.m_piece, piece.m_xpos, piece.m_ypos);
+
+      return (! is_field_save_for_color(field_state, PIECES_COLORS[piece.m_piece]));
 
   }
   //*****************************************
@@ -693,40 +870,84 @@
 
   //*****************************************
   void cEvaluator::priorize_move(cMatch &match, cMove &move){
-  
+
+      uint8_t count = 0;
+
       cMatch match_after_move(match);
       match_after_move.do_move(move);
 
-      uint8_t dstfield_state = eval_field_state(match_after_move, move.m_srcpiece, move.m_dst_x, move.m_dst_y);
+      cPiece *wlowest = nullptr;
+      cPiece *blowest = nullptr;
+      uint8_t dstfield_state = eval_field_state(wlowest, blowest, match_after_move, move.m_srcpiece, move.m_dst_x, move.m_dst_y);
 
-      priorize_passed_pawn_supporting_move(match_after_move, move, dstfield_state);
+      if(priorize_passed_pawn_supporting_move(match_after_move, move, dstfield_state)){
+          count++;
+      }
 
-      priorize_capture_move(move, dstfield_state);
+      if(priorize_capture_move(move, dstfield_state)){
+          count++;
+      }
 
       if(move.m_srcpiece == mWKG || move.m_srcpiece == mBKG){
-          priorize_castling_move(move);
+          if(priorize_castling_move(move)){
+              count++;
+          }
+
+          // do these checks for rooks after castling
+
+          if(move.is_short_castling() || move.is_long_castling()){
+              cMove rookmove;
+              move.create_fake_rook_move(rookmove);
+              
+              if(priorize_passed_pawn_supporting_move(match_after_move, rookmove, dstfield_state)){
+                  count++;
+              }
+
+              if(priorize_king_attacking_move(match_after_move, rookmove, dstfield_state)){
+                  count++;
+              }
+              
+              if(priorize_touch_weak_piece_move(match, rookmove, dstfield_state)){
+                  count++;
+              }
+
+              move.m_prio = min(move.m_prio, rookmove.m_prio);
+          }
       }
       else{
-          priorize_king_attacking_move(match_after_move, move, dstfield_state);
+          if(priorize_king_attacking_move(match_after_move, move, dstfield_state)){
+              count++;
+          }
 
-          priorize_escape_move(match, move, dstfield_state);
+          if(priorize_escape_move(match, move, dstfield_state)){
+              count++;
+          }
 
-          priorize_touch_soft_pinned_move(match, move, dstfield_state);
-
-          priorize_sac_for_supply_move(match, move);
+          if(priorize_touch_weak_piece_move(match, move, dstfield_state)){
+              count++;
+          }
 
           if(move.m_srcpiece == mWPW || move.m_srcpiece == mBPW){
-              priorize_promotion_move(move, dstfield_state);
+              if(priorize_promotion_move(move, dstfield_state)){
+                  count++;
+              }
 
-              priorize_passed_pawn_move(match_after_move, move, dstfield_state);
+              if(priorize_passed_pawn_move(match_after_move, move, dstfield_state)){
+                  count++;
+              }
           }
       }
 
-      if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
-          move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM + 3));
+      if(count == 0){
+          if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
+              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_BOTTOM - 50));
+          }
+          else{
+              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_BOTTOM - 100));
+          }
       }
       else{
-          move.m_prio = min(move.m_prio, cMove::P_LOW);
+          move.m_prio = max(cMove::P_TOP, (uint8_t)(move.m_prio - (count - 1)));
       }
 
   }
@@ -735,9 +956,9 @@
 
 
   //*****************************************
-  const cPiece *cEvaluator::get_lowest(vector <cPiece> &pieces){
+  cPiece *cEvaluator::get_lowest(vector <cPiece> &pieces){
 
-      const cPiece *lowest = nullptr;
+      cPiece *lowest = nullptr;
 
       if(pieces.size() == 0){
           return lowest;
@@ -745,7 +966,7 @@
 
       lowest = &(pieces.front());
 
-      for(const cPiece &piece : pieces){
+      for(cPiece &piece : pieces){
 
           if(PIECES_RANKS[piece.m_piece] < PIECES_RANKS[lowest->m_piece]){
               lowest = &(piece);
@@ -761,27 +982,33 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_capture_move(cMove &move, const uint8_t dstfield_state){
+  bool cEvaluator::priorize_capture_move(cMove &move, const uint8_t dstfield_state){
 
       if(move.is_en_passant()){ 
-          move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_HIGH_UP - 8));
+          move.m_prio = min(move.m_prio, cMove::P_CAPTURE);
+
+          return true;
       }
       else if(move.m_dstpiece != mBLK){
           if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_HIGH_UP - 6));
+              move.m_prio = min(move.m_prio, cMove::P_CAPTURE);
           }
           else{
               if(PIECES_RANKS[move.m_srcpiece] < PIECES_RANKS[move.m_dstpiece]){
-                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_HIGH_UP - 4));
+                  move.m_prio = min(move.m_prio, cMove::P_CAPTURE);
               }
               else if(PIECES_RANKS[move.m_srcpiece] == PIECES_RANKS[move.m_dstpiece]){
-                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP + 5));
+                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_CAPTURE + cMove::A_QUITE_GOOD));
               }
               else{
-                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_DOWN + 5));
+                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_CAPTURE + cMove::A_BAD));
               }
           }
+
+          return true;
       }
+
+      return false;
 
   }
   //*****************************************
@@ -789,16 +1016,20 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_promotion_move(cMove &move, const uint8_t dstfield_state){
+  bool cEvaluator::priorize_promotion_move(cMove &move, const uint8_t dstfield_state){
 
       if(move.is_promotion()){
           if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_HIGH_UP - 10));
+              move.m_prio = min(move.m_prio, cMove::P_PROMOTION);
           }
           else{
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_DOWN - 10));
+              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_PROMOTION + cMove::A_BAD));
           }
+          
+          return true;
       }
+
+      return false;
 
   }
   //*****************************************
@@ -806,11 +1037,15 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_castling_move(cMove &move){
+  bool cEvaluator::priorize_castling_move(cMove &move){
 
       if(move.is_short_castling() || move.is_long_castling()){
-          move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP + 6));
+          move.m_prio = min(move.m_prio, cMove::P_CASTLING);
+
+          return true;
       }
+
+      return false;
 
   }
   //*****************************************
@@ -818,21 +1053,25 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_passed_pawn_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
+  bool cEvaluator::priorize_passed_pawn_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
 
       if(match_after_move.m_board.is_passed_pawn(move.m_srcpiece, move.m_dst_x, move.m_dst_y)){
           if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
               if(match_after_move.eval_stage() == cMatch::STAGE_ENDGAME){ 
-                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP - 3));
+                  move.m_prio = min(move.m_prio, cMove::P_PASSED_PAWN);
               }
               else{
-                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM - 3));
+                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_PASSED_PAWN + cMove::A_HAZY));
               }
           }
           else{
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_LOW - 3));
+              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_PASSED_PAWN + cMove::A_BAD));
           }
+
+          return true;
       }
+
+      return false;
 
   }
   //*****************************************
@@ -840,7 +1079,7 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_passed_pawn_supporting_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
+  bool cEvaluator::priorize_passed_pawn_supporting_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
 
       vector<cPiece> friends, enemies;
 
@@ -865,20 +1104,22 @@
 
               if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){
                   if(match_after_move.eval_stage() == cMatch::STAGE_ENDGAME){  
-                      move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP - 2));
+                      move.m_prio = min(move.m_prio, cMove::P_PASSED_PAWN_SUPPORT);
                   }
                   else{
-                      move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM - 2));
+                      move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_PASSED_PAWN_SUPPORT + cMove::A_HAZY));
                   }
               }
               else{
-                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_LOW - 2));
+                  move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_PASSED_PAWN_SUPPORT + cMove::A_BAD));
               }
 
-              return;
+              return true;
           }
 
       }
+      
+      return false;
 
   }
   //*****************************************
@@ -886,16 +1127,20 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_king_attacking_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
+  bool cEvaluator::priorize_king_attacking_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
 
       if(match_after_move.is_king_attacked()){
           if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP - 10));
+              move.m_prio = min(move.m_prio, cMove::P_CHECK);
           }
           else{
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_LOW - 10));
+              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_CHECK + cMove::A_BAD));
           }
+          
+          return true;
       }
+      
+      return false;
 
   }
   //*****************************************
@@ -903,16 +1148,20 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_escape_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
+  bool cEvaluator::priorize_escape_move(cMatch &match, cMove &move, const uint8_t dstfield_state){
 
-      if(does_move_escape_soft_pin(match_after_move, move)){
+      if(does_move_escape_soft_pin(match, move)){
           if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP + 2));
+              move.m_prio = min(move.m_prio, cMove::P_ESCAPE);
           }
           else{
-              move.m_prio = min(move.m_prio, cMove::P_LOW);
+              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_ESCAPE + cMove::A_BAD));
           }
+          
+          return true;
       }
+
+      return false;
 
   }
   //*****************************************
@@ -920,28 +1169,20 @@
 
 
   //*****************************************
-  void cEvaluator::priorize_touch_soft_pinned_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
+  bool cEvaluator::priorize_touch_weak_piece_move(cMatch &match_after_move, cMove &move, const uint8_t dstfield_state){
 
-      if(cEvaluator::does_move_touch_soft_pinned(match_after_move, move)){
+      if(cEvaluator::does_move_touch_weak_piece(match_after_move, move)){
           if(is_field_save_for_color(dstfield_state, PIECES_COLORS[move.m_srcpiece])){ 
-              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP + 3));
+              move.m_prio = min(move.m_prio, cMove::P_TOUCH_WEAK_PIECE);
           }
           else{
-              move.m_prio = min(move.m_prio, cMove::P_LOW);
+              move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_TOUCH_WEAK_PIECE + cMove::A_BAD));
           }
+          
+          return true;
       }
 
-  }
-  //*****************************************
-
-
-
-  //*****************************************
-  void cEvaluator::priorize_sac_for_supply_move(cMatch &match, cMove &move){
-
-      if(cEvaluator::does_move_sac_for_supply(match, move)){
-          move.m_prio = min(move.m_prio, (uint8_t)(cMove::P_MEDIUM_UP - 7));
-      }
+      return false;
 
   }
   //*****************************************

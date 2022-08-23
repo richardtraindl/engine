@@ -202,7 +202,7 @@
             return (dir == mKNIGHT_DIR);
         }
         else if(piece == mWPW){
-            if((abs(src_x - dst_x) == 1) && (src_y - dst_y == -1)){
+            if( (abs(dst_x - src_x) == 1) && (abs(src_y - dst_y) == 1) ){
                 return (dir == mSTHWST_NTHEST || dir == mSTHEST_NTHWST);
             }
             else{
@@ -210,7 +210,7 @@
             }
         }
         else if(piece == mBPW){
-            if((abs(src_x - dst_x) == 1) && (src_y - dst_y == 1)){
+            if( (abs(dst_x - src_x) == 1) && (abs(src_y - dst_y) == 1) ){
                 return (dir == mNTHEST_STHWST || dir == mNTHWST_STHEST);
             }
             else{
@@ -220,5 +220,13 @@
         else{
             return false;
         }
+
+    }
+
+
+
+    string cPiece::format() const{
+
+        return reverse_lookup8(PIECES, m_piece) + " " + cBoard::indices_to_coord(m_xpos, m_ypos);
 
     }

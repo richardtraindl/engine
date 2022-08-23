@@ -5,6 +5,7 @@
       #define DAEMON_HPP
 
 
+      #include <vector>
       #include "./match.hpp"
       #include "./values.hpp"
 
@@ -15,13 +16,18 @@
       class cDaemon{
 
         public:
+          cDaemon(cMatch &match);
+
+          bool is_continue(cMatch &match, const cMove &move, const uint8_t depth);
+
+        private:
           uint8_t m_move_cnt;
 
           uint8_t m_capture_move_cnt;
 
-          uint8_t m_single_capture_move_prio;
-
           uint8_t m_other_move_cnt;
+
+          vector<cMove> m_escape_moves;
 
           bool m_last_move_was_check;
 
@@ -29,9 +35,7 @@
 
           bool m_last_move_was_promotion;
 
-          cDaemon(cMatch &match);
-
-          bool is_continue(cMatch &match, const cMove &move, const uint8_t depth, const uint8_t count);
+          cMove *m_postponed_moveptr;
 
       };
 

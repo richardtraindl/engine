@@ -339,50 +339,55 @@
 
 
     //*****************************************
-    bool cBoard::is_soft_pinned(const uint8_t src_x, const uint8_t src_y) const{
+    bool cBoard::get_soft_pinned(vector<cPiece> &targets, const uint8_t src_x, const uint8_t src_y) const{
 
         uint8_t piece = getfield(src_x, src_y);
 
         if(piece == mBLK){
             return false;
         }
-        
-        for(uint8_t i = 0; i < size(cPiece::qu_steps); i += 2){
-          
-            vector <cPiece> targets;
 
+        for(uint8_t i = 0; i < size(cPiece::qu_steps); i += 2){
+
+            targets.clear();
             search_cardinale(targets, src_x, src_y, cPiece::qu_steps[i].m_cardinale);
 
             if(targets.size() != 2){
                 continue;
             }
 
-            cPiece *friendptr, *enemyptr;
+            cPiece *frdbehindptr, *attackerptr;
 
             if(PIECES_COLORS[targets.front().m_piece] == PIECES_COLORS[piece]){
-                friendptr = &(targets.front());
-                enemyptr = &(targets.back());
+                frdbehindptr = &(targets.front());
+                attackerptr = &(targets.back());
             }
             else{
-                friendptr = &(targets.back());
-                enemyptr = &(targets.front());
+                frdbehindptr = &(targets.back());
+                attackerptr = &(targets.front());
             }
 
-            if(PIECES_COLORS[friendptr->m_piece] == PIECES_COLORS[enemyptr->m_piece]){
+            // friend and attacker can't have same color
+            if(PIECES_COLORS[frdbehindptr->m_piece] == PIECES_COLORS[attackerptr->m_piece]){
                 continue;
             }
 
-            if(PIECES_RANKS[friendptr->m_piece] > PIECES_RANKS[piece]){
-                if(enemyptr->m_piece == mWQU || enemyptr->m_piece == mBQU){
+            // check, if friend is supported
+            bool is_frdbehind_supported = is_field_touched(frdbehindptr->m_xpos, frdbehindptr->m_ypos, PIECES_COLORS[frdbehindptr->m_piece]);
+
+            // PIECES_RANKS[frdbehindptr->m_piece] > PIECES_RANKS[piece] ||
+            if(PIECES_RANKS[frdbehindptr->m_piece] > PIECES_RANKS[attackerptr->m_piece] || is_frdbehind_supported == false){
+
+                if(attackerptr->m_piece == mWQU || attackerptr->m_piece == mBQU){
                     return true;
                 }
                 else if(cPiece::qu_steps[i].m_cardinale == mVERTICAL || cPiece::qu_steps[i].m_cardinale == mHORIZONTAL){
-                    if(enemyptr->m_piece == mWRK || enemyptr->m_piece == mBRK){
+                    if(attackerptr->m_piece == mWRK || attackerptr->m_piece == mBRK){
                         return true;
                     }
                 }
                 else if(cPiece::qu_steps[i].m_cardinale == mDIA_LEFT_BOTTOM || cPiece::qu_steps[i].m_cardinale == mDIA_RIGHT_BOTTOM){
-                    if(enemyptr->m_piece == mWBP || enemyptr->m_piece == mBBP){
+                    if(attackerptr->m_piece == mWBP || attackerptr->m_piece == mBBP){
                         return true;
                     }
                 }
@@ -390,7 +395,19 @@
 
         }
 
+        targets.clear();
         return false;
+
+    }
+    //*****************************************
+
+
+
+    //*****************************************
+    bool cBoard::is_soft_pinned(const uint8_t src_x, const uint8_t src_y) const{
+
+        vector<cPiece> targets;
+        return get_soft_pinned(targets, src_x, src_y);
 
     }
   //*****************************************
@@ -876,3 +893,44 @@
 
   }
   //*****************************************
+
+
+
+  //*****************************************
+  void cBoard::coord_to_indices(uint8_t &x, uint8_t &y, string coord){
+
+      uint8_t x1 = (uint8_t)(coord[0]);
+
+      if(x1 > (uint8_t)'H'){
+
+          x = x1 - (uint8_t)'a';
+
+      }
+      else{
+
+          x = x1 - (uint8_t)'A';
+
+      }
+
+      uint8_t y1 = (uint8_t)(coord[1]);
+
+      y = y1 - (uint8_t)'1';
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  string cBoard::indices_to_coord(uint8_t x, uint8_t y){
+
+      ostringstream outstream;
+
+      outstream << (char)(x + (uint8_t)'a' ) << (char)(y + (uint8_t)'1');
+
+      return outstream.str();
+
+  }
+  //*****************************************
+
+
