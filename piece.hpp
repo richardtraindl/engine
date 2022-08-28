@@ -6,8 +6,6 @@
       #define PIECE_HPP
 
 
-      #include <cstdint>
-      #include <array>
       #include "./values.hpp"
 
 

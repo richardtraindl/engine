@@ -190,6 +190,7 @@
 
 
 
+    //*****************************************
     int main(void){
 
         cMatch match;
@@ -197,40 +198,15 @@
         uint8_t engine_color = mBLANK;
 
         import_minutes(match, "morphy");
-        
-        //match.m_board.setfield(2, 2, mWQU);
-        //match.m_board.setfield(3, 0, mWBP);
-        
+
         match.m_board.prnt();
 
-        //test_pins(match, 4, 4);
-
-        //cout << "score: " << to_string(match.m_score) << endl;
-
-
-        /*uint8_t src_x, src_y, dst_x, dst_y;
-        cBoard::coord_to_indices(src_x, src_y, "d1");
-        cBoard::coord_to_indices(dst_x, dst_y, "d7");
-        cMove move(src_x, src_y, dst_x, dst_y, mWRK, mBKN, mBLK, cMove::P_BOTTOM);
-        test_does_move_touch_weak_piece(match, move);*/
-
-        //uint8_t state = cEvaluator::eval_field_state(match, mWRK, 3, 0);
-        //cout << "state " << to_string(state) << endl;
-
         test_is_continue(match, 12);
-
-        //test_is_piece_weak(match);
-
-        //test_gen2(match);
-        
-        //test_gen2_king(match, mWHITE);
-
-        //test_find_mate(match, move, 5);
-        
-        //cout << cMatch::fmttime(160) << endl;;
 
         play(match, engine_color, 2);
 
         return 0;
 
     }
+    //*****************************************
+

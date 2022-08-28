@@ -4,8 +4,9 @@
   #ifndef TEST_HPP
 
     #define TEST_HPP
-
-
+  #include <algorithm> 
+    #include <vector>
+    #include <iomanip>
     #include <cstdint>
     #include <map>
     #include <string>

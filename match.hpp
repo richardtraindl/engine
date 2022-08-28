@@ -5,10 +5,6 @@
     #define MATCH_HPP
 
 
-    #include <vector>
-    #include <iomanip>
-    #include <unistd.h>
-    #include <algorithm> 
     #include "./board.hpp"
     #include "./move.hpp"
     #include "./piece.hpp"

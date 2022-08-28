@@ -1,8 +1,10 @@
 
 
   #include "./threading.hpp"
+  #include <iostream>
 
 
+  //*****************************************
   cThreading::cThreading(cMatch *match, vector<cMove> &moves, int32_t alpha, int32_t beta){
 
     m_match = match;
@@ -26,12 +28,18 @@
     m_beta = beta;
 
   }
+  //*****************************************
 
 
+
+  //*****************************************
   cThreading::~cThreading(){
   }
+  //*****************************************
 
 
+
+  //*****************************************
   void cThreading::start(const uint8_t depth, const uint8_t maxdepth, const uint8_t version){
 
     for(uint8_t i = 0; i < MAXTHREADS; ++i){
@@ -69,8 +77,11 @@
     }
 
   }
+  //*****************************************
 
 
+
+  //*****************************************
   bool cThreading::fetch_candidates(int32_t &newscore, vector<cMove> &newmoves){
       
     if(has_finished()){
@@ -97,8 +108,11 @@
     }
 
   }
+  //*****************************************
 
 
+
+  //*****************************************
   void cThreading::update_candidates(){
 
       //bool cutoff = false;
@@ -175,8 +189,11 @@
       //return cutoff;
 
   }
+  //*****************************************
 
 
+
+  //*****************************************
   bool cThreading::has_finished(){
       
       m_threading_mutex.lock();
@@ -205,8 +222,11 @@
       return true;
 
   }
+  //*****************************************
 
 
+
+  //*****************************************
   void cThreading::terminate(){
 
       //g_threading_mutex.lock();
@@ -226,4 +246,5 @@
       //g_threading_mutex.unlock();
 
   }
+  //*****************************************
 

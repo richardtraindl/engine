@@ -43,132 +43,152 @@
   }
   //*****************************************
 
-
-
- //*****************************************
-  int32_t cEvaluator::score_board(cMatch &match, const uint8_t depth, const uint8_t stage){
+ 
+ 
+  //*****************************************
+  int32_t cEvaluator::score_opening(cMatch &match){
 
       int32_t score = 0;
 
-      /*
-      // opening
-      if(stage == STAGE_OPENING){
+      if(match.eval_stage() != cMatch::STAGE_OPENING){
+          return score;
+      }
 
-          // penalty for inactive white pieces
-          cPiece white_pieces[4] = { 
-              cPiece(mWKN, 1, 0), cPiece(mWKN, 6, 0), cPiece(mWBP, 2, 0), cPiece(mWBP, 5, 0) 
-          };
+      // penalty for inactive white pieces
+      cPiece white_pieces[4] = { 
+          cPiece(mWKN, 1, 0), cPiece(mWKN, 6, 0), cPiece(mWBP, 2, 0), cPiece(mWBP, 5, 0) 
+      };
 
-          uint8_t wcnt = 0;
+      uint8_t wcnt = 0;
 
-          for(const cPiece &wpiece : white_pieces){
+      for(const cPiece &piece : white_pieces){
 
-              if(m_board.getfield(wpiece.m_xpos, wpiece.m_ypos) == wpiece.m_piece){
-                  wcnt++;
+          if(match.m_board.getfield(piece.m_xpos, piece.m_ypos) == piece.m_piece){
+              wcnt++;
+          }
+
+      }
+
+      if(wcnt > 1){
+          // penalty
+          score += SCORES[mBPLUS1] * wcnt;
+      }
+
+      // penalty for inactive black pieces
+      cPiece black_pieces[4] = { 
+          cPiece(mBKN, 1, 7), cPiece(mBKN, 6, 7), cPiece(mBBP, 2, 7), cPiece(mBBP, 5, 7) 
+      };
+
+      uint8_t bcnt = 0;
+
+      for(const cPiece &piece : black_pieces){
+
+          if(match.m_board.getfield(piece.m_xpos, piece.m_ypos) == piece.m_piece){
+              bcnt++;
+          }
+
+      }
+
+      if(bcnt > 1){
+          // penalty
+          score += SCORES[mWPLUS1] * bcnt;
+      }
+
+
+      // penalty for inactive white and black pawns
+      wcnt = 0;
+      bcnt = 0;
+
+      for(uint8_t x = 0; x < 8; ++x){
+
+          if(match.m_board.getfield(x, 1) == mWPW){
+              wcnt++;
+          }
+
+          if(match.m_board.getfield(x, 6) == mBPW){
+              bcnt++;
+          }
+
+      }
+
+      if(wcnt >= 6){
+          // penalty
+          score += SCORES[mBPLUS1];
+      }
+
+      if(bcnt >= 6){
+          // penalty
+          score += SCORES[mWPLUS1];
+      }
+
+
+      // pawns on central fields
+      vector<cPiece> wpieces, bpieces;
+      
+      for(uint8_t y = 3; y <= 4; ++y){
+
+          for(uint8_t x = 3; x <= 4; ++x){
+
+              match.m_board.search_all_dirs_for_touching_pieces(wpieces, bpieces, x, y, match.get_last_move(), false);
+
+          }
+
+      }
+
+      for(const cPiece &piece : wpieces){
+
+          if(piece.m_piece == mWPW){
+              score += SCORES[mWPLUS1];
+
+              if(piece.m_ypos == 3){
+                  // addition plus for 4th rank
+                  score += SCORES[mWPLUS1]; 
               }
-
           }
 
-          if(wcnt > 1){
-              score += SCORES[mBPLUS1] * wcnt; // penalty
-          }
+      }
 
+      for(const cPiece &piece : bpieces){
 
-          // penalty for inactive black pieces
-          cPiece black_pieces[4] = { 
-              cPiece(mBKN, 1, 7), cPiece(mBKN, 6, 7), cPiece(mBBP, 2, 7), cPiece(mBBP, 5, 7) 
-          };
+          if(piece.m_piece == mBPW){
+              score += SCORES[mBPLUS1];
 
-          uint8_t bcnt = 0;
-
-          for(const cPiece &bpiece : black_pieces){
-
-              if(m_board.getfield(bpiece.m_xpos, bpiece.m_ypos) == bpiece.m_piece){
-                  bcnt++;
-              }
-
-          }
-
-          if(bcnt > 1){
-              score += SCORES[mWPLUS1] * bcnt; // penalty
-          }
-
-          // penalty for inactive white pawns
-          wcnt = 0;
-
-          for(uint8_t x = 0; x < 8; ++x){
-
-              if(m_board.getfield(x, 1) == mWPW){
-                  wcnt++;
-              }
-
-          }
-
-          if(wcnt >= 6){
-              score += SCORES[mBPLUS1]; // penalty
-          }
-
-          // penalty for inactive black pawns
-          bcnt = 0;
-
-          for(uint8_t x = 0; x < 8; ++x){
-
-              if(m_board.getfield(x, 6) == mBPW){
-                  bcnt++;
-              }
-
-          }
-
-          if(bcnt >= 6){
-              score += SCORES[mWPLUS1]; // penalty
-          }
-
-
-          // pawns on central fields
-          vector<cPiece> wpieces, bpieces;
-
-          for(uint8_t y = 3; y <= 4; ++y){
-
-              for(uint8_t x = 3; x <= 4; ++x){
-
-                  m_board.search_all_dirs_for_touching_pieces(wpieces, bpieces, x, y, false);
-
-              }
-          }
-
-          for(const cPiece &wpiece : wpieces){
-
-              if(wpiece.m_piece == mWPW){
-                  score += SCORES[mWPLUS1];
-
-                  if(wpiece.m_ypos == 3){
-                      score += SCORES[mWPLUS1]; // addition plus for 4th rank
-                  }
-              }
-
-          }
-
-          for(const cPiece &bpiece : bpieces){
-
-              if(bpiece.m_piece == mBPW){
+              if(piece.m_ypos == 4){
+                  // addition plus for 5th rank
                   score += SCORES[mBPLUS1];
-
-                  if(bpiece.m_ypos == 4){
-                      score += SCORES[mBPLUS1]; // addition plus for 5th rank
-                  }
               }
-
           }
 
-          // penalty for f2 / f7 moved pawns
-          if(m_board.getfield(5, 1) != mWPW){
-              score += SCORES[mBPLUS3]; // penalty
-          }
+      }
 
-          if(m_board.getfield(5, 6) != mBPW){
-              score += SCORES[mWPLUS3]; // penalty
-          }
-      }*/
+
+      // penalty for f2 / f7 moved pawns
+      if(match.m_board.getfield(5, 1) != mWPW){
+          // penalty
+          score += SCORES[mBPLUS3];
+      }
+
+      if(match.m_board.getfield(5, 6) != mBPW){
+          // penalty
+          score += SCORES[mWPLUS3];
+      }
+
+      return score;
+
+  }
+  //*****************************************
+
+
+
+ //*****************************************
+  int32_t cEvaluator::score_board(cMatch &match, const uint8_t depth){
+
+      int32_t score = 0;
+
+
+      // opening
+      //score += score_opening(match);
+
 
       // opening and middlegame
 
@@ -214,9 +234,9 @@
           }
       }
 
-      score += score_touches_on_all_pieces(match);
+      //score += score_touches_on_all_pieces(match);
 
-      return score;
+      return 0; //score;
 
   }
   //*****************************************
@@ -777,6 +797,10 @@
   //*****************************************
   bool cEvaluator::is_wking_weak(cMatch &match){
 
+      if(match.eval_stage() == cMatch::STAGE_ENDGAME){
+          return false; // !!!
+      }
+
       for(uint8_t i = 0; i < size(cPiece::qu_steps); ++i){
 
           vector <cPiece> wpieces, bpieces;
@@ -802,6 +826,10 @@
   //*****************************************
   bool cEvaluator::is_bking_weak(cMatch &match){
 
+      if(match.eval_stage() == cMatch::STAGE_ENDGAME){
+          return false; // !!!
+      }
+
       for(uint8_t i = 0; i < size(cPiece::qu_steps); ++i){
 
           vector <cPiece> wpieces, bpieces;
@@ -818,6 +846,24 @@
       }
 
       return false;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cEvaluator::is_king_after_move_weak(cMatch &match, const cMove &move){
+    
+      cMatch match_after_move(match);
+      match_after_move.do_move(move);
+      
+      if(match_after_move.next_color() == mWHITE){
+          return is_wking_weak(match_after_move);
+      }
+      else{
+          return is_bking_weak(match_after_move);
+      }
 
   }
   //*****************************************

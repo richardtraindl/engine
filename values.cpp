@@ -2,7 +2,8 @@
 
   #include "./values.hpp"
 
-  
+
+  //*****************************************
   map<string, uint8_t> PIECES = {
       {"blk", mBLK}, 
       {"wPw", mWPW}, 
@@ -18,22 +19,31 @@
       {"bQu", mBQU}, 
       {"bKg", mBKG}
   };
+  //*****************************************
 
 
+
+  //*****************************************
   map<string, uint8_t> COLORS = {
       {"blank", mBLANK},
       {"white", mWHITE},
       {"black", mBLACK}
   };
+  //*****************************************
 
 
+
+  //*****************************************
   map<uint8_t, uint8_t> REVERSED_COLORS = {
       {mBLANK, mBLANK},
       {mWHITE, mBLACK},
       {mBLACK, mWHITE} 
   };
+  //*****************************************
 
 
+
+  //*****************************************
   map<uint8_t, uint8_t> PIECES_COLORS = {
       {mBLK, mBLANK},
       {mWPW, mWHITE},
@@ -49,8 +59,11 @@
       {mBQU, mBLACK},
       {mBKG, mBLACK}
   };
+  //*****************************************
 
 
+
+  //*****************************************
   map<string, uint16_t> DIRS = {
       {"no_dir", mNO_DIR},
       {"est-wst", mEST_WST},
@@ -67,8 +80,11 @@
       {"dia_left_bottom", mDIA_LEFT_BOTTOM},
       {"dia_right_bottom", mDIA_RIGHT_BOTTOM}
   };
+  //*****************************************
 
 
+
+  //*****************************************
   map<uint8_t, int32_t> SCORES = {
       {mBLK, 0},
       {mWPW, -100},
@@ -92,8 +108,11 @@
       {mBPLUS3, -70},
       {mBPLUS4, -90}
   };
+  //*****************************************
 
 
+
+  //*****************************************
   map<uint8_t, int32_t> REVERSED_SCORES = {
       {mBLK, 0},
       {mWPW, 100},
@@ -109,8 +128,11 @@
       {mBQU, -900},
       {mBKG, -20000}
   };
+  //*****************************************
 
 
+
+  //*****************************************
   map<uint8_t, uint8_t> PIECES_RANKS = {
       {mBLK, 0}, 
       {mWPW, 10}, 
@@ -126,8 +148,11 @@
       {mWKG, 200}, 
       {mBKG, 200}
   };
+  //*****************************************
 
 
+
+  //*****************************************
   string reverse_lookup8(const map<string, uint8_t> &dict, int value){
 
       for(auto &x: dict){
@@ -138,8 +163,11 @@
       return "";
 
   }
+  //*****************************************
 
 
+
+  //*****************************************
   string reverse_lookup16(const map<string, uint16_t> &dict, int value){
 
       for(auto &x: dict){
@@ -150,4 +178,5 @@
       return "";
 
   }
+  //*****************************************
 

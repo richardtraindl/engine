@@ -5,7 +5,6 @@
       #define DAEMON_HPP
 
 
-      #include <vector>
       #include "./match.hpp"
       #include "./values.hpp"
 
@@ -34,8 +33,6 @@
           bool m_last_move_was_capture;
 
           bool m_last_move_was_promotion;
-
-          cMove *m_postponed_moveptr;
 
       };
 

@@ -5,7 +5,6 @@
     #define BOARD_HPP
 
 
-    #include <iostream>
     #include <vector>
     #include "./move.hpp"
     #include "./piece.hpp"
@@ -64,6 +63,8 @@
 
         static bool is_inbounds(const uint8_t x, const uint8_t y);
 
+        void do_move_on_board_only(const cMove &move);
+
         static uint16_t eval_dir(const uint8_t x1, const uint8_t y1, const uint8_t x2, const uint8_t y2);
         
         static uint16_t eval_cardinale(const uint8_t x1, const uint8_t y1, const uint8_t x2, const uint8_t y2);
@@ -97,8 +98,6 @@
         static void coord_to_indices(uint8_t &x, uint8_t &y, string coord);
 
         static string indices_to_coord(uint8_t x, uint8_t y);
-
-        void do_move_on_board_only(const cMove &move);
 
     };
 

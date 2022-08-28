@@ -22,10 +22,12 @@
 
           static int32_t score_move(cMatch &match, const cMove &move);
 
-          static int32_t score_board(cMatch &match, const uint8_t depth, const uint8_t stage);
+          static int32_t score_board(cMatch &match, const uint8_t depth);
 
           static int32_t score_touches_on_all_pieces(cMatch &match);
-          
+
+          static int32_t score_opening(cMatch &match);
+
           static int8_t eval_piece_state(cMatch &match, const uint8_t piece, const uint8_t src_x, const uint8_t src_y);
 
           static uint8_t eval_field_state(cPiece *wlowest, cPiece *blowest, cMatch &match, const uint8_t piece, const uint8_t src_x, const uint8_t src_y);
@@ -49,6 +51,8 @@
           static bool is_wking_weak(cMatch &match);
 
           static bool is_bking_weak(cMatch &match);
+
+          static bool is_king_after_move_weak(cMatch &match, const cMove &move);
 
           static bool is_wqu_wrk_on_7th_rank(uint8_t &x, uint8_t &y, const cBoard &board);
 

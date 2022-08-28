@@ -1,5 +1,8 @@
 
 
+  #include <algorithm> 
+  #include <unistd.h>
+  #include <iostream>
   #include "./match.hpp"
   #include "./daemon.hpp"
   #include "./threading.hpp"
@@ -10,7 +13,7 @@
 
 
 
-//****************************************************************************
+  //****************************************************************************
   cMatch::cMatch() : m_board(){ 
     
       m_score = 0;
@@ -24,11 +27,11 @@
       m_bofficer_cnt = 7;
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   // copy constructor
   cMatch::cMatch(const cMatch &match) : m_board(match.m_board){
 
@@ -47,18 +50,18 @@
       }
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   cMatch::~cMatch(){
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   cMove *cMatch::get_last_move(){
 
       if(m_minutes.empty()){
@@ -69,11 +72,11 @@
       }
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   void cMatch::do_move(const cMove &move){
 
       // promotion
@@ -194,11 +197,11 @@
       m_minutes.push_back(move);
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   bool cMatch::undo_move(){
 
       if(m_minutes.empty()){
@@ -327,11 +330,11 @@
       return true;
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   uint8_t cMatch::next_color() const{
 
     if(m_minutes.size() % 2 == 0){
@@ -342,11 +345,11 @@
     }
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   bool cMatch::is_king_attacked() const{
 
       vector <cPiece> attacking, others;
@@ -361,11 +364,11 @@
       return (attacking.size() > 0);
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   uint8_t cMatch::eval_status(){
 
         vector<cMove> moves;
@@ -392,11 +395,11 @@
         return STATUS_DRAW;
 
     }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   string cMatch::format_moves(const vector<cMove> &moves, const bool ext){
 
       string str_moves = "";
@@ -408,29 +411,32 @@
       return str_moves;
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   string cMatch::fmttime(time_t seconds){
 
-      time_t hours = seconds / 3600;
+      string str_hours = to_string(seconds / 3600);
+      if(str_hours.length() == 1){ str_hours = "0" + str_hours; };
 
       time_t remaining = seconds % 3600;
 
-      time_t minutes = remaining / 60;
+      string str_minutes = to_string(remaining / 60);
+      if(str_minutes.length() == 1){ str_minutes = "0" + str_minutes; };
 
-      time_t secs = remaining % 60;
+      string str_seconds = to_string(remaining % 60);
+      if(str_seconds.length() == 1){ str_seconds = "0" + str_seconds; };
 
-      return to_string(hours) + ":" + to_string(minutes) + ":" + to_string(secs);
+      return str_hours + ":" + str_minutes + ":" + str_seconds;
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   void cMatch::calc_move(int32_t &rscore, vector<cMove> &rmoves, const uint8_t version){
 
     time_t time_start = time(0);
@@ -443,7 +449,7 @@
 
     uint8_t maxdepth = 3;
 
-    //void init_tracer();
+    void init_tracer();
 
     if(version == 1){
         calc_alphabeta(rscore, rmoves, depth, maxdepth, alpha, beta);
@@ -461,11 +467,11 @@
     prnt_tracer();
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   bool cMatch::is_move_valid(uint8_t src_x, uint8_t src_y, uint8_t dst_x, uint8_t dst_y, uint8_t prompiece){
 
         vector<cMove> moves;
@@ -491,207 +497,13 @@
     }
 
 
-//****************************************************************************
+  //****************************************************************************
 
-// CALCULATION
-// CALCULATION
-// CALCULATION
+  // CALCULATION
+  // CALCULATION
+  // CALCULATION
 
-//****************************************************************************
-  void cMatch::calc_alphabeta2(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta){
-
-      int32_t newscore;
-
-      u_int8_t count = 0;
-
-      bool maximizing = (next_color() == mWHITE);
-
-      if(maximizing){
-          rscore = SCORES[mWKG] * 10;
-      }
-      else{
-          rscore = SCORES[mBKG] * 10;
-      }
-
-      if(depth == 1){
-          vector<cMove> moves;
-
-          cGenerator gen(*this);
-          gen.gen_moves(moves, next_color());
-          
-          if(moves.size() == 0){
-              rscore = score_terminate(depth);
-
-              return;
-          }
-          else if(moves.size() == 1 && depth == 1){
-              cMove move = moves.back();
-
-              rscore = m_score; // + cEvaluator::score_board(*this, depth, stage);
-
-              rmoves.push_back(move);
-
-              return;
-          }
-
-          sort(moves.begin(), moves.end(), sortByPrio);
-
-          vector<cMove> newmoves;
-
-          /*uint8_t src_x, src_y, dst_x, dst_y;
-          cBoard::coord_to_indices(src_x, src_y, "h1");
-          cBoard::coord_to_indices(dst_x, dst_y, "d1");
-          cMove move(src_x, src_y, dst_x, dst_y, mWRK, mBLK, mBLK, cMove::P_BOTTOM);
-          moves.clear();
-          moves.push_back(move);*/
-
-          start_alphabeta_threads(newscore, newmoves, moves, depth, maxdepth, alpha, beta, 2);
-
-          rscore = newscore;
-
-          for(cMove &nmove : newmoves){
-
-              rmoves.push_back(nmove);
-
-          }
-
-          return;
-      }
-
-      cGenerator2 gen2(*this);
-
-      while(true){
-
-          cMove *moveptr = gen2.gen_move();
-
-          if(moveptr == nullptr){
-              if(count == 0){
-                  rscore = score_terminate(depth);
-
-                  return;
-              }
-              else{
-                  //rscore = m_score;
-
-                  return;
-              }
-          }
-
-          cDaemon daemon(*this);
-
-          count++;
-
-          if(depth == 1){
-              cout << moveptr->format(true) << endl;
-          }
-
-          vector<cMove> newmoves;
-          
-          bool dosearch = true;
-
-          bool mate = false;
-          
-          if(is_three_times_repetition(*moveptr, depth)){ 
-              newscore = 0;
-
-              newmoves.clear();
-
-              dosearch = false;
-          }
-          /*else if(cEvaluator::does_move_do_check(*this, *moveptr)){
-              // search for forced mate              
-              if(cEvaluator::find_mate(*this, *moveptr, 3)){
-                  dosearch = false;
-
-                  mate = true;
-
-                  newmoves.clear();
-
-                  if(maximizing){
-                      newscore = (SCORES[mBKG] + depth);
-                  }
-                  else{
-                      newscore = (SCORES[mWKG] - depth);
-                  }
-              }
-          }*/
-
-          if(mate == false && daemon.is_continue(*this, *moveptr, depth) == false){
-              newscore = m_score; // !!! + score_move and/or + score_board
-
-              newmoves.clear();
-
-              dosearch = false;
-          }
-
-          if(dosearch){
-              do_move(cMove(*moveptr));
-
-              calc_alphabeta2(newscore, newmoves, depth + 1, maxdepth, alpha, beta);
-
-              undo_move();
-          }
-
-          if(maximizing){
-              if(newscore > rscore){
-                  rscore = newscore;
-
-                  append_newmove2(rmoves, newmoves, moveptr);
-
-                  if(depth == 1){
-                      cout << "---------CANDIDATE APPROVED----------------\n" << endl;
-                      cout << "score: " << newscore << " ";
-                      cout << "[" << moveptr->format(true) << "]";
-                      cout << cMatch::format_moves(newmoves, true) << endl;
-                      cout << "\n" << endl;
-                      cout << "-------------------------------------------\n" << endl;
-                  }
-              }
-
-              alpha = max(rscore, alpha);
-              if(alpha >= beta){
-                  delete moveptr;
-
-                  return;
-              }
-          }
-          else{
-              if(newscore < rscore){
-                  rscore = newscore;
-
-                  append_newmove2(rmoves, newmoves, moveptr);
-
-                  if(depth == 1){
-                      cout << "---------CANDIDATE APPROVED----------------\n" << endl;
-                      cout << "score: " << newscore << " ";
-                      cout << "[" << moveptr->format(true) << "]";
-                      cout << cMatch::format_moves(newmoves, true) << endl;
-                      cout << "\n" << endl;
-                      cout << "-------------------------------------------\n" << endl;
-                  }
-              }
-              beta = min(rscore, beta);
-              if(beta <= alpha){
-                  delete moveptr;
-
-                  return;
-              }
-          }
-          
-          if(count > 200){
-              cout << "BUG" << endl;
-          }
-
-          delete moveptr;
-
-      }
-
-  }
-//****************************************************************************
-
-
-
-//****************************************************************************
+  //****************************************************************************
   void cMatch::calc_alphabeta(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta){
 
       int32_t newscore;
@@ -720,7 +532,7 @@
       else if(moves.size() == 1 && depth == 1){
           cMove move = moves.back();
 
-          rscore = m_score; // + cEvaluator::score_board(*this, depth, stage);
+          rscore = m_score + cEvaluator::score_board(*this, depth);
 
           rmoves.push_back(move);
 
@@ -764,15 +576,6 @@
               cout << "started for: " << to_string(count + 1) << "(" << to_string(moves.size()) << ") " << move.format(true) << endl;
           }
 
-          // start - only for performance research
-          /*if(depth >= 14 && depth <= 16){
-              cout << ".";
-          }
-          if(depth >= 17){
-              cout << "#";
-          }*/
-          // end - only for performance research
-
           count++;
 
           vector<cMove> newmoves;
@@ -782,6 +585,7 @@
           bool mate = false;
 
           if(is_three_times_repetition(move, depth)){ 
+              // draw
               newscore = 0;
 
               newmoves.clear();
@@ -789,13 +593,13 @@
               dosearch = false;
           }
           else if(mate == false && daemon.is_continue(*this, move, depth) == false){
-              newscore = m_score; // !!! + score_move and/or + score_board
+              newscore = m_score + cEvaluator::score_board(*this, depth);
 
               newmoves.clear();
 
               dosearch = false;
           }
-          /*else if(cEvaluator::does_move_do_check(*this, move)){
+          /*else if(depth > 3 && cEvaluator::does_move_do_check(*this, move)){
               // search for forced mate              
               if(cEvaluator::find_mate(*this, move, 3)){
                   dosearch = false;
@@ -870,11 +674,196 @@
       moves.clear();
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
+  void cMatch::calc_alphabeta2(int32_t &rscore, vector<cMove> &rmoves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta){
+
+      int32_t newscore;
+
+      u_int8_t count = 0;
+
+      bool maximizing = (next_color() == mWHITE);
+
+      if(maximizing){
+          rscore = SCORES[mWKG] * 10;
+      }
+      else{
+          rscore = SCORES[mBKG] * 10;
+      }
+
+      if(depth == 1){
+          vector<cMove> moves;
+
+          cGenerator gen(*this);
+          gen.gen_moves(moves, next_color());
+          
+          if(moves.size() == 0){
+              rscore = score_terminate(depth);
+
+              return;
+          }
+          else if(moves.size() == 1 && depth == 1){
+              cMove move = moves.back();
+
+              rscore = m_score + cEvaluator::score_board(*this, depth);
+
+              rmoves.push_back(move);
+
+              return;
+          }
+
+          sort(moves.begin(), moves.end(), sortByPrio);
+
+          vector<cMove> newmoves;
+
+          start_alphabeta_threads(newscore, newmoves, moves, depth, maxdepth, alpha, beta, 2);
+
+          rscore = newscore;
+
+          for(cMove &nmove : newmoves){
+
+              rmoves.push_back(nmove);
+
+          }
+
+          return;
+      }
+
+      cGenerator2 gen2(*this);
+
+      while(true){
+
+          cMove *moveptr = gen2.gen_move();
+
+          if(moveptr == nullptr){
+              if(count == 0){
+                  rscore = score_terminate(depth);
+
+                  return;
+              }
+              else{
+                  //rscore = m_score;
+
+                  return;
+              }
+          }
+
+          cDaemon daemon(*this);
+
+          count++;
+
+          if(depth == 1){
+              cout << moveptr->format(true) << endl;
+          }
+
+          vector<cMove> newmoves;
+          
+          bool dosearch = true;
+
+          bool mate = false;
+          
+          if(is_three_times_repetition(*moveptr, depth)){ 
+              // draw
+              newscore = 0;
+
+              newmoves.clear();
+
+              dosearch = false;
+          }
+          /*else if(depth > 3 && cEvaluator::does_move_do_check(*this, *moveptr)){
+              // search for forced mate              
+              if(cEvaluator::find_mate(*this, *moveptr, 3)){
+                  dosearch = false;
+
+                  mate = true;
+
+                  newmoves.clear();
+
+                  if(maximizing){
+                      newscore = (SCORES[mBKG] + depth);
+                  }
+                  else{
+                      newscore = (SCORES[mWKG] - depth);
+                  }
+              }
+          }*/
+
+          if(mate == false && daemon.is_continue(*this, *moveptr, depth) == false){
+              newscore = m_score + cEvaluator::score_board(*this, depth);
+
+              newmoves.clear();
+
+              dosearch = false;
+          }
+
+          if(dosearch){
+              do_move(cMove(*moveptr));
+
+              calc_alphabeta2(newscore, newmoves, depth + 1, maxdepth, alpha, beta);
+
+              undo_move();
+          }
+
+          if(maximizing){
+              if(newscore > rscore){
+                  rscore = newscore;
+
+                  append_newmove2(rmoves, newmoves, moveptr);
+
+                  if(depth == 1){
+                      cout << "---------CANDIDATE APPROVED----------------\n" << endl;
+                      cout << "score: " << newscore << " ";
+                      cout << "[" << moveptr->format(true) << "]";
+                      cout << cMatch::format_moves(newmoves, true) << endl;
+                      cout << "\n" << endl;
+                      cout << "-------------------------------------------\n" << endl;
+                  }
+              }
+
+              alpha = max(rscore, alpha);
+              if(alpha >= beta){
+                  delete moveptr;
+
+                  return;
+              }
+          }
+          else{
+              if(newscore < rscore){
+                  rscore = newscore;
+
+                  append_newmove2(rmoves, newmoves, moveptr);
+
+                  if(depth == 1){
+                      cout << "---------CANDIDATE APPROVED----------------\n" << endl;
+                      cout << "score: " << newscore << " ";
+                      cout << "[" << moveptr->format(true) << "]";
+                      cout << cMatch::format_moves(newmoves, true) << endl;
+                      cout << "\n" << endl;
+                      cout << "-------------------------------------------\n" << endl;
+                  }
+              }
+
+              beta = min(rscore, beta);
+              if(beta <= alpha){
+                  delete moveptr;
+
+                  return;
+              }
+          }
+          
+          delete moveptr;
+
+      }
+
+  }
+  //****************************************************************************
+
+
+
+  //****************************************************************************
   uint8_t cMatch::eval_stage() const{
 
     // opening
@@ -889,11 +878,11 @@
     }
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   void cMatch::append_newmove(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove &move){
 
     rcandidates.clear();
@@ -907,8 +896,11 @@
     }
 
   }
+  //****************************************************************************
 
 
+
+  //****************************************************************************
   void cMatch::append_newmove2(vector<cMove> &rcandidates, const vector<cMove> &newcandidates, const cMove *moveptr){
 
     rcandidates.clear();
@@ -922,11 +914,11 @@
     }
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   bool cMatch::is_three_times_repetition(const cMove &move, uint8_t depth) const{
 
     cMatch match(*this);
@@ -953,11 +945,11 @@
     return equalcnt >= 2;
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   void cMatch::start_alphabeta_threads(int32_t &rscore, vector<cMove> &rmoves, vector<cMove> &moves, const uint8_t depth, const uint8_t maxdepth, int32_t alpha, int32_t beta, const uint8_t version){
 
       cThreading threading(this, moves, alpha, beta);
@@ -979,11 +971,11 @@
       moves.clear(); 
 
   } 
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   // 100 Züge davor kein Bauernzug und keine Figur geschlagen
   bool cMatch::is_fifty_moves_rule() const{
 
@@ -1029,11 +1021,11 @@
     return false;
 
   } 
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   int32_t cMatch::score_terminate(uint8_t depth) const{
 
     if(next_color() == mWHITE){
@@ -1050,24 +1042,24 @@
     return 0; // draw
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   bool cMatch::sortByPrio(const cMove &a, const cMove &b){
 
     return a.m_prio < b.m_prio;
 
   }
-//****************************************************************************
+  //****************************************************************************
 
 
 
-//****************************************************************************
+  //****************************************************************************
   bool cMatch::sortByRank(const cPiece &a, const cPiece &b){
 
     return (PIECES_RANKS[a.m_piece] < PIECES_RANKS[b.m_piece]);
 
   }
-//****************************************************************************
+  //****************************************************************************

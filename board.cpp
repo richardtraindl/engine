@@ -1,459 +1,510 @@
 
 
-    #include "./board.hpp"
     #include <unistd.h>
+    #include <sstream>
+    #include <iostream>
+    #include "./board.hpp"
 
 
-
-    //*****************************************
-    cBoard::cBoard(){ 
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    // copy constructor
-    cBoard::cBoard(const cBoard &board){
-
-        for(uint8_t y = 0; y < 8; ++y){
-
-            for(uint8_t x = 0; x < 8; ++x){
-
-                m_fields[y][x] = board.m_fields[y][x];
-
-            }
-
-        }
-
-        m_wKg_x = board.m_wKg_x;
-
-        m_wKg_y = board.m_wKg_y;
-
-        m_bKg_x = board.m_bKg_x;
-
-        m_bKg_y = board.m_bKg_y;
-
-        m_wKg_has_moved_at = board.m_wKg_has_moved_at;
-
-        m_bKg_has_moved_at = board.m_bKg_has_moved_at;
-
-        m_wRkA_has_moved_at = board.m_wRkA_has_moved_at;
-
-        m_wRkH_has_moved_at = board.m_wRkH_has_moved_at;
-
-        m_bRkA_has_moved_at = board.m_bRkA_has_moved_at;
-
-        m_bRkH_has_moved_at = board.m_bRkH_has_moved_at;
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    uint8_t cBoard::getfield(uint8_t x, uint8_t y) const{
-
-        return m_fields[y][x];
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    void cBoard::setfield(uint8_t x, uint8_t y, uint8_t value){
-
-        m_fields[y][x] = (uint8_t)value;
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    void cBoard::copy_fields(uint8_t fields[8][8]) const{
-
-        for(uint8_t y = 0; y < 8; ++y){
-
-            for(uint8_t x = 0; x < 8; ++x){
-
-                fields[y][x] = m_fields[y][x];
-
-            }
-
-        }
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    bool cBoard::compare_fields(uint8_t fields[8][8]) const{
-
-        for(uint8_t y = 0; y < 8; ++y){
-
-            for(uint8_t x = 0; x < 8; ++x){
-
-                if(m_fields[y][x] != fields[y][x]){
-                    return false;
-                }
-            }
-
-        }
-
-        return true;
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    bool cBoard::is_inbounds(const uint8_t x, const uint8_t y){
-
-        return (x >= 0 && x <= 7 && y >= 0 && y <= 7);
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    uint16_t cBoard::eval_dir(const uint8_t x1, const uint8_t y1, const uint8_t x2, const uint8_t y2){
-
-        if(y1 == y2){ 
-            if(x1 < x2){
-                return mEST_WST; 
-            }
-            else{
-                return mWST_EST;
-            }
-        }
-
-        if(x1 == x2){ 
-            if(y1 < y2){
-                return mSTH_NTH; 
-            }
-            else{
-                return mNTH_STH;
-            }
-        }
-
-        if(x1 - y1 == x2 - y2){ 
-            if(y1 < y2){
-                return mSTHWST_NTHEST; 
-            }
-            else{
-                return mNTHEST_STHWST;
-            }
-        }
-
-        if(x1 + y1 == x2 + y2){
-            if(y1 < y2){
-                return mSTHEST_NTHWST; 
-            }
-            else{
-                return mNTHWST_STHEST;
-            }
-        }
-
-        if( (abs(x1 + y1) == 2) && (abs(x2 + y2) == 1) ){ 
-            return mKNIGHT_DIR; 
-        }
-
-        if( (abs(x1 + y1) == 1) && (abs(x2 + y2) == 2) ){ 
-            return mKNIGHT_DIR; 
-        }
-
-        return mNO_DIR;
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    uint16_t cBoard::eval_cardinale(const uint8_t x1, const uint8_t y1, const uint8_t x2, const uint8_t y2){
-
-        if(y1 == y2){ 
-            return mHORIZONTAL;
-        }
-
-        if(x1 == x2){ 
-            return mVERTICAL;
-        }
-
-        if(x1 - y1 == x2 - y2){ 
-            return mDIA_LEFT_BOTTOM;
-        }
-
-        if(x1 + y1 == x2 + y2){
-            return mDIA_RIGHT_BOTTOM;
-        }
-
-        if( (abs(x1 + y1) == 2) && (abs(x2 + y2) == 1) ){ 
-            return mKNIGHT_DIR; 
-        }
-
-        if( (abs(x1 + y1) == 1) && (abs(x2 + y2) == 2) ){ 
-            return mKNIGHT_DIR; 
-        }
-
-        return mNO_DIR;
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    bool cBoard::eval_steps(int8_t &step_x, int8_t &step_y, const uint16_t dir){
-
-        if(dir == mEST_WST){
-            step_x = 1;
-            step_y = 0;
-            return true;
-        }
-        if(dir == mWST_EST){
-            step_x = -1;
-            step_y = 0;
-            return true;
-        }
-        else if(dir == mSTH_NTH){
-            step_x = 0;
-            step_y = 1;
-            return true;
-        }
-        else if(dir == mNTH_STH){
-            step_x = 0;
-            step_y = -1;
-            return true;
-        }
-        else if(dir ==  mSTHWST_NTHEST){
-            step_x = 1;
-            step_y = 1;
-            return true;
-        }
-        else if(dir ==  mNTHEST_STHWST){
-            step_x = -1;
-            step_y = -1;
-            return true;
-        }
-        else if(dir == mSTHEST_NTHWST){
-            step_x = -1;
-            step_y = 1;
-            return true;
-        }
-        else if(dir == mNTHWST_STHEST){
-            step_x = 1;
-            step_y = -1;
-            return true;
-        }
-        else{
-            return false;
-        }
-
-    }
-    //*****************************************
-
-
-
-   //*****************************************
-    uint16_t cBoard::eval_pindir(const uint8_t src_x, const uint8_t src_y) const{
-
-        uint8_t piece = getfield(src_x, src_y);
-
-        if(piece == mBLK){
-            return mNO_DIR;
-        }
-
-        uint16_t cardinale;
-
-        if(PIECES_COLORS[piece] == mWHITE){
-            cardinale = eval_cardinale(src_x, src_y, m_wKg_x, m_wKg_y);
-        }
-        else{
-            cardinale = eval_cardinale(src_x, src_y, m_bKg_x, m_bKg_y);
-        }
-
-        if(cardinale == mNO_DIR || cardinale == mKNIGHT_DIR){ 
-            return mNO_DIR;
-        }
-
-        vector <cPiece> targets;
-
-        search_cardinale(targets, src_x, src_y, cardinale);
-
-        if(targets.size() != 2){
-            return mNO_DIR;
-        }
-
-        // create dummy pieces - is a hack but what else? pointers???
-        cPiece king(mBLK, 0, 0);
-        cPiece enemy(mBLK, 0, 0);
-
-        if(PIECES_COLORS[targets.at(0).m_piece] == PIECES_COLORS[piece]){
-            king = targets.at(0);
-            enemy = targets.at(1);
-        }
-        else{
-            king = targets.at(1);
-            enemy = targets.at(0);
-        }
-
-        if(PIECES_COLORS[king.m_piece] == PIECES_COLORS[enemy.m_piece]){
-            return mNO_DIR;
-        }
-
-        if(PIECES_COLORS[piece] == mWHITE){
-            if(! (king.m_xpos == m_wKg_x && king.m_ypos == m_wKg_y)){
-                return mNO_DIR;
-            }
-        }
-        else{
-            if(! (king.m_xpos == m_bKg_x && king.m_ypos == m_bKg_y)){
-                return mNO_DIR;
-            }
-        }
-
-        if(enemy.m_piece == mWQU || enemy.m_piece == mBQU){
-            return cardinale;
-        }
-
-        if((cardinale == mHORIZONTAL || cardinale == mVERTICAL) && 
-           (enemy.m_piece == mWRK || enemy.m_piece == mBRK)){
-            return cardinale;
-        }
-
-        if((cardinale == mDIA_LEFT_BOTTOM || cardinale == mDIA_RIGHT_BOTTOM) && (enemy.m_piece == mWBP || enemy.m_piece == mBBP)){
-            return cardinale;
-        }
-
-        return mNO_DIR;
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    bool cBoard::get_soft_pinned(vector<cPiece> &targets, const uint8_t src_x, const uint8_t src_y) const{
-
-        uint8_t piece = getfield(src_x, src_y);
-
-        if(piece == mBLK){
-            return false;
-        }
-
-        for(uint8_t i = 0; i < size(cPiece::qu_steps); i += 2){
-
-            targets.clear();
-            search_cardinale(targets, src_x, src_y, cPiece::qu_steps[i].m_cardinale);
-
-            if(targets.size() != 2){
-                continue;
-            }
-
-            cPiece *frdbehindptr, *attackerptr;
-
-            if(PIECES_COLORS[targets.front().m_piece] == PIECES_COLORS[piece]){
-                frdbehindptr = &(targets.front());
-                attackerptr = &(targets.back());
-            }
-            else{
-                frdbehindptr = &(targets.back());
-                attackerptr = &(targets.front());
-            }
-
-            // friend and attacker can't have same color
-            if(PIECES_COLORS[frdbehindptr->m_piece] == PIECES_COLORS[attackerptr->m_piece]){
-                continue;
-            }
-
-            // check, if friend is supported
-            bool is_frdbehind_supported = is_field_touched(frdbehindptr->m_xpos, frdbehindptr->m_ypos, PIECES_COLORS[frdbehindptr->m_piece]);
-
-            // PIECES_RANKS[frdbehindptr->m_piece] > PIECES_RANKS[piece] ||
-            if(PIECES_RANKS[frdbehindptr->m_piece] > PIECES_RANKS[attackerptr->m_piece] || is_frdbehind_supported == false){
-
-                if(attackerptr->m_piece == mWQU || attackerptr->m_piece == mBQU){
-                    return true;
-                }
-                else if(cPiece::qu_steps[i].m_cardinale == mVERTICAL || cPiece::qu_steps[i].m_cardinale == mHORIZONTAL){
-                    if(attackerptr->m_piece == mWRK || attackerptr->m_piece == mBRK){
-                        return true;
-                    }
-                }
-                else if(cPiece::qu_steps[i].m_cardinale == mDIA_LEFT_BOTTOM || cPiece::qu_steps[i].m_cardinale == mDIA_RIGHT_BOTTOM){
-                    if(attackerptr->m_piece == mWBP || attackerptr->m_piece == mBBP){
-                        return true;
-                    }
-                }
-            }
-
-        }
-
-        targets.clear();
-        return false;
-
-    }
-    //*****************************************
-
-
-
-    //*****************************************
-    bool cBoard::is_soft_pinned(const uint8_t src_x, const uint8_t src_y) const{
-
-        vector<cPiece> targets;
-        return get_soft_pinned(targets, src_x, src_y);
-
-    }
+  //*****************************************
+  cBoard::cBoard(){ 
+  }
   //*****************************************
 
 
 
-   //*****************************************
-    bool cBoard::is_piece_behind_soft_pinned(const uint8_t src_x, const uint8_t src_y) const{
+  //*****************************************
+  // copy constructor
+  cBoard::cBoard(const cBoard &board){
 
-        uint8_t behind_piece = getfield(src_x, src_y);
+      for(uint8_t y = 0; y < 8; ++y){
 
-        if(behind_piece == mBLK){
-            return false;
-        }
+          for(uint8_t x = 0; x < 8; ++x){
 
-        for(uint8_t i = 0; i < size(cPiece::qu_steps); ++i){
-          
-            uint8_t dst_x, dst_y;
+              m_fields[y][x] = board.m_fields[y][x];
 
-            uint8_t piece = search_dir(dst_x, dst_y, src_x, src_y, cPiece::qu_steps[i].m_xstep, cPiece::qu_steps[i].m_ystep, 6);
+          }
 
-            if(piece == mBLK || PIECES_COLORS[piece] != PIECES_COLORS[behind_piece] || PIECES_RANKS[piece] > PIECES_RANKS[behind_piece]){
-                continue;
-            }
+      }
 
-            uint8_t enemy = search_dir(dst_x, dst_y, dst_x, dst_y, cPiece::qu_steps[i].m_xstep, cPiece::qu_steps[i].m_ystep, 6);
+      m_wKg_x = board.m_wKg_x;
 
-            if(enemy == mBLK || PIECES_COLORS[enemy] == PIECES_COLORS[behind_piece]){
-                continue;
-            }
+      m_wKg_y = board.m_wKg_y;
 
-            if(enemy == mWQU || enemy == mBQU){
-                return true;
-            }
-            else if((enemy == mWRK || enemy == mBRK) && (cPiece::qu_steps[i].m_cardinale == mHORIZONTAL || cPiece::qu_steps[i].m_cardinale == mVERTICAL)){
-                return true;
-            }
-            else if((enemy == mWBP || enemy == mBBP) && (cPiece::qu_steps[i].m_cardinale == mDIA_LEFT_BOTTOM || cPiece::qu_steps[i].m_cardinale == mDIA_RIGHT_BOTTOM)){
-                return true;
-            }
+      m_bKg_x = board.m_bKg_x;
 
-        }
+      m_bKg_y = board.m_bKg_y;
 
-        return false;
+      m_wKg_has_moved_at = board.m_wKg_has_moved_at;
 
-    }
+      m_bKg_has_moved_at = board.m_bKg_has_moved_at;
+
+      m_wRkA_has_moved_at = board.m_wRkA_has_moved_at;
+
+      m_wRkH_has_moved_at = board.m_wRkH_has_moved_at;
+
+      m_bRkA_has_moved_at = board.m_bRkA_has_moved_at;
+
+      m_bRkH_has_moved_at = board.m_bRkH_has_moved_at;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  uint8_t cBoard::getfield(uint8_t x, uint8_t y) const{
+
+      return m_fields[y][x];
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  void cBoard::setfield(uint8_t x, uint8_t y, uint8_t value){
+
+      m_fields[y][x] = (uint8_t)value;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  void cBoard::copy_fields(uint8_t fields[8][8]) const{
+
+      for(uint8_t y = 0; y < 8; ++y){
+
+          for(uint8_t x = 0; x < 8; ++x){
+
+              fields[y][x] = m_fields[y][x];
+
+          }
+
+      }
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cBoard::compare_fields(uint8_t fields[8][8]) const{
+
+      for(uint8_t y = 0; y < 8; ++y){
+
+          for(uint8_t x = 0; x < 8; ++x){
+
+              if(m_fields[y][x] != fields[y][x]){
+                  return false;
+              }
+          }
+
+      }
+
+      return true;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cBoard::is_inbounds(const uint8_t x, const uint8_t y){
+
+      return (x >= 0 && x <= 7 && y >= 0 && y <= 7);
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  void cBoard::do_move_on_board_only(const cMove &move){
+
+      if(move.is_promotion()){
+          setfield(move.m_src_x, move.m_src_y, mBLK);
+          setfield(move.m_dst_x, move.m_dst_y, move.m_prompiece);
+      }
+      else{
+          setfield(move.m_src_x, move.m_src_y, mBLK);
+          setfield(move.m_dst_x, move.m_dst_y, move.m_srcpiece);
+
+          if(move.m_srcpiece == mWKG || move.m_srcpiece == mBKG){
+              if(move.m_srcpiece == mWKG){
+                  m_wKg_x = move.m_dst_x;
+                  m_wKg_y = move.m_dst_y;
+
+                  if(m_wKg_has_moved_at == 0){
+                      m_wKg_has_moved_at = 1; // Fake number due...
+                  }
+              }
+              else{
+                  m_bKg_x = move.m_dst_x;
+                  m_bKg_y = move.m_dst_y;
+                  
+                  if(m_bKg_has_moved_at == 0){
+                      m_bKg_has_moved_at = 1; // Fake number due...
+                  }
+              }
+
+              if(move.is_short_castling()){
+                  uint8_t rook = getfield(7, move.m_dst_y); // h == 7
+                  setfield(7, move.m_dst_y, mBLK);
+                  setfield(5, move.m_dst_y, rook); // f == 5
+              }
+              else if(move.is_long_castling()){
+                  uint8_t rook = getfield(0, move.m_dst_y); // a == 0
+                  setfield(0, move.m_dst_y, mBLK);
+                  setfield(3, move.m_dst_y, rook); // c == 3
+              }
+          }
+          else if(move.is_en_passant()){
+              setfield(move.m_dst_x, move.m_src_y, mBLK);
+          }
+      }
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  uint16_t cBoard::eval_dir(const uint8_t x1, const uint8_t y1, const uint8_t x2, const uint8_t y2){
+
+      if(y1 == y2){ 
+          if(x1 < x2){
+              return mEST_WST; 
+          }
+          else{
+              return mWST_EST;
+          }
+      }
+
+      if(x1 == x2){ 
+          if(y1 < y2){
+              return mSTH_NTH; 
+          }
+          else{
+              return mNTH_STH;
+          }
+      }
+
+      if(x1 - y1 == x2 - y2){ 
+          if(y1 < y2){
+              return mSTHWST_NTHEST; 
+          }
+          else{
+              return mNTHEST_STHWST;
+          }
+      }
+
+      if(x1 + y1 == x2 + y2){
+          if(y1 < y2){
+              return mSTHEST_NTHWST; 
+          }
+          else{
+              return mNTHWST_STHEST;
+          }
+      }
+
+      if( (abs(x1 + y1) == 2) && (abs(x2 + y2) == 1) ){ 
+          return mKNIGHT_DIR; 
+      }
+
+      if( (abs(x1 + y1) == 1) && (abs(x2 + y2) == 2) ){ 
+          return mKNIGHT_DIR; 
+      }
+
+      return mNO_DIR;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  uint16_t cBoard::eval_cardinale(const uint8_t x1, const uint8_t y1, const uint8_t x2, const uint8_t y2){
+
+      if(y1 == y2){ 
+          return mHORIZONTAL;
+      }
+
+      if(x1 == x2){ 
+          return mVERTICAL;
+      }
+
+      if(x1 - y1 == x2 - y2){ 
+          return mDIA_LEFT_BOTTOM;
+      }
+
+      if(x1 + y1 == x2 + y2){
+          return mDIA_RIGHT_BOTTOM;
+      }
+
+      if( (abs(x1 + y1) == 2) && (abs(x2 + y2) == 1) ){ 
+          return mKNIGHT_DIR; 
+      }
+
+      if( (abs(x1 + y1) == 1) && (abs(x2 + y2) == 2) ){ 
+          return mKNIGHT_DIR; 
+      }
+
+      return mNO_DIR;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cBoard::eval_steps(int8_t &step_x, int8_t &step_y, const uint16_t dir){
+
+      if(dir == mEST_WST){
+          step_x = 1;
+          step_y = 0;
+          return true;
+      }
+      if(dir == mWST_EST){
+          step_x = -1;
+          step_y = 0;
+          return true;
+      }
+      else if(dir == mSTH_NTH){
+          step_x = 0;
+          step_y = 1;
+          return true;
+      }
+      else if(dir == mNTH_STH){
+          step_x = 0;
+          step_y = -1;
+          return true;
+      }
+      else if(dir ==  mSTHWST_NTHEST){
+          step_x = 1;
+          step_y = 1;
+          return true;
+      }
+      else if(dir ==  mNTHEST_STHWST){
+          step_x = -1;
+          step_y = -1;
+          return true;
+      }
+      else if(dir == mSTHEST_NTHWST){
+          step_x = -1;
+          step_y = 1;
+          return true;
+      }
+      else if(dir == mNTHWST_STHEST){
+          step_x = 1;
+          step_y = -1;
+          return true;
+      }
+      else{
+          return false;
+      }
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  uint16_t cBoard::eval_pindir(const uint8_t src_x, const uint8_t src_y) const{
+
+      uint8_t piece = getfield(src_x, src_y);
+
+      if(piece == mBLK){
+          return mNO_DIR;
+      }
+
+      uint16_t cardinale;
+
+      if(PIECES_COLORS[piece] == mWHITE){
+          cardinale = eval_cardinale(src_x, src_y, m_wKg_x, m_wKg_y);
+      }
+      else{
+          cardinale = eval_cardinale(src_x, src_y, m_bKg_x, m_bKg_y);
+      }
+
+      if(cardinale == mNO_DIR || cardinale == mKNIGHT_DIR){ 
+          return mNO_DIR;
+      }
+
+      vector <cPiece> targets;
+
+      search_cardinale(targets, src_x, src_y, cardinale);
+
+      if(targets.size() != 2){
+          return mNO_DIR;
+      }
+
+      // create dummy pieces - is a hack but what else? pointers???
+      cPiece king(mBLK, 0, 0);
+      cPiece enemy(mBLK, 0, 0);
+
+      if(PIECES_COLORS[targets.at(0).m_piece] == PIECES_COLORS[piece]){
+          king = targets.at(0);
+          enemy = targets.at(1);
+      }
+      else{
+          king = targets.at(1);
+          enemy = targets.at(0);
+      }
+
+      if(PIECES_COLORS[king.m_piece] == PIECES_COLORS[enemy.m_piece]){
+          return mNO_DIR;
+      }
+
+      if(PIECES_COLORS[piece] == mWHITE){
+          if(! (king.m_xpos == m_wKg_x && king.m_ypos == m_wKg_y)){
+              return mNO_DIR;
+          }
+      }
+      else{
+          if(! (king.m_xpos == m_bKg_x && king.m_ypos == m_bKg_y)){
+              return mNO_DIR;
+          }
+      }
+
+      if(enemy.m_piece == mWQU || enemy.m_piece == mBQU){
+          return cardinale;
+      }
+
+      if((cardinale == mHORIZONTAL || cardinale == mVERTICAL) && 
+         (enemy.m_piece == mWRK || enemy.m_piece == mBRK)){
+          return cardinale;
+      }
+
+      if((cardinale == mDIA_LEFT_BOTTOM || cardinale == mDIA_RIGHT_BOTTOM) && (enemy.m_piece == mWBP || enemy.m_piece == mBBP)){
+          return cardinale;
+      }
+
+      return mNO_DIR;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cBoard::get_soft_pinned(vector<cPiece> &targets, const uint8_t src_x, const uint8_t src_y) const{
+
+      uint8_t piece = getfield(src_x, src_y);
+
+      if(piece == mBLK){
+          return false;
+      }
+
+      for(uint8_t i = 0; i < size(cPiece::qu_steps); i += 2){
+
+          targets.clear();
+          search_cardinale(targets, src_x, src_y, cPiece::qu_steps[i].m_cardinale);
+
+          if(targets.size() != 2){
+              continue;
+          }
+
+          cPiece *frdbehindptr, *attackerptr;
+
+          if(PIECES_COLORS[targets.front().m_piece] == PIECES_COLORS[piece]){
+              frdbehindptr = &(targets.front());
+              attackerptr = &(targets.back());
+          }
+          else{
+              frdbehindptr = &(targets.back());
+              attackerptr = &(targets.front());
+          }
+
+          // friend and attacker can't have same color
+          if(PIECES_COLORS[frdbehindptr->m_piece] == PIECES_COLORS[attackerptr->m_piece]){
+              continue;
+          }
+
+          // check, if friend is supported
+          bool is_frdbehind_supported = is_field_touched(frdbehindptr->m_xpos, frdbehindptr->m_ypos, PIECES_COLORS[frdbehindptr->m_piece]);
+
+          // PIECES_RANKS[frdbehindptr->m_piece] > PIECES_RANKS[piece] ||
+          if(PIECES_RANKS[frdbehindptr->m_piece] > PIECES_RANKS[attackerptr->m_piece] || is_frdbehind_supported == false){
+
+              if(attackerptr->m_piece == mWQU || attackerptr->m_piece == mBQU){
+                  return true;
+              }
+              else if(cPiece::qu_steps[i].m_cardinale == mVERTICAL || cPiece::qu_steps[i].m_cardinale == mHORIZONTAL){
+                  if(attackerptr->m_piece == mWRK || attackerptr->m_piece == mBRK){
+                      return true;
+                  }
+              }
+              else if(cPiece::qu_steps[i].m_cardinale == mDIA_LEFT_BOTTOM || cPiece::qu_steps[i].m_cardinale == mDIA_RIGHT_BOTTOM){
+                  if(attackerptr->m_piece == mWBP || attackerptr->m_piece == mBBP){
+                      return true;
+                  }
+              }
+          }
+
+      }
+
+      targets.clear();
+      return false;
+
+  }
+  //*****************************************
+
+
+
+  //*****************************************
+  bool cBoard::is_soft_pinned(const uint8_t src_x, const uint8_t src_y) const{
+
+      vector<cPiece> targets;
+      return get_soft_pinned(targets, src_x, src_y);
+
+  }
+//*****************************************
+
+
+
+ //*****************************************
+  bool cBoard::is_piece_behind_soft_pinned(const uint8_t src_x, const uint8_t src_y) const{
+
+      uint8_t behind_piece = getfield(src_x, src_y);
+
+      if(behind_piece == mBLK){
+          return false;
+      }
+
+      for(uint8_t i = 0; i < size(cPiece::qu_steps); ++i){
+        
+          uint8_t dst_x, dst_y;
+
+          uint8_t piece = search_dir(dst_x, dst_y, src_x, src_y, cPiece::qu_steps[i].m_xstep, cPiece::qu_steps[i].m_ystep, 6);
+
+          if(piece == mBLK || PIECES_COLORS[piece] != PIECES_COLORS[behind_piece] || PIECES_RANKS[piece] > PIECES_RANKS[behind_piece]){
+              continue;
+          }
+
+          uint8_t enemy = search_dir(dst_x, dst_y, dst_x, dst_y, cPiece::qu_steps[i].m_xstep, cPiece::qu_steps[i].m_ystep, 6);
+
+          if(enemy == mBLK || PIECES_COLORS[enemy] == PIECES_COLORS[behind_piece]){
+              continue;
+          }
+
+          if(enemy == mWQU || enemy == mBQU){
+              return true;
+          }
+          else if((enemy == mWRK || enemy == mBRK) && (cPiece::qu_steps[i].m_cardinale == mHORIZONTAL || cPiece::qu_steps[i].m_cardinale == mVERTICAL)){
+              return true;
+          }
+          else if((enemy == mWBP || enemy == mBBP) && (cPiece::qu_steps[i].m_cardinale == mDIA_LEFT_BOTTOM || cPiece::qu_steps[i].m_cardinale == mDIA_RIGHT_BOTTOM)){
+              return true;
+          }
+
+      }
+
+      return false;
+
+  }
   //*****************************************
 
 
@@ -764,28 +815,28 @@
             }
 
             return true;
-        }
-        else if(piece == mBPW){
-            for(uint8_t y = (src_y - 1); y >= 0; --y){
+      }
+      else if(piece == mBPW){
+          for(uint8_t y = (src_y - 1); y >= 0; --y){
 
-                for(int8_t i = -1; i <= 1; ++i){
+              for(int8_t i = -1; i <= 1; ++i){
 
-                    if(is_inbounds((src_x + i), y)){
-                        if(getfield((src_x + i), y) == mWPW){
-                            return false;
-                        }
-                    }
+                  if(is_inbounds((src_x + i), y)){
+                      if(getfield((src_x + i), y) == mWPW){
+                          return false;
+                      }
+                  }
 
-                }
+              }
 
-            }
+          }
 
-            return true;
-        }
+          return true;
+      }
 
-        return false;
+      return false;
 
-    }
+  }
   //*****************************************
 
 
@@ -839,56 +890,6 @@
 
           cout << endl;
 
-      }
-
-  }
-  //*****************************************
-
-
-
-  //*****************************************
-  void cBoard::do_move_on_board_only(const cMove &move){
-
-      if(move.is_promotion()){
-          setfield(move.m_src_x, move.m_src_y, mBLK);
-          setfield(move.m_dst_x, move.m_dst_y, move.m_prompiece);
-      }
-      else{
-          setfield(move.m_src_x, move.m_src_y, mBLK);
-          setfield(move.m_dst_x, move.m_dst_y, move.m_srcpiece);
-
-          if(move.m_srcpiece == mWKG || move.m_srcpiece == mBKG){
-              if(move.m_srcpiece == mWKG){
-                  m_wKg_x = move.m_dst_x;
-                  m_wKg_y = move.m_dst_y;
-
-                  if(m_wKg_has_moved_at == 0){
-                      m_wKg_has_moved_at = 1; // Fake number due...
-                  }
-              }
-              else{
-                  m_bKg_x = move.m_dst_x;
-                  m_bKg_y = move.m_dst_y;
-                  
-                  if(m_bKg_has_moved_at == 0){
-                      m_bKg_has_moved_at = 1; // Fake number due...
-                  }
-              }
-
-              if(move.is_short_castling()){
-                  uint8_t rook = getfield(7, move.m_dst_y); // h == 7
-                  setfield(7, move.m_dst_y, mBLK);
-                  setfield(5, move.m_dst_y, rook); // f == 5
-              }
-              else if(move.is_long_castling()){
-                  uint8_t rook = getfield(0, move.m_dst_y); // a == 0
-                  setfield(0, move.m_dst_y, mBLK);
-                  setfield(3, move.m_dst_y, rook); // c == 3
-              }
-          }
-          else if(move.is_en_passant()){
-              setfield(move.m_dst_x, move.m_src_y, mBLK);
-          }
       }
 
   }
